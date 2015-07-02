@@ -109,7 +109,7 @@ function PLUGIN.action(msg)
 	end
 
 	local message = PLUGIN.getSlap(slapper, victim)
-	send_message(target, message)
+	send_message(msg, message)
 
 end
 
