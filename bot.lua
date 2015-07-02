@@ -3,7 +3,7 @@
 
 HTTP = require('socket.http')
 HTTPS = require('ssl.https')
-JSON = require('dkjson')
+JSON = require('cjson')
 URL = require('socket.url')
 
 VERSION = 2.01
@@ -89,7 +89,7 @@ while is_started == true do
 		end
 	end
 
-	for k,v in pairs(reminders) do
+	for i,v in pairs(reminders) do
 		if os.time() > v.alarm then
 			send_message(v.chat_id, 'Reminder: '..v.text)
 			table.remove(reminders, i)
