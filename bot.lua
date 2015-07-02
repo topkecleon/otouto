@@ -3,7 +3,7 @@
 
 HTTP = require('socket.http')
 HTTPS = require('ssl.https')
-JSON = require('dkjson')
+JSON = require('cjson')
 URL = require('socket.url')
 
 VERSION = 2.01
