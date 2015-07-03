@@ -28,7 +28,10 @@ function PLUGIN.action(msg)
 		arg1 = string.upper(string.sub(msg.text, 6, 8))
 	end
 	if string.len(msg.text) > 9 then
-		arg2 = tonumber(string.sub(msg.text, 10))
+		arg2 = string.sub(msg.text, 10)
+		if not tonumber(arg2) then
+			return send_msg(msg, 'Invalid argument.')
+		end
 	end
 
 	for k,v in pairs(jdat) do

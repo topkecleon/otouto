@@ -32,7 +32,7 @@ function PLUGIN.action(msg)
 
 	local celsius = jdat.main.temp - 273.15
 	local fahrenheit = tonumber(string.format("%.2f", celsius * (9/5) + 32))
-	local message = jdat.name .. ': ' .. celsius .. '°C / ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.'
+	local message = jdat.name .. ': ' .. celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.'
 
 	send_msg(msg, message)
 
