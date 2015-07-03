@@ -38,14 +38,14 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		send_msg(target, 'Connection error.', ok_cb, false)
+		send_msg(msg, 'Connection error.')
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		send_msg(target, 'No results found.', ok_cb, false)
+		send_msg(msg, 'No results found.')
 		return
 	end
 
