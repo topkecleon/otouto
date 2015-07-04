@@ -108,7 +108,7 @@ function PLUGIN.action(msg)
 		slapper = bot.username
 	end
 
-	local message = latcyr(PLUGIN.getSlap(slapper, victim))
+	local message = PLUGIN.getSlap(slapper, victim)
 	send_message(msg.chat.id, latcyr(message))
 
 end

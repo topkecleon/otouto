@@ -57,7 +57,7 @@ function bot_init()
 	print('Done! Plugins loaded: ' .. #plugins .. '\n')
 	print('Generating help message...')
 
-	help_message = 'Available commands:\n'
+	help_message = ''
 	for i,v in ipairs(plugins) do
 		if v.doc then
 			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
@@ -65,11 +65,6 @@ function bot_init()
 			help_message = help_message .. ' - ' .. a .. '\n'
 		end
 	end
-	help_message = help_message .. [[
-		*Arguments: <required> [optional]
-		Use "!help <command>" for specific information.
-		otouto v]] .. VERSION .. [[ by @topkecleon.
-	]]
 
 	print('Help message generated!\n')
 

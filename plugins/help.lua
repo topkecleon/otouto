@@ -25,13 +25,19 @@ function PLUGIN.action(msg)
 		end
 	end
 
+	local message = 'Available commands:\n' .. help_message .. [[
+		*Arguments: <required> [optional]
+		Use "!help <command>" for specific information.
+		otouto v]] .. VERSION .. [[ by @topkecleon.
+	]]
+
 	if msg.from.id ~= msg.chat.id then
-		if not send_message(msg.from.id, help_message, true, msg.message_id) then
-			return send_msg(msg, help_message) -- Unable to PM user who hasn't PM'd first.
+		if not send_message(msg.from.id, message, true, msg.message_id) then
+			return send_msg(msg, message) -- Unable to PM user who hasn't PM'd first.
 		end
 		return send_msg(msg, 'I have sent you the requested information in a private message.')
 	else
-		return send_msg(msg, help_message)
+		return send_msg(msg, message)
 	end
 
 end
