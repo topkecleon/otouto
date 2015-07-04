@@ -10,7 +10,7 @@ VERSION = 2.01
 
 function on_msg_receive(msg)
 
-	if msg.date < os.time() -5 then return end -- don't react to old messages
+	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
 	if msg.forward_from then return end -- don't react to forwarded messages
 
