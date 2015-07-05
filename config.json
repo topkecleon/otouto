@@ -11,6 +11,7 @@
   "bible.lua",
   "btc.lua",
   "calc.lua",
+  "chatter.lua",
   "commit.lua",
   "dice.lua",
   "dogify.lua",
