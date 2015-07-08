@@ -12,7 +12,7 @@ PLUGIN.triggers = {
 
 function PLUGIN.action(msg)
 
-	if string.find(msg.text, '@') and not string.match('help@'..bot.username) then return end
+	if string.find(msg.text, '@') and not string.match(msg.text, 'help@'..bot.username) then return end
 
 	local input = get_input(msg.text)
 
