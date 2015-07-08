@@ -1,14 +1,18 @@
 # otouto
 
-The plugin-wielding, multi-purpose Telgram chat bot.
+The plugin-wielding, multi-purpose Telegram chat bot.
 
 Public bot runs on [@mokubot](http://telegram.me/mokubot).
 
-Requires lua-socket, lua-sec, and cjson or dkjson.
+Requires lua-socket and lua-sec. [dkjson](https://github.com/LuaDist/dkjson/) is provided.
+
+`lua bot.lua`
 
 ###Configuration
 
 Most config.json entries are self-explanatory.
+
+Giphy key provided is the public test key, and is subject to rate limitation.
 
 TIME_OFFSET is the time difference, in seconds, between your system clock. It is often necessary for accurate output of the time plugin.
 
