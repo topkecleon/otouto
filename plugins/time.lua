@@ -1,3 +1,5 @@
+ -- TIME_OFFSET is the number of seconds necessary to correct your system clock to UTC.
+
 local PLUGIN = {}
 
 PLUGIN.doc = [[

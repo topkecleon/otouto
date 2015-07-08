@@ -13,6 +13,8 @@ PLUGIN.triggers = {
 
 function PLUGIN.action(msg)
 
+	if string.find(msg.text, '@') and not string.match('help@'..bot.username) then return end
+
 	local input = get_input(msg.text)
 
 	if input then
@@ -29,6 +31,7 @@ function PLUGIN.action(msg)
 		*Arguments: <required> [optional]
 		Use "!help <command>" for specific information.
 		otouto v]] .. VERSION .. [[ by @topkecleon.
+		Fork me on github! github.com/topkecleon/otouto
 	]]
 
 	if msg.from.id ~= msg.chat.id then

@@ -25,14 +25,24 @@ function PLUGIN.action(msg)
 		jdat.res = "I don't know what to say to that."
 	end
 
+	local message = jdat.res
+
 	-- Let's clean up the response a little. Capitalization & punctuation.
-	local message = jdat.res:gsub('simsimi', 'clive')
-	local message = message:gsub("^%l", string.upper)
+	filter = {
+		['%aim%aimi'] = bot.first_name,
+		['^%s*(.-)%s*$'] = '%1',
+		['^%l'] = string.upper
+	}
+
+	for k,v in pairs(filter) do
+		message = string.gsub(message, k, v)
+	end
+
 	if not string.match(message, '%p$') then
 		message = message .. '.'
 	end
 
-	send_message(msg.chat.id, jdat.res)
+	send_message(msg.chat.id, message)
 
 end
 

@@ -1,9 +1,11 @@
 {
  "BOT_API_KEY": "",
- "ADMIN_ID": 0,
  "BIBLIA_API_KEY": "",
  "GIPHY_API_KEY": "",
  "TIME_OFFSET": 0,
+ "admins": [
+  0
+ ],
  "plugins": [
   "8ball.lua",
   "admin.lua",
@@ -27,6 +29,7 @@
   "imdb.lua",
   "personality.lua",
   "pokedex.lua",
+  "pun.lua",
   "reddit.lua",
   "remind.lua",
   "shrug.lua",
@@ -36,6 +39,9 @@
   "weather.lua",
   "whoami.lua",
   "xkcd.lua"
- ]
+ ],
+ "people": {
+  "0": "nickname",
+ }
 }
 

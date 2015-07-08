@@ -105,7 +105,7 @@ function PLUGIN.action(msg)
 		slapper = msg.from.first_name
 	else
 		victim = msg.from.first_name
-		slapper = bot.username
+		slapper = bot.first_name
 	end
 
 	local message = PLUGIN.getSlap(slapper, victim)
