@@ -1,14 +1,14 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!reddit [r/subreddit | query]
+	]] .. config.COMMAND_START .. [[reddit [r/subreddit | query]
 	This command returns top results for a given query or subreddit. NSFW posts are marked as such.
 ]]
 
 PLUGIN.triggers = {
-	'^!reddit',
-	'^!r$',
-	'^!r '
+	'^' .. config.COMMAND_START .. 'reddit',
+	'^' .. config.COMMAND_START .. 'r$',
+	'^' .. config.COMMAND_START .. 'r '
 }
 
 function PLUGIN.action(msg)

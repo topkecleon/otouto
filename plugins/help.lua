@@ -1,14 +1,14 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!help [command]
+	]] .. config.COMMAND_START .. [[help [command]
 	Get list of basic information for all commands, or more detailed documentation on a specified command.
 ]]
 
 PLUGIN.triggers = {
-	'^!help',
-	'^!h$',
-	'^/help'
+	'^'.. config.COMMAND_START ..'help',
+	'^'.. config.COMMAND_START ..'h$',
+	'^'.. config.COMMAND_START ..'help'
 }
 
 function PLUGIN.action(msg)
@@ -27,10 +27,10 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	local message = 'Available commands:\n' .. help_message .. [[
+	local message = '\n\nAvailable commands:\n' .. help_message .. [[
 		*Arguments: <required> [optional]
-		Use "!help <command>" for specific information.
-		otouto v]] .. VERSION .. [[ by @topkecleon.
+		Use "]] .. config.COMMAND_START .. [[ help <command>" for specific information.
+		otouto v]] .. VERSION .. [[ by @topkecleon forked by @luksi-reiku.
 		Fork me on github! github.com/topkecleon/otouto
 	]]
 

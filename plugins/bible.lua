@@ -1,14 +1,14 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!bible <verse>
+	]] .. config.COMMAND_START .. [[bible <verse>
 	Returns a verse from the bible, King James Version. Use a standard or abbreviated reference (John 3:16, Jn3:16).
 	http://biblia.com
 ]]
 
 PLUGIN.triggers = {
-	'^!bible',
-	'^!b '
+	'^' .. config.COMMAND_START .. 'bible',
+	'^' .. config.COMMAND_START .. 'b '
 }
 
 function PLUGIN.action(msg)

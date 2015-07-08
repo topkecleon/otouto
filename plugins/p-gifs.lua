@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[giphy [query]
-	Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '!gifnsfw' to get potentially NSFW results.
+	]] .. config.COMMAND_START .. [[gif [consulta]
+	Devuelve un gif de Giphy.
 ]]
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'giphy',
+	'^' .. config.COMMAND_START .. 'gif',
 	'^' .. config.COMMAND_START .. 'gifnsfw'
 }
 
@@ -28,25 +28,20 @@ function PLUGIN.action(msg)
 
 	if not input then
 
-		local jstr, res = HTTP.request(random_url)
-		if res ~= 200 then
-			return send_msg(msg, 'Connection error.')
-		end
-		local jdat = JSON.decode(jstr)
-		result_url = jdat.data.image_url
+		return send_msg(msg, PLUGIN.doc)
 
 	else
 
 		local jstr, res = HTTP.request(search_url .. input)
 		if res ~= 200 then
-			return send_msg(msg, 'Connection error.')
+			return send_msg(msg, 'No pude conectarme, ' .. msg.from.first_name .. '...  ')
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data[math.random(#jdat.data)].images.original.url
 
 	end
 
-	send_message(msg.chat.id, result_url, false, msg.message_id)
+	send_msg(msg, result_url)
 
 end
 

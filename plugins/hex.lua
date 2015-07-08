@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!hex <number>
+	]] .. config.COMMAND_START .. [[hex <number>
 	This function converts a number to or from hexadecimal.
 ]]
 
 PLUGIN.triggers = {
-	'^!hex '
+	'^' .. config.COMMAND_START .. 'hex '
 }
 
 function PLUGIN.action(msg)

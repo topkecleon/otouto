@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!ud <term>
+	]] .. config.COMMAND_START .. [[ud <term>
 	Returns the first definition for a given term from Urban Dictionary.
 ]]
 
 PLUGIN.triggers = {
-	'^!ud',
-	'^!urbandictionary'
+	'^' .. config.COMMAND_START .. 'ud',
+	'^' .. config.COMMAND_START .. 'urbandictionary'
 }
 
 function PLUGIN.action(msg)

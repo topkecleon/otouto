@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!dogify <lines/separatedby/slashes>
+	]] .. config.COMMAND_START .. [[dogify <lines/separatedby/slashes>
 	Produces a doge image from dogr.io. Newlines are indicated by a forward slash. Words do not need to be spaced, but spacing is supported. Will post a previewed link rather than an image.
 ]]
 
 PLUGIN.triggers = {
-	'^!doge ',
-	'^!dogify '
+	'^' .. config.COMMAND_START .. 'doge ',
+	'^' .. config.COMMAND_START .. 'dogify '
 }
 
 function PLUGIN.action(msg)

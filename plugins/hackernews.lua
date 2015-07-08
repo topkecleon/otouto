@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!hackernews
+	]] .. config.COMMAND_START .. [[hackernews
 	Returns some top stories from Hacker News. Four in a group or eight in a private message.
 ]]
 
 PLUGIN.triggers = {
-	'^!hackernews',
-	'^!hn$'
+	'^' .. config.COMMAND_START .. 'hackernews',
+	'^' .. config.COMMAND_START .. 'hn$'
 }
 
 function PLUGIN.action(msg)

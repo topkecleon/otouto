@@ -8,17 +8,10 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 
-	local message = 'Command not found.'
+	local message = 'No entiendo Senpai...'
 
-	local sudo = 0
-	for i,v in ipairs(config.admins) do
-		if msg.from.id == v then
-			sudo = v
-		end
-	end
-
-	if sudo == 0 then
-		message = 'Permission denied.'
+	if msg.from.id ~= config.ADMIN_ID then
+		message = '¡Solo acepto ordenes de Senpai! 😣'
 
 	elseif string.lower(first_word(input)) == 'run' then
 
@@ -28,14 +21,16 @@ function PLUGIN.action(msg)
 		output:close()
 
 	elseif string.lower(first_word(input)) == 'reload' then
+		message = 'Mata ne! 👋'
+		send_msg(msg, message)
 
 		bot_init()
-		message = 'Bot reloaded!'
+		message = 'Konnichi wa! 😊'
 
 	elseif string.lower(first_word(input)) == 'halt' then
 
 		is_started = false
-		message = 'Shutting down...'
+		message = 'Oyasumi~ 😴'
 
 	end
 

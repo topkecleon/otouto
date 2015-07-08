@@ -1,15 +1,7 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[images <query>
-	This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '!insfw' to get potentially NSFW results.
-]]
-
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'images?',
-	'^' .. config.COMMAND_START .. 'img',
-	'^' .. config.COMMAND_START .. 'i ',
-	'^' .. config.COMMAND_START .. 'insfw'
+	'^' .. config.COMMAND_START .. 'testi',
 }
 
 PLUGIN.exts = {
@@ -24,13 +16,13 @@ function PLUGIN.action(msg)
 
 	local url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8'
 
-	if not string.match(msg.text, '^' .. config.COMMAND_START .. 'insfw ') then
+	if (not string.match(msg.text, '^' .. config.COMMAND_START .. 'insfw ')) or (not string.match(msg.text, '^/fotonsfw ')) then
 		url = url .. '&safe=active'
 	end
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		return
 	end
 
 	url = url .. '&q=' .. URL.escape(input)
@@ -38,14 +30,14 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		send_msg(msg, 'Connection error.')
+		send_msg(msg, 'No pude conectarme, ' .. msg.from.first_name .. '...  ')
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		send_msg(msg, 'No results found.')
+		send_msg(msg, 'No pude encontrar nada, ' .. msg.from.first_name .. '... 😔')
 		return
 	end
 
@@ -59,8 +51,15 @@ function PLUGIN.action(msg)
 			end
 		end
 	end
-
-	send_message(msg.chat.id, result_url, false, msg.message_id)
+	
+	--send the url
+	send_msg(msg, result_url)
+	
+	--local path = download_to_file(result_url, 'photo.jpg')
+	local photo = get_file('sample.jpg')
+	
+	--send the photo
+	send_pic(msg, photo)
 
 end
 

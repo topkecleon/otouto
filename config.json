@@ -1,8 +1,9 @@
 {
  "BOT_API_KEY": "",
  "BIBLIA_API_KEY": "",
- "GIPHY_API_KEY": "dc6zaTOxFJmzC",
+ "GIPHY_API_KEY": "",
  "TIME_OFFSET": 0,
+ "COMMAND_START": "/",
  "admins": [
   0
  ],
@@ -10,6 +11,7 @@
   "8ball.lua",
   "admin.lua",
   "bandersnatch.lua",
+  "bible.lua",
   "btc.lua",
   "calc.lua",
   "chatter.lua",

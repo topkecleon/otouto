@@ -1,14 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!whoami
+	]] .. config.COMMAND_START .. [[whoami
 	Get the user ID for yourself and the group.
 ]]
 
 PLUGIN.triggers = {
-	'^!whoami',
-	'^!ping',
-	'^/ping'
+	'^' .. config.COMMAND_START .. 'whoami',
+	'^' .. config.COMMAND_START .. 'ping'
 }
 
 function PLUGIN.action(msg)
