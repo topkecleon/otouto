@@ -27,12 +27,11 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	local message = '\n\nAvailable commands:\n' .. help_message .. [[
+	local message = '\n\nAvailable commands:\n' .. help_message .. '\n' .. [[
 		*Arguments: <required> [optional]
 		Use "]] .. config.COMMAND_START .. [[ help <command>" for specific information.
-		otouto v]] .. VERSION .. [[ by @topkecleon forked by @luksi-reiku.
-		Fork me on github! github.com/topkecleon/otouto
-	]]
+		otouto v]] .. VERSION .. [[ by @topkecleon forked by @luksireiku.]] .. '\n\n' .. [[
+		Fork me on github!]] .. '\ngithub.com/topkecleon/otouto\ngithub.com/luksireiku/otouto'
 
 	if msg.from.id ~= msg.chat.id then
 		if not send_message(msg.from.id, message, true, msg.message_id) then

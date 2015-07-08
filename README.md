@@ -2,7 +2,7 @@
 
 The plugin-wielding, multi-purpose Telegram chat bot.
 
-Public bot runs on [@mokubot](http://telegram.me/mokubot).
+Public bot runs on [@petoutobot](http://telegram.me/petoutobot).
 
 Requires lua-socket and lua-sec. [dkjson](https://github.com/LuaDist/dkjson/) is provided.
 

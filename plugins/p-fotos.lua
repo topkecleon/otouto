@@ -59,7 +59,7 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	send_msg(msg, result_url)
+	send_message(msg.chat.id, result_url, false)
 
 end
 
