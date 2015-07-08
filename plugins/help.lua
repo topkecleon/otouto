@@ -20,7 +20,7 @@ function PLUGIN.action(msg)
 	if input then
 		for i,v in ipairs(plugins) do
 			if v.doc then
-				if '!' .. input == trim_string(first_word(v.doc)) then
+				if '/' .. input == trim_string(first_word(v.doc)) then
 					return send_msg(msg, v.doc)
 				end
 			end
