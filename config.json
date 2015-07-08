@@ -26,6 +26,7 @@
   "help.lua",
   "hex.lua",
   "imdb.lua",
+  "lenny.lua",
   "personality.lua",
   "pokedex.lua",
   "pun.lua",
