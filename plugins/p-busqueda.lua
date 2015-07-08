@@ -1,7 +1,7 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	' .. config.COMMAND_START .. 'busca <consulta>
+	]] .. config.COMMAND_START .. [[busca <consulta>
 	Realiza una busqueda en Google.
 ]]
 
