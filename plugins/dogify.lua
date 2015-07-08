@@ -18,6 +18,7 @@ function PLUGIN.action(msg)
 	end
 
 	local input = string.gsub(input, ' ', '')
+	local input = string.lower(input)
 
 	url = 'http://dogr.io/' .. input .. '.png'
 
