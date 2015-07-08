@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!ud <term>
+	/ud <term>
 	Returns the first definition for a given term from Urban Dictionary.
 ]]
 
 PLUGIN.triggers = {
-	'^!ud',
-	'^!urbandictionary'
+	'^/ud',
+	'^/urbandictionary'
 }
 
 function PLUGIN.action(msg)

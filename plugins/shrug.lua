@@ -1,7 +1,6 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^!shrug',
 	'/shrug'
 }
 

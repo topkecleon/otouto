@@ -20,4 +20,5 @@ TIME_OFFSET is the time difference, in seconds, between your system clock. It is
 
 "people" table is for the personality plugin:
 `"123456789": "foobar"`
+
 ID number must be a string.

@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!loc <location>
+	/loc <location>
 	Sends location data for query, taken from Google Maps. Works for countries, cities, landmarks, etc.
 ]]
 
 PLUGIN.triggers = {
-	'^!loc'
+	'^/loc'
 }
 
 function PLUGIN.action(msg)

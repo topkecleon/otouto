@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!help [command]
+	/help [command]
 	Get list of basic information for all commands, or more detailed documentation on a specified command.
 ]]
 
 PLUGIN.triggers = {
-	'^!help',
-	'^!h$',
+	'^/help',
+	'^/h$',
 	'^/help'
 }
 

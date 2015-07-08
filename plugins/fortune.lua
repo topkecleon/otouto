@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!fortune
+	/fortune
 	Get a random fortune from the UNIX fortune program.
 ]]
 
 PLUGIN.triggers = {
-	'^!fortune',
-	'^!f$'
+	'^/fortune',
+	'^/f$'
 }
 
 function PLUGIN.action(msg)

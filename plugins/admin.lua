@@ -1,7 +1,7 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^!admin '
+	'^/admin '
 }
 
 function PLUGIN.action(msg)

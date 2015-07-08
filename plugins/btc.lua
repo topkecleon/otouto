@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!btc <currency> [amount]
+	/btc <currency> [amount]
 	Gives bitcoin prices for the given currency, and optionally conversion of an amount to and from that currency.
 	BitcoinAverage Price Index https://bitcoinaverage.com/
 ]]
 
 PLUGIN.triggers = {
-	'^!btc'
+	'^/btc'
 }
 
 function PLUGIN.action(msg)

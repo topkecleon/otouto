@@ -1,14 +1,14 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!bible <verse>
+	/bible <verse>
 	Returns a verse from the bible, King James Version. Use a standard or abbreviated reference (John 3:16, Jn3:16).
 	http://biblia.com
 ]]
 
 PLUGIN.triggers = {
-	'^!bible',
-	'^!b '
+	'^/bible',
+	'^/b '
 }
 
 function PLUGIN.action(msg)

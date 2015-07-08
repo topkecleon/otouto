@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!remind <delay> <message>
+	/remind <delay> <message>
 	Set a reminder for yourself. First argument is the number of minutes until you wish to be reminded.
 ]]
 
 PLUGIN.triggers = {
-	'^!remind$',
-	'^!remind '
+	'^/remind$',
+	'^/remind '
 }
 
 function PLUGIN.action(msg)

@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!giphy [query]
+	/giphy [query]
 	Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '!gifnsfw' to get potentially NSFW results.
 ]]
 
 PLUGIN.triggers = {
-	'^!giphy',
-	'^!gifnsfw'
+	'^/giphy',
+	'^/gifnsfw'
 }
 
 function PLUGIN.action(msg)
@@ -16,7 +16,7 @@ function PLUGIN.action(msg)
 	local random_url = 'http://tv.giphy.com/v1/gifs/random?api_key=' .. config.GIPHY_API_KEY
 	local result_url = ''
 
-	if string.match(msg.text, '^!giphynsfw') then
+	if string.match(msg.text, '^/giphynsfw') then
 		search_url = search_url .. '&rating=r&q='
 		random_url = random_url .. '&rating=r'
 	else

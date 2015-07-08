@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!slap [victim]
+	/slap [victim]
 	Slap someone!
 ]]
 
 PLUGIN.triggers = {
-	'^!slap'
+	'^/slap'
 }
 
 function PLUGIN.getSlap(slapper, victim)

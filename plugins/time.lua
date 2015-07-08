@@ -3,12 +3,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!time <location>
+	/time <location>
 	Sends the time and timezone for a given location.
 ]]
 
 PLUGIN.triggers = {
-	'^!time'
+	'^/time'
 }
 
 function PLUGIN.action(msg)

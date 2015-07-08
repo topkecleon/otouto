@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!hex <number>
+	/hex <number>
 	This function converts a number to or from hexadecimal.
 ]]
 
 PLUGIN.triggers = {
-	'^!hex '
+	'^/hex '
 }
 
 function PLUGIN.action(msg)

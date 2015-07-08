@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!echo <text>
+	/echo <text>
 	Repeat a string.
 ]]
 
 PLUGIN.triggers = {
-	'^!echo'
+	'^/echo'
 }
 
 function PLUGIN.action(msg)

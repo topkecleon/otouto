@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!hackernews
+	/hackernews
 	Returns some top stories from Hacker News. Four in a group or eight in a private message.
 ]]
 
 PLUGIN.triggers = {
-	'^!hackernews',
-	'^!hn$'
+	'^/hackernews',
+	'^/hn$'
 }
 
 function PLUGIN.action(msg)

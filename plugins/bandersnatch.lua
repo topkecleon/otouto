@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!bandersnatch
+	/bandersnatch
 	This is a Benedict Cumberbatch name generator.
 ]]
 
 PLUGIN.triggers = {
-	'^!bandersnatch',
-	'^!bc$'
+	'^/bandersnatch',
+	'^/bc$'
 }
 
 PLUGIN.fullnames = { "Wimbledon Tennismatch", "Rinkydink Curdlesnoot", "Butawhiteboy Cantbekhan", "Benadryl Claritin", "Bombadil Rivendell", "Wanda's Crotchfruit", "Biblical Concubine", "Syphilis Cankersore", "Buckminster Fullerene", "Bourgeoisie Capitalist" }

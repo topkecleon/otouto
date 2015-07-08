@@ -1,15 +1,15 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!images <query>
+	/images <query>
 	This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '!insfw' to get potentially NSFW results.
 ]]
 
 PLUGIN.triggers = {
-	'^!images?',
-	'^!img',
-	'^!i ',
-	'^!insfw'
+	'^/images?',
+	'^/img',
+	'^/i ',
+	'^/insfw'
 }
 
 PLUGIN.exts = {
@@ -24,7 +24,7 @@ function PLUGIN.action(msg)
 
 	local url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8'
 
-	if not string.match(msg.text, '^!insfw ') then
+	if not string.match(msg.text, '^/insfw ') then
 		url = url .. '&safe=active'
 	end
 

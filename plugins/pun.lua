@@ -1,13 +1,13 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!pun
+	/pun
 	Get a random pun.
 	Have a recommendation? PM @topkecleon.
 ]]
 
 PLUGIN.triggers = {
-	'^!pun'
+	'^/pun'
 }
 
 PLUGIN.puns = {

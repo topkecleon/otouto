@@ -1,12 +1,12 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	!imdb <movie | TV series>
+	/imdb <movie | TV series>
 	This function retrieves the IMDb info for a given film or television series, including the year, genre, imdb rating, runtime, and a summation of the plot.
 ]]
 
 PLUGIN.triggers = {
-	'^!imdb'
+	'^/imdb'
 }
 
 function PLUGIN.action(msg)
