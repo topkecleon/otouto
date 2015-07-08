@@ -8,7 +8,6 @@ PLUGIN.doc = [[
 PLUGIN.triggers = {
 	'^/help',
 	'^/h$',
-	'^/help'
 }
 
 function PLUGIN.action(msg)
