@@ -24,11 +24,10 @@ function PLUGIN.action(msg)
 
 	local jdat = JSON.decode(jstr)
 
-	if string.len(msg.text) > 6 then
-		arg1 = string.upper(string.sub(msg.text, 6, 8))
-	end
-	if string.len(msg.text) > 9 then
-		arg2 = string.sub(msg.text, 10)
+	local input = get_input(msg.text)
+	if input then
+		arg1 = string.upper(string.sub(input, 1, 3))
+		arg2 = string.sub(input, 5)
 		if not tonumber(arg2) then
 			return send_msg(msg, 'Invalid argument.')
 		end

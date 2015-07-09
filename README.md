@@ -1,6 +1,6 @@
 # otouto
 
-The plugin-wielding, multi-purpose Telegram chat bot.
+The plugin-wielding, multi-purpose Telegram bot.
 
 Public bot runs on [@mokubot](http://telegram.me/mokubot).
 
