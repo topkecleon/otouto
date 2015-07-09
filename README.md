@@ -23,3 +23,4 @@ TIME_OFFSET is the time difference, in seconds, between your system clock. It is
 ID number must be a string.
 ###New stuff
 "COMMAND_START" that defines how the commands must start, default is "/"
+"LANGUAGE" is the name of the file inside 'lang' without the extension, default is 'en_US'. You can copy the file to translate the bot or change its messages.

@@ -4,6 +4,7 @@
  "GIPHY_API_KEY": "",
  "TIME_OFFSET": 0,
  "COMMAND_START": "/",
+ "LANGUAGE": "en_US",
  "admins": [
   0
  ],
