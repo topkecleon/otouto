@@ -3,7 +3,7 @@ local PLUGIN = {}
 PLUGIN.doc = [[
 	/weather <location>
 	Returns the current temperature and weather conditions for a specified location.
-	Non-city locations are accepted; "!weather Buckingham Palace" will return the weather for Westminster.
+	Non-city locations are accepted; "/weather Buckingham Palace" will return the weather for Westminster.
 ]]
 
 PLUGIN.triggers = {

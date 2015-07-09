@@ -2,7 +2,7 @@ local PLUGIN = {}
 
 PLUGIN.doc = [[
 	/giphy [query]
-	Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '!gifnsfw' to get potentially NSFW results.
+	Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '/gifnsfw' to get potentially NSFW results.
 ]]
 
 PLUGIN.triggers = {

@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	/roll [range]
+	/roll [arg]
 	Roll a die. Use any positive number for range or use D&D notation.
-	Example: !roll 4D100 will roll a 100-sided die four times.
+	Example: /roll 4D100 will roll a 100-sided die four times.
 ]]
 
 PLUGIN.triggers = {

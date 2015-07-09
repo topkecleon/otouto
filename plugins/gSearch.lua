@@ -2,7 +2,7 @@ local PLUGIN = {}
 
 PLUGIN.doc = [[
 	/google <query>
-	This command performs a Google search for the given query. Four results are returned. Safe search is enabled by default; use '!gnsfw' to get potentially NSFW results. Four results are returned for a group chat, or eight in a private message.
+	This command performs a Google search for the given query. Four results are returned. Safe search is enabled by default; use '/gnsfw' to get potentially NSFW results. Four results are returned for a group chat, or eight in a private message.
 ]]
 
 PLUGIN.triggers = {
