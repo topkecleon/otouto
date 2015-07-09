@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[bible <verse>
-	Returns a verse from the bible, King James Version. Use a standard or abbreviated reference (John 3:16, Jn3:16).
-	http://biblia.com
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('bible.COMMAND') .. ' <' .. I18N('bible.ARG_VERSE') .. '>' .. '\n' .. I18N('bible.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'bible',
+	'^' .. config.COMMAND_START .. I18N('bible.COMMAND'),
 	'^' .. config.COMMAND_START .. 'b '
 }
 
@@ -22,7 +18,7 @@ function PLUGIN.action(msg)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		message = 'Connection error.'
+		message = I18N('CONNECTION_ERROR')
 	end
 
 	send_msg(msg, message)

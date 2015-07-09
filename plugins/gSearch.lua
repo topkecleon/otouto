@@ -1,13 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[google <query>
-	This command performs a Google search for the given query. Four results are returned. Safe search is enabled by default; use '!gnsfw' to get potentially NSFW results. Four results are returned for a group chat, or eight in a private message.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('gSearch.COMMAND') .. ' <' .. I18N('ARG_QUERY') .. '>\n' .. I18N('gSearch.HELP', {COMMAND_START = config.COMMAND_START})
 
 PLUGIN.triggers = {
 	'^' .. config.COMMAND_START .. 'g ',
-	'^' .. config.COMMAND_START .. 'google',
+	'^' .. config.COMMAND_START .. I18N('gSearch.COMMAND'),
 	'^' .. config.COMMAND_START .. 'gnsfw'
 }
 
@@ -33,13 +30,13 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, I18N('CONNECTION_ERROR'))
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		return send_msg(msg, 'No results found.')
+		return send_msg(msg, I18N('NO_RESULTS_FOUND'))
 	end
 
 	message = ''

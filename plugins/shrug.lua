@@ -1,8 +1,7 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'shrug',
-	config.COMMAND_START .. 'shrug'
+	config.COMMAND_START .. I18N('shrug.COMMAND')
 }
 
 function PLUGIN.action(msg)

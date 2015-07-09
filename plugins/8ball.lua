@@ -1,13 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[8ball
-	Magic 8-ball. Returns a standard 8ball message, unless called with "y/n", where it will return a less verbose answer.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('8ball.COMMAND') .. '\n' .. I18N('8ball.HELP')
 
 PLUGIN.triggers = {
 	'^' .. config.COMMAND_START .. 'helix',
-	'^' .. config.COMMAND_START .. '8ball',
+	'^' .. config.COMMAND_START .. I18N('8ball.COMMAND'),
 	'y/n%p?$'
 }
 

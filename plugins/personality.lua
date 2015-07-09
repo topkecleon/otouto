@@ -2,14 +2,13 @@
  -- like so:
  -- 	13227902: "Drew"
 
-
 local PLUGIN = {}
 
 PLUGIN.triggers = {
 	bot.first_name .. '%p?$',
 	'^tadaima%p?$',
-	'^i\'m home%p?$',
-	'^i\'m back%p?$'
+	I18N('personality.IM_HOME'),
+	I18N('personality.IM_BACK')
 }
 
 function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
@@ -20,16 +19,16 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 
 	for i = 2, #PLUGIN.triggers do
 		if string.match(input, PLUGIN.triggers[i]) then
-			return send_message(msg.chat.id, 'Welcome back, ' .. msg.from.first_name .. '!')
+			return send_message(msg.chat.id, I18N('personality.WELCOME_BACK', {FIRST_NAME = msg.from.first_name}))
 		end
 	end
 
 	if input:match('thanks,? '..bot.first_name) or input:match('thank you,? '..bot.first_name) then
-		return send_message(msg.chat.id, 'No problem, ' .. msg.from.first_name .. '!')
+		return send_message(msg.chat.id, I18N('personality.NO_PROBLEM', {FIRST_NAME = msg.from.first_name}))
 	end
 
 	if input:match('hello,? '..bot.first_name) or input:match('hey,? '..bot.first_name) or input:match('hi,? '..bot.first_name) then
-		return send_message(msg.chat.id, 'Hi, ' .. msg.from.first_name .. '!')
+		return send_message(msg.chat.id, I18N('personality.HELLO', {FIRST_NAME = msg.from.first_name}))
 	end
 
 	if input:match('i hate you,? '..bot.first_name) or input:match('screw you,? '..bot.first_name) or input:match('fuck you,? '..bot.first_name) then

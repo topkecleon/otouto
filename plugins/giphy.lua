@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[giphy [query]
-	Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '!gifnsfw' to get potentially NSFW results.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('giphy.COMMAND') .. ' [' .. I18N('ARG_QUERY') .. ']\n' .. I18N('giphy.HELP', {COMMAND_START = config.COMMAND_START})
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'giphy',
+	'^' .. config.COMMAND_START .. I18N('giphy.COMMAND'),
 	'^' .. config.COMMAND_START .. 'gifnsfw'
 }
 
@@ -16,7 +13,7 @@ function PLUGIN.action(msg)
 	local random_url = 'http://tv.giphy.com/v1/gifs/random?api_key=' .. config.GIPHY_API_KEY
 	local result_url = ''
 
-	if string.match(msg.text, '^' .. config.COMMAND_START .. 'giphynsfw') then
+	if string.match(msg.text, '^' .. config.COMMAND_START .. 'gifnsfw') then
 		search_url = search_url .. '&rating=r&q='
 		random_url = random_url .. '&rating=r'
 	else
@@ -30,7 +27,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(random_url)
 		if res ~= 200 then
-			return send_msg(msg, 'Connection error.')
+			return send_msg(msg, I18N('CONNECTION_ERROR'))
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data.image_url
@@ -39,7 +36,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(search_url .. input)
 		if res ~= 200 then
-			return send_msg(msg, 'Connection error.')
+			return send_msg(msg, I18N('CONNECTION_ERROR'))
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data[math.random(#jdat.data)].images.original.url

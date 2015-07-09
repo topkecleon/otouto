@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[calc <expression>
-	This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('calc.COMMAND').. ' <' .. I18N('ARG_EXPRESSION') .. '>' .. '\n' .. I18N('calc.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'calc'
+	'^' .. config.COMMAND_START .. I18N('calc.COMMAND')
 }
 
 function PLUGIN.action(msg)
@@ -20,7 +17,7 @@ function PLUGIN.action(msg)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, I18N('CONNECTION_ERROR'))
 	end
 
 	send_msg(msg, message)

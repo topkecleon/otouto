@@ -5,6 +5,7 @@ HTTP = require('socket.http')
 HTTPS = require('ssl.https')
 JSON = require('dkjson')
 URL = require('socket.url')
+I18N = require('i18n')
 
 VERSION = 2.1
 
@@ -32,7 +33,18 @@ function bot_init()
 	local jstr = io.open('config.json')
 	local jstr = jstr:read('*all')
 	config = JSON.decode(jstr)
-	print(#config.plugins .. ' plugins enabled.')
+
+	--I18N.loadFile('lang/' .. config.LANGUAGE .. '.lua')
+	local jstr = io.open('lang/' .. config.LANGUAGE ..'.json')
+	local jstr = jstr:read('*all')
+	lang = JSON.decode(jstr)
+	I18N.load(lang)
+	print ("\nLoaded 'lang/" .. config.LANGUAGE ..'.json')
+
+	I18N.setLocale(config.LANGUAGE)
+	print ("Set language to '" .. config.LANGUAGE .. "'")
+
+	print('\n' .. #config.plugins .. ' plugins enabled.')
 
 	require('bindings')
 	require('utilities')
@@ -61,7 +73,7 @@ function bot_init()
 	for i,v in ipairs(plugins) do
 		if v.doc then
 			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
-			print(a)
+			print('\t' .. a)
 			help_message = help_message .. ' - ' .. a .. '\n'
 		end
 	end

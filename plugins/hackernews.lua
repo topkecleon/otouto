@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[hackernews
-	Returns some top stories from Hacker News. Four in a group or eight in a private message.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('hackernews.COMMAND') .. '\n' .. I18N('hackernews.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'hackernews',
+	'^' .. config.COMMAND_START .. I18N('hackernews.COMMAND'),
 	'^' .. config.COMMAND_START .. 'hn$'
 }
 

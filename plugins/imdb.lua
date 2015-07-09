@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[imdb <movie | TV series>
-	This function retrieves the IMDb info for a given film or television series, including the year, genre, imdb rating, runtime, and a summation of the plot.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('imdb.COMMAND') .. ' <' .. I18N('imdb.ARG_MOVIE_TVSERIES') .. '>\n' .. I18N('imdb.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'imdb'
+	'^' .. config.COMMAND_START .. I18N('imdb.COMMAND')
 }
 
 function PLUGIN.action(msg)
@@ -21,7 +18,7 @@ function PLUGIN.action(msg)
 	local jdat = JSON.decode(jstr)
 
 	if res ~= 200 then
-		return send_msg(msg, 'Error connecting to server.')
+		return send_msg(msg, I18N('CONNECTION_ERROR'))
 	end
 
 	if jdat.Response ~= 'True' then

@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[pun
-	Get a random pun.
-	Have a recommendation? PM @topkecleon.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('pun.COMMAND') .. '\n' .. I18N('pun.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'pun'
+	'^' .. config.COMMAND_START .. I18N('pun.COMMAND')
 }
 
 PLUGIN.puns = {

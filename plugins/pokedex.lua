@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[dex <pokemon>
-	Get Pokedex information for a given Pokemon.
-	Includes national ID number, type, height, weight, and a description from a random regional dex.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('pokedex.COMMAND') .. ' <' .. I18N('pokedex.ARG_POKEMON') .. '>\n' .. I18N('pokedex.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'dex'
+	'^' .. config.COMMAND_START .. I18N('pokedex.COMMAND')
 }
 
 function PLUGIN.action(msg)
@@ -23,7 +19,7 @@ function PLUGIN.action(msg)
 	local dex_url = base_url .. '/api/v1/pokemon/' .. input
 	local dex_jstr, res = HTTP.request(dex_url)
 	if res ~= 200 then
-		return send_msg(msg, 'Pokemon not found..')
+		return send_msg(msg, I18N('pokedex.NOT_FOUND'))
 	end
 
 	local dex_jdat = JSON.decode(dex_jstr)
@@ -31,7 +27,7 @@ function PLUGIN.action(msg)
 	local desc_url = base_url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
 	local desc_jstr, res = HTTP.request(desc_url)
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, I18N('CONNECTION_ERROR'))
 	end
 
 	local desc_jdat = JSON.decode(desc_jstr)

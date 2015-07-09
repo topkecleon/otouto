@@ -1,13 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[remind <delay> <message>
-	Set a reminder for yourself. First argument is the number of minutes until you wish to be reminded.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('remind.COMMAND') .. ' <' .. I18N('ARG_DELAY') .. '> <' .. I18N('ARG_MESSAGE') .. '>\n' .. I18N('remind.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'remind$',
-	'^' .. config.COMMAND_START .. 'remind '
+	'^' .. config.COMMAND_START .. I18N('remind.COMMAND') .. '$',
+	'^' .. config.COMMAND_START .. I18N('remind.COMMAND') .. ' '
 }
 
 function PLUGIN.action(msg)
@@ -19,11 +16,11 @@ function PLUGIN.action(msg)
 
 	local delay = first_word(input)
 	if not tonumber(delay) then
-		return send_msg(msg, 'The delay must be a number.')
+		return send_msg(msg, I18N('remind.NO_DELAY'))
 	end
 
 	if string.len(msg.text) <= string.len(delay) + 9 then
-		return send_msg(msg, 'Please include a reminder.')
+		return send_msg(msg, I18N('remind.NO_MESSAGE'))
 	end
 	local text = string.sub(msg.text, string.len(delay)+10) -- this is gross
 	if msg.from.username then
@@ -41,12 +38,12 @@ function PLUGIN.action(msg)
 	table.insert(reminders, reminder)
 
 	if delay <= 1 then
-		delay = (delay * 60) .. ' seconds'
+		delay = (delay * 60) .. ' ' .. I18N('remind.SECONDS')
 	else
-		delay = delay .. ' minutes'
+		delay = delay .. ' ' .. I18N('remind.MINUTES')
 	end
 
-	local message = 'Your reminder has been set for ' .. delay .. ' from now:\n' .. text
+	local message = I18N('remind.REMINDER_SET', {DELAY = delay, MESSAGE = text})
 
 	send_msg(msg, message)
 

@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[fortune
-	Get a random fortune from the UNIX fortune program.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('fortune.COMMAND') .. '\n' .. I18N('fortune.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'fortune',
+	'^' .. config.COMMAND_START .. I18N('fortune.COMMAND'),
 	'^' .. config.COMMAND_START .. 'f$'
 }
 

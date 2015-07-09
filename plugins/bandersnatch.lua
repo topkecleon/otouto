@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[bandersnatch
-	This is a Benedict Cumberbatch name generator.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('bandersnatch.COMMAND') .. '\n' .. I18N('bandersnatch.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'bandersnatch',
+	'^' .. config.COMMAND_START .. I18N('bandersnatch.COMMAND'),
 	'^' .. config.COMMAND_START .. 'bc$'
 }
 

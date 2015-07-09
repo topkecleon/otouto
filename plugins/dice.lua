@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[roll [range]
-	Roll a die. Use any positive number for range or use D&D notation.
-	Example: !roll 4D100 will roll a 100-sided die four times.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('dice.COMMAND') .. ' [' .. I18N('ARG_RANGE') .. ']\n' .. I18N('dice.HELP', {COMMAND_START = config.COMMAND_START, COMMAND = I18N('dice.COMMAND')})
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'roll'
+	'^' .. config.COMMAND_START .. I18N('dice.COMMAND')
 }
 
 function PLUGIN.action(msg)
@@ -33,10 +29,10 @@ function PLUGIN.action(msg)
 		end
 		range = string.sub(input, dloc+1)
 		if not tonumber(rolls) or not tonumber(range) then
-			return send_msg(msg, 'Invalid syntax.')
+			return send_msg(msg, I18N('INVALID_SYNTAX'))
 		end
 	else
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, I18N('INVALID_SYNTAX'))
 	end
 
 	if tonumber(rolls) == 1 then
@@ -44,19 +40,19 @@ function PLUGIN.action(msg)
 	elseif tonumber(rolls) > 1 then
 		results = rolls .. 'D' .. range .. ':\n'
 	else
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, I18N('INVALID_SYNTAX'))
 	end
 
 	if tonumber(range) < 2 then
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, I18N('INVALID_SYNTAX'))
 	end
 
 	if tonumber(rolls) > 100 then
-		return send_msg(msg, 'Maximum dice is 100.')
+		return send_msg(msg, I18N('dice.MAX_DICE'))
 	end
 
 	if tonumber(range) > 100000 then
-		return send_msg(msg, 'Maximum range is 100000.')
+		return send_msg(msg, I18N('dice.MAX_RANGE'))
 	end
 
 	for i = 1, tonumber(rolls) do

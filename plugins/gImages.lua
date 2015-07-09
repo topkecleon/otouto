@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[images <query>
-	This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '!insfw' to get potentially NSFW results.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('gImages.COMMAND') .. ' <' .. I18N('ARG_QUERY') .. '>\n' .. I18N('gImages.HELP', {COMMAND_START = config.COMMAND_START})
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'images?',
+	'^' .. config.COMMAND_START .. I18N('gImages.COMMAND') .. '?',
 	'^' .. config.COMMAND_START .. 'img',
 	'^' .. config.COMMAND_START .. 'i ',
 	'^' .. config.COMMAND_START .. 'insfw'
@@ -38,14 +35,14 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		send_msg(msg, 'Connection error.')
+		send_msg(msg, I18N('CONNECTION_ERROR'))
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		send_msg(msg, 'No results found.')
+		send_msg(msg, I18N('NO_RESULTS_FOUND'))
 		return
 	end
 

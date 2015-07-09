@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[hex <number>
-	This function converts a number to or from hexadecimal.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('hex.COMMAND') .. ' <' .. I18N('ARG_NUMBER') .. '>\n' .. I18N('hex.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'hex '
+	'^' .. config.COMMAND_START .. I18N('hex.COMMAND')
 }
 
 function PLUGIN.action(msg)
@@ -20,7 +17,7 @@ function PLUGIN.action(msg)
 		send_msg(msg, string.format('%x', input))
 
 	else
-		send_msg(msg, 'Invalid number.')
+		send_msg(msg, I18N('hex.INVALID_NUMBER'))
 
 	end
 

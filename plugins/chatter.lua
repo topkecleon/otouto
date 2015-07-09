@@ -16,13 +16,13 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_message(msg.chat.id, "I don't feel like talking right now.")
+		return send_message(msg.chat.id, I18N('chatter.CONNECTION_ERROR'))
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if string.match(jdat.res, '^I HAVE NO RESPONSE.') then
-		jdat.res = "I don't know what to say to that."
+		jdat.res = I18N('chatter.I_HAVE_NO_RESPONSE')
 	end
 
 	local message = jdat.res

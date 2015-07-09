@@ -1,13 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	]] .. config.COMMAND_START .. [[whoami
-	Get the user ID for yourself and the group.
-]]
+PLUGIN.doc = config.COMMAND_START .. I18N('whoami.COMMAND') .. '\n' .. I18N('whoami.HELP')
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'whoami',
-	'^' .. config.COMMAND_START .. 'ping'
+	'^' .. config.COMMAND_START .. I18N('whoami.COMMAND'),
+	'^' .. config.COMMAND_START .. 'ping',
 }
 
 function PLUGIN.action(msg)
@@ -20,15 +17,15 @@ function PLUGIN.action(msg)
 		from_name = '@' .. msg.from.username .. ', AKA ' .. from_name
 	end
 	from_name = from_name .. ' (' .. msg.from.id .. ')'
-	
+
 	if msg.from.id == msg.chat.id then
 		to_name = '@' .. bot.username .. ' (' .. bot.id .. ')'
 	else
 		to_name = string.gsub(msg.chat.title, '_', ' ') .. ' (' .. string.gsub(msg.chat.id, '-', '') .. ')'
 	end
-	
-	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name .. '.'
-	
+
+	local message = I18N('whoami.RESPONSE', {FROM = from_name, TO = to_name})
+
 	send_msg(msg, message)
 
 end
