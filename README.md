@@ -6,6 +6,9 @@ Public bot runs on [@mokubot](http://telegram.me/mokubot).
 
 Requires lua-socket and lua-sec. [dkjson](https://github.com/LuaDist/dkjson/) is provided.
 
+Edit config.json with your bot API key, and other API keys if desirable.
+Plugins which require an API key are disabled by default.
+
 `lua bot.lua`
 
 ###Configuration

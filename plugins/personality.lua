@@ -32,6 +32,10 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 		return send_message(msg.chat.id, 'Hi, ' .. msg.from.first_name .. '!')
 	end
 
+	if input:match('bye,? '..bot.first_name) or input:match('later,? '..bot.first_name) then
+		return send_message(msg.chat.id, 'Bye-bye, ' .. msg.from.first_name .. '!')
+	end
+
 	if input:match('i hate you,? '..bot.first_name) or input:match('screw you,? '..bot.first_name) or input:match('fuck you,? '..bot.first_name) then
 		return send_msg(msg, '; _ ;')
 	end
@@ -39,6 +43,9 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 	if string.match(input, 'i love you,? '..bot.first_name) then
 		return send_msg(msg, '<3')
 	end
+
+--	msg.text = '@' .. bot.username .. ', ' .. msg.text:gsub(bot.first_name, '')
+--	on_msg_receive(msg)
 
 end
 

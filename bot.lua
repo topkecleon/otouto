@@ -3,12 +3,14 @@
 
 HTTP = require('socket.http')
 HTTPS = require('ssl.https')
-JSON = require('dkjson')
 URL = require('socket.url')
+JSON = require('dkjson')
 
-VERSION = 2.2
+VERSION = 2.3
 
 function on_msg_receive(msg)
+
+	msg = process_msg(msg)
 
 	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
@@ -69,6 +71,22 @@ function bot_init()
 	print('Help message generated!\n')
 
 	is_started = true
+
+end
+
+function process_msg(msg)
+
+	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
+		msg.text = 'hi '..bot.first_name
+		msg.from = msg.new_chat_participant
+	end
+
+	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
+		msg.text = 'bye '..bot.first_name
+		msg.from = msg.left_chat_participant
+	end
+
+	return msg
 
 end
 

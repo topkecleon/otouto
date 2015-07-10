@@ -1,4 +1,4 @@
- -- shout-out to @luksi_reiku for showing me this site
+ -- shout-out to @luksireiku for showing me this site
 
 local PLUGIN = {}
 
