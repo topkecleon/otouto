@@ -5,7 +5,7 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	bot.first_name .. '%p?$',
+	string.lower(string.sub(bot.first_name, 1, string.find(bot.first_name, '%-')-1)),
 	'^tadaima%p?$',
 	I18N('personality.IM_HOME'),
 	I18N('personality.IM_BACK'),
@@ -27,6 +27,7 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 	end
 
 	if config.people[tostring(msg.from.id)] then msg.from.first_name = config.people[tostring(msg.from.id)] end
+	bot_name = string.lower(string.sub(bot.first_name, 1, string.find(bot.first_name, '%-')-1))
 
 	for i = 2,4 do
 		if string.match(input, PLUGIN.triggers[i]) then
@@ -35,13 +36,13 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 	end
 
 	for k,v in pairs(I18N('personality.GRATITUDE')) do
-		if input:match(v .. '(.*) '..bot.first_name) then
+		if input:match(v .. '(.*) ' .. bot_name) then
 			return send_message(msg.chat.id, I18N('personality.GRATITUDE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
 		end
 	end
 
 	for k,v in pairs(I18N('personality.GREETING')) do
-		if input:match(v .. '? '..bot.first_name) then
+		if input:match(v .. '? ' .. bot_name) then
 			if daytime == 'morning' then
 				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
 			elseif daytime == 'evening' then
@@ -53,7 +54,7 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 	end
 
 	for k,v in pairs(I18N('personality.FAREWELL')) do
-		if input:match(v .. '? '..bot.first_name) then
+		if input:match(v .. '? ' .. bot_name) then
 			if daytime == 'morning' then
 				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
 			elseif daytime == 'evening' then
@@ -65,13 +66,13 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 	end
 
 	for k,v in pairs(I18N('personality.LOVE')) do
-		if input:match(v .. '? '..bot.first_name) then
+		if input:match(v .. '? ' .. bot_name) then
 			return send_message(msg.chat.id, I18N('personality.LOVE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
 		end
 	end
 
 	for k,v in pairs(I18N('personality.HATE')) do
-		if input:match(v .. '? '..bot.first_name) then
+		if input:match(v .. '? ' .. bot_name) then
 			return send_message(msg.chat.id, I18N('personality.HATE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
 		end
 	end
