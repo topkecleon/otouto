@@ -11,6 +11,8 @@ VERSION = 2.1
 
 function on_msg_receive(msg)
 
+	msg = process_msg(msg)
+
 	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
 	--if msg.forward_from then return end -- don't react to forwarded messages
@@ -81,6 +83,22 @@ function bot_init()
 	print('Help message generated!\n')
 
 	is_started = true
+
+end
+
+function process_msg(msg)
+
+	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
+		msg.text = I18N('personality.GREETING.1') .. ' '..bot.first_name
+		msg.from = msg.new_chat_participant
+	elseif msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
+		msg.text = I18N('personality.FAREWELL.1') .. ' '..bot.first_name
+		msg.from = msg.left_chat_participant
+	elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
+		msg.text = '@' .. string.lower(bot.username) .. ' ' .. msg.text
+	end
+
+	return msg
 
 end
 

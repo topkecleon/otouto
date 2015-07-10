@@ -2,16 +2,22 @@
 
 local PLUGIN = {}
 
+if string.find(bot.first_name, '%-') then
+        bot_name = string.lower(string.sub(bot.first_name, 1, string.find(bot.first_name, '%-')-1))
+else
+        bot_name = string.lower(bot.first_name)
+end
+
 PLUGIN.triggers = {
-	'@' .. bot.username,
-	bot.first_name .. ', '
+	'@' .. string.lower(bot.username),
+	'^' .. bot_name,
 }
 
 function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 
-	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(input)
+	local url = 'http://www.simsimi.com/requestChat?lc=' .. I18N('chatter.LANG') .. '&ft=1.0&req=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 
@@ -38,9 +44,9 @@ function PLUGIN.action(msg)
 		message = string.gsub(message, k, v)
 	end
 
-	if not string.match(message, '%p$') then
+	--[[if not string.match(message, '%p$') then
 		message = message .. '.'
-	end
+	end]]
 
 	send_message(msg.chat.id, message)
 

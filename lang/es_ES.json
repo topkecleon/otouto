@@ -48,6 +48,7 @@
    "HELP": "Este comando resuelve expresiones matemáticas realiza conversiones entre unidades comunes. Mire mathjs.org/docs/expressions/syntax para la lista de sintaxis aceptadas."
   },
   "chatter":{
+   "LANG": "es",
    "CONNECTION_ERROR": "No tengo ganas de hablar ahora mismo.",
    "I_HAVE_NO_RESPONSE": "No sé qué decir a eso"
   },

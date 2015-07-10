@@ -48,6 +48,7 @@
    "HELP": "This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax."
   },
   "chatter":{
+   "LANG": "en",
    "CONNECTION_ERROR": "I don't feel like talking right now.",
    "I_HAVE_NO_RESPONSE": "I don't know what to say to that"
   },
