@@ -1,0 +1,216 @@
+{
+ "es_ES": {
+  "CONNECTION_ERROR": "Error de conexión.",
+  "NOT_FOUND": "No encontrado.",
+  "NO_RESULTS_FOUND": "Ningún resultado encontrado.",
+  "COMMAND_NOT_FOUND":"Comando no encontrado.",
+  "PERMISSION_DENIED": "Permiso denegado.",
+  "INVALID_ARGUMENT": "Argumento no válido.",
+  "INVALID_SYNTAX": "Sintaxis no válida.",
+  "ARG_COMMAND": "comando",
+  "ARG_QUERY": "consulta",
+  "ARG_EXPRESSION": "expresión",
+  "ARG_RANGE": "rango",
+  "ARG_LOCATION": "localización",
+  "ARG_NUMBER": "número",
+  "ARG_TEXT": "texto",
+  "ARG_DELAY": "retardo",
+  "ARG_MESSAGE": "mensaje",
+  "ARG_TERM": "término",
+  "ARG_SEARCH": "búsqueda",
+  "8ball": {
+   "COMMAND": "bola8",
+   "HELP": "Bola del 8 mágica. Emite un mensaje estándar de una Bola del 8, a menos que se llame con 'y/n', donde dará una respuesta menos verbosa."
+  },
+  "admin": {
+   "COMMAND": "admin",
+   "BOT_RELOAD": "Reiniciado exitoso",
+   "BOT_SHUTDOWN": "Apagando"
+  },
+  "bandersnatch":{
+   "COMMAND": "bandersnatch",
+   "HELP": "Este es un generador de nombres de Benedict Cumberbatch."
+  },
+  "bible":{
+   "COMMAND": "biblia",
+   "HELP": "Emite un verso de la Biblia, versión del Rey Jacobo. Use una referencia estándar o abreviada (John 3:16, Jn3:16).\nhttp://biblia.com",
+   "ARG_VERSE": "verso"
+  },
+  "btc":{
+   "COMMAND": "btc",
+   "HELP": "Da el precio en Bitcoin de la moneda dada, y opcionalmente la conversión de una cantidad a y de esa moneda.\nÍndice del precio BitCoin medio https://bitcoinaverage.com/",
+   "ARG_CURRENCY": "moneda",
+   "ARG_AMOUNT": "cantidad",
+   "CURRENCY_NOT_FOUND": "Error: Moneda no encontrada."
+  },
+  "calc":{
+   "COMMAND": "calc",
+   "HELP": "Este comando resuelve expresiones matemáticas realiza conversiones entre unidades comunes. Mire mathjs.org/docs/expressions/syntax para la lista de sintaxis aceptadas."
+  },
+  "chatter":{
+   "CONNECTION_ERROR": "No tengo ganas de hablar ahora mismo.",
+   "I_HAVE_NO_RESPONSE": "No sé qué decir a eso"
+  },
+  "commit":{
+   "COMMAND": "commit",
+   "HELP": "http://whatthecommit.com."
+  },
+  "dice":{
+   "COMMAND": "tirada",
+   "HELP": "Tira un dado. Usa cualquier número positivo como rango, o una notación D&D.\nEjemplo: %{COMMAND_START}%{COMMAND} 4D100 tirará un dado de 100 caras 4 veces.",
+   "MAX_DICE": "El máximo de dados es 100.",
+   "MAX_RANGE": "El rango máximo es 100000."
+  },
+  "dogify":{
+   "COMMAND": "dogifica",
+   "HELP": "Produce una imagen de Doge de dogr.io. Los saltos de línea se indican con una barra oblicua ('/'). Las palabras no tienen que estar espaciadas, pero el espaciado está soportado. Se enviará un link con la vista previa más que una imagen.",
+   "ARG_STUFF": "lineas/separadaspor/barras"
+  },
+  "echo":{
+   "COMMAND": "repite",
+   "HELP": "Repite una cadena."
+  },
+  "fortune":{
+   "COMMAND": "fortuna",
+   "HELP": "Pilla una fortuna aleatoria del programa de fortunas UNIX."
+  },
+  "gImages":{
+   "COMMAND": "foto",
+   "HELP": "Este comando realiza una búsqueda en Google Imágenes de la consulta dada. Se devuelve un resultado destacado aleatorio. La 'Búsqueda Segura' está activada por defecto; usa '%{COMMAND_START}insfw' para obtener resultados potencialmente NSFW."
+  },
+  "gMaps":{
+   "COMMAND": "loc",
+   "HELP": "Envía los datos de la localización consultada, tomados de Google Maps. Sirve para paises, ciudades, lugares destacados, etc.",
+  },
+  "gSearch":{
+   "COMMAND": "google",
+   "HELP": "Este comando realiza una búsqueda en Google de la consulta dada. Se devuelven 4 resultados. La 'Búsqueda Segura' está activada por defecto; usa '%{COMMAND_START}gnsfw' para obtener resultados potencialmente NSFW. Se devuelen 4 resultados en un chat grupal, u 8 por mensaje privado.",
+  },
+  "giphy":{
+   "COMMAND": "giphy",
+   "HELP": "Emite un GIF aleatorio o por búsqueda de giphy.com. Los resultados están limitados a PG-13 por defecto; usa '%{COMMAND_START}gifnsfw' para obtener resultados potencialmente NSFW.",
+  },
+  "hackernews":{
+   "COMMAND": "hackernews",
+   "HELP": "Emite artículos destacados de Hacker News. 4 en un chat grupal u 8 por mensaje privado."
+  },
+  "help":{
+   "COMMAND": "ayuda",
+   "HELP": "Da una lista de información básica de todos los comandos, o más detallada para un comando especificado.",
+   "AVAILABLE_COMMANDS": "Comandos disponibles:",
+   "ARGUMENTS": "*Argumentos: <required> [optional]",
+   "SPECIFIC_INFORMATION": "Usa '%{COMMAND_START}%{COMMAND} [%{ARG_COMMAND}]' para información específica.",
+   "SEND_IN_PM": "Te he enviado la información solicitada por mensaje privado."
+  },
+  "hex":{
+   "COMMAND": "hex",
+   "HELP": "Esta función convierte un número a o de hexadecimal.",
+   "INVALID_NUMBER": "Número no válido."
+  },
+  "imdb":{
+   "COMMAND": "imdb",
+   "HELP": "Esta función consigue la información de IMDb de una película o serie de TV dada, incluyendo el año, género, calificación en imdb, duración, y un resumen de la trama.",
+   "ARG_MOVIE_TVSERIES": "película | serie de TV"
+  },
+  "personality":{
+   "IM_HOME": "estoy en casa",
+   "IM_BACK": "he vuelto",
+   "WELCOME_RESPONSE": "Bienvenido a casa, %{FIRST_NAME}!",
+   "GRATITUDE": {
+    "1": "gracias",
+    "2": "bien",
+    "3": "buen"
+   },
+   "GRATITUDE_RESPONSE": "No ha sido nada, %{FIRST_NAME}!",
+   "GREETING": {
+    "1": "hola",
+    "2": "buenas",
+    "3": "buenos"
+   },
+   "GREETING_RESPONSES": {
+    "MORNING": "Hola, bonita mañana, %{FIRST_NAME}!",
+    "AFTERNOON": "Hola, bonito dia, %{FIRST_NAME}!",
+    "EVENING": "Hola, bonita noche, %{FIRST_NAME}!"
+   },
+   "FAREWELL": {
+    "1": "adios",
+    "2": "hasta luego",
+    "3": "bye"
+   },
+   "FAREWELL_RESPONSES": {
+    "MORNING": "Que te vaya bien, %{FIRST_NAME}!",
+    "AFTERNOON": "Hasta luego, %{FIRST_NAME}!",
+    "EVENING": "Buenas noches, %{FIRST_NAME}!"
+   },
+   "LOVE": {
+    "1": "te quiero",
+    "2": "te amo",
+    "3": "casate conmigo",
+    "4": "quiero un hijo tuyo"
+   },
+   "LOVE_RESPONSE": "%{FIRST_NAME}, creo que la ausencia de contacto fisico dificultaria nuestra relación.",
+   "HATE": {
+    "1": "te odio",
+    "2": "que te den",
+    "3": "que te peten"
+   },
+   "HATE_RESPONSE": "No te esfuerces, %{FIRST_NAME}, no tengo sentimientos."
+  },
+  "pokedex":{
+   "COMMAND": "dex",
+   "HELP": "Da la información de Pokédex de un pokémon dado.\nIncluye número de ID nacional, tipo, altura, peso, y la descripción de una dex regional aleatoria.",
+   "ARG_POKEMON": "pokémon",
+   "NOT_FOUND": "Pokémon no encontrado.",
+  },
+  "pun":{
+   "COMMAND": "pun",
+   "HELP": "Emite un juego de palabras aleatorio.\n¿Tienes una recomendación? PM @topkecleon.",
+  },
+  "reddit":{
+   "COMMAND": "reddit",
+   "HELP": "Este comando emite resultados destacados aleatorios de una búsqueda dada o subreddit. Posts NSFW están indicados como tales.",
+   "ARG_SUBREDDIT": "r/subreddit",
+   "SUBREDDIT_NOT_FOUND": "Subreddit no encontrado."
+  },
+  "remind":{
+   "COMMAND": "recuerdame",
+   "HELP": "Fija un recordatorio tú mismo. El primer argumento es el número de minutos hasta que desee que se le recuerde.",
+   "NO_DELAY_ERROR": "El retardo debe ser un número.",
+   "NO_REMINDER_ERROR": "Por favor, incluye un recordatorio.",
+   "MINUTES": "minutos",
+   "SECONDS": "segundos",
+   "REMINDER_SET": "Tu recordatorio se ha fijado para %{DELAY} desde ahora:\n%{MESSAGE}"
+  },
+  "shrug":{
+   "COMMAND": "shrug",
+  },
+  "slap":{
+   "COMMAND": "zurra",
+   "HELP": "¡Abofetea a alguien!",
+   "ARG_VICTIM": "victima"
+  },
+  "time":{
+   "COMMAND": "hora",
+   "HELP": "Envía la hora y la zona horaria de una localización dada.",
+   "RESULT": "La hora en %{TIMELOC} es %{TIMESTAMP}"
+  },
+  "urbandictionary":{
+   "COMMAND": "urbandictionary",
+   "HELP": "Da la primera definición de un término dado de Urban Dictionary.",
+   "EXAMPLE": "Ejemplo: "
+  },
+  "weather":{
+   "COMMAND": "tiempo",
+   "HELP": "Da la temperatura actual y condiciones atmosféricas de una localizacion especificada.\nLocalizaciones no-ciudades están aceptadas; '%{COMMAND_START}%{COMMAND} Palacio de Buckingham' dará el tiempo en Westminster."
+  },
+  "whoami":{
+   "COMMAND": "quiensoy",
+   "HELP": "Consigue tu ID de usuario y el del grupo.",
+   "RESPONSE": "Eres %{FROM} y estás hablando en %{TO}."
+  },
+  "xkcd":{
+   "COMMAND": "xkcd",
+   "HELP": "Este comando emite una tira de xkcd, su número, y su mensaje 'secreto. Puedes buscar una tira específica o recibir una aleatoria."
+  },
+ }
+}

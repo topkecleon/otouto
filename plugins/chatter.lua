@@ -3,8 +3,8 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^@' .. bot.username .. ', ',
-	'^' .. bot.first_name .. ', '
+	'@' .. bot.username,
+	bot.first_name .. ', '
 }
 
 function PLUGIN.action(msg)

@@ -116,9 +116,44 @@
   "personality":{
    "IM_HOME": "i'm home",
    "IM_BACK": "i'm back",
-   "WELCOME_BACK": "Welcome back, %{FIRST_NAME}'!",
-   "NO_PROBLEM": "No problem, %{FIRST_NAME}'!",
-   "HELLO": "Hi, %{FIRST_NAME}'!"
+   "WELCOME_RESPONSE": "Welcome, %{FIRST_NAME}!",
+   "GRATITUDE": {
+    "1": "thanks",
+    "2": "thank you",
+   },
+   "GRATITUDE_RESPONSE": "No problem, %{FIRST_NAME}!",
+   "GREETING": {
+    "1": "hello",
+    "2": "hi",
+    "3": "hey"
+   },
+   "GREETING_RESPONSES": {
+    "MORNING": "Good morning, %{FIRST_NAME}!",
+    "AFTERNOON": "Good afternoon, %{FIRST_NAME}!",
+    "EVENING": "Good evening, %{FIRST_NAME}!"
+   },
+   "FAREWELL": {
+    "1": "goodbye",
+    "2": "bye",
+    "3": "sayonara"
+   },
+   "FAREWELL_RESPONSES": {
+    "MORNING": "Have a nice day, %{FIRST_NAME}!",
+    "AFTERNOON": "See you later, %{FIRST_NAME}!",
+    "EVENING": "Sweet dreams, %{FIRST_NAME}!"
+   },
+   "LOVE": {
+    "1": "i love you",
+    "2": "i want to marry you",
+    "3": "fuck me",
+   },
+   "LOVE_RESPONSE": "%{FIRST_NAME}, I think that the absence of physical contact would make our relationship very hard.",
+   "HATE": {
+    "1": "i hate you",
+    "2": "fuck you",
+    "3": "screw you"
+   },
+   "HATE_RESPONSE": "Don't try, %{FIRST_NAME}, I have no feelings."
   },
   "pokedex":{
    "COMMAND": "dex",

@@ -8,35 +8,72 @@ PLUGIN.triggers = {
 	bot.first_name .. '%p?$',
 	'^tadaima%p?$',
 	I18N('personality.IM_HOME'),
-	I18N('personality.IM_BACK')
+	I18N('personality.IM_BACK'),
+	'^sayonara%p?$',
 }
 
 function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 
 	local input = string.lower(msg.text)
+	local time = tonumber(os.date('%H', os.time()))
+	local daytime
+
+	if time >= 17 or time < 05 then
+		daytime = 'evening'
+	elseif time >= 05 and time <12 then
+		daytime = 'morning'
+	else
+		daytime = 'afternoon'
+	end
 
 	if config.people[tostring(msg.from.id)] then msg.from.first_name = config.people[tostring(msg.from.id)] end
 
-	for i = 2, #PLUGIN.triggers do
+	for i = 2,4 do
 		if string.match(input, PLUGIN.triggers[i]) then
-			return send_message(msg.chat.id, I18N('personality.WELCOME_BACK', {FIRST_NAME = msg.from.first_name}))
+			return send_message(msg.chat.id, I18N('personality.WELCOME_RESPONSE', {FIRST_NAME = msg.from.first_name}))
 		end
 	end
 
-	if input:match('thanks,? '..bot.first_name) or input:match('thank you,? '..bot.first_name) then
-		return send_message(msg.chat.id, I18N('personality.NO_PROBLEM', {FIRST_NAME = msg.from.first_name}))
+	for k,v in pairs(I18N('personality.GRATITUDE')) do
+		if input:match(v .. '(.*) '..bot.first_name) then
+			return send_message(msg.chat.id, I18N('personality.GRATITUDE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
+		end
 	end
 
-	if input:match('hello,? '..bot.first_name) or input:match('hey,? '..bot.first_name) or input:match('hi,? '..bot.first_name) then
-		return send_message(msg.chat.id, I18N('personality.HELLO', {FIRST_NAME = msg.from.first_name}))
+	for k,v in pairs(I18N('personality.GREETING')) do
+		if input:match(v .. '? '..bot.first_name) then
+			if daytime == 'morning' then
+				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
+			elseif daytime == 'evening' then
+				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.EVENING', {FIRST_NAME = msg.from.first_name}))
+			else
+				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.AFTERNOON', {FIRST_NAME = msg.from.first_name}))
+			end
+		end
 	end
 
-	if input:match('i hate you,? '..bot.first_name) or input:match('screw you,? '..bot.first_name) or input:match('fuck you,? '..bot.first_name) then
-		return send_msg(msg, '; _ ;')
+	for k,v in pairs(I18N('personality.FAREWELL')) do
+		if input:match(v .. '? '..bot.first_name) then
+			if daytime == 'morning' then
+				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
+			elseif daytime == 'evening' then
+				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.EVENING', {FIRST_NAME = msg.from.first_name}))
+			else
+				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.AFTERNOON', {FIRST_NAME = msg.from.first_name}))
+			end
+		end
 	end
 
-	if string.match(input, 'i love you,? '..bot.first_name) then
-		return send_msg(msg, '<3')
+	for k,v in pairs(I18N('personality.LOVE')) do
+		if input:match(v .. '? '..bot.first_name) then
+			return send_message(msg.chat.id, I18N('personality.LOVE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
+		end
+	end
+
+	for k,v in pairs(I18N('personality.HATE')) do
+		if input:match(v .. '? '..bot.first_name) then
+			return send_message(msg.chat.id, I18N('personality.HATE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
+		end
 	end
 
 end
