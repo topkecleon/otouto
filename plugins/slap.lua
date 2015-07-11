@@ -100,12 +100,21 @@ function PLUGIN.action(msg)
 
 	math.randomseed(os.time())
 
+	local slapper
 	local victim = get_input(msg.text)
 	if victim then
 		slapper = msg.from.first_name
 	else
 		victim = msg.from.first_name
 		slapper = bot.first_name
+	end
+
+	if msg.reply_to_message then
+		victim = msg.reply_to_message.from.first_name
+		slapper = msg.from.first_name
+		if slapper == victim then
+			slapper = bot.first_name
+		end
 	end
 
 	local message = PLUGIN.getSlap(slapper, victim)

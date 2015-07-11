@@ -41,6 +41,10 @@ function PLUGIN.action(msg)
 
 	math.randomseed(os.time())
 
+	if msg.reply_to_message then
+		msg = msg.reply_to_message
+	end
+
 	if string.match(string.lower(msg.text), 'y/n') then
 		message = PLUGIN.yesno[math.random(#PLUGIN.yesno)]
 	else
