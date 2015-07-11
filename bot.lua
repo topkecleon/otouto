@@ -31,9 +31,13 @@ function bot_init()
 
 	print('\nLoading configuration...')
 
-	local jstr = io.open('config.json')
-	local jstr = jstr:read('*all')
-	config = JSON.decode(jstr)
+	local j = io.open('config.json')
+	local j = j:read('*all')
+	config = JSON.decode(j)
+	local j = io.open('loc/'..config.LOCALE..'.json')
+	local j = j:read('*all')
+	locale = JSON.decode(j)
+
 	print(#config.plugins .. ' plugins enabled.')
 
 	require('bindings')

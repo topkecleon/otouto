@@ -19,7 +19,7 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTPS.request('https://api.bitcoinaverage.com/ticker/global/')
 
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
@@ -29,7 +29,7 @@ function PLUGIN.action(msg)
 		arg1 = string.upper(string.sub(input, 1, 3))
 		arg2 = string.sub(input, 5)
 		if not tonumber(arg2) then
-			return send_msg(msg, 'Invalid argument.')
+			return send_msg(msg, locale.inv_arg)
 		end
 	end
 
@@ -43,7 +43,7 @@ function PLUGIN.action(msg)
 	if url then
 		jstr, b = HTTPS.request(url)
 	else
-		return send_msg(msg, 'Error: Currency not found.')
+		return send_msg(msg, locale.noresults)
 	end
 
 	jdat = JSON.decode(jstr)

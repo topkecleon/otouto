@@ -12,7 +12,7 @@ PLUGIN.triggers = {
 	'^i\'m back%p?$'
 }
 
-function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
+function PLUGIN.action(msg)
 
 	local input = string.lower(msg.text)
 
@@ -24,24 +24,20 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 		end
 	end
 
-	if input:match('thanks,? '..bot.first_name) or input:match('thank you,? '..bot.first_name) then
-		return send_message(msg.chat.id, 'No problem, ' .. msg.from.first_name .. '!')
-	end
+	interactions = {
+		[locale.responses.hello]	= locale.hello,
+		[locale.responses.goodbye]	= locale.goodbye,
+		[locale.responses.thankyou]	= locale.thankyou,
+		[locale.responses.love]		= locale.love,
+		[locale.responses.hate]		= locale.hate
+	}
 
-	if input:match('hello,? '..bot.first_name) or input:match('hey,? '..bot.first_name) or input:match('hi,? '..bot.first_name) then
-		return send_message(msg.chat.id, 'Hi, ' .. msg.from.first_name .. '!')
-	end
-
-	if input:match('bye,? '..bot.first_name) or input:match('later,? '..bot.first_name) then
-		return send_message(msg.chat.id, 'Bye-bye, ' .. msg.from.first_name .. '!')
-	end
-
-	if input:match('i hate you,? '..bot.first_name) or input:match('screw you,? '..bot.first_name) or input:match('fuck you,? '..bot.first_name) then
-		return send_msg(msg, '; _ ;')
-	end
-
-	if string.match(input, 'i love you,? '..bot.first_name) then
-		return send_msg(msg, '<3')
+	for k,v in pairs(interactions) do
+		for key,val in pairs(v) do
+			if input:match(val..',? '..bot.first_name) then
+				return send_message(msg.chat.id, k..', '..msg.from.first_name..'!')
+			end
+		end
 	end
 
 --	msg.text = '@' .. bot.username .. ', ' .. msg.text:gsub(bot.first_name, '')

@@ -1,7 +1,7 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-	/who
+	/whoami
 	Get the user ID for yourself and the group. Use it in a reply to get info for the sender of the original message.
 ]]
 

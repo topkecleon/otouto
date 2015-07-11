@@ -24,11 +24,11 @@ function PLUGIN.action(msg)
 			local url = 'http://www.reddit.com/' .. first_word(input) .. '/.json'
 			local jstr, res = HTTP.request(url)
 			if res ~= 200 then
-				return send_msg(msg, 'Connection error.')
+				return send_msg(msg, locale.conn_err)
 			end
 			jdat = JSON.decode(jstr)
 			if #jdat.data.children == 0 then
-				return send_msg(msg, 'Subreddit not found.')
+				return send_msg(msg, locale.noresults)
 			end
 
 		else
@@ -36,11 +36,11 @@ function PLUGIN.action(msg)
 			local url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input)
 			local jstr, res = HTTP.request(url)
 			if res ~= 200 then
-				return send_msg(msg, 'Connection error.')
+				return send_msg(msg, locale.conn_err)
 			end
 			jdat = JSON.decode(jstr)
 			if #jdat.data.children == 0 then
-				return send_msg(msg, 'No results found.')
+				return send_msg(msg, locale.noresults)
 			end
 
 		end
@@ -50,7 +50,7 @@ function PLUGIN.action(msg)
 		url = 'https://www.reddit.com/.json'
 		local jstr, res = HTTP.request(url)
 		if res ~= 200 then
-			return send_msg(msg, 'Connection error.')
+			return send_msg(msg, locale.conn_err)
 		end
 		jdat = JSON.decode(jstr)
 

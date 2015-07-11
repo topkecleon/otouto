@@ -20,7 +20,7 @@ function PLUGIN.action(msg)
 		send_msg(msg, string.format('%x', input))
 
 	else
-		send_msg(msg, 'Invalid number.')
+		send_msg(msg, locale.inv_arg)
 
 	end
 

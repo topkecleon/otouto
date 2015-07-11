@@ -3,6 +3,7 @@
  "BIBLIA_API_KEY": "",
  "GIPHY_API_KEY": "dc6zaTOxFJmzC",
  "TIME_OFFSET": 0,
+ "LOCALE": "en_US",
  "admins": [
   0
  ],

@@ -20,13 +20,13 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.status ~= 'OK' then
-		local message = 'Error: \"' .. input .. '\" not found.'
+		local message = locale.noresults
 		return send_msg(msg, message)
 	end
 

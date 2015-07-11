@@ -20,14 +20,13 @@ function PLUGIN.action(msg)
 
 	coords = get_coords(input)
 	if not coords then
-		local message = 'Error: \"' .. input .. '\" not found.'
-		return send_msg(msg, message)
+		return send_msg(msg, locale.noresults)
 	end
 
 	local url = 'http://maps.googleapis.com/maps/api/timezone/json?location=' .. coords.lat ..','.. coords.lon .. '&timestamp='..os.time()
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, locale.conn_err)
 	end
 	local jdat = JSON.decode(jstr)
 

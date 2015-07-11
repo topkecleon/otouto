@@ -4,7 +4,8 @@ PLUGIN.triggers = {
 	['¯\\_(ツ)_/¯'] = '/shrug$',
 	['( ͡° ͜ʖ ͡°)'] = '/lenny$',
 	['(╯°□°）╯︵ ┻━┻'] = '/flip$',
-	['┌（┌　＾o＾）┐'] = '/homo$'
+	['┌（┌　＾o＾）┐'] = '/homo$',
+	['ಠ_ಠ'] = '/look$'
 }
 
 function PLUGIN.action(msg)

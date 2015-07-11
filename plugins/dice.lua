@@ -33,10 +33,10 @@ function PLUGIN.action(msg)
 		end
 		range = string.sub(input, dloc+1)
 		if not tonumber(rolls) or not tonumber(range) then
-			return send_msg(msg, 'Invalid syntax.')
+			return send_msg(msg, locale.inv_arg)
 		end
 	else
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, locale.inv_arg)
 	end
 
 	if tonumber(rolls) == 1 then
@@ -44,19 +44,15 @@ function PLUGIN.action(msg)
 	elseif tonumber(rolls) > 1 then
 		results = rolls .. 'D' .. range .. ':\n'
 	else
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, locale.inv_arg)
 	end
 
 	if tonumber(range) < 2 then
-		return send_msg(msg, 'Invalid syntax.')
+		return send_msg(msg, locale.inv_arg)
 	end
 
-	if tonumber(rolls) > 100 then
-		return send_msg(msg, 'Maximum dice is 100.')
-	end
-
-	if tonumber(range) > 100000 then
-		return send_msg(msg, 'Maximum range is 100000.')
+	if tonumber(rolls) > 100 or tonumber(range) > 100000 then
+		return send_msg(msg, 'Max 100D100000')
 	end
 
 	for i = 1, tonumber(rolls) do

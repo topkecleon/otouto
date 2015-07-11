@@ -23,7 +23,7 @@ function PLUGIN.action(msg)
 	local dex_url = base_url .. '/api/v1/pokemon/' .. input
 	local dex_jstr, res = HTTP.request(dex_url)
 	if res ~= 200 then
-		return send_msg(msg, 'Pokemon not found..')
+		return send_msg(msg, locale.noresults)
 	end
 
 	local dex_jdat = JSON.decode(dex_jstr)
@@ -31,7 +31,7 @@ function PLUGIN.action(msg)
 	local desc_url = base_url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
 	local desc_jstr, res = HTTP.request(desc_url)
 	if res ~= 200 then
-		return send_msg(msg, 'Connection error.')
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local desc_jdat = JSON.decode(desc_jstr)

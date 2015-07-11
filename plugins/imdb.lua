@@ -21,7 +21,7 @@ function PLUGIN.action(msg)
 	local jdat = JSON.decode(jstr)
 
 	if res ~= 200 then
-		return send_msg(msg, 'Error connecting to server.')
+		return send_msg(msg, locale.conn_err)
 	end
 
 	if jdat.Response ~= 'True' then

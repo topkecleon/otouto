@@ -172,6 +172,8 @@ Add your bot API key, and other API keys if desirable.
 The plugins which require API keys that are not provided are disabled by default.
 The provided Giphy key is the public test key, and is subject to rate limitaton.
 
+The "fortune.lua" plugin requires the fortune program to be installed on the host computer.
+
 TIME_OFFSET is the time difference, in seconds, between your system clock. It is sometimes necessary for accurate output of the time plugin. Default at 0 (duh).
 
 "admins" table includes the ID numbers, as integers, of any privileged users. These will have access to the admin plugin and any addition privileged commands.

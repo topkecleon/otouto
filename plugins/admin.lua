@@ -6,9 +6,11 @@ PLUGIN.triggers = {
 
 function PLUGIN.action(msg)
 
+	if msg.date < os.time() - 1 then return end
+
 	local input = get_input(msg.text)
 
-	local message = 'Command not found.'
+	local message = locale.inv_arg
 
 	local sudo = 0
 	for i,v in ipairs(config.admins) do

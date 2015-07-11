@@ -22,7 +22,7 @@ function PLUGIN.action(msg)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		message = 'Connection error.'
+		message = locale.conn_err
 	end
 
 	send_msg(msg, message)
