@@ -17,7 +17,7 @@ function PLUGIN.action(msg)
 		Use /help for a list of commands.
 
 		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
-		otouto is licensed under the GPLv2.
+		otouto v2 is licensed under the GPLv2.
 		topkecleon.github.io/otouto
 	]] -- Please do not remove this message.
 
