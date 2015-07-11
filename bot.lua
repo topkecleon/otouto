@@ -70,6 +70,10 @@ function bot_init()
 
 	print('Help message generated!\n')
 
+	print('username: @'..bot.username)
+	print('name: '..bot.first_name)
+	print('ID: '..bot.id)
+
 	is_started = true
 
 end
