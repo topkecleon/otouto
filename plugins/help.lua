@@ -29,9 +29,6 @@ function PLUGIN.action(msg)
 
 	local message = 'Available commands:\n' .. help_message .. [[
 		*Arguments: <required> [optional]
-		Use "!help <command>" for specific information.
-		otouto v]] .. VERSION .. [[ by @topkecleon.
-		Fork me on github! github.com/topkecleon/otouto
 	]]
 
 	if msg.from.id ~= msg.chat.id then
