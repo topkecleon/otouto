@@ -1,11 +1,11 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	['¯\\_(ツ)_/¯'] = '/shrug$',
-	['( ͡° ͜ʖ ͡°)'] = '/lenny$',
-	['(╯°□°）╯︵ ┻━┻'] = '/flip$',
-	['┌（┌　＾o＾）┐'] = '/homo$',
-	['ಠ_ಠ'] = '/look$'
+	['¯\\_(ツ)_/¯'] = config.COMMAND_START .. 'shrug$',
+	['( ͡° ͜ʖ ͡°)'] = config.COMMAND_START .. 'lenny$',
+	['(╯°□°）╯︵ ┻━┻'] = config.COMMAND_START .. 'flip$',
+	['┌（┌　＾o＾）┐'] = config.COMMAND_START .. 'homo$',
+	['ಠ_ಠ'] = config.COMMAND_START .. 'look$'
 }
 
 function PLUGIN.action(msg)

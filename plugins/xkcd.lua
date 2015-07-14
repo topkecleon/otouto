@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/xkcd [search]
-	This command returns an xkcd strip, its number, and its "secret" text. You may search for a specific strip or get a random one.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.xkcd.command .. '\n' .. locale.xkcd.help
 
 PLUGIN.triggers = {
-	'^/xkcd'
+	'^' .. config.COMMAND_START .. locale.xkcd.command,
 }
 
 function PLUGIN.action(msg)

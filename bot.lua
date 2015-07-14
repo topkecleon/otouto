@@ -14,7 +14,7 @@ function on_msg_receive(msg)
 
 	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
-	if msg.forward_from then return end -- don't react to forwarded messages
+	--if msg.forward_from then return end -- don't react to forwarded messages
 
 	local lower = string.lower(msg.text)
 	for i,v in pairs(plugins) do
@@ -67,7 +67,7 @@ function bot_init()
 	for i,v in ipairs(plugins) do
 		if v.doc then
 			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
-			print(a)
+			print('',a)
 			help_message = help_message .. ' - ' .. a .. '\n'
 		end
 	end
@@ -85,12 +85,14 @@ end
 function process_msg(msg)
 
 	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
-		msg.text = 'hi '..bot.first_name
+		msg.text = locale.personality.responses.welcome
+		msg.text = msg.text:gsub('#NAME', msg.from.first_name)
 		msg.from = msg.new_chat_participant
 	end
 
 	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
-		msg.text = 'bye '..bot.first_name
+		msg.text = locale.personality.responses.kicked
+		msg.text = msg.text:gsub('#NAME', msg.from.first_name)
 		msg.from = msg.left_chat_participant
 	end
 

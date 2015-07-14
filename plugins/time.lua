@@ -2,13 +2,10 @@
 
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/time <location>
-	Sends the time and timezone for a given location.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.time.command .. '\n' .. locale.time.help
 
 PLUGIN.triggers = {
-	'^/time'
+	'^' .. config.COMMAND_START .. locale.time.command
 }
 
 function PLUGIN.action(msg)
@@ -33,7 +30,9 @@ function PLUGIN.action(msg)
 	local timestamp = os.time() + jdat.rawOffset + jdat.dstOffset + config.TIME_OFFSET
 	timestamp = os.date("%H:%M on %A, %B %d.", timestamp)
 	local timeloc = (string.gsub((string.sub(jdat.timeZoneId, string.find(jdat.timeZoneId, '/')+1)), '_', ' '))
-	local message = "The time in " .. timeloc .. " is " .. timestamp
+	local message = locale.time.result
+	message = message:gsub('#TIMESTAMP', timestamp)
+	message = message:gsub('#TIMELOC', timeloc)
 
 	send_msg(msg, message)
 

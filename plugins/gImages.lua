@@ -1,15 +1,12 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/images <query>
-	This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '/insfw' to get potentially NSFW results.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.gImages.command .. '\n' .. locale.gImages.help
 
 PLUGIN.triggers = {
-	'^/images?',
-	'^/img',
-	'^/i ',
-	'^/insfw'
+	'^' .. config.COMMAND_START .. locale.gImages.command .. '?',
+	'^' .. config.COMMAND_START .. 'img',
+	'^' .. config.COMMAND_START .. 'i ',
+	'^' .. config.COMMAND_START .. 'insfw'
 }
 
 PLUGIN.exts = {
@@ -24,7 +21,7 @@ function PLUGIN.action(msg)
 
 	local url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8'
 
-	if not string.match(msg.text, '^/insfw ') then
+	if not string.match(msg.text, '^' .. config.COMMAND_START .. 'insfw ') then
 		url = url .. '&safe=active'
 	end
 
@@ -60,7 +57,7 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	send_message(msg.chat.id, result_url, false, msg.message_id)
+	send_message(msg.chat.id, result_url, false)
 
 end
 

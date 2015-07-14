@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/dex <pokemon>
-	Get Pokedex information for a given Pokemon.
-	Includes national ID number, type, height, weight, and a description from a random regional dex.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.pokedex.command .. '\n' .. locale.pokedex.help
 
 PLUGIN.triggers = {
-	'^/dex'
+	'^' .. config.COMMAND_START .. locale.pokedex.command,
 }
 
 function PLUGIN.action(msg)

@@ -1,14 +1,11 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/whoami
-	Get the user ID for yourself and the group. Use it in a reply to get info for the sender of the original message.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.whoami.command .. '\n' .. locale.whoami.help
 
 PLUGIN.triggers = {
-	'^/whoami',
-	'^/ping',
-	'^/who$'
+	'^' .. config.COMMAND_START .. locale.whoami.command,
+	'^' .. config.COMMAND_START .. 'ping',
+	'^' .. config.COMMAND_START .. 'who$'
 }
 
 function PLUGIN.action(msg)
@@ -32,7 +29,9 @@ function PLUGIN.action(msg)
 	end
 	from_name = from_name .. ' (' .. msg.from.id .. ')'
 
-	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name .. '.'
+	local message = locale.whoami.result
+	message = message:gsub('#TO_NAME', to_name)
+	message = message:gsub('#FROM_NAME', from_name)
 
 	send_msg(msg, message)
 

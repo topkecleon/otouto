@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/loc <location>
-	Sends location data for query, taken from Google Maps. Works for countries, cities, landmarks, etc.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.gMaps.command .. '\n' .. locale.gMaps.help
 
 PLUGIN.triggers = {
-	'^/loc'
+	'^' .. config.COMMAND_START .. locale.gMaps.command,
 }
 
 function PLUGIN.action(msg)

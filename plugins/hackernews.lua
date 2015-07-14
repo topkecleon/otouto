@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/hackernews
-	Returns some top stories from Hacker News. Four in a group or eight in a private message.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.hackernews.command .. '\n' .. locale.hackernews.help
 
 PLUGIN.triggers = {
-	'^/hackernews',
+	'^' .. config.COMMAND_START .. locale.hackernews.command,
 	'^/hn$'
 }
 

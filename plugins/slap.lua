@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/slap [victim]
-	Slap someone!
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.slap.command .. '\n' .. locale.slap.help
 
 PLUGIN.triggers = {
-	'^/slap'
+	'^' .. config.COMMAND_START .. locale.slap.command
 }
 
 function PLUGIN.getSlap(slapper, victim)

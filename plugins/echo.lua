@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/echo <text>
-	Repeat a string.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.echo.command .. '\n' .. locale.echo.help
 
 PLUGIN.triggers = {
-	'^/echo'
+	'^' .. config.COMMAND_START .. locale.echo.command
 }
 
 function PLUGIN.action(msg)

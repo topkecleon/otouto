@@ -1,12 +1,12 @@
 {
-    "conn_err": "Connection error.",
-    "noresults": "No results found.",
-    "inv_arg": "Invalid argument.",
-    "notfound": "Not found.",
-    "comm_not_found":"command not found.",
-    "no_perm": "Permission denied.",
-    "inv_syntax": "Invalid syntax.",
-    "pm_info": "I have sent you the requested information in a private message.",
+    "conn_err": "N-no pude conectarme...",
+    "noresults": "N-no he encontrado nada...",
+    "inv_arg": "N-no entiendo...",
+    "notfound": "N-no he encontrado nada...",
+    "comm_not_found":"N-no entiendo...",
+    "no_perm": "¡Solo cumplo ordenes de Sempai!",
+    "inv_syntax": "¡Por alli no desu!",
+    "pm_info": "T-te lo puedo explicar a solas... s-si quieres...",
     "arg": {
         "comm": "command",
         "query": "query",
@@ -26,9 +26,9 @@
     },
     "about": {
         "command": "about",
-        "help": "Information about the bot.",
-        "description": "This is #BOTNAME: a plugin-wielding, multi-purpose Telegram bot.\nUse #C_START#COMMAND for a list of commands.",
-        "version": "Based on otouto v#VERSION by @topkecleon.\notouto v2 is licensed under the GPLv2.\ntopkecleon.github.io/otouto"
+        "help": "Información acerca del bot",
+        "description": "Esto es #BOTNAME: un bot de Telegram multiproposito con soporte para plugins.\nUsa #C_START#COMMAND para ver todos los comandos disponibles.",
+        "version": "Basado en otouto v#VERSION de @topkecleon y modificado por @luksireiku.\notouto v2 esta licenciado bajo GPLv2.\ntopkecleon.github.io/otouto\nluksireiku.github.io/petouto"
     },
     "admin": {
         "command": "admin",
@@ -53,9 +53,9 @@
         "help": "This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax."
     },
     "chatter":{
-        "lang": "en",
-        "conn_err": "I don't feel like talking right now.",
-        "no_resp": "I don't know what to say to that."
+        "lang": "es",
+        "conn_err": "...",
+        "no_resp": "Nani...? 😥"
     },
     "commit":{
         "command": "commit",
@@ -114,52 +114,56 @@
         "help": "This function retrieves the IMDb info for a given film or television series, including the year, genre, imdb rating, runtime, and a summation of the plot.",
     },
     "personality":{
-        "im_home": "i'm home",
-        "im_back": "i'm back",
+        "im_home": "estoy en casa",
+        "im_back": "he vuelto",
         "hello": [
-            "hello",
+            "hola",
             "hey",
             "hi",
-            "good morning",
-            "good day",
-            "good afternoon",
-            "good evening"
+            "buenos dias"
         ],
         "goodbye": [
+            "adios",
+            "hasta luego",
             "bye",
-            "later",
-            "see ya",
-            "good night"
+            "buenas noches",
+            "nos vemos",
+            "hasta otra"
         ],
         "gratitude": [
-            "thanks",
-            "thank you"
+            "gracias",
+            "bien ",
+            "buen ",
+            "eres la mejor",
+            "grande "
         ],
         "love": [
-            "love you"
+            "te quiero",
+            "te amo",
+            "casate conmigo",
+            "quiero un hijo tuyo"
         ],
         "hate": [
-            "hate you",
-            "screw you",
-            "fuck you",
-            "go away"
+            "te odio",
+            "que te den",
+            "que te peten"
         ],
         "responses": {
             "hello": {
-                "morning": "Good morning, #NAME!",
-                "afternoon": "Good afternoon, #NAME!",
-                "evening": "Good evening, #NAME!"
+                "morning": "Ohayō gozaimasu, #NAME! 😊",
+                "afternoon": "Konnichi wa, #NAME! 😊",
+                "evening": "Konban wa, #NAME! 😊"
             },
             "goodbye": {
-                "morning":"Bye bye, #NAME!",
-                "afternoon":"Bye bye, #NAME!",
-                "evening":"Bye bye, #NAME!"
+                "morning":"Sayōnara, #NAME! 😊",
+                "afternoon":"Sayōnara, #NAME! 😊",
+                "evening":"Oyasumi nasai, #NAME! 😊"
             },
-            "welcome": "Welcome, #NAME!",
+            "welcome": "Okaeri nasai, #NAME! 😄",
             "kicked": "See you soon, #NAME!",
-            "gratitude": "No problem, #NAME!",
-            "love": "#NAME, I think that the absence of physical contact would make our relationship very hard.",
-            "hate": "Don't even try, #NAME, I have no feelings."
+            "gratitude": "Arigatō, #NAME! 😊",
+            "love": "#NAME... 😣",
+            "hate": "Gomen nasai #NAME... 😭"
         }
     	
     },
@@ -207,17 +211,25 @@
         "help": "Returns the first definition for a given term from Urban Dictionary.",
         "example": "Example: "
     },
-    "weather":{
+    "weather": {
         "command": "weather",
         "help": "Returns the current temperature and weather conditions for a specified location.\nNon-city locations are accepted; '%{command_START}%{command} Buckingham Palace' will return the weather for Westminster."
     },
-    "whoami":{
+    "whoami": {
         "command": "whoami",
         "help": "Get the user ID for yourself and the group.",
         "result": "You are #FROM_NAME and you are messaging #TO_NAME."
     },
-    "xkcd":{
+    "xkcd": {
         "command": "xkcd",
         "help": "This command returns an xkcd strip, its number, and its 'secret' text. You may search for a specific strip or get a random one."
+    },
+    "pInsulta": {
+        "command": "insulta",
+        "help": "Se hace respetar."
+    },
+    "pAlaba": {
+        "command": "alaba",
+        "help": "Tambien sabe decir cosas bonitas"
     }
 }

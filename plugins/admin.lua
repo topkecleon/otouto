@@ -1,7 +1,7 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^/admin '
+	'^' .. config.COMMAND_START .. locale.admin.command
 }
 
 function PLUGIN.action(msg)
@@ -20,7 +20,7 @@ function PLUGIN.action(msg)
 	end
 
 	if sudo == 0 then
-		message = 'Permission denied.'
+		message = locale.no_perm
 
 	elseif string.lower(first_word(input)) == 'run' then
 
@@ -32,12 +32,12 @@ function PLUGIN.action(msg)
 	elseif string.lower(first_word(input)) == 'reload' then
 
 		bot_init()
-		message = 'Bot reloaded!'
+		message = locale.admin.reload
 
 	elseif string.lower(first_word(input)) == 'halt' then
 
 		is_started = false
-		message = 'Shutting down...'
+		message = locale.admin.halt
 
 	end
 

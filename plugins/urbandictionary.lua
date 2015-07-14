@@ -1,13 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/ud <term>
-	Returns the first definition for a given term from Urban Dictionary.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.urbandictionary.command .. '\n' .. locale.urbandictionary.help
 
 PLUGIN.triggers = {
-	'^/ud',
-	'^/urbandictionary'
+	'^' .. config.COMMAND_START .. locale.urbandictionary.command,
+	'^' .. config.COMMAND_START .. 'ud',
 }
 
 function PLUGIN.action(msg)
@@ -32,7 +29,7 @@ function PLUGIN.action(msg)
 
 	message = '"' .. jdat.list[1].word .. '"\n' .. trim_string(jdat.list[1].definition)
 	if string.len(jdat.list[1].example) > 0 then
-		message = message .. '\n\nExample:\n' .. trim_string(jdat.list[1].example)
+		message = message .. '\n\n'.. locale.urbandictionary.example .. '\n' .. trim_string(jdat.list[1].example)
 	end
 
 	send_msg(msg, message)

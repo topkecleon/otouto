@@ -1,25 +1,21 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/about
-	Information about the bot.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.about.command .. '\n' .. locale.about.help
 
 PLUGIN.triggers = {
-	'^/about',
-	'^/info'
+	'^' .. config.COMMAND_START .. locale.about.command,
+	'^' .. config.COMMAND_START ..'info'
 }
 
 function PLUGIN.action(msg)
+	local description = locale.about.description
+	description = description:gsub('#BOTNAME', bot.first_name)
+	description = description:gsub('#C_START', config.COMMAND_START)
+	description = description:gsub('#COMMAND', locale.about.command)
+	local version = locale.about.version
+	version = version:gsub('#VERSION', VERSION)
 
-	local message = [[
-		This is ]] .. bot.first_name .. [[: a plugin-wielding, multi-purpose Telegram bot.
-		Use /help for a list of commands.
-
-		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
-		otouto v2 is licensed under the GPLv2.
-		topkecleon.github.io/otouto
-	]] -- Please do not remove this message.
+	local message = description .. '\n\n' .. version
 
 	send_msg(msg, message)
 

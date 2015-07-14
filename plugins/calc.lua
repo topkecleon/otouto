@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/calc <expression>
-	This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.calc.command .. '\n' .. locale.calc.help
 
 PLUGIN.triggers = {
-	'^/calc'
+	'^' .. config.COMMAND_START .. locale.calc.command
 }
 
 function PLUGIN.action(msg)

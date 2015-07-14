@@ -1,13 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/btc <currency> [amount]
-	Gives bitcoin prices for the given currency, and optionally conversion of an amount to and from that currency.
-	BitcoinAverage Price Index https://bitcoinaverage.com/
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.btc.command .. '\n' .. locale.btc.help
 
 PLUGIN.triggers = {
-	'^/btc'
+	'^' .. config.COMMAND_START .. locale.btc.command
 }
 
 function PLUGIN.action(msg)

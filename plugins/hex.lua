@@ -1,12 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = [[
-	/hex <number>
-	This function converts a number to or from hexadecimal.
-]]
+PLUGIN.doc = config.COMMAND_START .. locale.hex.command .. '\n' .. locale.hex.help
 
 PLUGIN.triggers = {
-	'^/hex '
+	'^' .. config.COMMAND_START .. locale.hex.command
 }
 
 function PLUGIN.action(msg)

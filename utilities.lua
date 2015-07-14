@@ -63,7 +63,7 @@ function latcyr(str)
 end
 
 function send_msg(msg, message)
-	send_message(msg.chat.id, message, true, msg.message_id)
+	send_message(msg.chat.id, message, true)
 end
 
 function get_coords(input)
