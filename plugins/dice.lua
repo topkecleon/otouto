@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('dice.COMMAND') .. ' [' .. I18N('ARG_RANGE') .. ']\n' .. I18N('dice.HELP', {COMMAND_START = config.COMMAND_START, COMMAND = I18N('dice.COMMAND')})
+PLUGIN.doc = config.COMMAND_START .. locale.dice.command .. '\n' .. locale.dice.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('dice.COMMAND')
+	'^' .. config.COMMAND_START .. locale.dice.command,
 }
 
 function PLUGIN.action(msg)
@@ -29,10 +29,10 @@ function PLUGIN.action(msg)
 		end
 		range = string.sub(input, dloc+1)
 		if not tonumber(rolls) or not tonumber(range) then
-			return send_msg(msg, I18N('INVALID_SYNTAX'))
+			return send_msg(msg, locale.inv_arg)
 		end
 	else
-		return send_msg(msg, I18N('INVALID_SYNTAX'))
+		return send_msg(msg, locale.inv_arg)
 	end
 
 	if tonumber(rolls) == 1 then
@@ -40,19 +40,15 @@ function PLUGIN.action(msg)
 	elseif tonumber(rolls) > 1 then
 		results = rolls .. 'D' .. range .. ':\n'
 	else
-		return send_msg(msg, I18N('INVALID_SYNTAX'))
+		return send_msg(msg, locale.inv_arg)
 	end
 
 	if tonumber(range) < 2 then
-		return send_msg(msg, I18N('INVALID_SYNTAX'))
+		return send_msg(msg, locale.inv_arg)
 	end
 
-	if tonumber(rolls) > 100 then
-		return send_msg(msg, I18N('dice.MAX_DICE'))
-	end
-
-	if tonumber(range) > 100000 then
-		return send_msg(msg, I18N('dice.MAX_RANGE'))
+	if tonumber(rolls) > 100 or tonumber(range) > 100000 then
+		return send_msg(msg, locale.dice.max)
 	end
 
 	for i = 1, tonumber(rolls) do

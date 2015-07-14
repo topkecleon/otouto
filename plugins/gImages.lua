@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('gImages.COMMAND') .. ' <' .. I18N('ARG_QUERY') .. '>\n' .. I18N('gImages.HELP', {COMMAND_START = config.COMMAND_START})
+PLUGIN.doc = config.COMMAND_START .. locale.gImages.command .. '\n' .. locale.gImages.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('gImages.COMMAND') .. '?',
+	'^' .. config.COMMAND_START .. locale.gImages.command .. '?',
 	'^' .. config.COMMAND_START .. 'img',
 	'^' .. config.COMMAND_START .. 'i ',
 	'^' .. config.COMMAND_START .. 'insfw'
@@ -35,14 +35,14 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		send_msg(msg, I18N('CONNECTION_ERROR'))
+		send_msg(msg, locale.conn_err)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		send_msg(msg, I18N('NO_RESULTS_FOUND'))
+		send_msg(msg, locale.noresults)
 		return
 	end
 
@@ -57,7 +57,7 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	send_message(msg.chat.id, result_url, false, msg.message_id)
+	send_message(msg.chat.id, result_url, false)
 
 end
 

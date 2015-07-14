@@ -1,14 +1,16 @@
 local PLUGIN = {}
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('admin.COMMAND')
+	'^' .. config.COMMAND_START .. locale.admin.command
 }
 
 function PLUGIN.action(msg)
 
+	if msg.date < os.time() - 1 then return end
+
 	local input = get_input(msg.text)
 
-	local message = I18N('COMMAND_NOT_FOUND')
+	local message = locale.inv_arg
 
 	local sudo = 0
 	for i,v in ipairs(config.admins) do
@@ -18,7 +20,7 @@ function PLUGIN.action(msg)
 	end
 
 	if sudo == 0 then
-		message = I18N('PERMISSION_DENIED')
+		message = locale.no_perm
 
 	elseif string.lower(first_word(input)) == 'run' then
 
@@ -30,12 +32,12 @@ function PLUGIN.action(msg)
 	elseif string.lower(first_word(input)) == 'reload' then
 
 		bot_init()
-		message = I18N('admin.BOT_RELOAD')
+		message = locale.admin.reload
 
 	elseif string.lower(first_word(input)) == 'halt' then
 
 		is_started = false
-		message = I18N('admin.BOT_SHUTDOWN')
+		message = locale.admin.halt
 
 	end
 

@@ -4,15 +4,15 @@
  "GIPHY_API_KEY": "",
  "TIME_OFFSET": 0,
  "COMMAND_START": "/",
- "LANGUAGE": "en_US",
+ "LOCALE": "en_US",
  "admins": [
   0
  ],
  "plugins": [
+  "about.lua",
   "8ball.lua",
   "admin.lua",
   "bandersnatch.lua",
-  "bible.lua",
   "btc.lua",
   "calc.lua",
   "chatter.lua",
@@ -32,9 +32,9 @@
   "personality.lua",
   "pokedex.lua",
   "pun.lua",
+  "reaction.lua",
   "reddit.lua",
   "remind.lua",
-  "shrug.lua",
   "slap.lua",
   "time.lua",
   "urbandictionary.lua",
@@ -43,7 +43,7 @@
   "xkcd.lua"
  ],
  "people": {
-  "0": "nickname",
+  "0": "some nick",
  }
 }
 

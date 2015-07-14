@@ -1,10 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('gSearch.COMMAND') .. ' <' .. I18N('ARG_QUERY') .. '>\n' .. I18N('gSearch.HELP', {COMMAND_START = config.COMMAND_START})
+PLUGIN.doc = config.COMMAND_START .. locale.gSearch.command .. '\n' .. locale.gSearch.help
 
 PLUGIN.triggers = {
+	'^' .. config.COMMAND_START .. locale.gSearch.command,
 	'^' .. config.COMMAND_START .. 'g ',
-	'^' .. config.COMMAND_START .. I18N('gSearch.COMMAND'),
 	'^' .. config.COMMAND_START .. 'gnsfw'
 }
 
@@ -30,13 +30,13 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		return send_msg(msg, I18N('NO_RESULTS_FOUND'))
+		return send_msg(msg, locale.noresults)
 	end
 
 	message = ''

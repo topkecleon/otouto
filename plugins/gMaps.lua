@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('gMaps.COMMAND') .. ' <' .. I18N('ARG_LOCATION') .. '>\n' .. I18N('gMaps.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.gMaps.command .. '\n' .. locale.gMaps.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('gMaps.COMMAND')
+	'^' .. config.COMMAND_START .. locale.gMaps.command,
 }
 
 function PLUGIN.action(msg)
@@ -17,13 +17,13 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.status ~= 'OK' then
-		local message = I18N('NOT_FOUND')
+		local message = locale.noresults
 		return send_msg(msg, message)
 	end
 

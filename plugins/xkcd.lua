@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('xkcd.COMMAND') .. ' [' .. I18N('ARG_SEARCH') .. ']\n' .. I18N('xkcd.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.xkcd.command .. '\n' .. locale.xkcd.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('xkcd.COMMAND')
+	'^' .. config.COMMAND_START .. locale.xkcd.command,
 }
 
 function PLUGIN.action(msg)
@@ -12,7 +12,7 @@ function PLUGIN.action(msg)
 	local url = 'http://xkcd.com/info.0.json'
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 	local latest = JSON.decode(jstr).num
 
@@ -21,7 +21,7 @@ function PLUGIN.action(msg)
 		local jstr, res = HTTP.request(url)
 		if res ~= 200 then
 			print('here')
-			return send_msg(msg, I18N('CONNECTION_ERROR'))
+			return send_msg(msg, locale.conn_err)
 		end
 		url = JSON.decode(jstr).responseData.results[1].url .. 'info.0.json'
 	else
@@ -31,7 +31,7 @@ function PLUGIN.action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 	local jdat = JSON.decode(jstr)
 

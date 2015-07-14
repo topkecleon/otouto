@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('btc.COMMAND') .. ' <' .. I18N('btc.ARG_CURRENCY') .. '> [' .. I18N('btc.ARG_AMOUNT') .. ']' .. '\n' .. I18N('btc.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.btc.command .. '\n' .. locale.btc.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('btc.COMMAND')
+	'^' .. config.COMMAND_START .. locale.btc.command
 }
 
 function PLUGIN.action(msg)
@@ -15,18 +15,17 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTPS.request('https://api.bitcoinaverage.com/ticker/global/')
 
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
 
-	if string.len(msg.text) > 6 then
-		arg1 = string.upper(string.sub(msg.text, 6, 8))
-	end
-	if string.len(msg.text) > 9 then
-		arg2 = string.sub(msg.text, 10)
+	local input = get_input(msg.text)
+	if input then
+		arg1 = string.upper(string.sub(input, 1, 3))
+		arg2 = string.sub(input, 5)
 		if not tonumber(arg2) then
-			return send_msg(msg, I18N('INVALID_ARGUMENT'))
+			return send_msg(msg, locale.inv_arg)
 		end
 	end
 
@@ -40,7 +39,7 @@ function PLUGIN.action(msg)
 	if url then
 		jstr, b = HTTPS.request(url)
 	else
-		return send_msg(msg, I18N('btc.CURRENCY_NOT_FOUND'))
+		return send_msg(msg, locale.noresults)
 	end
 
 	jdat = JSON.decode(jstr)

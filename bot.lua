@@ -3,11 +3,10 @@
 
 HTTP = require('socket.http')
 HTTPS = require('ssl.https')
-JSON = require('dkjson')
 URL = require('socket.url')
-I18N = require('i18n')
+JSON = require('dkjson')
 
-VERSION = 2.1
+VERSION = 2.3
 
 function on_msg_receive(msg)
 
@@ -32,21 +31,14 @@ function bot_init()
 
 	print('\nLoading configuration...')
 
-	local jstr = io.open('config.json')
-	local jstr = jstr:read('*all')
-	config = JSON.decode(jstr)
+	local j = io.open('config.json')
+	local j = j:read('*all')
+	config = JSON.decode(j)
+	local j = io.open('loc/'..config.LOCALE..'.json')
+	local j = j:read('*all')
+	locale = JSON.decode(j)
 
-	--I18N.loadFile('lang/' .. config.LANGUAGE .. '.lua')
-	local jstr = io.open('lang/' .. config.LANGUAGE ..'.json')
-	local jstr = jstr:read('*all')
-	lang = JSON.decode(jstr)
-	I18N.load(lang)
-	print ("\nLoaded 'lang/" .. config.LANGUAGE ..'.json')
-
-	I18N.setLocale(config.LANGUAGE)
-	print ("Set language to '" .. config.LANGUAGE .. "'")
-
-	print('\n' .. #config.plugins .. ' plugins enabled.')
+	print(#config.plugins .. ' plugins enabled.')
 
 	require('bindings')
 	require('utilities')
@@ -75,12 +67,16 @@ function bot_init()
 	for i,v in ipairs(plugins) do
 		if v.doc then
 			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
-			print('\t' .. a)
+			print('',a)
 			help_message = help_message .. ' - ' .. a .. '\n'
 		end
 	end
 
 	print('Help message generated!\n')
+
+	print('username: @'..bot.username)
+	print('name: '..bot.first_name)
+	print('ID: '..bot.id)
 
 	is_started = true
 
@@ -89,13 +85,15 @@ end
 function process_msg(msg)
 
 	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
-		msg.text = I18N('personality.GREETING.1') .. ' '..bot.first_name
+		msg.text = locale.personality.responses.welcome
+		msg.text = msg.text:gsub('#NAME', msg.from.first_name)
 		msg.from = msg.new_chat_participant
-	elseif msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
-		msg.text = I18N('personality.FAREWELL.1') .. ' '..bot.first_name
+	end
+
+	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
+		msg.text = locale.personality.responses.kicked
+		msg.text = msg.text:gsub('#NAME', msg.from.first_name)
 		msg.from = msg.left_chat_participant
-	elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
-		msg.text = '@' .. string.lower(bot.username) .. ' ' .. msg.text
 	end
 
 	return msg

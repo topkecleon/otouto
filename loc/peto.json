@@ -1,0 +1,235 @@
+{
+    "conn_err": "N-no pude conectarme...",
+    "noresults": "N-no he encontrado nada...",
+    "inv_arg": "N-no entiendo...",
+    "notfound": "N-no he encontrado nada...",
+    "comm_not_found":"N-no entiendo...",
+    "no_perm": "¡Solo cumplo ordenes de Sempai!",
+    "inv_syntax": "¡Por alli no desu!",
+    "pm_info": "T-te lo puedo explicar a solas... s-si quieres...",
+    "arg": {
+        "comm": "command",
+        "query": "query",
+        "exp": "expression",
+        "range": "range",
+        "loc": "location",
+        "number": "number",
+        "text": "text",
+        "delay": "delay",
+        "msg": "message",
+        "term": "term",
+        "search": "search",
+    },
+    "eightball": {
+        "command": "8ball",
+        "help": "Magic 8-ball. Returns a standard 8ball message, unless called with 'y/n', where it will return a less verbose answer."
+    },
+    "about": {
+        "command": "about",
+        "help": "Información acerca del bot",
+        "description": "Esto es #BOTNAME: un bot de Telegram multiproposito con soporte para plugins.\nUsa #C_START#COMMAND para ver todos los comandos disponibles.",
+        "version": "Basado en otouto v#VERSION de @topkecleon y modificado por @luksireiku.\notouto v2 esta licenciado bajo GPLv2.\ntopkecleon.github.io/otouto\nluksireiku.github.io/petouto"
+    },
+    "admin": {
+        "command": "admin",
+        "reload": "Bot reloaded!",
+        "halt": "Shutting down..."
+    },
+    "bandersnatch":{
+        "command": "bandersnatch",
+        "help": "This is a Benedict Cumberbatch name generator."
+    },
+    "bible":{
+        "command": "bible",
+        "help": "Returns a verse from the bible, King James Version. Use a standard or abbreviated reference (John 3:16, Jn3:16).\nhttp://biblia.com",
+    },
+    "btc":{
+        "command": "btc",
+        "help": "Gives bitcoin prices for the given currency, and optionally conversion of an amount to and from that currency.\nBitcoinAverage Price Index https://bitcoinaverage.com/",
+        "currency_err": "Error: Currency not found."
+    },
+    "calc":{
+        "command": "calc",
+        "help": "This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax."
+    },
+    "chatter":{
+        "lang": "es",
+        "conn_err": "...",
+        "no_resp": "Nani...? 😥"
+    },
+    "commit":{
+        "command": "commit",
+        "help": "http://whatthecommit.com."
+    },
+    "dice":{
+        "command": "roll",
+        "help": "Roll a die. Use any positive number for range or use D&D notation.\nExample: %{command_START}%{command} 4D100 will roll a 100-sided die four times.",
+        "max": "Max 100D100000"
+    },
+    "dogify":{
+        "command": "dogify",
+        "help": "Produces a doge image from dogr.io. Newlines are indicated by a forward slash. Words do not need to be spaced, but spacing is supported. Will post a previewed link rather than an image.",
+    },
+    "echo":{
+    "command": "echo",
+    "help": "Repeat a string."
+    },
+    "fortune":{
+        "command": "fortune",
+        "help": "Get a random fortune from the UNIX fortune program."
+    },
+    "gImages":{
+        "command": "images",
+        "help": "This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '%{command_START}insfw' to get potentially NSFW results."
+    },
+    "gMaps":{
+        "command": "loc",
+        "help": "Sends location data for query, taken from Google Maps. Works for countries, cities, landmarks, etc.",
+    },
+    "gSearch":{
+        "command": "google",
+        "help": "This command performs a Google search for the given query. Four results are returned. Safe search is enabled by default; use '%{command_START}gnsfw' to get potentially NSFW results. Four results are returned for a group chat, or eight in a private message.",
+    },
+    "giphy":{
+        "command": "giphy",
+        "help": "Returns a random or search-resulted GIF from giphy.com. Results are limited to PG-13 by default; use '%{command_START}gifnsfw' to get potentially NSFW results.",
+    },
+    "hackernews":{
+        "command": "hackernews",
+        "help": "Returns some top stories from Hacker News. Four in a group or eight in a private message."
+    },
+    "help":{
+        "command": "help",
+        "help": "Get list of basic information for all commands, or more detailed documentation on a specified command.",
+        "available_commands": "Available commands:",
+        "arguments": "*Arguments: <required> [optional]",
+    },
+    "hex":{
+        "command": "hex",
+        "help": "This function converts a number to or from hexadecimal.",
+        "invalid_num": "Invalid number."
+    },
+    "imdb":{
+        "command": "imdb",
+        "help": "This function retrieves the IMDb info for a given film or television series, including the year, genre, imdb rating, runtime, and a summation of the plot.",
+    },
+    "personality":{
+        "im_home": "estoy en casa",
+        "im_back": "he vuelto",
+        "hello": [
+            "hola",
+            "hey",
+            "hi",
+            "buenos dias"
+        ],
+        "goodbye": [
+            "adios",
+            "hasta luego",
+            "bye",
+            "buenas noches",
+            "nos vemos",
+            "hasta otra"
+        ],
+        "gratitude": [
+            "gracias",
+            "bien ",
+            "buen ",
+            "eres la mejor",
+            "grande "
+        ],
+        "love": [
+            "te quiero",
+            "te amo",
+            "casate conmigo",
+            "quiero un hijo tuyo"
+        ],
+        "hate": [
+            "te odio",
+            "que te den",
+            "que te peten"
+        ],
+        "responses": {
+            "hello": {
+                "morning": "Ohayō gozaimasu, #NAME! 😊",
+                "afternoon": "Konnichi wa, #NAME! 😊",
+                "evening": "Konban wa, #NAME! 😊"
+            },
+            "goodbye": {
+                "morning":"Sayōnara, #NAME! 😊",
+                "afternoon":"Sayōnara, #NAME! 😊",
+                "evening":"Oyasumi nasai, #NAME! 😊"
+            },
+            "welcome": "Okaeri nasai, #NAME! 😄",
+            "kicked": "See you soon, #NAME!",
+            "gratitude": "Arigatō, #NAME! 😊",
+            "love": "#NAME... 😣",
+            "hate": "Gomen nasai #NAME... 😭"
+        }
+    	
+    },
+    "pokedex":{
+        "command": "dex",
+        "help": "Get Pokedex information for a given Pokemon.\nIncludes national ID number, type, height, weight, and a description from a random regional dex.",
+        "ARG_POKEMON": "pokémon",
+        "NOT_FOUND": "Pokémon not found.",
+    },
+    "pun":{
+        "command": "pun",
+        "help": "Get a random pun.\nHave a recommendation? PM @topkecleon.",
+    },
+    "reddit":{
+        "command": "reddit",
+        "help": "This command returns top results for a given query or subreddit. NSFW posts are marked as such.",
+        "ARG_SUBREDDIT": "r/subreddit",
+        "SUBREDDIT_NOT_FOUND": "Subreddit not found."
+    },
+    "remind":{
+        "command": "remind",
+        "help": "Set a reminder for yourself. First argument is the number of minutes until you wish to be reminded.",
+        "no_delay": "The delay must be a number.",
+        "no_message": "Please include a reminder.",
+        "minutes": "minutes",
+        "seconds": "seconds",
+        "reminder_set": "Your reminder has been set for #DELAY from now:\n#TEXT"
+    },
+    "shrug":{
+        "command": "shrug",
+        "help": "Get a random pun.\nHave a recommendation? PM @topkecleon.",
+    },
+    "slap":{
+        "command": "slap",
+        "help": "Slap someone!",
+        "ARG_VICTIM": "victim"
+    },
+    "time":{
+        "command": "time",
+        "help": "Sends the time and timezone for a given location.",
+        "result": "The time in #TIMELOC is #TIMESTAMP"
+    },
+        "urbandictionary":{
+        "command": "urbandictionary",
+        "help": "Returns the first definition for a given term from Urban Dictionary.",
+        "example": "Example: "
+    },
+    "weather": {
+        "command": "weather",
+        "help": "Returns the current temperature and weather conditions for a specified location.\nNon-city locations are accepted; '%{command_START}%{command} Buckingham Palace' will return the weather for Westminster."
+    },
+    "whoami": {
+        "command": "whoami",
+        "help": "Get the user ID for yourself and the group.",
+        "result": "You are #FROM_NAME and you are messaging #TO_NAME."
+    },
+    "xkcd": {
+        "command": "xkcd",
+        "help": "This command returns an xkcd strip, its number, and its 'secret' text. You may search for a specific strip or get a random one."
+    },
+    "pInsulta": {
+        "command": "insulta",
+        "help": "Se hace respetar."
+    },
+    "pAlaba": {
+        "command": "alaba",
+        "help": "Tambien sabe decir cosas bonitas"
+    }
+}

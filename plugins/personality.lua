@@ -2,6 +2,7 @@
  -- like so:
  -- 	13227902: "Drew"
 
+
 local PLUGIN = {}
 
 if string.find(bot.first_name, '%-') then
@@ -11,14 +12,13 @@ else
 end
 
 PLUGIN.triggers = {
-	bot_name,
+	bot_name .. '%p?$',
 	'^tadaima%p?$',
-	I18N('personality.IM_HOME'),
-	I18N('personality.IM_BACK'),
-	'^sayonara%p?$',
+	'^' .. locale.personality.im_home .. '%p?$',
+	'^' .. locale.personality.im_back .. '%p?$'
 }
 
-function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
+function PLUGIN.action(msg)
 
 	local input = string.lower(msg.text)
 	local time = tonumber(os.date('%H', os.time()))
@@ -36,54 +36,45 @@ function PLUGIN.action(msg) -- I WISH LUA HAD PROPER REGEX SUPPORT
 
 	for i = 2,4 do
 		if string.match(input, PLUGIN.triggers[i]) then
-			return send_message(msg.chat.id, I18N('personality.WELCOME_RESPONSE', {FIRST_NAME = msg.from.first_name}))
+			local message = locale.personality.responses.welcome
+			message = message:gsub('#NAME', msg.from.first_name)
+			return send_message(msg.chat.id, message)
 		end
 	end
 
-	for k,v in pairs(I18N('personality.GREETING')) do
-		if input:match(v .. '(.*) ' .. bot_name) then
-			if daytime == 'morning' then
-				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
-			elseif daytime == 'evening' then
-				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.EVENING', {FIRST_NAME = msg.from.first_name}))
-			else
-				return send_message(msg.chat.id, I18N('personality.GREETING_RESPONSES.AFTERNOON', {FIRST_NAME = msg.from.first_name}))
+	interactions = {
+		[locale.personality.responses.hello.morning]		= locale.personality.hello,
+		[locale.personality.responses.hello.afternoon]		= locale.personality.hello,
+		[locale.personality.responses.hello.evening]		= locale.personality.hello,
+		[locale.personality.responses.goodbye.morning]		= locale.personality.goodbye,
+		[locale.personality.responses.goodbye.afternoon]	= locale.personality.goodbye,
+		[locale.personality.responses.goodbye.evening]		= locale.personality.goodbye,
+		[locale.personality.responses.gratitude]		= locale.personality.gratitude,
+		[locale.personality.responses.love]			= locale.personality.love,
+		[locale.personality.responses.hate]			= locale.personality.hate
+	}
+
+	for k,v in pairs(interactions) do
+		for key,val in pairs(v) do			
+			if input:match(val..',? '..bot_name) then
+				local message
+
+				if val[daytime] then
+					message = k[daytime]
+				else
+					message = k
+				end
+
+				message = message:gsub('#NAME', msg.from.first_name)
+
+				return send_message(msg.chat.id, message)
 			end
 		end
 	end
 
-	for k,v in pairs(I18N('personality.FAREWELL')) do
-		if input:match(v .. '(.*) ' .. bot_name) or string.match(input, PLUGIN.triggers[5]) then
-			if daytime == 'morning' then
-				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.MORNING', {FIRST_NAME = msg.from.first_name}))
-			elseif daytime == 'evening' then
-				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.EVENING', {FIRST_NAME = msg.from.first_name}))
-			else
-				return send_message(msg.chat.id, I18N('personality.FAREWELL_RESPONSES.AFTERNOON', {FIRST_NAME = msg.from.first_name}))
-			end
-		end
-	end
+--	msg.text = '@' .. bot.username .. ', ' .. msg.text:gsub(bot.first_name, '')
+--	on_msg_receive(msg)
 
-	for k,v in pairs(I18N('personality.LOVE')) do
-		if input:match(v .. '(.*) ' .. bot_name) then
-			return send_message(msg.chat.id, I18N('personality.LOVE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
-		end
-	end
-
-	for k,v in pairs(I18N('personality.HATE')) do
-		if input:match(v .. '(.*) ' .. bot_name) then
-			return send_message(msg.chat.id, I18N('personality.HATE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
-		end
-	end
-
-	for k,v in pairs(I18N('personality.GRATITUDE')) do
-		if input:match(v .. '(.*) ' .. bot_name) then
-			return send_message(msg.chat.id, I18N('personality.GRATITUDE_RESPONSE', {FIRST_NAME = msg.from.first_name}))
-		end
-	end
-
-	--msg.text = '@' .. bot.username .. ' ' .. msg.text:gsub(bot.first_name, '')
-	--on_msg_receive(msg)
 end
 
 return PLUGIN

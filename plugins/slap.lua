@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('slap.COMMAND') .. ' [' .. I18N('slap.ARG_VICTIM') .. ']\n' .. I18N('slap.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.slap.command .. '\n' .. locale.slap.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('slap.COMMAND')
+	'^' .. config.COMMAND_START .. locale.slap.command
 }
 
 function PLUGIN.getSlap(slapper, victim)
@@ -97,12 +97,21 @@ function PLUGIN.action(msg)
 
 	math.randomseed(os.time())
 
+	local slapper
 	local victim = get_input(msg.text)
 	if victim then
 		slapper = msg.from.first_name
 	else
 		victim = msg.from.first_name
 		slapper = bot.first_name
+	end
+
+	if msg.reply_to_message then
+		victim = msg.reply_to_message.from.first_name
+		slapper = msg.from.first_name
+		if slapper == victim then
+			slapper = bot.first_name
+		end
 	end
 
 	local message = PLUGIN.getSlap(slapper, victim)

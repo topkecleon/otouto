@@ -1,10 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('8ball.COMMAND') .. '\n' .. I18N('8ball.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.eightball.command .. '\n' .. locale.eightball.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'helix',
-	'^' .. config.COMMAND_START .. I18N('8ball.COMMAND'),
+	'^' .. config.COMMAND_START .. locale.eightball.command,
+	'^' .. config.COMMAND_START ..'helix',
 	'y/n%p?$'
 }
 
@@ -37,6 +37,10 @@ PLUGIN.yesno = {'Absolutely.', 'In your dreams.', 'Yes.', 'No.', 'Maybe.'}
 function PLUGIN.action(msg)
 
 	math.randomseed(os.time())
+
+	if msg.reply_to_message then
+		msg = msg.reply_to_message
+	end
 
 	if string.match(string.lower(msg.text), 'y/n') then
 		message = PLUGIN.yesno[math.random(#PLUGIN.yesno)]

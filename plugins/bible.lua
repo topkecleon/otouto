@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('bible.COMMAND') .. ' <' .. I18N('bible.ARG_VERSE') .. '>' .. '\n' .. I18N('bible.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.bible.command .. '\n' .. locale.bible.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('bible.COMMAND'),
+	'^' .. config.COMMAND_START .. locale.bible.command,
 	'^' .. config.COMMAND_START .. 'b '
 }
 
@@ -18,7 +18,7 @@ function PLUGIN.action(msg)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		message = I18N('CONNECTION_ERROR')
+		message = locale.conn_err
 	end
 
 	send_msg(msg, message)

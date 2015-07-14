@@ -1,10 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('giphy.COMMAND') .. ' [' .. I18N('ARG_QUERY') .. ']\n' .. I18N('giphy.HELP', {COMMAND_START = config.COMMAND_START})
+PLUGIN.doc = config.COMMAND_START .. locale.giphy.command .. '\n' .. locale.giphy.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('giphy.COMMAND'),
-	'^' .. config.COMMAND_START .. 'gifnsfw'
+	'^' .. config.COMMAND_START .. locale.giphy.command,
+	'^/gifnsfw'
 }
 
 function PLUGIN.action(msg)
@@ -27,7 +27,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(random_url)
 		if res ~= 200 then
-			return send_msg(msg, I18N('CONNECTION_ERROR'))
+			return send_msg(msg, locale.conn_err)
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data.image_url
@@ -36,7 +36,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(search_url .. input)
 		if res ~= 200 then
-			return send_msg(msg, I18N('CONNECTION_ERROR'))
+			return send_msg(msg, locale.conn_err)
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data[math.random(#jdat.data)].images.original.url

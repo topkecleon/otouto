@@ -1,10 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('hackernews.COMMAND') .. '\n' .. I18N('hackernews.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.hackernews.command .. '\n' .. locale.hackernews.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('hackernews.COMMAND'),
-	'^' .. config.COMMAND_START .. 'hn$'
+	'^' .. config.COMMAND_START .. locale.hackernews.command,
+	'^/hn$'
 }
 
 function PLUGIN.action(msg)

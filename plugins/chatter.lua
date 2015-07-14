@@ -1,34 +1,28 @@
- -- shout-out to @luksi_reiku for showing me this site
+ -- shout-out to @luksireiku for showing me this site
 
 local PLUGIN = {}
 
-if string.find(bot.first_name, '%-') then
-        bot_name = string.lower(string.sub(bot.first_name, 1, string.find(bot.first_name, '%-')-1))
-else
-        bot_name = string.lower(bot.first_name)
-end
-
 PLUGIN.triggers = {
-	'@' .. string.lower(bot.username),
-	'^' .. bot_name,
+	'^@' .. bot.username .. ', ',
+	'^' .. bot.first_name .. ', '
 }
 
 function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 
-	local url = 'http://www.simsimi.com/requestChat?lc=' .. I18N('chatter.LANG') .. '&ft=1.0&req=' .. URL.escape(input)
+	local url = 'http://www.simsimi.com/requestChat?lc=' .. locale.chatter.lang .. '&ft=1.0&req=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_message(msg.chat.id, I18N('chatter.CONNECTION_ERROR'))
+		return send_message(msg.chat.id, locale.chatter.conn_err)
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if string.match(jdat.res, '^I HAVE NO RESPONSE.') then
-		jdat.res = I18N('chatter.I_HAVE_NO_RESPONSE')
+		jdat.res = locale.chatter.no_resp
 	end
 
 	local message = jdat.res
@@ -44,9 +38,9 @@ function PLUGIN.action(msg)
 		message = string.gsub(message, k, v)
 	end
 
-	--[[if not string.match(message, '%p$') then
+	if not string.match(message, '%p$') then
 		message = message .. '.'
-	end]]
+	end
 
 	send_message(msg.chat.id, message)
 

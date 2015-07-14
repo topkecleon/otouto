@@ -1,10 +1,10 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('dogify.COMMAND') .. ' <' .. I18N('dogify.ARG_STUFF') .. '>\n' .. I18N('dogify.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.dogify.command .. '\n' .. locale.dogify.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. 'doge ',
-	'^' .. config.COMMAND_START .. I18N('dogify.COMMAND')
+	'^' .. config.COMMAND_START .. locale.dogify.command,
+	'^' .. config.COMMAND_START .. 'doge '
 }
 
 function PLUGIN.action(msg)
@@ -15,6 +15,7 @@ function PLUGIN.action(msg)
 	end
 
 	local input = string.gsub(input, ' ', '')
+	local input = string.lower(input)
 
 	url = 'http://dogr.io/' .. input .. '.png'
 

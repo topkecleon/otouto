@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('pun.COMMAND') .. '\n' .. I18N('pun.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.pun.command .. '\n' .. locale.pun.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('pun.COMMAND')
+	'^' .. config.COMMAND_START .. locale.pun.command,
 }
 
 PLUGIN.puns = {

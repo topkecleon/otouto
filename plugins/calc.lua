@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('calc.COMMAND').. ' <' .. I18N('ARG_EXPRESSION') .. '>' .. '\n' .. I18N('calc.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.calc.command .. '\n' .. locale.calc.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('calc.COMMAND')
+	'^' .. config.COMMAND_START .. locale.calc.command
 }
 
 function PLUGIN.action(msg)
@@ -17,7 +17,7 @@ function PLUGIN.action(msg)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, I18N('CONNECTION_ERROR'))
+		return send_msg(msg, locale.conn_err)
 	end
 
 	send_msg(msg, message)

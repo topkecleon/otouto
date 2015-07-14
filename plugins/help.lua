@@ -1,38 +1,40 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('help.COMMAND') .. ' [' .. I18N('ARG_COMMAND') .. ']\n' .. I18N('help.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.help.command .. '\n' .. locale.help.help
 
 PLUGIN.triggers = {
-	'^'.. config.COMMAND_START .. I18N('help.COMMAND'),
-	'^'.. config.COMMAND_START ..'h$'
+	'^' .. config.COMMAND_START .. locale.help.command,
+	'^' .. config.COMMAND_START .. 'h$',
+	'^' .. config.COMMAND_START .. 'start$'
 }
 
 function PLUGIN.action(msg)
 
-	if string.find(msg.text, '@') and not string.match('help@'..bot.username) then return end
+	if string.find(msg.text, '@') and not string.match(msg.text, 'help@'..bot.username) then return end
 
 	local input = get_input(msg.text)
+
+	if(msg.from.id == 11987707) then
+		return send_msg(msg, 'Mario, ¿no te cansas de hacer el tonto?')
+	end
 
 	if input then
 		for i,v in ipairs(plugins) do
 			if v.doc then
-				if config.COMMAND_START .. input == trim_string(first_word(v.doc)) then
+				if '/' .. input == trim_string(first_word(v.doc)) then
 					return send_msg(msg, v.doc)
 				end
 			end
 		end
 	end
 
-	local message = I18N('help.AVAILABLE_COMMANDS')
-	message = message .. '\n' .. help_message
-	message = message .. '\n' .. I18N('help.ARGUMENTS')
-	message = message .. '\n' .. I18N('help.SPECIFIC_INFORMATION', {COMMAND_START = config.COMMAND_START, COMMAND = I18N('help.COMMAND'), ARG_COMMAND = I18N('ARG_COMMAND')})
- 
+	local message = locale.help.available_commands.. '\n' .. help_message .. locale.help.arguments
+
 	if msg.from.id ~= msg.chat.id then
 		if not send_message(msg.from.id, message, true, msg.message_id) then
 			return send_msg(msg, message) -- Unable to PM user who hasn't PM'd first.
 		end
-		return send_msg(msg, I18N('help.SEND_IN_PM'))
+		return send_msg(msg, locale.pm_info)
 	else
 		return send_msg(msg, message)
 	end

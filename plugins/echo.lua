@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('echo.COMMAND') .. ' <' .. I18N('ARG_TEXT') .. '>\n' .. I18N('echo.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.echo.command .. '\n' .. locale.echo.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('echo.COMMAND')
+	'^' .. config.COMMAND_START .. locale.echo.command
 }
 
 function PLUGIN.action(msg)

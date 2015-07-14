@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('bandersnatch.COMMAND') .. '\n' .. I18N('bandersnatch.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.bandersnatch.command .. '\n' .. locale.bandersnatch.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('bandersnatch.COMMAND'),
+	'^' .. config.COMMAND_START .. locale.bandersnatch.command,
 	'^' .. config.COMMAND_START .. 'bc$'
 }
 

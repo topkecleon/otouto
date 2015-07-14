@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('commit.COMMAND') .. '\n' .. I18N('commit.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.commit.command .. '\n' .. locale.commit.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('commit.COMMAND')
+	'^' .. config.COMMAND_START .. locale.commit.command
 }
 
 function PLUGIN.action(msg)

@@ -1,9 +1,9 @@
 local PLUGIN = {}
 
-PLUGIN.doc = config.COMMAND_START .. I18N('reddit.COMMAND') .. ' [' .. I18N('reddit.ARG_SUBREDDIT') .. ' | ' .. I18N('ARG_QUERY') .. ']\n' .. I18N('reddit.HELP')
+PLUGIN.doc = config.COMMAND_START .. locale.reddit.command .. '\n' .. locale.reddit.help
 
 PLUGIN.triggers = {
-	'^' .. config.COMMAND_START .. I18N('reddit.COMMAND'),
+	'^' .. config.COMMAND_START .. locale.reddit.command,
 	'^' .. config.COMMAND_START .. 'r$',
 	'^' .. config.COMMAND_START .. 'r '
 }
@@ -21,11 +21,11 @@ function PLUGIN.action(msg)
 			local url = 'http://www.reddit.com/' .. first_word(input) .. '/.json'
 			local jstr, res = HTTP.request(url)
 			if res ~= 200 then
-				return send_msg(msg, I18N('CONNECTION_ERROR'))
+				return send_msg(msg, locale.conn_err)
 			end
 			jdat = JSON.decode(jstr)
 			if #jdat.data.children == 0 then
-				return send_msg(msg, I18N('reddit.SUBREDDIT_NOT_FOUND'))
+				return send_msg(msg, locale.noresults)
 			end
 
 		else
@@ -33,11 +33,11 @@ function PLUGIN.action(msg)
 			local url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input)
 			local jstr, res = HTTP.request(url)
 			if res ~= 200 then
-				return send_msg(msg, I18N('CONNECTION_ERROR'))
+				return send_msg(msg, locale.conn_err)
 			end
 			jdat = JSON.decode(jstr)
 			if #jdat.data.children == 0 then
-				return send_msg(msg, I18N('NO_RESULTS_FOUND'))
+				return send_msg(msg, locale.noresults)
 			end
 
 		end
@@ -47,7 +47,7 @@ function PLUGIN.action(msg)
 		url = 'https://www.reddit.com/.json'
 		local jstr, res = HTTP.request(url)
 		if res ~= 200 then
-			return send_msg(msg, I18N('CONNECTION_ERROR'))
+			return send_msg(msg, locale.conn_err)
 		end
 		jdat = JSON.decode(jstr)
 
