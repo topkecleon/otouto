@@ -19,13 +19,13 @@ function PLUGIN.action(msg)
 
 	coords = get_coords(input)
 	if not coords then
-		return send_msg(msg, locale.noresults)
+		return send_msg(msg, config.locale.errors.results)
 	end
 
 	local url = 'http://api.openweathermap.org/data/2.5/weather?lat=' .. coords.lat .. '&lon=' .. coords.lon
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, locale.conn_err)
+		return send_msg(msg, config.locale.errors.connection)
 	end
 	local jdat = JSON.decode(jstr)
 

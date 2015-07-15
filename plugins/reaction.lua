@@ -12,14 +12,16 @@ function PLUGIN.action(msg)
 
 	local message = string.lower(msg.text)
 
-	if msg.reply_to_message then
-		msg = msg.reply_to_message
-	end
-
 	for k,v in pairs(PLUGIN.triggers) do
 		if string.match(message, v) then
-			return send_msg(msg, k)
+			message = k
 		end
+	end
+
+	if msg.reply_to_message then
+		send_msg(msg.reply_to_message, message)
+	else
+		send_message(msg.chat.id, message)
 	end
 
 end

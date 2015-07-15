@@ -15,7 +15,7 @@ function PLUGIN.action(msg)
 	local url = 'http://xkcd.com/info.0.json'
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, locale.conn_err)
+		return send_msg(msg, config.locale.errors.connection)
 	end
 	local latest = JSON.decode(jstr).num
 
@@ -24,7 +24,7 @@ function PLUGIN.action(msg)
 		local jstr, res = HTTP.request(url)
 		if res ~= 200 then
 			print('here')
-			return send_msg(msg, locale.conn_err)
+			return send_msg(msg, config.locale.errors.connection)
 		end
 		url = JSON.decode(jstr).responseData.results[1].url .. 'info.0.json'
 	else
@@ -34,7 +34,7 @@ function PLUGIN.action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, locale.conn_err)
+		return send_msg(msg, config.locale.errors.connection)
 	end
 	local jdat = JSON.decode(jstr)
 

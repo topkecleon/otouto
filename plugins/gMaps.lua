@@ -13,20 +13,25 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message then
+			msg = msg.reply_to_message
+			input = msg.text
+		else
+			return send_msg(msg, PLUGIN.doc)
+		end
 	end
 
 	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		return send_msg(msg, locale.conn_err)
+		return send_msg(msg, config.locale.errors.connection)
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.status ~= 'OK' then
-		local message = locale.noresults
+		local message = config.locale.errors.results
 		return send_msg(msg, message)
 	end
 

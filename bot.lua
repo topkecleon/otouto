@@ -6,7 +6,7 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.3
+VERSION = 2.4
 
 function on_msg_receive(msg)
 
@@ -31,12 +31,7 @@ function bot_init()
 
 	print('\nLoading configuration...')
 
-	local j = io.open('config.json')
-	local j = j:read('*all')
-	config = JSON.decode(j)
-	local j = io.open('loc/'..config.LOCALE..'.json')
-	local j = j:read('*all')
-	locale = JSON.decode(j)
+	config = dofile('config.lua')
 
 	print(#config.plugins .. ' plugins enabled.')
 
@@ -56,7 +51,7 @@ function bot_init()
 	plugins = {}
 	for i,v in ipairs(config.plugins) do
 		print('',v)
-		local p = loadfile('plugins/'..v)()
+		local p = dofile('plugins/'..v)
 		table.insert(plugins, p)
 	end
 
@@ -94,6 +89,10 @@ function process_msg(msg)
 		msg.from = msg.left_chat_participant
 	end
 
+	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
+		msg.text = '/about'
+	end
+
 	return msg
 
 end
@@ -103,17 +102,24 @@ reminders = {}
 last_update = 0
 while is_started == true do
 
-	for i,v in ipairs(get_updates(last_update).result) do
-		if v.update_id > last_update then
-			last_update = v.update_id
-			on_msg_receive(v.message)
+	local result = get_updates(last_update)
+	if not result then
+		print('Error getting updates.')
+	else
+		for i,v in ipairs(get_updates(last_update).result) do
+			if v.update_id > last_update then
+				last_update = v.update_id
+				on_msg_receive(v.message)
+			end
 		end
 	end
 
 	for i,v in pairs(reminders) do
 		if os.time() > v.alarm then
-			send_message(v.chat_id, 'Reminder: '..v.text)
-			table.remove(reminders, i)
+			local a = send_message(v.chat_id, 'Reminder: '..v.text)
+			if a then
+				table.remove(reminders, i)
+			end
 		end
 	end
 

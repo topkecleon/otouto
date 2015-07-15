@@ -1,0 +1,47 @@
+return {
+	bot_api_key = '', -- Put your Telegram bot API key here
+	biblia_api_key = '', -- For bible.lua; get one at biblia.com
+	giphy_api_key = 'dc6zaTOxFJmzC', -- Public test key
+	time_offset = 0, -- Offset to be added/subtracted to match UTC
+	locale = require('loc.en'),
+	admins = {
+		0
+	},
+	plugins = {
+		'about.lua',
+		'help.lua',
+		'admin.lua',
+		'gSearch.lua',
+		'gImages.lua',
+		'reddit.lua',
+		'giphy.lua',
+		'xkcd.lua',
+		'gMaps.lua',
+		'imdb.lua',
+		'urbandictionary.lua',
+		'hackernews.lua',
+		'time.lua',
+		'weather.lua',
+		'calc.lua',
+		'dice.lua',
+		'remind.lua',
+		'8ball.lua',
+		'bandersnatch.lua',
+		'btc.lua',
+		'chatter.lua',
+		'commit.lua',
+		'dogify.lua',
+		'echo.lua',
+		'hex.lua',
+		'interactions.lua',
+		'pokedex.lua',
+		'pun.lua',
+		'reaction.lua',
+		'slap.lua',
+		'whoami.lua',
+		'lmgtfy.lua'
+	},
+	people = { -- For interactions.lua; ID number and nickname
+		['55994550'] = 'topkecleon'
+	}
+}

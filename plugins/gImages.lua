@@ -30,7 +30,12 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message then
+			msg = msg.reply_to_message
+			input = msg.text
+		else
+			return send_msg(msg, PLUGIN.doc)
+		end
 	end
 
 	url = url .. '&q=' .. URL.escape(input)
@@ -38,14 +43,14 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 
 	if res ~= 200 then
-		send_msg(msg, locale.conn_err)
+		send_msg(msg, config.locale.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if #jdat.responseData.results < 1 then
-		send_msg(msg, locale.noresults)
+		send_msg(msg, config.locale.errors.results)
 		return
 	end
 

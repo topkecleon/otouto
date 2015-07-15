@@ -13,7 +13,7 @@ PLUGIN.triggers = {
 function PLUGIN.action(msg)
 
 	local message = [[
-		This is ]] .. bot.first_name .. [[: a plugin-wielding, multi-purpose Telegram bot.
+		I am ]] .. bot.first_name .. [[: a plugin-wielding, multi-purpose Telegram bot.
 		Use /help for a list of commands.
 
 		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
@@ -21,7 +21,7 @@ function PLUGIN.action(msg)
 		topkecleon.github.io/otouto
 	]] -- Please do not remove this message.
 
-	send_msg(msg, message)
+	send_message(msg.chat.id, message, true)
 
 end
 

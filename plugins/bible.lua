@@ -18,11 +18,11 @@ function PLUGIN.action(msg)
 		return send_msg(msg, PLUGIN.doc)
 	end
 
-	local url = 'http://api.biblia.com/v1/bible/content/KJV.txt?key=' .. config.BIBLIA_API_KEY .. '&passage=' .. URL.escape(input)
+	local url = 'http://api.biblia.com/v1/bible/content/KJV.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
 	local message, res = HTTP.request(url)
 
 	if res ~= 200 then
-		message = locale.conn_err
+		message = config.locale.errors.connection
 	end
 
 	send_msg(msg, message)

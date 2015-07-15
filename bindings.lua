@@ -1,9 +1,9 @@
 -- bindings.lua
 -- Functions for the Telegram API.
 -- Requires ssl.https ('HTTPS'), socket.url ('URL'), and a json decoder ('JSON').
--- Also requires config.BOT_API_KEY.
+-- Also requires config.bot_api_key.
 
-local BASE_URL = 'https://api.telegram.org/bot' .. config.BOT_API_KEY .. '/'
+local BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
 
 local function send_request(url)
 

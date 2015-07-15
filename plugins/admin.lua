@@ -10,7 +10,7 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 
-	local message = locale.inv_arg
+	local message = config.locale.errors.argument
 
 	local sudo = 0
 	for i,v in ipairs(config.admins) do
@@ -24,7 +24,10 @@ function PLUGIN.action(msg)
 
 	elseif string.lower(first_word(input)) == 'run' then
 
-		local output = string.sub(input, 5)
+		local output = get_input(input)
+		if not output then
+			return send_msg(msg, config.locale.errors.argument)
+		end
 		local output = io.popen(output)
 		message = output:read('*all')
 		output:close()

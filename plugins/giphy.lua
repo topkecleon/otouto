@@ -12,8 +12,8 @@ PLUGIN.triggers = {
 
 function PLUGIN.action(msg)
 
-	local search_url = 'http://api.giphy.com/v1/gifs/search?limit=10&api_key=' .. config.GIPHY_API_KEY
-	local random_url = 'http://tv.giphy.com/v1/gifs/random?api_key=' .. config.GIPHY_API_KEY
+	local search_url = 'http://api.giphy.com/v1/gifs/search?limit=10&api_key=' .. config.giphy_api_key
+	local random_url = 'http://tv.giphy.com/v1/gifs/random?api_key=' .. config.giphy_api_key
 	local result_url = ''
 
 	if string.match(msg.text, '^/giphynsfw') then
@@ -30,7 +30,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(random_url)
 		if res ~= 200 then
-			return send_msg(msg, locale.conn_err)
+			return send_msg(msg, config.locale.errors.connection)
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data.image_url
@@ -39,7 +39,7 @@ function PLUGIN.action(msg)
 
 		local jstr, res = HTTP.request(search_url .. input)
 		if res ~= 200 then
-			return send_msg(msg, locale.conn_err)
+			return send_msg(msg, config.locale.errors.connection)
 		end
 		local jdat = JSON.decode(jstr)
 		result_url = jdat.data[math.random(#jdat.data)].images.original.url

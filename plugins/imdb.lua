@@ -13,7 +13,12 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message then
+			msg = msg.reply_to_message
+			input = msg.text
+		else
+			return send_msg(msg, PLUGIN.doc)
+		end
 	end
 
 	local url = 'http://www.imdbapi.com/?t=' .. URL.escape(input)
@@ -21,7 +26,7 @@ function PLUGIN.action(msg)
 	local jdat = JSON.decode(jstr)
 
 	if res ~= 200 then
-		return send_msg(msg, locale.conn_err)
+		return send_msg(msg, config.locale.errors.connection)
 	end
 
 	if jdat.Response ~= 'True' then
