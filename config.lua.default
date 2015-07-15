@@ -1,9 +1,9 @@
 return {
-	bot_api_key = '', -- Put your Telegram bot API key here
-	biblia_api_key = '', -- For bible.lua; get one at biblia.com
-	giphy_api_key = 'dc6zaTOxFJmzC', -- Public test key
-	time_offset = 0, -- Offset to be added/subtracted to match UTC
-	locale = require('loc.en'),
+	bot_api_key = '',
+	biblia_api_key = '',
+	giphy_api_key = 'dc6zaTOxFJmzC',
+	time_offset = 0,
+	locale = dofile('loc.en'),
 	admins = {
 		0
 	},
