@@ -3,7 +3,7 @@ return {
 	biblia_api_key = '',
 	giphy_api_key = 'dc6zaTOxFJmzC',
 	time_offset = 0,
-	locale = dofile('loc.en'),
+	locale = dofile('loc/en.lua'),
 	admins = {
 		0
 	},
@@ -41,7 +41,7 @@ return {
 		'whoami.lua',
 		'lmgtfy.lua'
 	},
-	people = { -- For interactions.lua; ID number and nickname
+	people = {
 		['55994550'] = 'topkecleon'
 	}
 }

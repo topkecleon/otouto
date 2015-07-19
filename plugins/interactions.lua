@@ -5,6 +5,8 @@
 
 local PLUGIN = {}
 
+PLUGIN.no_typing = true
+
 PLUGIN.triggers = {
 	bot.first_name .. '%p?$',
 	'@' .. bot.username .. '%p?$',

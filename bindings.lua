@@ -77,3 +77,11 @@ function send_location(chat_id, latitude, longitude, reply_to_message_id)
 	return send_request(url)
 
 end
+
+function forward_message(chat_id, from_chat_id, message_id)
+
+	local url = BASE_URL .. 'forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
+
+	return send_request(url)
+
+end

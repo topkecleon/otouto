@@ -20,7 +20,9 @@ function on_msg_receive(msg)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
 			if string.match(lower, w) then
-				send_chat_action(msg.chat.id, 'typing')
+				if not v.no_typing then
+					send_chat_action(msg.chat.id, 'typing')
+				end
 				v.action(msg)
 			end
 		end
@@ -41,6 +43,9 @@ function bot_init()
 	print('\nFetching bot information...')
 
 	bot = get_me().result
+	if not bot then
+		error('Failure fetching bot information.')
+	end
 	for k,v in pairs(bot) do
 		print('',k,v)
 	end
@@ -102,11 +107,11 @@ reminders = {}
 last_update = 0
 while is_started == true do
 
-	local result = get_updates(last_update)
-	if not result then
+	local res = get_updates(last_update)
+	if not res then
 		print('Error getting updates.')
 	else
-		for i,v in ipairs(get_updates(last_update).result) do
+		for i,v in ipairs(res.result) do
 			if v.update_id > last_update then
 				last_update = v.update_id
 				on_msg_receive(v.message)
@@ -124,3 +129,4 @@ while is_started == true do
 	end
 
 end
+print('Halted.')
