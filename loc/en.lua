@@ -16,6 +16,7 @@ return {
 		results		= 'No results found.',
 		argument	= 'Invalid argument.',
 		syntax		= 'Invalid syntax.'
-	}
+	},
+	translate = 'en'
 }
 

@@ -3,6 +3,7 @@ local PLUGIN = {}
 PLUGIN.doc = [[
 	/images <query>
 	This command performs a Google Images search for the given query. One random top result is returned. Safe search is enabled by default; use '/insfw' to get potentially NSFW results.
+	Want images sent directly to chat? Try @ImageBot.
 ]]
 
 PLUGIN.triggers = {
