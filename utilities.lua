@@ -22,6 +22,19 @@ function get_input(text) -- returns string or false
 	return string.sub(text, string.find(text, ' ')+1)
 end
 
+function get_target(msg)
+
+	if msg.reply_to_message then
+		return msg.reply_to_message.from.id
+	elseif string.find(msg.text, '@') then
+		local a = string.find(msg.text, '@')
+		return first_word(string.sub(msg.text, a))
+	else
+		return false
+	end
+
+end
+
 function trim_string(text) -- another alias
 	return string.gsub(text, "^%s*(.-)%s*$", "%1")
 end
@@ -80,5 +93,28 @@ function get_coords(input)
 	end
 
 	return { lat = jdat.results[1].geometry.location.lat, lon = jdat.results[1].geometry.location.lng }
+
+end
+
+function load_data(filename)
+
+	local f = io.open(filename)
+	if not f then
+		return {}
+	end
+	local s = f:read('*all')
+	f:close()
+	local data = JSON.decode(s)
+
+	return data
+
+end
+
+function save_data(filename, data)
+
+	local s = JSON.encode(data)
+	local f = io.open(filename, 'w')
+	f:write(s)
+	f:close()
 
 end

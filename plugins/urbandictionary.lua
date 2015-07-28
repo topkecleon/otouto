@@ -14,7 +14,12 @@ function PLUGIN.action(msg)
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message then
+			msg = msg.reply_to_message
+			input = msg.text
+		else
+			return send_msg(msg, PLUGIN.doc)
+		end
 	end
 
 	local url = 'http://api.urbandictionary.com/v0/define?term=' .. URL.escape(input)

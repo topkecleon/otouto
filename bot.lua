@@ -15,7 +15,11 @@ function on_msg_receive(msg)
 	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
 	if msg.forward_from then return end -- don't react to forwarded messages
-
+--[[
+	if msg.from.id == 77029297 then
+		send_message(msg.chat.id, '/END@MINDSTORMER619')
+	end
+]]--
 	local lower = string.lower(msg.text)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
