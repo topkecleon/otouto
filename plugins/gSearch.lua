@@ -48,13 +48,15 @@ function PLUGIN.action(msg)
 		return send_msg(msg, config.locale.errors.results)
 	end
 
-	message = ''
+	local message = ''
 
 	for i = 1, #jdat.responseData.results do
 		local result_url = jdat.responseData.results[i].unescapedUrl
 		local result_title = jdat.responseData.results[i].titleNoFormatting
 		message = message  .. ' - ' .. result_title ..'\n'.. result_url .. '\n'
 	end
+
+	local message = message:gsub('&amp;', '&') -- blah
 
 	send_msg(msg, message)
 

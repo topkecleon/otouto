@@ -8,6 +8,9 @@ return {
 	admins = {
 		0
 	},
+	blaclist = {
+		0
+	},
 	plugins = {
 		'about.lua',
 		'help.lua',
@@ -40,7 +43,9 @@ return {
 		'reaction.lua',
 		'slap.lua',
 		'whoami.lua',
-		'lmgtfy.lua'
+		'lmgtfy.lua',
+		'translate.lua',
+		'currency.lua'
 	},
 	people = {
 		['55994550'] = 'topkecleon'

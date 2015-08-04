@@ -33,10 +33,10 @@ end
 
 function get_updates(offset)
 
-	local url = BASE_URL .. 'getUpdates'
+	local url = BASE_URL .. 'getUpdates?timeout=30'
 
 	if offset then
-		url = url .. '?offset=' .. offset
+		url = url .. '&offset=' .. offset
 	end
 
 	return send_request(url)

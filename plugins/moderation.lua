@@ -28,10 +28,10 @@ help.action = function(msg)
 			/modkick -  Kick a user via reply or username.
 			/modlist - Get a list of moderators for this group.
 		Administrator commands:
-			/modadd - Add this group to the database.
-			/modrem - Remove this group from the database.
-			/modprom - Promote a user via reply.
-			/moddem - Demote a user via reply.
+			/add - Add this group to the database.
+			/remove - Remove this group from the database.
+			/promote - Promote a user via reply.
+			/demote - Demote a user via reply.
 			/modcast - Send a broastcast to every group.
 	]]
 
@@ -108,7 +108,7 @@ end
 
 local add = {}
 
-add.trigger = '^/modadd'
+add.trigger = '^/[mod]*add$'
 
 add.action = function(msg)
 
@@ -130,7 +130,7 @@ end
 
 local rem = {}
 
-rem.trigger = '^/modrem'
+rem.trigger = '^/[mod]*rem[ove]*$'
 
 rem.action = function(msg)
 
@@ -152,7 +152,7 @@ end
 
 local promote = {}
 
-promote.trigger = '^/modprom'
+promote.trigger = '^/[mod]*prom[ote]*$'
 
 promote.action = function(msg)
 
@@ -186,7 +186,7 @@ end
 
 local demote = {}
 
-demote.trigger = '^/moddem'
+demote.trigger = '^/[mod]*dem[ote]*$'
 
 demote.action = function(msg)
 
@@ -281,10 +281,10 @@ local triggers = {
 	'^/modhelp',
 	'^/modlist',
 	'^/modcast',
-	'^/modadd',
-	'^/modrem',
-	'^/modprom',
-	'^/moddem',
+	'^/[mod]*add$',
+	'^/[mod]*rem[ove]*$',
+	'^/[mod]*prom[ote]*$',
+	'^/[mod]*dem[ote]*$',
 	'^/modkick',
 	'^/modban'
 }

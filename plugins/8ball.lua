@@ -35,7 +35,7 @@ PLUGIN.answers = {
 	"There is a time and place for everything, but not now."
 }
 
-PLUGIN.yesno = {'Absolutely.', 'In your dreams.', 'Yes.', 'No.', 'Maybe.'}
+PLUGIN.yesno = {'Absolutely.', 'In your dreams.', 'Yes.', 'No.'}
 
 function PLUGIN.action(msg)
 

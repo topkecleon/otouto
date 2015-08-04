@@ -1,2 +1,4 @@
 config.lua
 loc/weeb.lua
+console.lua
+*.json

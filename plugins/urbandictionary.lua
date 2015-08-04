@@ -7,7 +7,8 @@ PLUGIN.doc = [[
 
 PLUGIN.triggers = {
 	'^/ud',
-	'^/urbandictionary'
+	'^/urbandictionary',
+	'^/urban'
 }
 
 function PLUGIN.action(msg)

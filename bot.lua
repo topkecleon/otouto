@@ -6,20 +6,18 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.5
+VERSION = 2.6
 
 function on_msg_receive(msg)
+
+	if config.blacklist[msg.from.id] then return end
 
 	msg = process_msg(msg)
 
 	if msg.date < os.time() - 5 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
 	if msg.forward_from then return end -- don't react to forwarded messages
---[[
-	if msg.from.id == 77029297 then
-		send_message(msg.chat.id, '/END@MINDSTORMER619')
-	end
-]]--
+
 	local lower = string.lower(msg.text)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
@@ -27,7 +25,13 @@ function on_msg_receive(msg)
 				if not v.no_typing then
 					send_chat_action(msg.chat.id, 'typing')
 				end
-				v.action(msg)
+				local a,b = pcall(function() -- Janky error handling, but it works.
+					v.action(msg)
+				end)
+				if not a then
+					print(b)
+					send_msg(msg, b)
+				end
 			end
 		end
 	end
@@ -109,9 +113,9 @@ end
 bot_init()
 reminders = {}
 last_update = 0
-while is_started == true do
+while is_started do
 
-	local res = get_updates(last_update)
+	local res = get_updates(last_update+1)
 	if not res then
 		print('Error getting updates.')
 	else
@@ -131,6 +135,5 @@ while is_started == true do
 			end
 		end
 	end
-
 end
 print('Halted.')

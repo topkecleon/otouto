@@ -16,7 +16,7 @@ function PLUGIN.action(msg)
 		return send_msg(msg, PLUGIN.doc)
 	end
 
-	send_msg(msg, latcyr(input))
+	send_message(msg.chat.id, latcyr(input))
 
 end
 

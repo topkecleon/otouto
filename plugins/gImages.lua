@@ -55,8 +55,13 @@ function PLUGIN.action(msg)
 		return
 	end
 
-	is_real = false
+	local is_real = false
+	local counter = 0
 	while is_real == false do
+		counter = counter + 1
+		if counter > 5 then
+			return send_msg(msg, config.locale.errors.results)
+		end
 		local i = math.random(#jdat.responseData.results)
 		result_url = jdat.responseData.results[i].url
 		for i,v in pairs(PLUGIN.exts) do
