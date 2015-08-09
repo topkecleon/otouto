@@ -186,7 +186,7 @@ end
 
 local demote = {}
 
-demote.trigger = '^/[mod]*dem[ote]*$'
+demote.trigger = '^/[mod]*dem[ote]*'
 
 demote.action = function(msg)
 
@@ -289,7 +289,7 @@ local triggers = {
 	'^/[mod]*add$',
 	'^/[mod]*rem[ove]*$',
 	'^/[mod]*prom[ote]*$',
-	'^/[mod]*dem[ote]*$',
+	'^/[mod]*dem[ote]*',
 	'^/modkick',
 	'^/modban'
 }
