@@ -1,12 +1,12 @@
 return {
 	bot_api_key = '',
-	lastfm_api_key = ''
+	lastfm_api_key = '',
 	biblia_api_key = '',
 	giphy_api_key = 'dc6zaTOxFJmzC',
 	time_offset = 0,
 	locale = dofile('loc/en.lua'),
 	admins = {
-		0
+		[0] = 'name'
 	},
 	blacklist = load_data('blacklist.json'),
 	plugins = {
