@@ -36,10 +36,9 @@ local action = function(msg)
 			return send_msg(msg, config.locale.errors.connection)
 		end
 
-		local str = str:match('<span class=bld>.*</span>')
+		local str = str:match('<span class=bld>(.*) %u+</span>')
 		if not str then return send_msg(msg, config.locale.errors.results) end
-		local str = str:sub(str:find('>')+1)
-		result = str:sub(1, str:find(' ')-1)
+		result = string.format('%.2f', str)
 
 	end
 

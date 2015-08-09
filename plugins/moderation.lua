@@ -198,18 +198,23 @@ demote.action = function(msg)
 		return send_message(msg.chat.id, 'Group is not added.')
 	end
 
-	if not msg.reply_to_message then
-		return send_message(msg.chat.id, 'Demotions must be done via reply.')
+	local input = get_input(msg.text)
+	if not input then
+		if msg.reply_to_message then
+			input = msg.reply_to_message.from.id
+		else
+			return send_msg('Demotions must be done by reply or by specifying a moderator\'s ID.')
+		end
 	end
 
-	if not data[tostring(msg.chat.id)][tostring(msg.reply_to_message.from.id)] then
-		return send_message(msg.chat.id, msg.reply_to_message.from.first_name..' is not a moderator.')
+	if not data[tostring(msg.chat.id)][tostring(input)] then
+		return send_message(msg.chat.id, input..' is not a moderator.')
 	end
 
-	data[tostring(msg.chat.id)][tostring(msg.reply_to_message.from.id)] = nil
+	data[tostring(msg.chat.id)][tostring(input)] = nil
 	save_data(config.moderation.data, data)
 
-	send_message(msg.chat.id, msg.reply_to_message.from.first_name..' has been demoted.')
+	send_message(msg.chat.id, input..' has been demoted.')
 
 end
 

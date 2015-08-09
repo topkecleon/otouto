@@ -25,6 +25,9 @@ function PLUGIN.action(msg)
 		return send_msg(msg, config.locale.errors.connection)
 	end
 	local jdat = JSON.decode(jstr)
+	if not jdat.query.results then
+		return send_msg(msg, config.locale.errors.results)
+	end
 	local data = jdat.query.results.channel.item.condition
 
 	local fahrenheit = data.temp

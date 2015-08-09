@@ -8,9 +8,7 @@ return {
 	admins = {
 		0
 	},
-	blaclist = {
-		0
-	},
+	blacklist = load_data('blacklist.json'),
 	plugins = {
 		'about.lua',
 		'help.lua',

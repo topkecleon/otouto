@@ -6,11 +6,11 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.6
+VERSION = 2.7
 
 function on_msg_receive(msg)
 
-	if config.blacklist[msg.from.id] then return end
+	if config.blacklist[tostring(msg.from.id)] then return end
 
 	msg = process_msg(msg)
 
@@ -25,7 +25,7 @@ function on_msg_receive(msg)
 				if not v.no_typing then
 					send_chat_action(msg.chat.id, 'typing')
 				end
-				local a,b = pcall(function() -- Janky error handling, but it works.
+				local a,b = pcall(function() -- Janky error handling
 					v.action(msg)
 				end)
 				if not a then
@@ -38,6 +38,7 @@ function on_msg_receive(msg)
 end
 
 function bot_init()
+	require('utilities')
 
 	print('\nLoading configuration...')
 
@@ -46,7 +47,6 @@ function bot_init()
 	print(#config.plugins .. ' plugins enabled.')
 
 	require('bindings')
-	require('utilities')
 
 	print('\nFetching bot information...')
 
