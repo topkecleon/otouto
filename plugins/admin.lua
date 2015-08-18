@@ -4,8 +4,6 @@ PLUGIN.triggers = {
 	'^/admin '
 }
 
-PLUGIN.no_typing = true
-
 function PLUGIN.action(msg)
 
 	if msg.date < os.time() - 1 then return end

@@ -36,6 +36,5 @@ end
 return {
 	doc = doc,
 	triggers = triggers,
-	action = action,
-	no_typing = true
+	action = action
 }

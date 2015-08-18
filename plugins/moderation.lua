@@ -19,7 +19,7 @@ help.action = function(msg)
 
 	local do_send = false
 	if data[tostring(msg.chat.id)] and data[tostring(msg.chat.id)][tostring(msg.from.id)] then do_send = true end
-	if config.moderation.admins[msg.from.id] then do_send = true end
+	if config.moderation.admins[tostring(msg.from.id)] then do_send = true end
 	if do_send == false then return end
 
 	local message = [[
@@ -33,6 +33,7 @@ help.action = function(msg)
 			/promote - Promote a user via reply.
 			/demote - Demote a user via reply.
 			/modcast - Send a broastcast to every group.
+			/hammer - Ban a user from all groups via reply or username.
 	]]
 
 	send_message(msg.chat.id, message)
@@ -49,7 +50,11 @@ ban.action = function(msg)
 	local data = load_data(config.moderation.data)
 
 	if not data[tostring(msg.chat.id)] then return end
-	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then return end
+	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then
+		if not config.moderation.admins[tostring(msg.from.id)] then
+			return
+		end
+	end
 
 	local target = get_target(msg)
 	if not target then
@@ -82,11 +87,15 @@ kick.action = function(msg)
 	local data = load_data(config.moderation.data)
 
 	if not data[tostring(msg.chat.id)] then return end
-	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then return end
+	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then
+		if not config.moderation.admins[tostring(msg.from.id)] then
+			return
+		end
+	end
 
 	local target = get_target(msg)
 	if not target then
-		return send_message(msg.chat.id, 'No one to remove.\nTip: Bots must be removed by username.')
+		return send_message(msg.chat.id, 'No one to remove.\nBots must be removed by username.')
 	end
 
 	if msg.reply_to_message and data[tostring(msg.chat.id)][tostring(msg.reply_to_message.from.id)] then
@@ -114,7 +123,7 @@ add.action = function(msg)
 
 	local data = load_data(config.moderation.data)
 
-	if not config.moderation.admins[msg.from.id] then return end
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
 	if data[tostring(msg.chat.id)] then
 		return send_message(msg.chat.id, 'Group is already added.')
@@ -136,7 +145,7 @@ rem.action = function(msg)
 
 	local data = load_data(config.moderation.data)
 
-	if not config.moderation.admins[msg.from.id] then return end
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
 	if not data[tostring(msg.chat.id)] then
 		return send_message(msg.chat.id, 'Group is not added.')
@@ -157,10 +166,11 @@ promote.trigger = '^/[mod]*prom[ote]*$'
 promote.action = function(msg)
 
 	local data = load_data(config.moderation.data)
+	local chatid = tostring(msg.chat.id)
 
-	if not config.moderation.admins[msg.from.id] then return end
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
-	if not data[tostring(msg.chat.id)] then
+	if not data[chatid] then
 		return send_message(msg.chat.id, 'Group is not added.')
 	end
 
@@ -168,15 +178,21 @@ promote.action = function(msg)
 		return send_message(msg.chat.id, 'Promotions must be done via reply.')
 	end
 
-	if data[tostring(msg.chat.id)][tostring(msg.reply_to_message.from.id)] then
+	local targid = tostring(msg.reply_to_message.from.id)
+
+	if data[chatid][targid] then
 		return send_message(msg.chat.id, msg.reply_to_message.from.first_name..' is already a moderator.')
+	end
+
+	if config.moderation.admins[targid] then
+		return send_message(msg.chat.id, 'Administrators do not need to be promoted.')
 	end
 
 	if not msg.reply_to_message.from.username then
 		msg.reply_to_message.from.username = msg.reply_to_message.from.first_name
 	end
 
-	data[tostring(msg.chat.id)][tostring(msg.reply_to_message.from.id)] = msg.reply_to_message.from.first_name
+	data[chatid][targid] = msg.reply_to_message.from.first_name
 	save_data(config.moderation.data, data)
 
 	send_message(msg.chat.id, msg.reply_to_message.from.first_name..' has been promoted.')
@@ -192,7 +208,7 @@ demote.action = function(msg)
 
 	local data = load_data(config.moderation.data)
 
-	if not config.moderation.admins[msg.from.id] then return end
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
 	if not data[tostring(msg.chat.id)] then
 		return send_message(msg.chat.id, 'Group is not added.')
@@ -227,7 +243,7 @@ broadcast.action = function(msg)
 
 	local data = load_data(config.moderation.data)
 
-	if not config.moderation.admins[msg.from.id] then return end
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
 	if msg.chat.id ~= config.moderation.realm then
 		return send_message(msg.chat.id, 'This command must be run in the admin group.')
@@ -258,13 +274,46 @@ modlist.action = function(msg)
 		return send_message(msg.chat.id, 'Group is not added.')
 	end
 
-	local message = 'List of moderators for ' .. msg.chat.title .. ':\n'
+	local message = ''
 
 	for k,v in pairs(data[tostring(msg.chat.id)]) do
-		message = message .. v .. ' (' .. k .. ')\n'
+		message = message ..' - '..v.. ' (' .. k .. ')\n'
+	end
+
+	if message ~= '' then
+		message = 'Moderators for ' .. msg.chat.title .. ':\n' .. message .. '\n'
+	end
+
+	message = message .. 'Administrators for ' .. config.moderation.realmname .. ':\n'
+	for k,v in pairs(config.moderation.admins) do
+		message = message ..' - '..v.. ' (' .. k .. ')\n'
 	end
 
 	send_message(msg.chat.id, message)
+
+end
+
+
+local badmin = {}
+
+badmin.trigger = '^/hammer'
+
+badmin.action = function(msg)
+
+	if not config.moderation.admins[tostring(msg.from.id)] then return end
+
+	local target = get_target(msg)
+	if not target then
+		return send_message(msg.chat.id, 'No one to remove.\nBots must be removed by username.')
+	end
+
+	send_message(config.moderation.realm, '/ban ' .. target .. ' from all')
+
+	if msg.reply_to_message then
+		target = msg.reply_to_message.from.first_name
+	end
+
+	send_message(config.moderation.realm, target .. ' was banhammered by ' .. msg.from.first_name .. '.')
 
 end
 
@@ -278,7 +327,8 @@ local modactions = {
 	promote,
 	demote,
 	broadcast,
-	modlist
+	modlist,
+	badmin
 }
 
 
@@ -291,7 +341,8 @@ local triggers = {
 	'^/[mod]*prom[ote]*$',
 	'^/[mod]*dem[ote]*',
 	'^/modkick',
-	'^/modban'
+	'^/modban',
+	'^/hammer'
 }
 
 local action = function(msg)
@@ -304,6 +355,5 @@ end
 
 return {
 	triggers = triggers,
-	action = action,
-	no_typing = true
+	action = action
 }

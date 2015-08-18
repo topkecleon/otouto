@@ -2,6 +2,8 @@
 
 local PLUGIN = {}
 
+PLUGIN.typing = true
+
 PLUGIN.triggers = {
 	'^@' .. bot.username .. ', ',
 	'^' .. bot.first_name .. ', '

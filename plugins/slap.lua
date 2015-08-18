@@ -86,7 +86,7 @@ function PLUGIN.getSlap(slapper, victim)
 		slapper .. " hit " .. victim .. " with a small, interstellar spaceship.",
 		victim .. " was quickscoped by " .. slapper .. ".",
 		slapper .. " put " .. victim .. " in check-mate.",
-		slapper .. " encrypted " .. victim .. " and deleted the private key.",
+		slapper .. " RSA-encrypted " .. victim .. " and deleted the private key.",
 		slapper .. " put " .. victim .. " in the friendzone.",
 		slapper .. " slaps " .. victim .. " with a DMCA takedown request!",
 		victim .. " became a corpse blanket for " .. slapper .. ".",

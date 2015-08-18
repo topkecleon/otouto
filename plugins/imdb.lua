@@ -25,7 +25,7 @@ function PLUGIN.action(msg)
 	local jstr, res = HTTP.request(url)
 	local jdat = JSON.decode(jstr)
 
-	if res ~= 200 then
+	if res ~= 200 or not jdat then
 		return send_msg(msg, config.locale.errors.connection)
 	end
 

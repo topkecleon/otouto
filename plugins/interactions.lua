@@ -5,8 +5,6 @@
 
 local PLUGIN = {}
 
-PLUGIN.no_typing = true
-
 PLUGIN.triggers = {
 	bot.first_name .. '%p?$',
 	'^tadaima%p?$',
@@ -18,18 +16,22 @@ function PLUGIN.action(msg)
 
 	local input = string.lower(msg.text)
 
-	if config.people[tostring(msg.from.id)] then msg.from.first_name = config.people[tostring(msg.from.id)] end
+	local data = load_data('nicknames.json')
+	local id = tostring(msg.from.id)
+	local nick = msg.from.first_name
+
+	if data[id] then nick = data[id] end
 
 	for i = 2, #PLUGIN.triggers do
 		if string.match(input, PLUGIN.triggers[i]) then
-			return send_message(msg.chat.id, 'Welcome back, ' .. msg.from.first_name .. '!')
+			return send_message(msg.chat.id, 'Welcome back, ' .. nick .. '!')
 		end
 	end
 
 	for k,v in pairs(config.locale.interactions) do
 		for key,val in pairs(v) do
 			if input:match(val..',? '..bot.first_name) then
-				return send_message(msg.chat.id, k:gsub('#NAME', msg.from.first_name))
+				return send_message(msg.chat.id, k:gsub('#NAME', nick))
 			end
 		end
 	end

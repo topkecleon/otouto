@@ -22,7 +22,7 @@ function on_msg_receive(msg)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
 			if string.match(lower, w) then
-				if not v.no_typing then
+				if v.typing then
 					send_chat_action(msg.chat.id, 'typing')
 				end
 				local a,b = pcall(function() -- Janky error handling

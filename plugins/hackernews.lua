@@ -1,5 +1,7 @@
 local PLUGIN = {}
 
+PLUGIN.typing = true -- usually takes a few seconds to load
+
 PLUGIN.doc = [[
 	/hackernews
 	Returns some top stories from Hacker News. Four in a group or eight in a private message.

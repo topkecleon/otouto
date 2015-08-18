@@ -6,7 +6,7 @@ return {
 	time_offset = 0,
 	locale = dofile('loc/en.lua'),
 	admins = {
-		[0] = 'name'
+		[000] = 'name'
 	},
 	blacklist = load_data('blacklist.json'),
 	plugins = {
@@ -19,6 +19,7 @@ return {
 		'giphy.lua',
 		'xkcd.lua',
 		'gMaps.lua',
+		'wikipedia.lua',
 		'imdb.lua',
 		'urbandictionary.lua',
 		'hackernews.lua',
@@ -43,16 +44,16 @@ return {
 		'whoami.lua',
 		'lmgtfy.lua',
 		'translate.lua',
-		'currency.lua'
-	},
-	people = {
-		['55994550'] = 'topkecleon'
+		'currency.lua',
+		'blacklist.lua',
+		'nick.lua'
 	},
 	moderation = {
-		realm = -0,
+		realm = -000,
+		realmname = 'Realm name or ident',
 		data = 'moderation.json',
 		admins = {
-			[0] = 'nickname',
+			['000'] = 'nickname',
 		}
 	}
 }
