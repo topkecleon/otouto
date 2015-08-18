@@ -6,7 +6,7 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.7
+VERSION = 2.8
 
 function on_msg_receive(msg)
 
