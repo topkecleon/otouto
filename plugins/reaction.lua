@@ -1,3 +1,8 @@
+local doc = [[
+	/reactions
+	Get a list of the available reaction emoticons.
+]]
+
 local triggers = {
 	['¯\\_(ツ)_/¯'] = '/shrug$',
 	['( ͡° ͜ʖ ͡°)'] = '/lenny$',
@@ -36,5 +41,6 @@ triggers[help] = '^/reactions'
 
 return {
 	triggers = triggers,
-	action = action
+	action = action,
+	doc = doc
 }
