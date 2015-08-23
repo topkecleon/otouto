@@ -41,9 +41,13 @@ function PLUGIN.action(msg)
 	end
 
 	if url then
-		jstr, b = HTTPS.request(url)
+		jstr, res = HTTPS.request(url)
 	else
 		return send_msg(msg, config.locale.errors.results)
+	end
+
+	if res ~= 200 then
+		return send_msg(msg, config.locale.errors.connection)
 	end
 
 	jdat = JSON.decode(jstr)

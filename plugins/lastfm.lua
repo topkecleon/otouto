@@ -67,9 +67,16 @@ function PLUGIN.action(msg)
 
 	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 
-	local message = '🎵  ' .. input .. ' last listened to:\n'
+	local message = '🎵  ' .. msg.from.first_name .. ' last listened to:\n'
 	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = '🎵  ' .. input .. ' is listening to:\n'
+		message = '🎵  ' .. msg.from.first_name .. ' is listening to:\n'
+	end
+
+	local artist
+	if jdat.artist then
+		artist = jdat.artist['#text']
+	else
+		artist = 'Unknown'
 	end
 
 	local message = message .. jdat.name .. ' - ' .. jdat.artist['#text']

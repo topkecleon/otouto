@@ -32,7 +32,7 @@ function PLUGIN.action(msg)
 
 	local fahrenheit = data.temp
 	local celsius = string.format('%.0f', (fahrenheit - 32) * 5/9)
-	local message = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. data.text
+	local message = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. data.text .. '.'
 
 	send_msg(msg, message)
 

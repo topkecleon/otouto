@@ -38,10 +38,22 @@ local action = function(msg)
 		break -- Seriously, there's probably a way more elegant solution.
 	end
 
-	text = text:gsub('</?.>', '')
+	if not text then
+		return send_msg(msg, config.locale.errors.results)
+	end
+
+	--[[ Uncomment this for more than one-paragraph summaries.
 	local l = text:find('<h2>')
 	if l then
 		text = text:sub(1, l-2)
+	end
+	]]--
+
+	text = text:gsub('</?.->', '')
+
+	local l = text:find('\n') -- Comment this block for more than one-paragraph summaries.
+	if l then
+		text = text:sub(1, l-1)
 	end
 
 	text = text .. '\n' .. url

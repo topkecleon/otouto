@@ -1,7 +1,8 @@
  -- Admins can blacklist a user from utilizing this bot. Use via reply or with an ID as an argument. Un-blacklist a user with the same command.
 
 local triggers = {
-	'^/blacklist'
+	'^/blacklist',
+	'^/listofcolor'
 }
 
 local action = function(msg)
@@ -23,10 +24,10 @@ local action = function(msg)
 
 	if config.blacklist[id] then
 		config.blacklist[id] = nil
-		send_msg(msg, 'User has been removed from the blacklist.')
+		send_message(msg.chat.id, 'User has been removed from the blacklist.')
 	else
 		config.blacklist[id] = true
-		send_msg(msg, 'User has been blacklisted.')
+		send_message(msg.chat.id, 'User has been blacklisted.')
 	end
 
 	save_data('blacklist.json', config.blacklist)

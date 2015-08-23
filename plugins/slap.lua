@@ -100,22 +100,33 @@ function PLUGIN.action(msg)
 
 	math.randomseed(os.time())
 
-	local slapper
-	local victim = get_input(msg.text)
+	local slapper, victim, sid, vid
+
+	victim = get_input(msg.text)
 	if victim then
 		slapper = msg.from.first_name
 	else
 		victim = msg.from.first_name
+		vid = msg.from.id
 		slapper = bot.first_name
 	end
 
 	if msg.reply_to_message then
 		victim = msg.reply_to_message.from.first_name
+		vid = msg.reply_to_message.from.id
 		slapper = msg.from.first_name
+		sid = msg.from.id
 		if slapper == victim then
 			slapper = bot.first_name
+			sid = bot.id
 		end
 	end
+
+	nicks = load_data('nicknames.json') -- Try to replace slapper/victim names with nicknames.
+	sid = tostring(sid)
+	vid = tostring(vid)
+	if nicks[sid] then slapper = nicks[sid] end
+	if nicks[vid] then victim =  nicks[vid] end
 
 	local message = PLUGIN.getSlap(slapper, victim)
 	send_message(msg.chat.id, latcyr(message))

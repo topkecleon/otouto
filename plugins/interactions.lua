@@ -1,8 +1,3 @@
- -- config.people is a table of IDs/nicknames the bot can address more familiarly
- -- like so:
- -- 	13227902: "Drew"
-
-
 local PLUGIN = {}
 
 PLUGIN.triggers = {
@@ -31,7 +26,7 @@ function PLUGIN.action(msg)
 	for k,v in pairs(config.locale.interactions) do
 		for key,val in pairs(v) do
 			if input:match(val..',? '..bot.first_name) then
-				return send_message(msg.chat.id, k:gsub('#NAME', nick))
+				return send_message(msg.chat.id, latcyr(k:gsub('#NAME', nick)))
 			end
 		end
 	end
