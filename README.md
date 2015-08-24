@@ -1,166 +1,237 @@
-# otouto
+
 
 The plugin-wielding, multi-purpose Telegram bot.
 
-Public bot runs on [@mokubot](http://telegram.me/mokubot).
+Based on otouto by [@topkecleon](http://telegram.me/topkecleon)
 
-To start, send "/start" or say "Hello, otouto."
-
-
-##Plugins
-
-<table>
-  <thead>
-    <tr>
-      <td>help.lua</td>
-      <td>/help [command]</td>
-      <td>List commands</td>
-    </tr>
-    <tr>
-      <td>about.lua</td>
-      <td>/about</td>
-      <td>Information about the bot</td>
-    </tr>
-    <tr>
-      <td>gSearch.lua</td>
-      <td>/google &lt;query&gt;</td>
-      <td>Google Search</td>
-    </tr>
-    <tr>
-      <td>gImages.lua</td>
-      <td>/images &lt;query&gt;</td>
-      <td>Google Images search</td>
-    </tr>
-    <tr>
-      <td>reddit.lua</td>
-      <td>/reddit [r/subreddit | query]</td>
-      <td>Posts from reddit</td>
-    </tr>
-    <tr>
-      <td>giphy.lua</td>
-      <td>/giphy [query]</td>
-      <td>Giphy search or random</td>
-    </tr>
-    <tr>
-      <td>xkcd.lua</td>
-      <td>/xkcd [search]</td>
-      <td>xkcd strips and alt text</td>
-    </tr>
-    <tr>
-      <td>gMaps.lua</td>
-      <td>/loc &lt;location&gt;</td>
-      <td>Google Maps search</td>
-    </tr>
-    <tr>
-      <td>imdb.lua</td>
-      <td>/imdb &lt;movie | TV series&gt;</td>
-      <td>IMDb movie/television info</td>
-    </tr>
-    <tr>
-      <td>urbandictionary.lua</td>
-      <td>/ud &lt;term&gt;</td>
-      <td>Urban Dictionary search</td>
-    </tr>
-    <tr>
-      <td>hackernews.lua</td>
-      <td>/hackernews</td>
-      <td>Top stories from Hackernews</td>
-    </tr>
-    <tr>
-      <td>time.lua</td>
-      <td>/time &lt;location&gt;</td>
-      <td>Get the time for a place</td>
-    </tr>
-    <tr>
-      <td>weather.lua</td>
-      <td>/weather &lt;location&gt;</td>
-      <td>Get the weather for a place</td>
-    </tr>
-    <tr>
-      <td>calc.lua</td>
-      <td>/calc &lt;expression&gt;</td>
-      <td>Solve math expression and convert units</td>
-    </tr>
-    <tr>
-      <td>dice.lua</td>
-      <td>/roll [arg]</td>
-      <td>Roll a die. Accepts D&amp;D notation</td>
-    </tr>
-    <tr>
-      <td>remind.lua</td>
-      <td>/remind &lt;delay&gt; &lt;message&gt;</td>
-      <td>Set a reminder for yourself or a group</td>
-    </tr>
-    <tr>
-      <td>8ball.lua</td>
-      <td>/8ball</td>
-      <td>Magic 8-ball</td>
-    </tr>
-    <tr>
-      <td>bandersnatch.lua</td>
-      <td>/bandersnatch</td>
-      <td>Benedict Cumberbatch name generator</td>
-    </tr>
-    <tr>
-      <td>bible.lua</td>
-      <td>/bible &lt;verse&gt;</td>
-      <td>King James Version</td>
-    </tr>
-    <tr>
-      <td>btc.lua</td>
-      <td>/btc &lt;currency&gt; [amount]</td>
-      <td>Bitcoin prices and conversion</td>
-    </tr>
-    <tr>
-      <td>commit.lua</td>
-      <td>/commit</td>
-      <td>http://whatthecommit.com</td>
-    </tr>
-    <tr>
-      <td>dogify.lua</td>
-      <td>/dogify &lt;lines/separatedby/slashes&gt;</td>
-      <td>Create a doge image</td>
-    </tr>
-    <tr>
-      <td>echo.lua</td>
-      <td>/echo &lt;text&gt;</td>
-      <td>Repeat a string</td>
-    </tr>
-    <tr>
-      <td>fortune.lua</td>
-      <td>/fortune</td>
-      <td>Random fortunes</td>
-    </tr>
-    <tr>
-      <td>hex.lua</td>
-      <td>/hex &lt;number&gt;</td>
-      <td>Convert to and from hexadecimal</td>
-    </tr>
-    <tr>
-      <td>pokedex.lua</td>
-      <td>/dex &lt;pokemon&gt;</td>
-      <td>Pokedex!</td>
-    </tr>
-    <tr>
-      <td>pun.lua</td>
-      <td>/pun</td>
-      <td>Puns</td>
-    </tr>
-    <tr>
-      <td>slap.lua</td>
-      <td>/slap [victim]</td>
-      <td>Slap someone!</td>
-    </tr>
-    <tr>
-      <td>whoami.lua</td>
-      <td>/who</td>
-      <td>Get user and group IDs</td>
-    </tr>
-  </tbody>
-</table>
+To start, send "/start" or say "Hello, jack."
 
 
-##Setup
+
+
+# feathers/plugins list
+
+**1-Help**
+
+List commands
+
+`/help` 
+
+***
+
+**2-About**
+
+Information about the bot
+
+`/about`
+
+***
+
+**3-Google Search**
+
+Perform a Google search for you
+
+`/google <query>`
+
+![/google](http://s6.uplod.ir/i/00665/lmjw79okxtbi.png)
+
+
+***
+
+**4-Google Images search**
+
+Perform a Google Images search for you
+
+`/images <query>`
+
+![/images](http://s6.uplod.ir/i/00665/urpc7s6j1p25.png)
+
+
+***
+
+
+**5-Posts from reddit**
+
+Posts from reddit
+
+`/reddit [r/subreddit | query]`
+
+
+***
+
+
+**6-Giphy**
+
+Giphy search or random
+
+`/giphy [query]`
+
+![/giphy](http://s6.uplod.ir/i/00665/a6fffbua378j.png)
+
+
+***
+
+
+**7-Google Maps search**
+
+Perform a Google Maps search for you
+
+`/loc <location>`
+
+![/loc](http://s6.uplod.ir/i/00665/65kxb5my02qx.png)
+
+
+***
+
+**8-IMDb**
+
+IMDb movie/television info
+
+`/imdb <movie | TV series>`
+
+![/imdb](http://s6.uplod.ir/i/00665/tcfnwvfchsgk.png)
+
+
+***
+
+**9-Urban Dictionary**
+
+Urban Dictionary search
+
+`/ud <term>`
+
+
+![/ud](http://s6.uplod.ir/i/00665/ekoe7jdo22bs.png)
+
+
+***
+
+**10-Time**
+
+Get the time for a place
+
+`/time <location>`
+
+![/time](http://s6.uplod.ir/i/00665/owxw84ii2e5m.png)
+
+
+***
+
+
+**11-Weather**
+
+Get the weather for a place
+
+`/weather <location>`
+
+![/weather](http://s6.uplod.ir/i/00665/0uflhecap8fn.png)
+
+**12-Calculator**
+
+***
+
+
+Solve math expression and convert units
+
+`/calc <expression>`
+
+![/calc](http://s6.uplod.ir/i/00665/ug53xmbcdqu4.png)
+
+***
+
+
+**13-Remind**
+
+Set a reminder for yourself or a group
+
+`/remind <delay> <message>`
+
+![/remind](http://s6.uplod.ir/i/00665/ggaqonabz9wj.png)
+
+***
+
+
+**14-8ball**
+
+Magic 8-ball
+
+`/8ball`
+
+
+***
+
+**15-Bitcoin**
+
+Bitcoin prices and conversion
+
+`/btc <currency> [amount]`
+
+![/btc](http://s6.uplod.ir/i/00665/nyy9eim3rnvn.png)
+
+
+***
+**16-dogify**
+
+Create a doge image
+
+`/dogify <lines/separatedby/slashes>`
+
+![/dogify](http://s6.uplod.ir/i/00665/se5v6jprtpqp.png)
+
+
+***
+
+**17-Echo**
+
+Repeat a string
+
+`/echo <text>`
+
+![/echo](http://s6.uplod.ir/i/00665/s5kznagq86gv.png)
+
+
+***
+
+**18-Pun**
+
+Puns 
+
+`/pun`
+
+**19-Slap**
+
+***
+
+
+Slap someone!
+
+`/slap [victim]`
+
+![/slap](http://s6.uplod.ir/i/00665/2glwd0lms7fd.png)
+
+**20-whoami**
+
+***
+
+
+Get user and group IDs
+
+`/who`
+
+![/who](http://s6.uplod.ir/i/00665/ys5dmuzta3om.png)
+
+**20-Translate**
+
+***
+
+
+ Reply to a message to translate it to the default language
+
+`/translate [target lang]`
+
+![/translate](http://s6.uplod.ir/i/00665/2nzk90nsc921.png)
+
+## Setup
 
 Requires Lua, lua-socket and lua-sec. [dkjson](http://github.com/LuaDist/dkjson/) is provided. Written for Lua 5.2 but will probably run on 5.3.
 
@@ -183,7 +254,7 @@ The "fortune.lua" plugin requires the fortune program to be installed on the hos
 "admins" table includes the ID numbers, as integers, of any privileged users. These will have access to the admin plugin and any addition privileged commands.
 
 "people" table is for the personality plugin:
-`["55994550"] = "topkecleon"`
+`["110626080"] = "imandaneshi"`
 
 ID number must be a string. The second string is the nickname to be given to the identified user when a personality greeting is triggered.
 
@@ -192,8 +263,12 @@ To run:
 `lua bot.lua`
 
 
-##Support
 
-Do not private message me for support.
 
-For support for otouto as well as general Lua and bot assistance, please join the [CIS Bot Development](http://telegram.me/joinchat/05fe39f500f8f1b2d1548147a68acd2a) group. After you read the rules and the pastebin, I will assist you there.
+## Contact 
+
+Contact me if you had any suggestion or problem.
+
+[@imandaneshi](http://telegram.me/imandaneshi)
+[imandaneshi@yahoo.com](mailto:imandaneshi@yahoo.com)
+
