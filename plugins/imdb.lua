@@ -36,7 +36,12 @@ function PLUGIN.action(msg)
 	local message = jdat.Title ..' ('.. jdat.Year ..')\n'
 	message = message .. jdat.imdbRating ..' | '.. jdat.Runtime ..' | '.. jdat.Genre ..'\n'
 	message = message .. jdat.Plot .. '\n'
-	message = message .. 'http://imdb.com/title/' .. jdat.imdbID
+	message = message .. 'http://imdb.com/title/' .. jdat.imdbID..'\n'
+	message = message .. 'Rate: '..jdat.imdbRating..'\n'
+	message = message .. 'Actors: '..jdat.Actors..'\n'
+	message = message .. 'Writer: '..jdat.Writer..'\n'
+	message = message .. 'Poster: '..jdat.Poster..'\n'
+
 
 	send_msg(msg, message)
 
