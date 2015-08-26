@@ -15,17 +15,9 @@ function PLUGIN.action(msg)
 	local url = 'http://kat.cr/json.php'
 
 
-	local input = get_input(msg.text)
-	if not input then
-		if msg.reply_to_message then
-			msg = msg.reply_to_message
-			input = msg.text
-		else
-			return send_msg(msg, PLUGIN.doc)
-		end
-	end
 
-	url = url .. '?q=' .. URL.escape(input)
+
+	url = url .. '?q=' .. get_input(msg.text)
 
 	local jstr, res = HTTP.request(url)
 
