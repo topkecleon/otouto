@@ -41,7 +41,7 @@ function PLUGIN.action(msg)
 		local result_seeds = jdat.list[i].seeds
 		local result_size = jdat.list[i].size
 		local result_guid = jdat.list[i].guid
-		message = message  .. ' - ' .. result_title ..'\n'.. result_url .. '\n'..'ategory:'..result_category..'\n'..'Peers:'..result_peers..'\n'..'Seeds:'..result_seeds..'\n'..'Size:'..result_size..'\n'..'Guid:'..result_guid..'\n'
+		message = message  .. ' - ' .. result_title ..'\n'.. result_url .. '\n'..'Category:'..result_category..'\n'..'Peers:'..result_peers..'\n'..'Seeds:'..result_seeds..'\n'..'Size:'..result_size..'\n'..'Guid:'..result_guid..'\n'
 	end
 
 	local message = message:gsub('&amp;', '&') -- blah
@@ -51,3 +51,4 @@ function PLUGIN.action(msg)
 end
 
 return PLUGIN
+
