@@ -15,7 +15,7 @@ help.trigger = '^/modhelp'
 
 help.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	local do_send = false
 	if data[tostring(msg.chat.id)] and data[tostring(msg.chat.id)][tostring(msg.from.id)] then do_send = true end
@@ -47,7 +47,7 @@ ban.trigger = '^/modban'
 
 ban.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not data[tostring(msg.chat.id)] then return end
 	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then
@@ -84,7 +84,7 @@ kick.trigger = '^/modkick'
 
 kick.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not data[tostring(msg.chat.id)] then return end
 	if not data[tostring(msg.chat.id)][tostring(msg.from.id)] then
@@ -121,7 +121,7 @@ add.trigger = '^/[mod]*add$'
 
 add.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
@@ -130,7 +130,7 @@ add.action = function(msg)
 	end
 
 	data[tostring(msg.chat.id)] = {}
-	save_data(config.moderation.data, data)
+	save_data('moderation.json', data)
 
 	send_message(msg.chat.id, 'Group has been added.')
 
@@ -143,7 +143,7 @@ rem.trigger = '^/[mod]*rem[ove]*$'
 
 rem.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
@@ -152,7 +152,7 @@ rem.action = function(msg)
 	end
 
 	data[tostring(msg.chat.id)] = nil
-	save_data(config.moderation.data, data)
+	save_data('moderation.json', data)
 
 	send_message(msg.chat.id, 'Group has been removed.')
 
@@ -165,7 +165,7 @@ promote.trigger = '^/[mod]*prom[ote]*$'
 
 promote.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 	local chatid = tostring(msg.chat.id)
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
@@ -193,7 +193,7 @@ promote.action = function(msg)
 	end
 
 	data[chatid][targid] = msg.reply_to_message.from.first_name
-	save_data(config.moderation.data, data)
+	save_data('moderation.json', data)
 
 	send_message(msg.chat.id, msg.reply_to_message.from.first_name..' has been promoted.')
 
@@ -206,7 +206,7 @@ demote.trigger = '^/[mod]*dem[ote]*'
 
 demote.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
@@ -228,7 +228,7 @@ demote.action = function(msg)
 	end
 
 	data[tostring(msg.chat.id)][tostring(input)] = nil
-	save_data(config.moderation.data, data)
+	save_data('moderation.json', data)
 
 	send_message(msg.chat.id, input..' has been demoted.')
 
@@ -241,7 +241,7 @@ broadcast.trigger = '^/modcast'
 
 broadcast.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
 
@@ -268,7 +268,7 @@ modlist.trigger = '^/modlist'
 
 modlist.action = function(msg)
 
-	local data = load_data(config.moderation.data)
+	local data = load_data('moderation.json')
 
 	if not data[tostring(msg.chat.id)] then
 		return send_message(msg.chat.id, 'Group is not added.')

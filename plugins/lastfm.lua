@@ -72,6 +72,7 @@ function PLUGIN.action(msg)
 		message = '🎵  ' .. msg.from.first_name .. ' is listening to:\n'
 	end
 
+	local name = jdat.name or 'Unknown'
 	local artist
 	if jdat.artist then
 		artist = jdat.artist['#text']
@@ -79,7 +80,7 @@ function PLUGIN.action(msg)
 		artist = 'Unknown'
 	end
 
-	local message = message .. jdat.name .. ' - ' .. jdat.artist['#text']
+	local message = message .. name .. ' - ' .. artist
 
 	send_message(msg.chat.id, message)
 

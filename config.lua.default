@@ -23,6 +23,7 @@ return {
 		'wikipedia.lua',
 		'imdb.lua',
 		'urbandictionary.lua',
+		'kickass.lua',
 		'hackernews.lua',
 		'cats.lua',
 		'time.lua',
@@ -48,12 +49,12 @@ return {
 		'translate.lua',
 		'currency.lua',
 		'blacklist.lua',
-		'nick.lua'
+		'nick.lua',
+		'floodcontrol.lua'
 	},
 	moderation = {
 		realm = -000,
 		realmname = 'Realm name or ident',
-		data = 'moderation.json',
 		admins = {
 			['000'] = 'nickname',
 		}

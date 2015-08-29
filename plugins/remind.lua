@@ -1,20 +1,20 @@
-local PLUGIN = {}
+reminders = load_data('reminders.json')
 
-PLUGIN.doc = [[
+local doc = [[
 	/remind <delay> <message>
 	Set a reminder for yourself. First argument is the number of minutes until you wish to be reminded.
 ]]
 
-PLUGIN.triggers = {
+local triggers = {
 	'^/remind$',
 	'^/remind '
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
 	local input = get_input(msg.text)
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		return send_msg(msg, doc)
 	end
 
 	local delay = first_word(input)
@@ -39,6 +39,7 @@ function PLUGIN.action(msg)
 	}
 
 	table.insert(reminders, reminder)
+	save_data('reminders.json', reminders)
 
 	if delay <= 1 then
 		delay = (delay * 60) .. ' seconds'
@@ -52,4 +53,30 @@ function PLUGIN.action(msg)
 
 end
 
-return PLUGIN
+local cron = function()
+
+	reminders = load_data('reminders.json')
+	for k,v in pairs(reminders) do
+		if os.time() > v.alarm then
+			local a = send_message(v.chat_id, 'Reminder: '..v.text)
+			if a then
+				reminders[k] = nil
+				save_data('reminders.json', reminders)
+			end
+		end
+		-- If the bot is no longer in the chat, he won't be able to send reminders.
+		-- To prevent abuse, check for old reminders and remove them.
+		if v.alarm < os.time() + 3600 then
+			reminders[k] = nil
+			save_data('reminders.json', reminders)
+		end
+	end
+
+end
+
+return {
+	doc = doc,
+	triggers = triggers,
+	action = action,
+	cron = cron
+}

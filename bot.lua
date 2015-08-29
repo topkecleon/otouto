@@ -1,16 +1,14 @@
--- bot.lua
--- Run this!
-
 HTTP = require('socket.http')
-HTTPS = require('ssl.https')
-URL = require('socket.url')
+HTTPS= require('ssl.https')
+URL  = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.8
+VERSION = 2.9
 
 function on_msg_receive(msg)
 
-	if config.blacklist[tostring(msg.from.id)] then return end
+	if blacklist[tostring(msg.from.id)] then return end
+	if floodcontrol[-msg.chat.id] then return end
 
 	msg = process_msg(msg)
 
@@ -29,7 +27,7 @@ function on_msg_receive(msg)
 					v.action(msg)
 				end)
 				if not a then
-					print(b)
+					print('',msg.text,'\n',b) -- For debugging purposes.
 					send_msg(msg, b)
 				end
 			end
@@ -38,53 +36,40 @@ function on_msg_receive(msg)
 end
 
 function bot_init()
-	require('utilities')
 
-	print('\nLoading configuration...')
+	print('Loading configuration...')
 
 	config = dofile('config.lua')
-
-	print(#config.plugins .. ' plugins enabled.')
-
 	require('bindings')
+	require('utilities')
+	blacklist = load_data('blacklist.json')
 
-	print('\nFetching bot information...')
+	print('Fetching bot information...')
 
 	bot = get_me().result
 	if not bot then
 		error('Failure fetching bot information.')
 	end
-	for k,v in pairs(bot) do
-		print('',k,v)
-	end
 
-	print('Bot information retrieved!\n')
 	print('Loading plugins...')
 
 	plugins = {}
 	for i,v in ipairs(config.plugins) do
-		print('',v)
 		local p = dofile('plugins/'..v)
 		table.insert(plugins, p)
 	end
 
-	print('Done! Plugins loaded: ' .. #plugins .. '\n')
-	print('Generating help message...')
+	print('Plugins loaded: ' .. #plugins .. '. Generating help message...')
 
 	help_message = ''
 	for i,v in ipairs(plugins) do
 		if v.doc then
 			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
-			print(a)
 			help_message = help_message .. ' - ' .. a .. '\n'
 		end
 	end
 
-	print('Help message generated!\n')
-
-	print('username: @'..bot.username)
-	print('name: '..bot.first_name)
-	print('ID: '..bot.id)
+	print('@'.. bot.username ..', AKA '.. bot.first_name ..' ('.. bot.id ..')')
 
 	is_started = true
 
@@ -92,12 +77,18 @@ end
 
 function process_msg(msg)
 
+	if msg.text and msg.reply_to_message and string.sub(msg.text, 1, 1) ~= '/' and msg.reply_to_message.from.id == bot.id then
+		msg.text = bot.first_name .. ', ' .. msg.text
+	end
+
 	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
+		if msg.from.id == 100547061 then return msg end
 		msg.text = 'hi '..bot.first_name
 		msg.from = msg.new_chat_participant
 	end
 
 	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
+		if msg.from.id == 100547061 then return msg end
 		msg.text = 'bye '..bot.first_name
 		msg.from = msg.left_chat_participant
 	end
@@ -111,8 +102,8 @@ function process_msg(msg)
 end
 
 bot_init()
-reminders = {}
 last_update = 0
+
 while is_started do
 
 	local res = get_updates(last_update+1)
@@ -127,13 +118,16 @@ while is_started do
 		end
 	end
 
-	for i,v in pairs(reminders) do
-		if os.time() > v.alarm then
-			local a = send_message(v.chat_id, 'Reminder: '..v.text)
-			if a then
-				table.remove(reminders, i)
+	-- cron-like thing
+	-- run PLUGIN.cron() every five seconds
+	if os.date('%S', os.time()) % 5 == 0 then -- Only check every five seconds.
+		for k,v in pairs(plugins) do
+			if v.cron then
+				pcall(function() v.cron() end)
 			end
 		end
 	end
+
 end
+
 print('Halted.')

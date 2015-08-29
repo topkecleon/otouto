@@ -11,26 +11,29 @@ local action = function(msg)
 		return send_msg(msg, 'Permission denied.')
 	end
 
+	local name
 	local input = get_input(msg.text)
 	if not input then
 		if msg.reply_to_message then
 			input = msg.reply_to_message.from.id
+			name = msg.reply_to_message.from.first_name
 		else
 			return send_msg(msg, 'Must be used via reply or by specifying a user\'s ID.')
 		end
 	end
 
 	local id = tostring(input)
+	if not name then name = id end
 
-	if config.blacklist[id] then
-		config.blacklist[id] = nil
-		send_message(msg.chat.id, 'User has been removed from the blacklist.')
+	if blacklist[id] then
+		blacklist[id] = nil
+		send_message(msg.chat.id, name .. ' has been removed from the blacklist.')
 	else
-		config.blacklist[id] = true
-		send_message(msg.chat.id, 'User has been blacklisted.')
+		blacklist[id] = true
+		send_message(msg.chat.id, name .. ' has been blacklisted.')
 	end
 
-	save_data('blacklist.json', config.blacklist)
+	save_data('blacklist.json', blacklist)
 
 end
 

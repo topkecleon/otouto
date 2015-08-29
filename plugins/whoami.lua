@@ -23,6 +23,12 @@ function PLUGIN.action(msg)
 		msg = msg.reply_to_message
 	end
 
+	local nicknames = load_data('nicknames.json')
+	local message = ''
+	if nicknames[tostring(msg.from.id)] then
+		message = 'Hi, ' .. nicknames[tostring(msg.from.id)] .. '!\n'
+	end
+
 	local from_name = msg.from.first_name
 	if msg.from.last_name then
 		from_name = from_name .. ' ' .. msg.from.last_name
@@ -32,7 +38,7 @@ function PLUGIN.action(msg)
 	end
 	from_name = from_name .. ' (' .. msg.from.id .. ')'
 
-	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name .. '.'
+	local message = message .. 'You are ' .. from_name .. ' and you are messaging ' .. to_name .. '.'
 
 	send_msg(msg, message)
 

@@ -43,6 +43,9 @@ function PLUGIN.action(msg)
 			return send_msg(msg, config.locale.errors.connection)
 		end
 		local jdat = JSON.decode(jstr)
+		if #jdat.data == 0 then
+			return send_msg(msg, config.locale.errors.results)
+		end
 		result_url = jdat.data[math.random(#jdat.data)].images.original.url
 
 	end

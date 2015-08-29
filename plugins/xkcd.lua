@@ -18,6 +18,7 @@ function PLUGIN.action(msg)
 		return send_msg(msg, config.locale.errors.connection)
 	end
 	local latest = JSON.decode(jstr).num
+	local jdat
 
 	if input then
 		url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&safe=active&q=site%3axkcd%2ecom%20' .. URL.escape(input)
@@ -26,7 +27,11 @@ function PLUGIN.action(msg)
 			print('here')
 			return send_msg(msg, config.locale.errors.connection)
 		end
-		url = JSON.decode(jstr).responseData.results[1].url .. 'info.0.json'
+		jdat = JSON.decode(jstr)
+		if #jdat.responseData.results == 0 then
+			return send_msg(msg, config.locale.errors.results)
+		end
+		url = jdat.responseData.results[1].url .. 'info.0.json'
 	else
 		math.randomseed(os.time())
 		url = 'http://xkcd.com/' .. math.random(latest) .. '/info.0.json'
@@ -36,7 +41,7 @@ function PLUGIN.action(msg)
 	if res ~= 200 then
 		return send_msg(msg, config.locale.errors.connection)
 	end
-	local jdat = JSON.decode(jstr)
+	jdat = JSON.decode(jstr)
 
 	local message = '[' .. jdat.num .. '] ' .. jdat.alt .. '\n' .. jdat.img
 
