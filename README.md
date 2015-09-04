@@ -197,3 +197,5 @@ To run:
 Do not private message me for support.
 
 For support for otouto as well as general Lua and bot assistance, please join the [CIS Bot Development](http://telegram.me/joinchat/05fe39f500f8f1b2d1548147a68acd2a) group. After you read the rules and the pastebin, I will assist you there.
+
+PS - Since there seems to be some confusion on the matter, otouto is *not* a port of yagop's telegram-bot. I am friends with yagop, and he is part of the Bot Development group, but our codebases are and always have been entirely separate. otouto was a CLI bot like telegram-bot before the new API, but they were entirely separate, non-intermingled projects.
