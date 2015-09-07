@@ -196,7 +196,7 @@ To run:
 
 Do not private message me for support.
 
-For support for otouto as well as general Lua and bot assistance, please join the Bot Development group (send "/join 16314802" to [@Liberbot](telegram.me/liberbot). After you read the rules and the pastebin, I will assist you there.
+For support for otouto as well as general Lua and bot assistance, please join the Bot Development group (send "/join 16314802" to [@Liberbot](http://telegram.me/liberbot). After you read the rules and the pastebin, I will assist you there.
 
 ###PS
 
