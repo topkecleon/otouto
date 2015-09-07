@@ -3,12 +3,15 @@ HTTPS= require('ssl.https')
 URL  = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = 2.9
+VERSION = '2.10'
 
 function on_msg_receive(msg)
 
 	if blacklist[tostring(msg.from.id)] then return end
-	if floodcontrol[-msg.chat.id] then return end
+	if floodcontrol[-msg.chat.id] then -- This stuff is useful for the moderation plugin to not be completely unusable when floodcontrol is activated.
+		msg.flood = msg.chat.id
+		msg.chat.id = msg.from.id
+	end
 
 	msg = process_msg(msg)
 
@@ -20,8 +23,11 @@ function on_msg_receive(msg)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
 			if string.match(lower, w) then
+				if not counter[msg.from.id] then counter[msg.from.id] = 0 end
+				counter[msg.from.id] = counter[msg.from.id] + 1
+				print(msg.from.first_name, msg.from.id, counter[msg.from.id])
 				if v.typing then
-					send_chat_action(msg.chat.id, 'typing')
+					send_chat_action(msg.from.id, 'typing')
 				end
 				local a,b = pcall(function() -- Janky error handling
 					v.action(msg)
@@ -46,10 +52,12 @@ function bot_init()
 
 	print('Fetching bot information...')
 
-	bot = get_me().result
-	if not bot then
-		error('Failure fetching bot information.')
+	bot = get_me()
+	while bot == false do
+		print('Failure fetching bot information. Trying again...')
+		bot = get_me()
 	end
+	bot = bot.result
 
 	print('Loading plugins...')
 
@@ -72,19 +80,20 @@ function bot_init()
 	print('@'.. bot.username ..', AKA '.. bot.first_name ..' ('.. bot.id ..')')
 
 	is_started = true
+	counter = {}
 
 end
 
 function process_msg(msg)
 
-	if msg.text and msg.reply_to_message and string.sub(msg.text, 1, 1) ~= '/' and msg.reply_to_message.from.id == bot.id then
-		msg.text = bot.first_name .. ', ' .. msg.text
-	end
-
-	if msg.new_chat_participant and msg.new_chat_participant.id ~= bot.id then
-		if msg.from.id == 100547061 then return msg end
-		msg.text = 'hi '..bot.first_name
-		msg.from = msg.new_chat_participant
+	if msg.new_chat_participant then
+		if msg.new_chat_participant.id ~= bot.id then
+			if msg.from.id == 100547061 then return msg end
+			msg.text = 'hi '..bot.first_name
+			msg.from = msg.new_chat_participant
+		else
+			msg.text = '/about'
+		end
 	end
 
 	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
@@ -93,16 +102,13 @@ function process_msg(msg)
 		msg.from = msg.left_chat_participant
 	end
 
-	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
-		msg.text = '/about'
-	end
-
 	return msg
 
 end
 
 bot_init()
 last_update = 0
+counter = {}
 
 while is_started do
 
@@ -123,7 +129,8 @@ while is_started do
 	if os.date('%S', os.time()) % 5 == 0 then -- Only check every five seconds.
 		for k,v in pairs(plugins) do
 			if v.cron then
-				pcall(function() v.cron() end)
+				a,b = pcall(function() v.cron() end)
+				if not a then print(b) end
 			end
 		end
 	end

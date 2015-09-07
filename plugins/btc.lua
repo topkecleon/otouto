@@ -51,6 +51,11 @@ function PLUGIN.action(msg)
 	end
 
 	jdat = JSON.decode(jstr)
+
+	if not jdat['24h_avg'] then
+		return send_msg(msg, config.locale.errors.results)
+	end
+
 	local m = arg2 .. ' BTC = ' .. jdat['24h_avg']*arg2 ..' '.. arg1 .. '\n'
 	m = m .. arg2 ..' '.. arg1 .. ' = ' .. string.format("%.8f", arg2/jdat['24h_avg']) .. ' BTC'
 

@@ -11,7 +11,7 @@ local function send_request(url)
 	local tab = JSON.decode(dat)
 
 	if res ~= 200 then
-		print('','Connection error.\n',url)
+		print('Connection error.')
 		return false
 	end
 

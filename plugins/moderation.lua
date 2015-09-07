@@ -1,5 +1,7 @@
 --[[
 
+This plugin will ONLY WORK in Liberbot-administered groups.
+
 This works using the settings in the "moderation" section of config.lua.
 "realm" should be set to the group ID of the admin group. A negative number.
 "data" will be the file name of where the moderation 'database' will be stored. The file will be created if it does not exist.
@@ -47,6 +49,10 @@ ban.trigger = '^/modban'
 
 ban.action = function(msg)
 
+	if msg.flood then
+		msg.chat.id = msg.flood
+	end
+
 	local data = load_data('moderation.json')
 
 	if not data[tostring(msg.chat.id)] then return end
@@ -83,6 +89,10 @@ local kick = {}
 kick.trigger = '^/modkick'
 
 kick.action = function(msg)
+
+	if msg.flood then
+		msg.chat.id = msg.flood
+	end
 
 	local data = load_data('moderation.json')
 
@@ -299,6 +309,10 @@ local badmin = {}
 badmin.trigger = '^/hammer'
 
 badmin.action = function(msg)
+
+	if msg.flood then
+		msg.chat.id = msg.flood
+	end
 
 	if not config.moderation.admins[tostring(msg.from.id)] then return end
 

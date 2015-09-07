@@ -42,7 +42,7 @@ local action = function(msg)
 		return send_msg(msg, config.locale.errors.results)
 	end
 
-	--[[ Uncomment this for more than one-paragraph summaries.
+	--[[ Uncomment this block for more than one-paragraph summaries.
 	local l = text:find('<h2>')
 	if l then
 		text = text:sub(1, l-2)

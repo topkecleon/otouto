@@ -25,7 +25,7 @@ local action = function(msg)
 
 	local s = input.groupid .. ' silenced for ' .. input.duration .. ' seconds.'
 
-	send_message(-34496439, s)
+	send_message(-34496439, s) -- Set this to whatever, or comment it out. I use it to send this data to my private bot group.
 
 end
 
