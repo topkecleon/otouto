@@ -4,3 +4,4 @@ console.lua
 *.json
 plugins/owm.lua
 plugins/liberblock.lua
+plugins/dgmp.lua

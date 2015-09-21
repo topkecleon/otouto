@@ -15,7 +15,7 @@ function on_msg_receive(msg)
 
 	msg = process_msg(msg)
 
-	if msg.date < os.time() - 5 then return end -- don't react to old messages
+	if msg.date < os.time() - 10 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
 	if msg.forward_from then return end -- don't react to forwarded messages
 
@@ -27,7 +27,7 @@ function on_msg_receive(msg)
 				counter[msg.from.id] = counter[msg.from.id] + 1
 				print(msg.from.first_name, msg.from.id, counter[msg.from.id])
 				if v.typing then
-					send_chat_action(msg.from.id, 'typing')
+					send_chat_action(msg.chat.id, 'typing')
 				end
 				local a,b = pcall(function() -- Janky error handling
 					v.action(msg)

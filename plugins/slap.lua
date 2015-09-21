@@ -45,7 +45,7 @@ function PLUGIN.getSlap(slapper, victim)
 		victim .. " was fragged by " .. slapper .. ".",
 		victim .. " was desynchronized.",
 		victim .. " was wasted.",
-		victim .. " was busted by " .. slapper .. ".",
+		victim .. " was busted.",
 		victim .. "'s bones are scraped clean by the desolate wind.",
 		victim .. " has died of dysentery.",
 		victim .. " fainted.",

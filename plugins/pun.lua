@@ -7,7 +7,8 @@ PLUGIN.doc = [[
 ]]
 
 PLUGIN.triggers = {
-	'^/pun'
+	'^/pun$',
+	'^/pun@'
 }
 
 PLUGIN.puns = {

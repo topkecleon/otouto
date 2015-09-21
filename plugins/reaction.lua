@@ -8,7 +8,8 @@ local triggers = {
 	['( ͡° ͜ʖ ͡°)'] = '/lenny$',
 	['(╯°□°）╯︵ ┻━┻'] = '/flip$',
 	['┌（┌　＾o＾）┐'] = '/homo$',
-	['ಠ_ಠ'] = '/look$'
+	['ಠ_ಠ'] = '/look$',
+	['SHOTS FIRED'] = '/shot$'
 }
 
 local action = function(msg)
