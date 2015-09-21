@@ -21,7 +21,7 @@ function PLUGIN.action(msg)
 		end
 	end
 
-	local url = 'http://www.imdbapi.com/?t=' .. URL.escape(input)
+	local url = 'http://www.omdbapi.com/?t=' .. URL.escape(input)
 	local jstr, res = HTTP.request(url)
 	local jdat = JSON.decode(jstr)
 
