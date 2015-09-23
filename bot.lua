@@ -23,9 +23,6 @@ function on_msg_receive(msg)
 	for i,v in pairs(plugins) do
 		for j,w in pairs(v.triggers) do
 			if string.match(lower, w) then
-				if not counter[msg.from.id] then counter[msg.from.id] = 0 end
-				counter[msg.from.id] = counter[msg.from.id] + 1
-				print(msg.from.first_name, msg.from.id, counter[msg.from.id])
 				if v.typing then
 					send_chat_action(msg.chat.id, 'typing')
 				end
@@ -108,7 +105,6 @@ end
 
 bot_init()
 last_update = 0
-counter = {}
 
 while is_started do
 
