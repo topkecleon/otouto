@@ -19,7 +19,10 @@ function PLUGIN.action(msg)
 		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
 		otouto v2 is licensed under the GPLv2.
 		topkecleon.github.io/otouto
-	]] -- Please do not remove this message.
+
+		Join the update/news channel!
+		telegram.me/otouto
+	]] -- Please do not remove this message. ^.^
 
 	send_message(msg.chat.id, message, true)
 

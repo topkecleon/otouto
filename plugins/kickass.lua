@@ -21,7 +21,7 @@ local action = function(msg)
 		return send_msg(msg, doc)
 	end
 
-	local jstr, res = HTTP.request(url..URL.escape(input))
+	local jstr, res = HTTPS.request(url..URL.escape(input))
 	if res ~= 200 then
 		return send_msg(msg, config.locale.errors.connection)
 	end

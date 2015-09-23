@@ -1,3 +1,5 @@
+ -- This is an experimental plugin for indexing a list of compliant groups, their descriptions, how to join them, etc. It is not complete nor fully implemented. The current test bot is @dgmpbot.
+
 local triggers = {
 	'^/index',
 	'^/listgroups'
