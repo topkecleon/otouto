@@ -3,8 +3,8 @@
 local PLUGIN = {}
 
 PLUGIN.doc = [[
-  /youtube [term]: Search for a youtube video and send it.
-  Search video on youtube and send it.
+  /youtube <query>
+  Search videos on YouTube.
 ]]
 
 PLUGIN.triggers = {

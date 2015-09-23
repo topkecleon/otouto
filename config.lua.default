@@ -23,6 +23,7 @@ return {
 		'imdb.lua',
 		'urbandictionary.lua',
 		'spotify.lua',
+		'youtube.lua',
 		'kickass.lua',
 		'hackernews.lua',
 		'cats.lua',

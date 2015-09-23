@@ -30,7 +30,7 @@ function on_msg_receive(msg)
 					v.action(msg)
 				end)
 				if not a then
-					print('',msg.text,'\n',b) -- For debugging purposes.
+					print('',msg.text,'\n',b) -- debugging
 					send_msg(msg, b)
 				end
 			end
@@ -77,7 +77,6 @@ function bot_init()
 	print('@'.. bot.username ..', AKA '.. bot.first_name ..' ('.. bot.id ..')')
 
 	is_started = true
-	counter = {}
 
 end
 
@@ -105,6 +104,7 @@ end
 
 bot_init()
 last_update = 0
+last_cron = os.time()
 
 while is_started do
 
@@ -122,13 +122,14 @@ while is_started do
 
 	-- cron-like thing
 	-- run PLUGIN.cron() every five seconds
-	if os.date('%S', os.time()) % 5 == 0 then -- Only check every five seconds.
+	if last_cron < os.time() - 5 then
 		for k,v in pairs(plugins) do
 			if v.cron then
 				a,b = pcall(function() v.cron() end)
 				if not a then print(b) end
 			end
 		end
+		last_cron = os.time()
 	end
 
 end
