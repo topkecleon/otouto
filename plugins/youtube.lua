@@ -8,7 +8,8 @@ PLUGIN.doc = [[
 ]]
 
 PLUGIN.triggers = {
-  '^/youtube'
+  '^/youtube',
+  '^/yt'
 }
 
 function PLUGIN.action(msg)
@@ -28,7 +29,7 @@ function PLUGIN.action(msg)
   -- Print Items
   local text = ""
   for k,item in pairs(data_JSON.items) do
-    text = text..'http://youtu.be/'..item.id.videoId..' '..item.snippet.title..'\n\n'
+    text = text .. item.snippet.title .. '\n' .. 'http://youtu.be/' .. item.id.videoId .. '\n\n'
   end
   -- END - ERRO 404
   local text_end = text

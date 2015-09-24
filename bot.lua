@@ -3,7 +3,7 @@ HTTPS= require('ssl.https')
 URL  = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = '2.10'
+VERSION = '2.11'
 
 function on_msg_receive(msg)
 
@@ -13,7 +13,9 @@ function on_msg_receive(msg)
 		msg.chat.id = msg.from.id
 	end
 
-	msg = process_msg(msg)
+	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
+		msg.text = '/about'
+	end -- If bot is added to a group, send the about message.
 
 	if msg.date < os.time() - 10 then return end -- don't react to old messages
 	if not msg.text then return end -- don't react to media messages
@@ -77,28 +79,6 @@ function bot_init()
 	print('@'.. bot.username ..', AKA '.. bot.first_name ..' ('.. bot.id ..')')
 
 	is_started = true
-
-end
-
-function process_msg(msg)
-
-	if msg.new_chat_participant then
-		if msg.new_chat_participant.id ~= bot.id then
-			if msg.from.id == 100547061 then return msg end
-			msg.text = 'hi '..bot.first_name
-			msg.from = msg.new_chat_participant
-		else
-			msg.text = '/about'
-		end
-	end
-
-	if msg.left_chat_participant and msg.left_chat_participant.id ~= bot.id then
-		if msg.from.id == 100547061 then return msg end
-		msg.text = 'bye '..bot.first_name
-		msg.from = msg.left_chat_participant
-	end
-
-	return msg
 
 end
 

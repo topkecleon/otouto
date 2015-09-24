@@ -14,7 +14,7 @@ function PLUGIN.action(msg)
 
 	local message = [[
 		I am ]] .. bot.first_name .. [[: a plugin-wielding, multi-purpose Telegram bot.
-		Use /help for a list of commands.
+		Send /help for a list of commands.
 
 		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
 		otouto v2 is licensed under the GPLv2.
