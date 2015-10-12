@@ -156,6 +156,31 @@ To start, send "/start" or say "Hello, otouto."
       <td>/who</td>
       <td>Get user and group IDs</td>
     </tr>
+    <tr>
+      <td>nick.lua</td>
+      <td>/nick &lt;nickname&gt;</td>
+      <td>Set your nickname for the bot</td>
+    </tr>
+    <tr>
+      <td>wikipedia.lua</td>
+      <td>/wiki &lt;topic&gt;</td>
+      <td>Search Wikipedia</td>
+    </tr>
+    <tr>
+      <td>spotify.lua</td>
+      <td>/spotify &lt;music&gt;</td>
+      <td>Search Spotify</td>
+    </tr>
+    <tr>
+      <td>youtube.lua</td>
+      <td>/youtube &lt;query&gt;</td>
+      <td>Search Youtube</td>
+    </tr>
+    <tr>
+      <td>translate.lua</td>
+      <td>/translate [target lang]</td>
+      <td>Message to translate</td>
+    </tr>
   </tbody>
 </table>
 
