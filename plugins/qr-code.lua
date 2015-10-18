@@ -19,7 +19,7 @@ function PLUGIN.action(msg)
 	end
 	
   local url = 'http://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' .. (URL.escape(input) or '')
-	send_message(msg.chat.id, latcyr(url))
+	send_message(msg.chat.id, url)
 
 end
 
