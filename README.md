@@ -9,92 +9,19 @@ To start, send "/start" or say "Hello, otouto."
 
 ##Plugins
 
+
+
 <table>
   <thead>
-    <tr>
-      <td>help.lua</td>
-      <td>/help [command]</td>
-      <td>List commands</td>
-    </tr>
     <tr>
       <td>about.lua</td>
       <td>/about</td>
       <td>Information about the bot</td>
     </tr>
     <tr>
-      <td>gSearch.lua</td>
-      <td>/google &lt;query&gt;</td>
-      <td>Google Search</td>
-    </tr>
-    <tr>
-      <td>gImages.lua</td>
-      <td>/images &lt;query&gt;</td>
-      <td>Google Images search</td>
-    </tr>
-    <tr>
-      <td>reddit.lua</td>
-      <td>/reddit [r/subreddit | query]</td>
-      <td>Posts from reddit</td>
-    </tr>
-    <tr>
-      <td>giphy.lua</td>
-      <td>/giphy [query]</td>
-      <td>Giphy search or random</td>
-    </tr>
-    <tr>
-      <td>xkcd.lua</td>
-      <td>/xkcd [search]</td>
-      <td>xkcd strips and alt text</td>
-    </tr>
-    <tr>
-      <td>gMaps.lua</td>
-      <td>/loc &lt;location&gt;</td>
-      <td>Google Maps search</td>
-    </tr>
-    <tr>
-      <td>imdb.lua</td>
-      <td>/imdb &lt;movie | TV series&gt;</td>
-      <td>IMDb movie/television info</td>
-    </tr>
-    <tr>
-      <td>urbandictionary.lua</td>
-      <td>/ud &lt;term&gt;</td>
-      <td>Urban Dictionary search</td>
-    </tr>
-    <tr>
-      <td>hackernews.lua</td>
-      <td>/hackernews</td>
-      <td>Top stories from Hackernews</td>
-    </tr>
-    <tr>
-      <td>time.lua</td>
-      <td>/time &lt;location&gt;</td>
-      <td>Get the time for a place</td>
-    </tr>
-    <tr>
-      <td>weather.lua</td>
-      <td>/weather &lt;location&gt;</td>
-      <td>Get the weather for a place</td>
-    </tr>
-    <tr>
-      <td>calc.lua</td>
-      <td>/calc &lt;expression&gt;</td>
-      <td>Solve math expression and convert units</td>
-    </tr>
-    <tr>
-      <td>dice.lua</td>
-      <td>/roll [arg]</td>
-      <td>Roll a die. Accepts D&amp;D notation</td>
-    </tr>
-    <tr>
-      <td>remind.lua</td>
-      <td>/remind &lt;delay&gt; &lt;message&gt;</td>
-      <td>Set a reminder for yourself or a group</td>
-    </tr>
-    <tr>
-      <td>8ball.lua</td>
-      <td>/8ball</td>
-      <td>Magic 8-ball</td>
+      <td>admin.lua</td>
+      <td>/admin [command]</td>
+      <td>Support for admin</td>
     </tr>
     <tr>
       <td>bandersnatch.lua</td>
@@ -107,14 +34,49 @@ To start, send "/start" or say "Hello, otouto."
       <td>King James Version</td>
     </tr>
     <tr>
+      <td>blacklist.lua</td>
+      <td>/blacklist</td>
+      <td>Blacklist</td>
+    </tr>
+    <tr>
       <td>btc.lua</td>
       <td>/btc &lt;currency&gt; [amount]</td>
       <td>Bitcoin prices and conversion</td>
     </tr>
     <tr>
+      <td>calc.lua</td>
+      <td>/calc &lt;expression&gt;</td>
+      <td>Calculator</td>
+    </tr>
+    <tr>
+      <td>cats.lua</td>
+      <td>/calc &lt;expression&gt;</td>
+      <td>Solve math expression and convert units</td>
+    </tr>
+    <tr>
+      <td>chatter.lua</td>
+      <td>@[user_name_bot], [message]</td>
+      <td>Chatter Bot</td>
+    </tr>
+    <tr>
       <td>commit.lua</td>
       <td>/commit</td>
       <td>http://whatthecommit.com</td>
+    </tr>
+    <tr>
+      <td>currency.lua</td>
+      <td>/cash &lt;from&gt; &lt;to&gt; [amount]</td>
+      <td>Convert an amount from one currency to another</td>
+    </tr>
+    <tr>
+      <td>dgmp.lua</td>
+      <td>/index and /listgroups</td>
+      <td>Plugin to display the groups, descriptions, etc.</td>
+    </tr>
+    <tr>
+      <td>dice.lua</td>
+      <td>/roll [arg]</td>
+      <td>Roll a die. Accepts D&D notation</td>
     </tr>
     <tr>
       <td>dogify.lua</td>
@@ -127,14 +89,94 @@ To start, send "/start" or say "Hello, otouto."
       <td>Repeat a string</td>
     </tr>
     <tr>
+      <td>floodcontrol.lua</td>
+      <td>No command</td>
+      <td>Flood control</td>
+    </tr>
+    <tr>
       <td>fortune.lua</td>
       <td>/fortune</td>
       <td>Random fortunes</td>
     </tr>
     <tr>
+      <td>gImages.lua</td>
+      <td>/images &lt;query&gt;</td>
+      <td>Google Images search</td>
+    </tr>
+    <tr>
+      <td>giphy.lua</td>
+      <td>/giphy [query]</td>
+      <td>Giphy search or random</td>
+    </tr>
+    <tr>
+      <td>gMaps.lua</td>
+      <td>/loc &lt;location&gt;</td>
+      <td>Google Maps search</td>
+    </tr>
+    <tr>
+      <td>gSearch.lua</td>
+      <td>/google &lt;query&gt;</td>
+      <td>Google Search</td>
+    </tr>
+    <tr>
+      <td>hackernews.lua</td>
+      <td>/hackernews</td>
+      <td>Top stories from Hackernews</td>
+    </tr>
+    <tr>
+      <td>hearthstone.lua</td>
+      <td>/hearthstone &lt;card&gt;</td>
+      <td>Information about a Hearthstone card</td>
+    </tr>
+    <tr>
+      <td>help.lua</td>
+      <td>/help [command]</td>
+      <td>List commands</td>
+    </tr>
+    <tr>
       <td>hex.lua</td>
       <td>/hex &lt;number&gt;</td>
       <td>Convert to and from hexadecimal</td>
+    </tr>
+    <tr>
+      <td>imdb.lua</td>
+      <td>/imdb &lt;movie | TV series&gt;</td>
+      <td>IMDb movie/television info</td>
+    </tr>
+    <tr>
+      <td>interactions.lua</td>
+      <td>No command</td>
+      <td>Welcome</td>
+    </tr>
+    <tr>
+      <td>kickass.lua</td>
+      <td>/torrent &lt;query&gt;</td>
+      <td>Search Kickass Torrents</td>
+    </tr>
+    <tr>
+      <td>lastfm.lua</td>
+      <td>/lastfm [username]</td>
+      <td>Get current- or last-played track</td>
+    </tr>
+    <tr>
+      <td>lmgtfy.lua</td>
+      <td>/lmgtfy</td>
+      <td>Open page of lmgtfy</td>
+    </tr>
+    <tr>
+      <td>moderation.lua</td>
+      <td>/modhelp</td>
+      <td>Support for moderator or admin</td>
+    </tr>
+    <tr>
+      <td>nick.lua</td>
+      <td>/nick &lt;nickname&gt;</td>
+      <td>Set your nickname for the bot</td>
+    </tr>
+    <tr>
+      <td>owm.lua</td>
+      <td>/weather &lt;location&gt;</td>
+      <td>Temperature and weather conditions</td>
     </tr>
     <tr>
       <td>pokedex.lua</td>
@@ -147,24 +189,24 @@ To start, send "/start" or say "Hello, otouto."
       <td>Puns</td>
     </tr>
     <tr>
+      <td>reaction.lua</td>
+      <td>/reactions</td>
+      <td>Get a list emoticons</td>
+    </tr>
+    <tr>
+      <td>reddit.lua</td>
+      <td>/reddit [r/subreddit | query]</td>
+      <td>Posts from reddit</td>
+    </tr>
+    <tr>
+      <td>remind.lua</td>
+      <td>/remind &lt;delay&gt; &lt;message&gt;</td>
+      <td>Set a reminder for yourself or a group</td>
+    </tr>
+    <tr>
       <td>slap.lua</td>
       <td>/slap [victim]</td>
       <td>Slap someone!</td>
-    </tr>
-    <tr>
-      <td>whoami.lua</td>
-      <td>/who</td>
-      <td>Get user and group IDs</td>
-    </tr>
-    <tr>
-      <td>nick.lua</td>
-      <td>/nick &lt;nickname&gt;</td>
-      <td>Set your nickname for the bot</td>
-    </tr>
-    <tr>
-      <td>wikipedia.lua</td>
-      <td>/wiki &lt;topic&gt;</td>
-      <td>Search Wikipedia</td>
     </tr>
     <tr>
       <td>spotify.lua</td>
@@ -172,17 +214,53 @@ To start, send "/start" or say "Hello, otouto."
       <td>Search Spotify</td>
     </tr>
     <tr>
-      <td>youtube.lua</td>
-      <td>/youtube &lt;query&gt;</td>
-      <td>Search Youtube</td>
+      <td>time.lua</td>
+      <td>/time &lt;location&gt;</td>
+      <td>Get the time for a place</td>
     </tr>
     <tr>
       <td>translate.lua</td>
       <td>/translate [target lang]</td>
       <td>Message to translate</td>
     </tr>
+    <tr>
+      <td>urbandictionary.lua</td>
+      <td>/ud &lt;term&gt;</td>
+      <td>Urban Dictionary search</td>
+    </tr>
+    <tr>
+      <td>weather.lua</td>
+      <td>/weather &lt;location&gt;</td>
+      <td>Get the weather for a place</td>
+    </tr>
+    <tr>
+      <td>whoami.lua</td>
+      <td>/who</td>
+      <td>Get user and group IDs</td>
+    </tr>
+    <tr>
+      <td>wikipedia.lua</td>
+      <td>/wiki &lt;topic&gt;</td>
+      <td>Search Wikipedia</td>
+    </tr>
+    <tr>
+      <td>xkcd.lua</td>
+      <td>/xkcd [search]</td>
+      <td>Xkcd strips and alt text</td>
+    </tr>
+    <tr>
+      <td>youtube.lua</td>
+      <td>/youtube &lt;query&gt;</td>
+      <td>Search Youtube</td>
+    </tr>
+    <tr>
+      <td>8ball.lua</td>
+      <td>/8ball</td>
+      <td>Magic 8-ball.</td>
+    </tr>    
   </tbody>
 </table>
+
 
 
 ##Setup
