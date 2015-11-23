@@ -23,11 +23,11 @@ function PLUGIN.action(msg)
 
 	local jdat = JSON.decode(jstr)
 
-	if string.match(jdat.res, '^I HAVE NO RESPONSE.') or not jdat then
-		jdat.res = "I don't know what to say to that."
+	if string.match(jdat.res.msg, '^I HAVE NO RESPONSE.') or not jdat then
+		jdat.res.msg = "I don't know what to say to that."
 	end
 
-	local message = jdat.res
+	local message = jdat.res.msg
 
 	-- Let's clean up the response a little. Capitalization & punctuation.
 	filter = {
