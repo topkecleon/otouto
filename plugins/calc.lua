@@ -1,30 +1,38 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/calc <expression>
-	This command solves math expressions and does conversion between common units. See mathjs.org/docs/expressions/syntax for a list of accepted syntax.
+	Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 ]]
 
-PLUGIN.triggers = {
-	'^/calc'
+local triggers = {
+	'^/calc[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
+		else
+			sendReply(msg, doc)
+			return
+		end
 	end
 
-	local url = 'http://api.mathjs.org/v1/?expr=' .. URL.escape(input)
-	local message, res = HTTP.request(url)
+	local url = 'https://api.mathjs.org/v1/?expr=' .. URL.escape(input)
 
-	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.syntax)
+	local ans, res = HTTPS.request(url)
+	if not ans then
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
-	send_msg(msg, message)
+	sendReply(msg, ans)
+
 end
 
-return PLUGIN
-
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

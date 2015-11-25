@@ -1,36 +1,36 @@
- -- shout-out to @luksireiku for showing me this site
+ -- Put this absolutely at the end, even after greetings.lua.
 
-local PLUGIN = {}
-
-PLUGIN.typing = true
-
-PLUGIN.triggers = {
-	'^@' .. bot.username .. ', ',
-	'^' .. bot.first_name .. ', '
+local triggers = {
+	''
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	if not msg.reply_to_message then
+		return true
+	elseif msg.reply_to_message and msg.reply_to_message.from.id ~= bot.id then
+		return true
+	end
 
-	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(input)
+	sendChatAction(msg.chat.id, 'typing')
+
+	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(msg.text_lower)
 
 	local jstr, res = HTTP.request(url)
-
 	if res ~= 200 then
-		return send_message(msg.chat.id, "I don't feel like talking right now.")
+		sendMessage(msg.chat.id, config.errors.chatter_connection)
+		return
 	end
 
 	local jdat = JSON.decode(jstr)
-
-	if string.match(jdat.res.msg, '^I HAVE NO RESPONSE.') or not jdat then
-		jdat.res.msg = "I don't know what to say to that."
-	end
-
 	local message = jdat.res.msg
 
+	if message:match('^I HAVE NO RESPONSE.') then
+		message = config.errors.chatter_response
+	end
+
 	-- Let's clean up the response a little. Capitalization & punctuation.
-	filter = {
+	local filter = {
 		['%aimi?%aimi?'] = bot.first_name,
 		['^%s*(.-)%s*$'] = '%1',
 		['^%l'] = string.upper,
@@ -45,8 +45,11 @@ function PLUGIN.action(msg)
 		message = message .. '.'
 	end
 
-	send_message(msg.chat.id, message)
+	sendMessage(msg.chat.id, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers
+}

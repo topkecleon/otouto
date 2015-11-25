@@ -1,48 +1,50 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
-	/ud <term>
-	Returns the first definition for a given term from Urban Dictionary.
+local doc = [[
+	/urbandictionary <query>
+	Returns a definition from Urban Dictionary.
 ]]
 
-PLUGIN.triggers = {
-	'^/ud',
-	'^/urbandictionary',
-	'^/urban'
+local triggers = {
+	'^/u[rban]*d[ictionary]*[@'..bot.username..']*',
+	'^/urban[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		if msg.reply_to_message then
-			msg = msg.reply_to_message
-			input = msg.text
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
 		else
-			return send_msg(msg, PLUGIN.doc)
+			sendReply(msg, doc)
+			return
 		end
 	end
 
 	local url = 'http://api.urbandictionary.com/v0/define?term=' .. URL.escape(input)
-	local jstr, res = HTTP.request(url)
 
+	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
 	local jdat = JSON.decode(jstr)
-
 	if jdat.result_type == "no_results" then
-		return send_msg(msg, config.locale.errors.results)
+		sendReply(msg, config.errors.results)
+		return
 	end
 
-	message = '"' .. jdat.list[1].word .. '"\n' .. trim_string(jdat.list[1].definition)
+	local message = '"' .. jdat.list[1].word .. '"\n' .. jdat.list[1].definition:trim()
 	if string.len(jdat.list[1].example) > 0 then
-		message = message .. '\n\nExample:\n' .. trim_string(jdat.list[1].example)
+		message = message .. '\n\nExample:\n' .. jdat.list[1].example:trim()
 	end
 
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

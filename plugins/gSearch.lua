@@ -1,65 +1,62 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/google <query>
-	This command performs a Google search for the given query. Four results are returned. Safe search is enabled by default; use '/gnsfw' to get potentially NSFW results. Four results are returned for a group chat, or eight in a private message.
+	Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
 ]]
 
-PLUGIN.triggers = {
-	'^/g ',
-	'^/g$',
-	'^/google',
-	'^/gnsfw'
+local triggers = {
+	'^/g[oogle]*[nsfw]*[@'..bot.username..']*$',
+	'^/g[oogle]*[nsfw]*[@'..bot.username..']* '
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0'
-
-	if not string.match(msg.text, '^/gnsfw ') then
-		url = url .. '&safe=active'
-	end
-
-	if not msg.chat.title then
-		url = url .. '&rsz=8'
-	end
-
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		if msg.reply_to_message then
-			msg = msg.reply_to_message
-			input = msg.text
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
 		else
-			return send_msg(msg, PLUGIN.doc)
+			sendReply(msg, doc)
+			return
 		end
+	end
+
+	local url = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.0'
+
+	if msg.from.id == msg.chat.id then
+		url = url .. '&rsz=8'
+	else
+		url = url .. '&rsz=4'
+	end
+
+	if not string.match(msg.text, '^/g[oogle]*nsfw') then
+		url = url .. '&safe=active'
 	end
 
 	url = url .. '&q=' .. URL.escape(input)
 
-	local jstr, res = HTTP.request(url)
-
+	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
 	local jdat = JSON.decode(jstr)
-
 	if #jdat.responseData.results < 1 then
-		return send_msg(msg, config.locale.errors.results)
+		sendReply(msg, config.errors.results)
+		return
 	end
 
 	local message = ''
-
-	for i = 1, #jdat.responseData.results do
-		local result_url = jdat.responseData.results[i].unescapedUrl
-		local result_title = jdat.responseData.results[i].titleNoFormatting
-		message = message  .. ' - ' .. result_title ..'\n'.. result_url .. '\n'
+	for i,v in ipairs(jdat.responseData.results) do
+		message = message .. jdat.responseData.results[i].titleNoFormatting .. '\n ' .. jdat.responseData.results[i].unescapedUrl .. '\n'
 	end
 
-	local message = message:gsub('&amp;', '&') -- blah
-
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

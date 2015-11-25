@@ -1,48 +1,53 @@
- -- time_offset is the number of seconds necessary to correct your system clock to UTC.
-
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/time <location>
-	Sends the time and timezone for a given location.
+	Returns the time, date, and timezone for the given location.
 ]]
 
-PLUGIN.triggers = {
-	'^/time'
+local triggers = {
+	'^/time[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
+		else
+			sendReply(msg, doc)
+			return
+		end
 	end
 
 	local coords = get_coords(input)
-	if not coords then
-		return send_msg(msg, config.locale.errors.results)
+	if type(coords) == 'string' then
+		sendReply(msg, coords)
+		return
 	end
 
 	local url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' .. coords.lat ..','.. coords.lon .. '&timestamp='..os.time()
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	local timestamp = os.time() + jdat.rawOffset + jdat.dstOffset + config.time_offset
-
 	local utcoff = (jdat.rawOffset + jdat.dstOffset) / 3600
 	if utcoff == math.abs(utcoff) then
 		utcoff = '+' .. utcoff
 	end
-
 	local message = os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
 
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

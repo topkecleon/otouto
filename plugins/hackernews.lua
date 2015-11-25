@@ -1,37 +1,46 @@
-local PLUGIN = {}
-
-PLUGIN.typing = true -- usually takes a few seconds to load
-
-PLUGIN.doc = [[
+local doc = [[
 	/hackernews
-	Returns some top stories from Hacker News. Four in a group or eight in a private message.
+	Returns four (if group) or eight (if private message) top stories from Hacker News.
 ]]
 
-PLUGIN.triggers = {
-	'^/hackernews',
-	'^/hn$'
+local triggers = {
+	'^/hackernews[@'..bot.username..']*',
+	'^/hn[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
+
+	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
+	if res ~= 200 then
+		sendReply(msg, config.errors.connection)
+		return
+	end
+
+	local jdat = JSON.decode(jstr)
+
+	local res_count = 4
+	if msg.chat.id == msg.from.id then
+		res_count = 8
+	end
 
 	local message = ''
-	local jstr = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
-	local stories = JSON.decode(jstr)
-
-	local limit = 4
-	if msg.chat.id == msg.from.id then
-		limit = 8
+	for i = 1, res_count do
+		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
+		jstr, res = HTTPS.request(res_url)
+		if res ~= 200 then
+			sendReply(msg, config.errors.connection)
+			return
+		end
+		local res_jdat = JSON.decode(jstr)
+		message = message .. res_jdat.title .. '\n ' .. res_jdat.url .. '\n'
 	end
 
-	for i = 1, limit do
-		url = 'https://hacker-news.firebaseio.com/v0/item/'..stories[i]..'.json'
-		jstr = HTTPS.request(url)
-		jdat = JSON.decode(jstr)
-		message = message .. jdat.title .. '\n' .. jdat.url .. '\n'
-	end
-
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

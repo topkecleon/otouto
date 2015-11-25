@@ -1,31 +1,30 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/about
-	Information about the bot.
+	Get info about the bot.
 ]]
 
-PLUGIN.triggers = {
-	'^/about',
-	'^/info'
+local triggers = {
+	''
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local message = [[
-		I am ]] .. bot.first_name .. [[: a plugin-wielding, multi-purpose Telegram bot.
-		Send /help for a list of commands.
+	local message = config.about_text .. '\nBased on otouto v'..version..' by topkecleon.\notouto v3 is licensed under the GPLv2.\ntopkecleon.github.io/otouto'
 
-		Based on otouto v]] .. VERSION .. [[ by @topkecleon.
-		otouto v2 is licensed under the GPLv2.
-		topkecleon.github.io/otouto
+	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
+		sendMessage(msg.chat.id, message)
+		return
+	elseif string.match(msg.text_lower, '^/about[@'..bot.username..']*') then
+		sendReply(msg, message)
+		return
+	end
 
-		Join the update/news channel!
-		telegram.me/otouto
-	]] -- Please do not remove this message. ^.^
-
-	send_message(msg.chat.id, message, true)
+	return true
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

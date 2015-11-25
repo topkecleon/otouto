@@ -1,32 +1,11 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
-	/whoami
-	Get the user ID for yourself and the group. Use it in a reply to get info for the sender of the original message.
-]]
-
-PLUGIN.triggers = {
-	'^/whoami',
-	'^/ping',
-	'^/who$'
+local triggers = {
+	'^/who[ami]*[@'..bot.username..']*$'
 }
 
-function PLUGIN.action(msg)
-
-	if msg.from.id == msg.chat.id then
-		to_name = '@' .. bot.username .. ' (' .. bot.id .. ')'
-	else
-		to_name = string.gsub(msg.chat.title, '_', ' ') .. ' (' .. string.gsub(msg.chat.id, '-', '') .. ')'
-	end
+local action = function(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
-	end
-
-	local nicknames = load_data('nicknames.json')
-	local message = ''
-	if nicknames[tostring(msg.from.id)] then
-		message = 'Hi, ' .. nicknames[tostring(msg.from.id)] .. '!\n'
 	end
 
 	local from_name = msg.from.first_name
@@ -38,10 +17,25 @@ function PLUGIN.action(msg)
 	end
 	from_name = from_name .. ' (' .. msg.from.id .. ')'
 
-	local message = message .. 'You are ' .. from_name .. ' and you are messaging ' .. to_name .. '.'
+	local to_name
+	if msg.chat.title then
+		to_name = msg.chat.title .. ' (' .. math.abs(msg.chat.id) .. ').'
+	else
+		to_name = '@' .. bot.username .. ', AKA ' .. bot.first_name .. ' (' .. bot.id .. ').'
+	end
 
-	send_msg(msg, message)
+	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name
+
+	local nicks = load_data('nicknames.json')
+	if nicks[msg.from.id_str] then
+		message = message .. '\nYour nickname is ' .. nicks[msg.from.id_str] .. '.'
+	end
+
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers
+}

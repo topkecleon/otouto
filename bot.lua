@@ -1,115 +1,95 @@
 HTTP = require('socket.http')
-HTTPS= require('ssl.https')
-URL  = require('socket.url')
+HTTPS = require('ssl.https')
+URL = require('socket.url')
 JSON = require('dkjson')
 
-VERSION = '2.11'
+version = '3.0.1'
 
-function on_msg_receive(msg)
+bot_init = function() -- The function run when the bot is started or reloaded.
 
-	if blacklist[tostring(msg.from.id)] then return end
-	if floodcontrol[-msg.chat.id] then -- This stuff is useful for the moderation plugin to not be completely unusable when floodcontrol is activated.
-		msg.flood = msg.chat.id
-		msg.chat.id = msg.from.id
-	end
+	config = dofile("config.lua") -- Load configuration file.
+	dofile("bindings.lua") -- Load Telegram bindings.
+	dofile("utilities.lua") -- Load miscellaneous and cross-plugin functions.
 
-	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
-		msg.text = '/about'
-	end -- If bot is added to a group, send the about message.
-
-	if msg.date < os.time() - 10 then return end -- don't react to old messages
-	if not msg.text then return end -- don't react to media messages
-	if msg.forward_from then return end -- don't react to forwarded messages
-
-	local lower = string.lower(msg.text)
-	for i,v in pairs(plugins) do
-		for j,w in pairs(v.triggers) do
-			if string.match(lower, w) then
-				if v.typing then
-					send_chat_action(msg.chat.id, 'typing')
-				end
-				local a,b = pcall(function() -- Janky error handling
-					v.action(msg)
-				end)
-				if not a then
-					print('',msg.text,'\n',b) -- debugging
-					send_msg(msg, b)
-				end
-			end
-		end
-	end
-end
-
-function bot_init()
-
-	print('Loading configuration...')
-
-	config = dofile('config.lua')
-	require('bindings')
-	require('utilities')
-	blacklist = load_data('blacklist.json')
-
-	print('Fetching bot information...')
-
-	bot = get_me()
-	while bot == false do
-		print('Failure fetching bot information. Trying again...')
-		bot = get_me()
+	bot = nil
+	while not bot do -- Get bot info and retry if unable to connect.
+		bot = getMe()
 	end
 	bot = bot.result
 
-	print('Loading plugins...')
-
-	plugins = {}
+	plugins = {} -- Load plugins.
 	for i,v in ipairs(config.plugins) do
-		local p = dofile('plugins/'..v)
+		local p = dofile("plugins/"..v)
 		table.insert(plugins, p)
 	end
 
-	print('Plugins loaded: ' .. #plugins .. '. Generating help message...')
+	print('@'..bot.username .. ', AKA ' .. bot.first_name ..' ('..bot.id..')')
 
-	help_message = ''
-	for i,v in ipairs(plugins) do
-		if v.doc then
-			local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
-			help_message = help_message .. ' - ' .. a .. '\n'
-		end
-	end
+	-- Generate a random seed and "pop" the first random number. :)
+	math.randomseed(os.time())
+	math.random()
 
-	print('@'.. bot.username ..', AKA '.. bot.first_name ..' ('.. bot.id ..')')
-
-	is_started = true
+	last_update = last_update or 0 -- Set loop variables: Update offset,
+	last_cron = last_cron or os.time() -- the time of the last cron job,
+	is_started = true -- whether the bot should be running or not.
 
 end
 
-bot_init()
-last_update = 0
-last_cron = os.time()
+on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
-while is_started do
+	if not msg.text then msg.text = '' end -- So about.lua works.
+	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 
-	local res = get_updates(last_update+1)
-	if not res then
-		print('Error getting updates.')
-	else
-		for i,v in ipairs(res.result) do
-			if v.update_id > last_update then
-				last_update = v.update_id
-				on_msg_receive(v.message)
+	msg.chat.id_str = tostring(msg.chat.id)
+	msg.from.id_str = tostring(msg.from.id)
+	msg.text_lower = msg.text:lower()
+
+	for i,v in ipairs(plugins) do
+		for k,w in pairs(v.triggers) do
+			if string.match(msg.text_lower, w) then
+				local success, result = pcall(function()
+					return v.action(msg)
+				end)
+				if not success then
+					sendReply(msg, 'An unexpected error occurred.')
+					print(msg.text, result)
+					return
+				end
+				-- If the action returns a table, make that table msg.
+				if type(result) == 'table' then
+					msg = result
+				-- If the action returns true, don't stop.
+				elseif result ~= true then
+					return
+				end
 			end
 		end
 	end
 
-	-- cron-like thing
-	-- run PLUGIN.cron() every five seconds
-	if last_cron < os.time() - 5 then
-		for k,v in pairs(plugins) do
-			if v.cron then
-				a,b = pcall(function() v.cron() end)
-				if not a then print(b) end
+end
+
+bot_init() -- Actually start the script. Run the bot_init function.
+
+while is_started do -- Start a loop while the bot should be running.
+
+	local res = getUpdates(last_update+1) -- Get the latest updates!
+	if res then
+		for i,v in ipairs(res.result) do -- Go through every new damned message.
+			last_update = v.update_id
+			on_msg_receive(v.message)
+		end
+	else
+		print(config.errors.connection)
+	end
+
+	if last_cron < os.time() - 5 then -- Run cron jobs if the time has come.
+		for i,v in ipairs(plugins) do
+			if v.cron then -- Call each plugin's cron function, if it has one.
+				local res, err = pcall(function() v.cron() end)
+				if not res then print('ERROR: '..err) end
 			end
 		end
-		last_cron = os.time()
+		last_cron = os.time() -- And finally, update the variable.
 	end
 
 end

@@ -1,42 +1,42 @@
 local doc = [[
 	/nick <nickname>
-	Set your nickname for the bot to call you.
-	Use -- to clear your nickname.
+	Set your nickname. Use "/whoami" to check your nickname and "/nick -" to delete it.
 ]]
 
 local triggers = {
-	'^/nick'
+	'^/nick[@'..bot.username..']*'
 }
 
 local action = function(msg)
 
-	local data = load_data('nicknames.json')
-	local id = tostring(msg.from.id)
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		local message = ''
-		if data[id] then
-			message = '\nYour nickname is currently ' .. data[id] .. '.'
-		end
-		return send_msg(msg, doc..message)
+		sendReply(msg, doc)
+		return true
 	end
 
-	if input == '--' then
-		data[id] = nil
-		save_data('nicknames.json', data)
-		send_msg(msg, 'Your nickname has been deleted.')
-		return
+	if string.len(input) > 32 then
+		sendReply(msg, 'The character limit for nicknames is 32.')
+		return true
 	end
 
-	input = input:sub(1,64):gsub('\n',' ')
-	data[id] = input
-	save_data('nicknames.json', data)
-	send_msg(msg, 'Your nickname has been set to ' .. input .. '.')
+	nicks = load_data('nicknames.json')
+
+	if input == '-' then
+		nicks[msg.from.id_str] = nil
+		sendReply(msg, 'Your nickname has been deleted.')
+	else
+		nicks[msg.from.id_str] = input
+		sendReply(msg, 'Your nickname has been set to "' .. input .. '".')
+	end
+
+	save_data('nicknames.json', nicks)
+	return true
 
 end
 
 return {
-	doc = doc,
+	action = action,
 	triggers = triggers,
-	action = action
+	doc = doc
 }

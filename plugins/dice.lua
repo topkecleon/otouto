@@ -1,67 +1,54 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
-	/roll [arg]
-	Roll a die. Use any positive number for range or use D&D notation.
-	Example: /roll 4D100 will roll a 100-sided die four times.
+local doc = [[
+	/roll <nDr>
+	Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
 ]]
 
-PLUGIN.triggers = {
-	'^/roll'
+local triggers = {
+	'^/roll[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	math.randomseed(os.time())
-
-	local input = get_input(msg.text)
+	local input = msg.text_lower:input()
 	if not input then
-		input = 6
+		sendReply(msg, doc)
+		return
+	end
+
+	local count, range
+	if input:match('^[%d]+d[%d]+$') then
+		count, range = input:match('([%d]+)d([%d]+)')
+	elseif input:match('^d?[%d]+$') then
+		count = 1
+		range = input:match('^d?([%d]+)$')
 	else
-		input = string.upper(input)
+		sendReply(msg, doc)
+		return
 	end
 
-	if tonumber(input) then
-		range = tonumber(input)
-		rolls = 1
-	elseif string.find(input, 'D') then
-		local dloc = string.find(input, 'D')
-		if dloc == 1 then
-			rolls = 1
-		else
-			rolls = string.sub(input, 1, dloc-1)
-		end
-		range = string.sub(input, dloc+1)
-		if not tonumber(rolls) or not tonumber(range) then
-			return send_msg(msg, config.locale.errors.argument)
-		end
-	else
-		return send_msg(msg, config.locale.errors.argument)
+	count = tonumber(count)
+	range = tonumber(range)
+
+	if range < 2 then
+		sendReply(msg, 'The minimum range is 2.')
+		return
+	end
+	if range > 1000 or count > 1000 then
+		sendReply(msg, 'The maximum range and count are 1000.')
+		return
 	end
 
-	if tonumber(rolls) == 1 then
-		results = 'Random (1-' .. range .. '):\t'
-	elseif tonumber(rolls) > 1 then
-		results = rolls .. 'D' .. range .. ':\n'
-	else
-		return send_msg(msg, config.locale.errors.syntax)
+	local message = ''
+	for i = 1, count do
+		message = message .. math.random(range) .. '\t'
 	end
 
-	if tonumber(range) < 2 then
-		return send_msg(msg, config.locale.errors.syntax)
-	end
-
-	if tonumber(rolls) > 100 or tonumber(range) > 100000 then
-		return send_msg(msg, 'Max 100D100000')
-	end
-
-	for i = 1, tonumber(rolls) do
-		results = results .. math.random(range) .. '\t'
-	end
-
-	send_msg(msg, results)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
-
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

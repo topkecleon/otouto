@@ -1,31 +1,37 @@
-floodcontrol = {}
+ -- Liberbot-compliant floodcontrol.
+ -- Put this after moderation.lua or blacklist.lua.
+
+floodcontrol = floodcontrol or {}
 
 local triggers = {
-	'/floodcontrol'
+	''
 }
 
 local action = function(msg)
 
-	local input, output
-
-	if msg.from.id ~= 100547061 then -- Only acknowledge Liberbot.
-		if not config.admins[msg.from.id] then -- or an admin. :)
-			return
-		end
+	if floodcontrol[-msg.chat.id] then
+		return
 	end
-	input = get_input(msg.text) -- Remove the first word from the input.
-	input = JSON.decode(input) -- Parse the JSON into a table.
-	if not input.groupid then return end -- If no group is specified, end.
 
-	if not input.duration then -- If no duration is specified, set it to 5min.
+	local input = msg.text_lower:match('^/floodcontrol[@'..bot.username..']* (.+)')
+	if not input then return true end
+
+	if msg.from.id ~= 100547061 and msg.from.id ~= config.admin then
+		return -- Only run for Liberbot or the admin.
+	end
+
+	input = JSON.decode(input)
+
+	if not input.groupid then
+		return
+	end
+	if not input.duration then
 		input.duration = 600
 	end
 
 	floodcontrol[input.groupid] = os.time() + input.duration
 
-	local s = input.groupid .. ' silenced for ' .. input.duration .. ' seconds.'
-
-	send_message(-34496439, s) -- Set this to whatever, or comment it out. I use it to send this data to my private bot group.
+	print(input.groupid .. ' silenced for ' .. input.duration .. ' seconds.')
 
 end
 
@@ -40,7 +46,7 @@ local cron = function()
 end
 
 return {
-	triggers = triggers,
 	action = action,
+	triggers = triggers,
 	cron = cron
 }

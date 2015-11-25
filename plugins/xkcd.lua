@@ -1,52 +1,56 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
-	/xkcd [search]
-	This command returns an xkcd strip, its number, and its "secret" text. You may search for a specific strip or get a random one.
+local doc = [[
+	/xkcd [query]
+	Returns an xkcd strip and its alt text. If there is no query, it will be randomized.
 ]]
 
-PLUGIN.triggers = {
-	'^/xkcd'
+local triggers = {
+	'^/xkcd[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
-	local url = 'http://xkcd.com/info.0.json'
-	local jstr, res = HTTP.request(url)
+	local input = msg.text:input()
+
+	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
+
 	local latest = JSON.decode(jstr).num
-	local jdat
+	local res_url
 
 	if input then
-		url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&safe=active&q=site%3axkcd%2ecom%20' .. URL.escape(input)
-		local jstr, res = HTTP.request(url)
+		local url = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.0&safe=active&q=site%3axkcd%2ecom%20' .. URL.escape(input)
+		local jstr, res = HTTPS.request(url)
 		if res ~= 200 then
-			print('here')
-			return send_msg(msg, config.locale.errors.connection)
+			sendReply(msg, config.errors.connection)
+			return
 		end
-		jdat = JSON.decode(jstr)
+		local jdat = JSON.decode(jstr)
 		if #jdat.responseData.results == 0 then
-			return send_msg(msg, config.locale.errors.results)
+			sendReply(msg, config.errors.results)
+			return
 		end
-		url = jdat.responseData.results[1].url .. 'info.0.json'
+		res_url = jdat.responseData.results[1].url .. 'info.0.json'
 	else
-		math.randomseed(os.time())
-		url = 'http://xkcd.com/' .. math.random(latest) .. '/info.0.json'
+		res_url = 'http://xkcd.com/' .. math.random(latest) .. '/info.0.json'
 	end
 
-	local jstr, res = HTTP.request(url)
+	local jstr, res = HTTP.request(res_url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
-	jdat = JSON.decode(jstr)
+	local jdat = JSON.decode(jstr)
 
 	local message = '[' .. jdat.num .. '] ' .. jdat.alt .. '\n' .. jdat.img
-
-	send_message(msg.chat.id, message, false, msg.message_id)
+	sendMessage(msg.chat.id, message, false, msg.message_id)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

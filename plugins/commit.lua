@@ -1,20 +1,15 @@
-local PLUGIN = {}
+ -- Commits from https://github.com/ngerakines/commitment.
 
-PLUGIN.doc = [[
+local doc = [[
 	/commit
-	http://whatthecommit.com.
+	Returns a commit message from whatthecommit.com.
 ]]
 
-PLUGIN.triggers = {
-	'^/commit'
+local triggers = {
+	'^/commit[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
-	math.randomseed(os.time())
-	send_msg(msg, PLUGIN.commits[math.random(#PLUGIN.commits)])
-end
-
-PLUGIN.commits = {
+local commits = {
 	"One does not simply merge into master",
 	"Merging the merge",
 	"Another bug bites the dust",
@@ -417,4 +412,14 @@ PLUGIN.commits = {
 	"One little whitespace gets its very own commit! Oh, life is so erratic!"
 }
 
-return PLUGIN
+local action = function(msg)
+
+	sendMessage(msg.chat.id, commits[math.random(#commits)])
+
+end
+
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

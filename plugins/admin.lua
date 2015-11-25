@@ -1,45 +1,75 @@
-local PLUGIN = {}
-
-PLUGIN.triggers = {
-	'^/admin '
+local triggers = {
+	'^/admin[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local commands = {
 
-	if msg.date < os.time() - 1 then return end
-
-	local input = get_input(msg.text)
-
-	local message = config.locale.errors.argument
-
-	if not config.admins[msg.from.id] then
-		return send_msg(msg, 'Permission denied.')
-	end
-
-	if string.lower(first_word(input)) == 'run' then
-
-		local output = get_input(input)
-		if not output then
-			return send_msg(msg, config.locale.errors.argument)
+	['run'] = function(cmd)
+		local cmd = cmd:input()
+		if not cmd then
+			return 'Please enter a command to run.'
 		end
-		local output = io.popen(output)
-		message = output:read('*all')
-		output:close()
+		return io.popen(cmd):read('*all')
+	end,
 
-	elseif string.lower(first_word(input)) == 'reload' then
+	['lua'] = function(cmd)
+		local cmd = cmd:input()
+		if not cmd then
+			return 'Please enter a command to run.'
+		end
+		local a = loadstring(cmd)()
+		if a then
+			return a
+		else
+			return 'Done!'
+		end
+	end,
 
+	['reload'] = function(cmd)
 		bot_init()
-		message = 'Bot reloaded!'
+		return 'Bot reloaded!'
+	end,
 
-	elseif string.lower(first_word(input)) == 'halt' then
-
+	['halt'] = function(cmd)
 		is_started = false
-		message = 'Shutting down...'
+		return 'Stopping bot!'
+	end,
 
+	['error'] = function(cmd)
+		error('Intentional test error.')
 	end
 
-	send_msg(msg, message)
+}
+
+local action = function(msg)
+
+	if msg.from.id ~= config.admin then
+		return
+	end
+
+	local input = msg.text:input()
+	if not input then
+		local list = 'Specify a command: '
+		for k,v in pairs(commands) do
+			list = list .. k .. ', '
+		end
+		list = list:gsub(', $', '.')
+		sendReply(msg, list)
+		return
+	end
+
+	for k,v in pairs(commands) do
+		if string.match(get_word(input, 1), k) then
+			sendReply(msg, v(input))
+			return
+		end
+	end
+
+	sendReply(msg, 'Specify a command: run, reload, halt.')
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers
+}

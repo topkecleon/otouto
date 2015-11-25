@@ -1,17 +1,13 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/pun
-	Get a random pun.
-	Have a recommendation? PM @topkecleon.
+	Returns a pun.
 ]]
 
-PLUGIN.triggers = {
-	'^/pun$',
-	'^/pun@'
+local triggers = {
+	'^/pun[@'..bot.username..']*'
 }
 
-PLUGIN.puns = {
+local puns = {
 	"The person who invented the door-knock won the No-bell prize.",
 	"I couldn't work out how to fasten my seatbelt. Then it clicked.",
 	"Never trust atoms; they make up everything.",
@@ -135,9 +131,14 @@ PLUGIN.puns = {
 	"In democracy, it's your vote that counts. In feudalism, it's your count that votes."
 }
 
-function PLUGIN.action(msg)
-	math.randomseed(os.time())
-	send_msg(msg, PLUGIN.puns[math.random(#PLUGIN.puns)])
+local action = function(msg)
+
+	sendReply(msg, puns[math.random(#puns)])
+
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

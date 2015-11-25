@@ -1,42 +1,42 @@
 -- utilities.lua
 -- Functions shared among plugins.
 
-function first_word(str, idx) -- get the indexed word in a string
+function get_word(str, idx) -- get the indexed word in a string
+
+	local str = str:gsub('^%s*(.-)%s*$', '%1')
+
 	str = string.gsub(str, '\n', ' ')
-	if not string.find(str, ' ') then return str end
+	if not string.find(str, ' ') then
+		if idx == 1 then
+			return str
+		else
+			return false
+		end
+	end
+
 	str = str .. ' '
-	if not idx then idx = 1 end
 	if idx ~= 1 then
 		for i = 2, idx do
 			str = string.sub(str, string.find(str, ' ') + 1)
 		end
 	end
-	str = string.sub(str, 1, string.find(str, ' '))
-	return string.sub(str, 1, -2)
+	str = str:sub(1, str:find(' '))
+
+	return str:sub(1, -2)
+
 end
 
-function get_input(text) -- returns string or false
-	if not string.find(text, ' ') then
+function string:input() -- Returns the string after the first space.
+	if not self:find(' ') then
 		return false
 	end
-	return string.sub(text, string.find(text, ' ')+1)
+	return self:sub(self:find(' ')+1)
 end
 
-function get_target(msg)
-
-	if msg.reply_to_message then
-		return msg.reply_to_message.from.id
-	elseif string.find(msg.text, '@') then
-		local a = string.find(msg.text, '@')
-		return first_word(string.sub(msg.text, a))
-	else
-		return false
-	end
-
-end
-
-function trim_string(text) -- another alias
-	return string.gsub(text, "^%s*(.-)%s*$", "%1")
+ -- I swear, I copied this from PIL, not yago! :)
+function string:trim() -- Trims whitespace from a string.
+	local s = self:gsub('^%s*(.-)%s*$', '%1')
+	return s
 end
 
 local lc_list = {
@@ -68,35 +68,14 @@ local lc_list = {
 	['!'] = 'ǃ'
 }
 
-function latcyr(str)
+function latcyr(str) -- Replaces letters with corresponding Cyrillic characters.
 	for k,v in pairs(lc_list) do
 		str = string.gsub(str, k, v)
 	end
 	return str
 end
 
-function send_msg(msg, message)
-	send_message(msg.chat.id, message, true, msg.message_id)
-end
-
-function get_coords(input)
-
-	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
-	local jstr, res = HTTP.request(url)
-	if res ~= 200 then
-		return false
-	end
-
-	local jdat = JSON.decode(jstr)
-	if jdat.status == 'ZERO_RESULTS' then
-		return false
-	end
-
-	return { lat = jdat.results[1].geometry.location.lat, lon = jdat.results[1].geometry.location.lng }
-
-end
-
-function load_data(filename)
+function load_data(filename) -- Loads a JSON file as a table.
 
 	local f = io.open(filename)
 	if not f then
@@ -110,11 +89,33 @@ function load_data(filename)
 
 end
 
-function save_data(filename, data)
+function save_data(filename, data) -- Saves a table to a JSON file.
 
 	local s = JSON.encode(data)
 	local f = io.open(filename, 'w')
 	f:write(s)
 	f:close()
+
+end
+
+ -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
+function get_coords(input)
+
+	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
+
+	local jstr, res = HTTP.request(url)
+	if res ~= 200 then
+		return config.errors.connection
+	end
+
+	local jdat = JSON.decode(jstr)
+	if jdat.status == 'ZERO_RESULTS' then
+		return config.errors.results
+	end
+
+	return {
+		lat = jdat.results[1].geometry.location.lat,
+		lon = jdat.results[1].geometry.location.lng
+	}
 
 end

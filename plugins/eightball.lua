@@ -1,17 +1,14 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/8ball
-	Magic 8-ball. Returns a standard 8ball message, unless called with "y/n", where it will return a less verbose answer.
+	Returns an answer from a magic 8-ball!
 ]]
 
-PLUGIN.triggers = {
-	'^/helix',
+local triggers = {
 	'^/8ball',
 	'y/n%p?$'
 }
 
-PLUGIN.answers = {
+local ball_answers = {
 	"It is certain.",
 	"It is decidedly so.",
 	"Without a doubt.",
@@ -35,24 +32,33 @@ PLUGIN.answers = {
 	"There is a time and place for everything, but not now."
 }
 
-PLUGIN.yesno = {'Absolutely.', 'In your dreams.', 'Yes.', 'No.'}
+local yesno_answers = {
+	'Absolutely.',
+	'In your dreams.',
+	'Yes.',
+	'No.'
+}
 
-function PLUGIN.action(msg)
-
-	math.randomseed(os.time())
+local action = function(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
 	end
 
-	if string.match(string.lower(msg.text), 'y/n') then
-		message = PLUGIN.yesno[math.random(#PLUGIN.yesno)]
+	local message
+
+	if msg.text:match('y/n%p?$') then
+		message = yesno_answers[math.random(#yesno_answers)]
 	else
-		message = PLUGIN.answers[math.random(#PLUGIN.answers)]
+		message = ball_answers[math.random(#ball_answers)]
 	end
 
-  send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

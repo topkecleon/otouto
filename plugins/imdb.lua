@@ -1,36 +1,37 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
-	/imdb <movie | TV series>
-	This function retrieves the IMDb info for a given film or television series, including the year, genre, imdb rating, runtime, and a summation of the plot.
+local doc = [[
+	/imdb <query>
+	Returns an IMDb entry.
 ]]
 
-PLUGIN.triggers = {
-	'^/imdb'
+local triggers = {
+	'^/imdb[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		if msg.reply_to_message then
-			msg = msg.reply_to_message
-			input = msg.text
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
 		else
-			return send_msg(msg, PLUGIN.doc)
+			sendReply(msg, doc)
+			return
 		end
 	end
 
 	local url = 'http://www.omdbapi.com/?t=' .. URL.escape(input)
-	local jstr, res = HTTP.request(url)
-	local jdat = JSON.decode(jstr)
 
-	if res ~= 200 or not jdat then
-		return send_msg(msg, config.locale.errors.connection)
+	local jstr, res = HTTP.request(url)
+	if res ~= 200 then
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
+	local jdat = JSON.decode(jstr)
+
 	if jdat.Response ~= 'True' then
-		return send_msg(msg, jdat.Error)
+		sendReply(msg, config.errors.results)
+		return
 	end
 
 	local message = jdat.Title ..' ('.. jdat.Year ..')\n'
@@ -38,8 +39,12 @@ function PLUGIN.action(msg)
 	message = message .. jdat.Plot .. '\n'
 	message = message .. 'http://imdb.com/title/' .. jdat.imdbID
 
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

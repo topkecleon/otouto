@@ -1,10 +1,15 @@
+if not config.thecatapi_key then
+	print('Missing config value: thecatapi_key.')
+	print('cats.lua will be enabled, but there are more features with a key.')
+end
+
 local doc = [[
 	/cat
-	Get a cat pic!
+	Returns a cat!
 ]]
 
 local triggers = {
-	'^/cats?'
+	'^/cat[@'..bot.username..']*$'
 }
 
 local action = function(msg)
@@ -14,20 +19,20 @@ local action = function(msg)
 		url = url .. '&api_key=' .. config.thecatapi_key
 	end
 
-	local jstr, res = HTTP.request(url)
+	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
-	jstr = jstr:match('<img src="(.*)">')
+	str = str:match('<img src="(.*)">')
 
-	send_message(msg.chat.id, jstr, false, msg.message_id)
+	sendMessage(msg.chat.id, str)
 
 end
 
 return {
-	doc = doc,
-	triggers = triggers,
 	action = action,
-	typing = true
+	triggers = triggers,
+	doc = doc
 }

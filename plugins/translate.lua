@@ -1,41 +1,40 @@
-  -- Glanced at https://github.com/yagop/telegram-bot/blob/master/plugins/translate.lua
-
- local PLUGIN = {}
-
- PLUGIN.triggers = {
-	'^/translate'
-}
-
-PLUGIN.doc = [[
-	/translate [target lang]
-	Reply to a message to translate it to the default language.
+local doc = [[
+	/translate [text]
+	Translates input or the replied-to message into the bot's language.
 ]]
 
-PLUGIN.action = function(msg)
+local triggers = {
+	'^/translate[@'..bot.username..']*'
+}
 
-	if not msg.reply_to_message then
-		return send_msg(msg, PLUGIN.doc)
+local action = function(msg)
+
+	local input = msg.text:input()
+	if not input then
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
+		else
+			sendReply(msg, doc)
+			return
+		end
 	end
 
-	local tl = config.locale.translate or 'en'
-	local input = get_input(msg.text)
-	if input then
-		tl = input
-	end
+	local url = 'https://translate.google.com/translate_a/single?client=t&ie=UTF-8&oe=UTF-8&hl=en&dt=t&sl=auto&tl=' .. config.lang .. '&text=' .. URL.escape(input)
 
-	local url = 'http://translate.google.com/translate_a/single?client=t&ie=UTF-8&oe=UTF-8&hl=en&dt=t&tl=' .. tl .. '&sl=auto&text=' .. URL.escape(msg.reply_to_message.text)
-
-	local str, res = HTTP.request(url)
-
+	local str, res = HTTPS.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
-	local output = str:gmatch("%[%[%[\"(.*)\"")():gsub("\"(.*)", "")
-	local output = latcyr(output)
+	local output = latcyr(str:gmatch("%[%[%[\"(.*)\"")():gsub("\"(.*)", ""))
 
-	send_msg(msg.reply_to_message, output)
+	sendReply(msg.reply_to_message or msg, output)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

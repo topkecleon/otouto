@@ -1,54 +1,54 @@
 local doc = [[
-	/cash <from> <to> [amount]
-	Convert an amount from one currency to another.
-	Example: /cash USD EUR 5
+	/cash [amount] <from> to <to>
+	Example: /cash 5 USD to EUR
+	Returns exchange rates for various currencies.
 ]]
 
 local triggers = {
-	'^/cash'
+	'^/cash[@'..bot.username..']*'
 }
 
 local action = function(msg)
 
-	local input = get_input(msg.text)
-	if not input then
-		return send_msg(msg, doc)
+	local input = msg.text:upper()
+	if not input:match('%a%a%a TO %a%a%a') then
+		sendReply(msg, doc)
+		return
 	end
 
-	local url = 'http://www.google.com/finance/converter' -- thanks juan :^)
+	local from = input:match('(%a%a%a) TO')
+	local to = input:match('TO (%a%a%a)')
+	local amount = input:match('([%d]+) %a%a%a TO %a%a%a') or 1
+	local result = 1
 
-	local from = first_word(input):upper()
-	local to = first_word(input, 2):upper()
-	local amount = first_word(input, 3)
-	local result
-
-	if not tonumber(amount) then
-		amount = 1
-		result = 1
-	end
+	local url = 'https://www.google.com/finance/converter'
 
 	if from ~= to then
 
 		local url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
-
-		local str, res = HTTP.request(url)
+		local str, res = HTTPS.request(url)
 		if res ~= 200 then
-			return send_msg(msg, config.locale.errors.connection)
+			sendReply(msg, config.errors.connection)
+			return
 		end
 
-		local str = str:match('<span class=bld>(.*) %u+</span>')
-		if not str then return send_msg(msg, config.locale.errors.results) end
-		result = string.format('%.2f', str)
+		str = str:match('<span class=bld>(.*) %u+</span>')
+		if not str then
+			sendReply(msg, config.errors.results)
+			return
+		end
+
+		result = str:format('%.2f')
 
 	end
 
 	local message = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
 return {
-	doc = doc,
+	action = action,
 	triggers = triggers,
-	action = action
+	doc = doc
 }

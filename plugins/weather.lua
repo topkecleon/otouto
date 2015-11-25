@@ -1,41 +1,56 @@
-local PLUGIN = {}
+if not config.owm_api_key then
+	print('Missing config value: owm_api_key.')
+	print('weather.lua will not be enabled.')
+	return
+end
 
-PLUGIN.doc = [[
+local doc = [[
 	/weather <location>
-	Returns the current temperature and weather conditions for a specified location.
-	Non-city locations are accepted; "/weather Buckingham Palace" will return the weather for Westminster.
-	Results and weather data are powered by Yahoo.
+	Returns the current weather conditions for a given location.
 ]]
 
-PLUGIN.triggers = {
-	'^/weather'
+local triggers = {
+	'^/weather[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		if msg.reply_to_message and msg.reply_to_message.text then
+			input = msg.reply_to_message.text
+		else
+			sendReply(msg, doc)
+			return
+		end
 	end
 
-	local url = 'https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20%28select%20woeid%20from%20geo.places%281%29%20where%20text%3D%22' .. URL.escape(input) .. '%22%29&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
+	local coords = get_coords(input)
+	if type(coords) == 'string' then
+		sendReply(msg, coords)
+		return
+	end
+
+	local url = 'http://api.openweathermap.org/data/2.5/weather?APPID=' .. config.owm_api_key .. '&lat=' .. coords.lat .. '&lon=' .. coords.lon
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
+
 	local jdat = JSON.decode(jstr)
-	if not jdat.query.results then
-		return send_msg(msg, config.locale.errors.results)
-	end
-	local data = jdat.query.results.channel.item.condition
 
-	local fahrenheit = data.temp
-	local celsius = string.format('%.0f', (fahrenheit - 32) * 5/9)
-	local message = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. data.text .. '.'
+	local celsius = string.format('%.2f', jdat.main.temp - 273.15)
+	local fahrenheit = string.format('%.2f', celsius * (9/5) + 32)
+	local message = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.'
 
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

@@ -1,45 +1,37 @@
-local PLUGIN = {}
+ -- This plugin should go at the end of your plugin list in
+ -- config.lua, but not after greetings.lua.
 
-PLUGIN.doc = [[
-	/help [command]
-	Get list of basic information for all commands, or more detailed documentation on a specified command.
-]]
+local help_text = 'Available commands:\n'
 
-PLUGIN.triggers = {
-	'^/help',
-	'^/h$',
-	'^/start$'
+for i,v in ipairs(plugins) do
+	if v.doc then
+		local a = string.sub(v.doc, 1, string.find(v.doc, '\n')-1)
+		help_text =  help_text .. a .. '\n'
+	end
+end
+
+local help_text = help_text .. 'Arguments: <required> [optional]'
+
+local triggers = {
+	'^/h[elp]*[@'..bot.username..']*$',
+	'^/start[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
-
-	if string.find(msg.text, '@') and not string.match(msg.text, 'help@'..bot.username) then return end
-
-	local input = get_input(msg.text)
-
-	if input then
-		for i,v in ipairs(plugins) do
-			if v.doc then
-				if '/' .. input == trim_string(first_word(v.doc)) then
-					return send_msg(msg, v.doc)
-				end
-			end
-		end
-	end
-
-	local message = 'Available commands:\n' .. help_message .. [[
-		*Arguments: <required> [optional]
-	]]
+local action = function(msg)
 
 	if msg.from.id ~= msg.chat.id then
-		if not send_message(msg.from.id, message, true, msg.message_id) then
-			return send_msg(msg, message) -- Unable to PM user who hasn't PM'd first.
+		if sendMessage(msg.from.id, help_text) then
+			sendReply(msg, 'I have sent you the requested information in a private message.')
+		else
+			sendReply(msg, help_text)
 		end
-		return send_msg(msg, 'I have sent you the requested information in a private message.')
 	else
-		return send_msg(msg, message)
+		sendReply(msg, help_text)
 	end
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers
+}

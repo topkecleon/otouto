@@ -1,32 +1,50 @@
-local PLUGIN = {}
+if not config.biblia_api_key then
+	print('Missing config value: biblia_api_key.')
+	print('bible.lua will not be enabled.')
+	return
+end
 
-PLUGIN.doc = [[
-	/bible <verse>
-	Returns a verse from the bible, King James Version. Use a standard or abbreviated reference (John 3:16, Jn3:16).
-	http://biblia.com
+local doc = [[
+	/bible <reference>
+	Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
 ]]
 
-PLUGIN.triggers = {
-	'^/bible',
-	'^/b '
+local triggers = {
+	'^/b[ible]*[@'..bot.username..']*$',
+	'^/b[ible]*[@'..bot.username..']* '
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
+	local input = msg.text:input()
 	if not input then
-		return send_msg(msg, PLUGIN.doc)
+		sendReply(msg, doc)
+		return
 	end
 
-	local url = 'http://api.biblia.com/v1/bible/content/KJV.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
+	local url = 'http://api.biblia.com/v1/bible/content/ASV.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
+
 	local message, res = HTTP.request(url)
 
-	if res ~= 200 then
-		message = config.locale.errors.connection
+	if message:len() == 0 then
+		url = 'http://api.biblia.com/v1/bible/content/KJVAPOC.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
+		message, res = HTTP.request(url)
 	end
 
-	send_msg(msg, message)
+	if res ~= 200 then
+		message = config.errors.results
+	end
+
+	if message:len() > 4000 then
+		message = 'The text is too long to post here. Try being more specific.'
+	end
+
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

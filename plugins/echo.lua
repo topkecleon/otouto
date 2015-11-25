@@ -1,23 +1,26 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/echo <text>
-	Repeat a string.
+	Repeat a string of text!
 ]]
 
-PLUGIN.triggers = {
-	'^/echo'
+local triggers = {
+	'^/echo[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
-	if not input then
-		return send_msg(msg, PLUGIN.doc)
+	local input = msg.text:input()
+
+	if input then
+		sendReply(msg, latcyr(input))
+	else
+		sendReply(msg, doc)
 	end
-
-	send_message(msg.chat.id, latcyr(input))
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

@@ -1,84 +1,66 @@
-local PLUGIN = {}
-
-PLUGIN.doc = [[
+local doc = [[
 	/reddit [r/subreddit | query]
-	This command returns top results for a given query or subreddit. NSFW posts are marked as such.
+	Returns the four (if group) or eight (if private message) top posts for the given subreddit or query, or from the frontpage.
 ]]
 
-PLUGIN.triggers = {
-	'^/reddit',
-	'^/r$',
-	'^/r '
+local triggers = {
+	'^/r[eddit]*[@'..bot.username..']*$',
+	'^/r[eddit]*[@'..bot.username..']* ',
+	'^/r/'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	local input = get_input(msg.text)
-	local jdat = {}
-	local message = ''
-
-	if input then
-
-		if string.match(input, '^r/') then
-
-			local url = 'http://www.reddit.com/' .. first_word(input) .. '/.json'
-			local jstr, res = HTTP.request(url)
-			if res ~= 200 then
-				return send_msg(msg, config.locale.errors.connection)
-			end
-			jdat = JSON.decode(jstr)
-			if #jdat.data.children == 0 then
-				return send_msg(msg, config.locale.errors.results)
-			end
-
-		else
-
-			local url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input)
-			local jstr, res = HTTP.request(url)
-			if res ~= 200 then
-				return send_msg(msg, config.locale.errors.connection)
-			end
-			jdat = JSON.decode(jstr)
-			if #jdat.data.children == 0 then
-				return send_msg(msg, config.locale.errors.results)
-			end
-
-		end
-
-	else
-
-		url = 'https://www.reddit.com/.json'
-		local jstr, res = HTTP.request(url)
-		if res ~= 200 then
-			return send_msg(msg, config.locale.errors.connection)
-		end
-		jdat = JSON.decode(jstr)
-
-	end
+	msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
+	local input = msg.text_lower:input()
+	local url
 
 	local limit = 4
-	if #jdat.data.children < limit then
-		limit = #jdat.data.children
+	if msg.chat.id == msg.from.id then
+		limit = 8
 	end
 
-	for i = 1, limit do
+	if input then
+		if input:match('^r/') then
+			url = 'http://www.reddit.com/' .. input .. '/.json?limit=' .. limit
+		else
+			url = 'http://www.reddit.com/search.json?q=' .. input .. '&limit=' .. limit
+		end
+	else
+		url = 'http://www.reddit.com/.json?limit=' .. limit
+	end
 
-		if jdat.data.children[i].data.over_18 then
+	local jstr, res = HTTP.request(url)
+	if res ~= 200 then
+		sendReply(msg, config.errors.connection)
+		return
+	end
+
+	local jdat = JSON.decode(jstr)
+	if #jdat.data.children == 0 then
+		sendReply(msg, config.errors.results)
+		return
+	end
+
+	local message = ''
+	for i,v in ipairs(jdat.data.children) do
+		if v.data.over_18 then
 			message = message .. '[NSFW] '
 		end
-
-		url = '\n'
-		if not jdat.data.children[i].data.is_self then
-			url = '\n' .. jdat.data.children[i].data.url .. '\n'
+		local long_url = '\n'
+		if not v.data.is_self then
+			long_url = '\n' .. v.data.url .. '\n'
 		end
-
-		local short_url = '[redd.it/' .. jdat.data.children[i].data.id .. '] '
-		message = message .. short_url .. jdat.data.children[i].data.title .. url
-
+		local short_url = '[redd.it/' .. v.data.id .. '] '
+		message = message .. short_url .. v.data.title .. long_url
 	end
 
-	send_msg(msg, message)
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}

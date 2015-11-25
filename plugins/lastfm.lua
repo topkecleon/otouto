@@ -1,89 +1,101 @@
-local PLUGIN = {}
+if not config.lastfm_api_key then
+	print('Missing config value: lastfm_api_key.')
+	print('lastfm.lua will not be enabled.')
+	return
+end
 
-PLUGIN.doc = [[
-	/lastfm [username]
-	Get current- or last-played track data from last.fm. If a username is specified, it will return info for that username rather than your own.
-	"/fmset username" will configure your last.fm username.
+local doc = [[
+	/lastfm
+	/np [username]
+	Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
+	/fmset <username>
+	Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
 ]]
 
-PLUGIN.triggers = {
-	'^/lastfm',
-	'^/np$',
-	'^/fm$',
-	'^/fmset'
+local triggers = {
+	'^/lastfm[@'..bot.username..']*',
+	'^/np[@'..bot.username..']*',
+	'^/fmset[@'..bot.username..']*'
 }
 
-function PLUGIN.action(msg)
+local action = function(msg)
 
-	if msg.text:match('^/fmset') then
+	lastfm = load_data('lastfm.json')
+	local input = msg.text:input()
 
-		local input = get_input(msg.text)
-		if not input then
-			return send_msg(msg, PLUGIN.doc)
-		end
-
-		local data = load_data('lastfm.json')
-		local id = tostring(msg.from.id)
-
-		data[id] = input
-
-		save_data('lastfm.json', data)
-
-		send_msg(msg, 'Your last.fm username has been set to ' .. input .. '.')
-
+	if string.match(msg.text, '^/lastfm') then
+		sendReply(msg, doc:sub(10))
 		return
-
-	end
-
-	local base_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
-
-	local input = get_input(msg.text)
-	if not input then
-		local data = load_data('lastfm.json')
-		if data[tostring(msg.from.id)] then
-			input = data[tostring(msg.from.id)]
-		elseif msg.from.username then
-			input = msg.from.username
+	elseif string.match(msg.text, '^/fmset') then
+		if not input then
+			sendReply(msg, doc)
+		elseif input == '-' then
+			lastfm[msg.from.id_str] = nil
+			sendReply(msg, 'Your last.fm username has been forgotten.')
 		else
-			return send_msg(msg, 'Please provide a valid last.fm username.\nYou can set yours with /fmset.')
+			lastfm[msg.from.id_str] = input
+			sendReply(msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
+		save_data('lastfm.json', lastfm)
+		return
 	end
 
-	local jstr, res = HTTP.request(base_url..input)
+	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
+	local username
+	if input then
+		username = input
+	elseif lastfm[msg.from.id_str] then
+		username = lastfm[msg.from.id_str]
+	elseif msg.from.username then
+		username = msg.from.username
+	else
+		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
+		return
+	end
+
+	url = url .. URL.escape(username)
+
+	jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		return send_msg(msg, config.locale.errors.connection)
+		sendReply(msg, config.errors.connection)
+		return
 	end
 
 	local jdat = JSON.decode(jstr)
-
 	if jdat.error then
-		return send_msg(msg, 'Please provide a valid last.fm username.\nYou can set yours with /fmset.')
-	end
-
-	if not jdat.recenttracks.track then
-		return send_msg(msg, 'No history for that user.')
+		sendReply(msg, jdat.error)
+		return
 	end
 
 	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
-
-	local message = '🎵  ' .. msg.from.first_name .. ' last listened to:\n'
-	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = '🎵  ' .. msg.from.first_name .. ' is listening to:\n'
+	if not jdat then
+		sendReply(msg, 'No history for this user.')
+		return
 	end
 
-	local name = jdat.name or 'Unknown'
-	local artist
+	local message = input or msg.from.first_name
+	message = '🎵  ' .. message
+
+	if jdat['@attr'] and jdat['@attr'].nowplaying then
+		message = message .. ' is currently listening to:\n'
+	else
+		message = message .. ' last listened to:\n'
+	end
+
+	local title = jdat.name or 'Unknown'
+	local artist = 'Unknown'
 	if jdat.artist then
 		artist = jdat.artist['#text']
-	else
-		artist = 'Unknown'
 	end
 
-	local message = message .. name .. ' - ' .. artist
-
-	send_message(msg.chat.id, message)
+	message = message .. title .. ' - ' .. artist
+	sendReply(msg, message)
 
 end
 
-return PLUGIN
+return {
+	action = action,
+	triggers = triggers,
+	doc = doc
+}
