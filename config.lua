@@ -48,7 +48,7 @@ telegram.me/otouto
 			'i\'m home',
 			'i\'m back'
 		},
-		['You're welcome, #NAME.'] = {
+		['You\'re welcome, #NAME.'] = {
 			'thanks',
 			'thank you'
 		}
