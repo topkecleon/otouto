@@ -13,7 +13,7 @@ Bot commands and functions use a comprehensive plugin system, similar to that of
 ##Plugins
 Below are listed many (but not all) of otouto's plugins. This list will be updated as more plugins are added.
 
-**echo.lua**
+###**echo.lua**
 
 >**Command:** /echo &lt;text&gt;
 
@@ -21,7 +21,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Notes:** Replaces letters with corresponding characters from the Cyrillic alphabet.
 
-**gSearch.lua**
+###**gSearch.lua**
 
 >**Command:** /google [query]
 
@@ -31,7 +31,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Notes:** If "nsfw" is appended to the command, Safe Search will not be used.
 
-**gImages.lua**
+###**gImages.lua**
 
 >**Command:** /images [query]
 
@@ -41,7 +41,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Notes:** If "nsfw" is appended to the command, Safe Search and image preview will not be used.
 
-**gMaps.lua**
+###**gMaps.lua**
 
 >**Command:** /location [query]
 
@@ -49,13 +49,13 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /loc
 
-**translate.lua**
+###**translate.lua**
 
 >**Command:** /translate [text]
 
 >**Function:** Translates the replied-to message or the given string to the configured language.
 
-**youtube.lua**
+###**youtube.lua**
 
 >**Command:** /youtube [query]
 
@@ -63,7 +63,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /yt
 
-**wikipedia.lua**
+###**wikipedia.lua**
 
 >**Command:** /wikipedia [query]
 
@@ -71,7 +71,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /wiki
 
-**lastfm.lua**
+###**lastfm.lua**
 
 >**Command:** /lastfm
 
@@ -88,7 +88,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >>Sets your last.fm username. Use /fmset - to delete it.
 
-**hackernews.lua**
+###**hackernews.lua**
 
 >**Command:** /hackernews
 
@@ -96,19 +96,19 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /hn
 
-**imdb.lua**
+###**imdb.lua**
 
 >**Command:** /imdb &lt;query&gt;
 
 >**Function:** Returns movie information from IMDb.
 
-**calc.lua**
+###**calc.lua**
 
 >**Command:** /calc &lt;expression&gt;
 
 >**Function:** Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 
-**bible.lua**
+###**bible.lua**
 
 >**Command:** /bible &lt;reference&gt;
 
@@ -116,7 +116,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /b
 
-**urbandictionary.lua**
+###**urbandictionary.lua**
 
 >**Command:** /urbandictionary &lt;query&gt;
 
@@ -124,37 +124,37 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /ud, /urban
 
-**time.lua**
+###**time.lua**
 
 >**Command:** /time &lt;query&gt;
 
 >**Function:** Returns the time, date, and timezone for a given location.
 
-**weather.lua**
+###**weather.lua**
 
 >**Command:** /weather &lt;query&gt;
 
 >**Function:** Returns the current weather conditions for a given location.
 
-**nick.lua**
+###**nick.lua**
 
 >**Command:** /nick &lt;nickname&gt;
 
 >**Function:** Set your nickname. Use "/nick -" to delete it.
 
-**whoami.lua**
+###**whoami.lua**
 
 >**Command:** /whoami
 
 >**Function:** Returns user and chat info for your or the replied-to message.
 
-**8ball.lua**
+###**8ball.lua**
 
 >**Command:** /8ball
 
 >**Function:** Returns an answer from a magic 8-ball.
 
-**dice.lua**
+###**dice.lua**
 
 >**Command:** /roll &lt;nDr&gt;
 
@@ -166,7 +166,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >>/roll 6
 
-**reddit.lua**
+###**reddit.lua**
 
 >**Command:** /reddit [r/subreddit | query]
 
@@ -184,37 +184,37 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >>/r/talesfromtechsupport
 
-**xkcd.lua**
+###**xkcd.lua**
 
 >**Command:** /xkcd [query]
 
 >**Function:** Returns an xkcd strip and it's alt text. If not query is given, it will use a random strip.
 
-**slap.lua**
+###**slap.lua**
 
 >**Command:** /slap &lt;target&gt;
 
 >**Function:** Give someone a good slap (or worse).
 
-**commit.lua**
+###**commit.lua**
 
 >**Command:** /commit
 
 >**Function:** Returns a commit message from whatthecommit.com.
 
-**fortune.lua**
+###**fortune.lua**
 
 >**Command:** /fortune
 
 >**Function:** Returns a UNIX fortune.
 
-**pun.lua**
+###**pun.lua**
 
 >**Command:** /pun
 
 >**Function:** Returns a pun.
 
-**pokedex.lua**
+###**pokedex.lua**
 
 >**Command:** /pokedex &lt;query&gt;
 
@@ -222,7 +222,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Aliases:** /dex
 
-**currency.lua**
+###**currency.lua**
 
 >**Command:** /cash [amount] &lt;from&gt; to &lt;from&gt;
 
@@ -234,13 +234,13 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >>/cash BTC to GBP
 
-**cats.lua**
+###**cats.lua**
 
 >**Command:** /cat
 
 >**Function:** Returns a cat pic.
 
-**admin.lua**
+###**admin.lua**
 
 >**Command:** /admin [command]
 
@@ -248,7 +248,7 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Notes:** Only usable by the configured admin.
 
-**blacklist.lua**
+###**blacklist.lua**
 
 >**Command:** /blacklist [id]
 
