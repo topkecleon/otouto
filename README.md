@@ -13,7 +13,7 @@ Bot commands and functions use a comprehensive plugin system, similar to that of
 ##Plugins
 Below are listed many (but not all) of otouto's plugins. This list will be updated as more plugins are added.
 
->**echo.lua**
+**echo.lua**
 
 >**Command:** /echo &lt;text&gt;
 
