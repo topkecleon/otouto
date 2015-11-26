@@ -2,13 +2,15 @@
 
 local triggers = {
 	'',
-	'^' .. bot.first_name .. ','
+	'^' .. bot.first_name .. ',',
+	'^@' .. bot.username .. ','
 }
 
 local action = function(msg)
 
 	-- This is awkward, but if you have a better way, please share.
 	if msg.text_lower:match('^' .. bot.first_name .. ',') then
+	elseif msg.text_lower:match('^@' .. bot.username .. ',') then
 	elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
 	elseif msg.from.id == msg.chat.id then
 	else
@@ -17,7 +19,9 @@ local action = function(msg)
 
 	sendChatAction(msg.chat.id, 'typing')
 
-	local input = msg.text_lower:gsub(bot.first_name, 'simsimi')
+	local input = msg.text_lower
+	input = input:gsub(bot.first_name, 'simsimi')
+	input = input:gsub('@'..bot.username, 'simsimi')
 
 	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(input)
 
