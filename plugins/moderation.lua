@@ -219,13 +219,13 @@ local commands = {
 		local userid = msg.text:input()
 		local usernm = userid
 
+		if msg.reply_to_message then
+			userid = tostring(msg.reply_to_message.from.id)
+			usernm = msg.reply_to_message.from.first_name
+		end
+		
 		if not userid then
-			if msg.reply_to_message then
-				userid = tostring(msg.reply_to_message.from.id)
-				usernm = msg.reply_to_message.from.first_name
-			else
-				return 'Kicks must be done via reply or specification of a user/bot\'s ID or username.'
-			end
+			return 'Kicks must be done via reply or specification of a user/bot\'s ID or username.'
 		end
 
 		if moddat[msg.chat.id_str][userid] or config.moderation.admins[userid] then
