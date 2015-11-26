@@ -1,20 +1,25 @@
  -- Put this absolutely at the end, even after greetings.lua.
 
 local triggers = {
-	''
+	'',
+	'^' .. bot.first_name .. ','
 }
 
 local action = function(msg)
 
-	if not msg.reply_to_message then
-		return true
-	elseif msg.reply_to_message and msg.reply_to_message.from.id ~= bot.id then
+	-- This is awkward, but if you have a better way, please share.
+	if msg.text_lower:match('^' .. bot.first_name .. ',') then
+	elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
+	elseif msg.from.id == msg.chat.id then
+	else
 		return true
 	end
 
 	sendChatAction(msg.chat.id, 'typing')
 
-	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(msg.text_lower)
+	local input = msg.text_lower:gsub(bot.first_name, 'simsimi')
+
+	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then

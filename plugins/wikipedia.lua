@@ -25,11 +25,16 @@ local action = function(msg)
 
 	local jstr, res = HTTPS.request(gurl .. URL.escape(input))
 	if res ~= 200 then
-		sendReply(msg, config.error.connection)
+		sendReply(msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
+	if not jdat.responseData.results[1] then
+		sendReply(msg, config.errors.results)
+		return
+	end
+
 	local url = jdat.responseData.results[1].url
 	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
 
@@ -45,7 +50,7 @@ local action = function(msg)
 		break -- Seriously, there's probably a way more elegant solution.
 	end
 	if not text then
-		sendReply(msg, config.error.connection)
+		sendReply(msg, config.errors.results)
 		return
 	end
 
