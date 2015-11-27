@@ -11,7 +11,8 @@ local action = function(msg)
 	-- This is awkward, but if you have a better way, please share.
 	if msg.text_lower:match('^' .. bot.first_name .. ',') then
 	elseif msg.text_lower:match('^@' .. bot.username .. ',') then
-	elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
+	-- Uncomment the following line for Al Gore-like reply chatter.
+	-- elseif msg.reply_to_message and msg.reply_to_message.from.id == bot.id then
 	elseif msg.from.id == msg.chat.id then
 	else
 		return true
