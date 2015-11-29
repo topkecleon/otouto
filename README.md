@@ -240,6 +240,14 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Function:** Returns a cat pic.
 
+###**hearthstone.lua**
+
+>**Command:** /hearthstone &lt;query&gt;
+
+>**Function:** Returns Hearthstone card info.
+
+>**Aliases:** /hs
+
 ###**admin.lua**
 
 >**Command:** /admin [command]
@@ -310,7 +318,7 @@ greetings = {
 Where the key is the preconfigured response (where #NAME will be replaced with the user's name or nickname) and the strings in the table are the expected greetings (followed by the bot's name and possible punctuation).
 
 ##Setup
-You **must** have lua-socket and lua-sec installed. For uploading photos and other files, you must have curl installed. The fortune.lua plugin requires that fortune is installed.
+You **must** have Lua, lua-socket and lua-sec installed. For uploading photos and other files, you must have curl installed. The fortune.lua plugin requires that fortune is installed.
 
 For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for openweathermap.org, last.fm, and biblia.com, respectively. cats.lua uses an API key to get more results, though it is not required.
 
