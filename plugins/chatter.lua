@@ -8,6 +8,8 @@ local triggers = {
 
 local action = function(msg)
 
+	if msg.text == '' then return end
+
 	-- This is awkward, but if you have a better way, please share.
 	if msg.text_lower:match('^' .. bot.first_name .. ',') then
 	elseif msg.text_lower:match('^@' .. bot.username .. ',') then
