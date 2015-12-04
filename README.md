@@ -1,7 +1,7 @@
 #otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-The public bot runs on [@mokubot](https://telegram.me/otouto).
+The public bot runs on [@mokubot](https://telegram.me/mokubot).
 
 otouto is licensed under the GNU General Public License. A copy of the license has been included in [LICENSE](https://github.com/topkecleon/otouto/blob/master/LICENSE).
 

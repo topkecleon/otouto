@@ -37,8 +37,8 @@ end
 
 on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
-	if not msg.text then msg.text = msg.caption or '' end -- So about.lua works.
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
+	if not msg.text then msg.text = msg.caption or '' end
 
 	msg.chat.id_str = tostring(msg.chat.id)
 	msg.from.id_str = tostring(msg.from.id)

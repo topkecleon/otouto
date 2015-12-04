@@ -15,7 +15,7 @@ local action = function(msg)
 		sendMessage(msg.chat.id, message)
 		return
 	elseif string.match(msg.text_lower, '^/about[@'..bot.username..']*') then
-		sendReply(msg, message)
+		sendMessage(msg.chat.id, message)
 		return
 	end
 

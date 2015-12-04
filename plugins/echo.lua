@@ -12,7 +12,7 @@ local action = function(msg)
 	local input = msg.text:input()
 
 	if input then
-		sendReply(msg, latcyr(input))
+		sendMessage(msg.chat.id, latcyr(input))
 	else
 		sendReply(msg, doc)
 	end
