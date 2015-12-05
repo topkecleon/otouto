@@ -40,7 +40,7 @@ getUpdates = function(offset)
 
 end
 
-sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message_id)
+sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
 
 	local url = BASE_URL .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. URL.escape(text)
 
@@ -50,6 +50,10 @@ sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message
 
 	if reply_to_message_id then
 		url = url .. '&reply_to_message_id=' .. reply_to_message_id
+	end
+
+	if use_markdown then
+		url = url .. '&parse_mode=Markdown'
 	end
 
 	return sendRequest(url)

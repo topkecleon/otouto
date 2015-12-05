@@ -90,7 +90,7 @@ local action = function(msg)
 	end
 
 	message = message .. title .. ' - ' .. artist
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, message)
 
 end
 

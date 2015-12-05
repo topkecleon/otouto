@@ -74,7 +74,7 @@ while is_started do -- Start a loop while the bot should be running.
 
 	local res = getUpdates(last_update+1) -- Get the latest updates!
 	if res then
-		for i,v in ipairs(res.result) do -- Go through every new damned message.
+		for i,v in ipairs(res.result) do -- Go through every new message.
 			last_update = v.update_id
 			on_msg_receive(v.message)
 		end

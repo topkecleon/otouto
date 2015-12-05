@@ -21,6 +21,12 @@ Below are listed many (but not all) of otouto's plugins. This list will be updat
 
 >**Notes:** Replaces letters with corresponding characters from the Cyrillic alphabet.
 
+###**ping.lua**
+
+>**Command:** /ping
+
+>**Function:** The simplest plugin ever!
+
 ###**gSearch.lua**
 
 >**Command:** /google [query]

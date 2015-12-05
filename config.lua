@@ -65,6 +65,7 @@ telegram.me/otouto
 		'floodcontrol.lua',
 		'admin.lua',
 		'about.lua',
+		'ping.lua',
 		'whoami.lua',
 		'nick.lua',
 		'echo.lua',
