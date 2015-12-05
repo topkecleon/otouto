@@ -20,10 +20,12 @@ local action = function(msg)
 		end
 	end
 
-	local url = 'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8'
+	local url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1'
+        url = url .. '&key=0000000' -- KEY Get https://console.developers.google.com/apis/credentials
+        url = url .. '&cx=ABCD:000' -- CX Get https://cse.google.com/cse
 
 	if not string.match(msg.text, '^/i[mage]*nsfw') then
-		url = url .. '&safe=active'
+		url = url .. '&safe=high'
 	end
 
 	url = url .. '&q=' .. URL.escape(input)
@@ -35,13 +37,13 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
-	if #jdat.responseData.results < 1 then
+	if jdat.searchInformation.totalResults == '0' then
 		sendReply(msg, config.errors.results)
 		return
 	end
 
-	local i = math.random(#jdat.responseData.results)
-	local result = jdat.responseData.results[i].url
+	local i = math.random(jdat.queries.request[1].count)
+	local result = jdat.items[i].link
 
 	if string.match(msg.text, '^/i[mage]*nsfw') then
 		sendReply(msg, result)
