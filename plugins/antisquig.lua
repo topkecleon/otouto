@@ -1,5 +1,7 @@
  -- Put this at the very top of your plugin list, even before blacklist.lua.
 
+ -- Developed by the incredible JuanPotato, creator of the Python CLI bot Botato.
+
 antisquig = {}
 
 local triggers = {

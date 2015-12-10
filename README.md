@@ -328,6 +328,8 @@ You **must** have Lua, lua-socket and lua-sec installed. For uploading photos an
 
 For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for openweathermap.org, last.fm, and biblia.com, respectively. cats.lua uses an API key to get more results, though it is not required.
 
+For gImages.lua to work, you must have a Google API key, a Google Custom Search Engine key, and have it configured to show image results.
+
 >**Before you do anything, edit config.lua and make the following changes:**
 
 >* Edit bot_api_key with your authentication token from Botfather.

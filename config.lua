@@ -93,7 +93,7 @@ telegram.me/otouto
 		'bandersnatch.lua',
 		'currency.lua',
 		'cats.lua',
-
+		-- Put new plugins here.
 		'help.lua',
 		'greetings.lua'
 	}
