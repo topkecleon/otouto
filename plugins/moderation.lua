@@ -7,10 +7,10 @@
 	'^/modhelp[@'..bot.username..']*$',
 	'^/modlist[@'..bot.username..']*$',
 	'^/modcast[@'..bot.username..']*',
-	'^/add[@'..bot.username..']*$',
-	'^/remove[@'..bot.username..']*$',
-	'^/promote[@'..bot.username..']*$',
-	'^/demote[@'..bot.username..']*',
+	'^/modadd[@'..bot.username..']*$',
+	'^/modrem[@'..bot.username..']*$',
+	'^/modprom[@'..bot.username..']*$',
+	'^/moddem[@'..bot.username..']*',
 	'^/modkick[@'..bot.username..']*',
 	'^/modban[@'..bot.username..']*',
  }
@@ -94,7 +94,7 @@ local commands = {
 
 	end,
 
-	['^/add[@'..bot.username..']*$'] = function(msg)
+	['^/modadd[@'..bot.username..']*$'] = function(msg)
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -112,7 +112,7 @@ local commands = {
 
 	end,
 
-	['^/remove[@'..bot.username..']*$'] = function(msg)
+	['^/modrem[@'..bot.username..']*$'] = function(msg)
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -130,7 +130,7 @@ local commands = {
 
 	end,
 
-	['^/promote[@'..bot.username..']*$'] = function(msg)
+	['^/modprom[@'..bot.username..']*$'] = function(msg)
 
 		local moddat = load_data('moderation.json')
 
@@ -164,7 +164,7 @@ local commands = {
 
 	end,
 
-	['^/demote[@'..bot.username..']*'] = function(msg)
+	['^/moddem[@'..bot.username..']*'] = function(msg)
 
 		local moddat = load_data('moderation.json')
 
@@ -279,7 +279,7 @@ local commands = {
 local action = function(msg)
 
 	for k,v in pairs(commands) do
-		if string.match(msg.text, k) then
+		if string.match(msg.text_lower, k) then
 			local output = v(msg)
 			if output then
 				sendReply(msg, output)

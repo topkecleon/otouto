@@ -65,7 +65,7 @@ telegram.me/otouto
 	plugins = {
 		'blacklist.lua',
 		'floodcontrol.lua',
-		'admin.lua',
+		'control.lua',
 		'about.lua',
 		'ping.lua',
 		'whoami.lua',

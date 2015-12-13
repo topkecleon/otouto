@@ -1,28 +1,14 @@
 -- utilities.lua
 -- Functions shared among plugins.
 
-function get_word(str, idx) -- get the indexed word in a string
+function get_word(s, i) -- get the indexed word in a string
 
-	local str = str:gsub('^%s*(.-)%s*$', '%1')
-
-	str = string.gsub(str, '\n', ' ')
-	if not string.find(str, ' ') then
-		if idx == 1 then
-			return str
-		else
-			return false
-		end
+	local t = {}
+	for w in s:gmatch('%g+') do
+		table.insert(t, w)
 	end
 
-	str = str .. ' '
-	if idx ~= 1 then
-		for i = 2, idx do
-			str = string.sub(str, string.find(str, ' ') + 1)
-		end
-	end
-	str = str:sub(1, str:find(' '))
-
-	return str:sub(1, -2)
+	return t[i] or false
 
 end
 

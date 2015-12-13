@@ -40,13 +40,15 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 	if not msg.text then msg.text = msg.caption or '' end
 
-	msg.chat.id_str = tostring(msg.chat.id)
-	msg.from.id_str = tostring(msg.from.id)
-	msg.text_lower = msg.text:lower()
-
 	for i,v in ipairs(plugins) do
 		for k,w in pairs(v.triggers) do
-			if string.match(msg.text_lower, w) then
+			if string.match(msg.text:lower(), w) then
+
+				-- a few shortcuts
+				msg.chat.id_str = tostring(msg.chat.id)
+				msg.from.id_str = tostring(msg.from.id)
+				msg.text_lower = msg.text:lower()
+
 				local success, result = pcall(function()
 					return v.action(msg)
 				end)
