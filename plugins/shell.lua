@@ -15,8 +15,12 @@ local action = function(msg)
 	end
 
 	local output = io.popen(input):read('*all')
-	if output:len() == 0 then output = 'Done!' end
-	sendReply(msg, output)
+	if output:len() == 0 then
+		output = 'Done!'
+	else
+		output = '```\n' .. output .. '\n```'
+	end
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

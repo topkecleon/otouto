@@ -15,6 +15,11 @@ local action = function(msg)
 		sendReply(msg, doc)
 		return
 	end
+	input = input:trim()
+
+	if input:len() > 20 then
+		input = input:sub(1,20)
+	end
 
 	input = input:upper()
 	local output = ''

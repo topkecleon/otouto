@@ -9,6 +9,7 @@ return {
 	time_offset = 0,
 	lang = 'en',
 	admin = 00000000,
+	admin_name = 'John Smith',
 	about_text = [[
 I am otouto, the plugin-wielding, multi-purpose Telegram bot written by topkecleon.
 
@@ -93,6 +94,7 @@ telegram.me/otouto
 		'bandersnatch.lua',
 		'currency.lua',
 		'cats.lua',
+		'shout.lua',
 		-- Put new plugins here.
 		'help.lua',
 		'greetings.lua'
