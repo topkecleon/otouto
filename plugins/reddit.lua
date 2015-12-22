@@ -42,6 +42,7 @@ local action = function(msg)
 		return
 	end
 
+  	local i = 0 + 1
 	local message = ''
 	for i,v in ipairs(jdat.data.children) do
 		if v.data.over_18 then
@@ -51,11 +52,11 @@ local action = function(msg)
 		if not v.data.is_self then
 			long_url = '\n' .. v.data.url .. '\n'
 		end
-		local short_url = '[redd.it/' .. v.data.id .. '] '
-		message = message .. short_url .. v.data.title .. long_url
+		local short_url = '(redd.it/' .. v.data.id .. ') '
+		message = message .. i ..  ' - [' .. v.data.title .. ']' .. short_url .. long_url
 	end
-
-	sendReply(msg, message)
+  	
+  	sendMessage(msg.chat.id, message, true, msg.message_id, true)
 
 end
 
