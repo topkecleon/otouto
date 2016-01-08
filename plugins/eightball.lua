@@ -47,7 +47,7 @@ local action = function(msg)
 
 	local message
 
-	if msg.text_lower:match('y/n%p?$') then
+	if msg.text:lower():match('y/n%p?$') then
 		message = yesno_answers[math.random(#yesno_answers)]
 	else
 		message = ball_answers[math.random(#ball_answers)]

@@ -4,8 +4,10 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/g[oogle]*[nsfw]*[@'..bot.username..']*$',
-	'^/g[oogle]*[nsfw]*[@'..bot.username..']* '
+	'^/g[@'..bot.username..']*$',
+	'^/g[@'..bot.username..']* ',
+	'^/google[@'..bot.username..']*',
+	'^/gnsfw[@'..bot.username..']*'
 }
 
 local action = function(msg)

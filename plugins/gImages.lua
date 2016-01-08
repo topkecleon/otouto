@@ -17,8 +17,10 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/i[mage]*[nsfw]*[@'..bot.username..']*$',
-	'^/i[mage]*[nsfw]*[@'..bot.username..']* '
+	'^/image[@'..bot.username..']*',
+	'^/i[@'..bot.username..']* ',
+	'^/i[@'..bot.username..']*$',
+	'^/insfw[@'..bot.username..']*'
 }
 
 local action = function(msg)

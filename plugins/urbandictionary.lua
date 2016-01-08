@@ -4,7 +4,9 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/u[rban]*d[ictionary]*[@'..bot.username..']*',
+	'^/urbandictionary[@'..bot.username..']*',
+	'^/ud[@'..bot.username..']*$',
+	'^/ud[@'..bot.username..']* ',
 	'^/urban[@'..bot.username..']*'
 }
 

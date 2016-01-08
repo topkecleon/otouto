@@ -10,8 +10,9 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/b[ible]*[@'..bot.username..']*$',
-	'^/b[ible]*[@'..bot.username..']* '
+	'^/bible*[@'..bot.username..']*',
+	'^/b[@'..bot.username..']* ',
+	'^/b[@'..bot.username..']*$'
 }
 
 local action = function(msg)

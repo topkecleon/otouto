@@ -3,23 +3,12 @@
  -- Put this near the top, after blacklist.
  -- If you want to enable antisquig, put that at the top, before blacklist.
 
- local triggers = {
-	'^/modhelp[@'..bot.username..']*$',
-	'^/modlist[@'..bot.username..']*$',
-	'^/modcast[@'..bot.username..']*',
-	'^/modadd[@'..bot.username..']*$',
-	'^/modrem[@'..bot.username..']*$',
-	'^/modprom[@'..bot.username..']*$',
-	'^/moddem[@'..bot.username..']*',
-	'^/modkick[@'..bot.username..']*',
-	'^/modban[@'..bot.username..']*',
- }
+moddat = load_data('moderation.json')
+antisquig = {}
 
 local commands = {
 
 	['^/modhelp[@'..bot.username..']*$'] = function(msg)
-
-		local moddat = load_data('moderation.json')
 
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
@@ -31,10 +20,10 @@ local commands = {
 			/modkick - Kick a user from this group.
 			/modban - Ban a user from this group.
 			Administrator commands:
-			/add - Add this group to the moderation system.
-			/remove - Remove this group from the moderation system.
-			/promote - Promote a user to a moderator.
-			/demote - Demote a moderator to a user.
+			/modadd - Add this group to the moderation system.
+			/modrem - Remove this group from the moderation system.
+			/modprom - Promote a user to a moderator.
+			/moddem - Demote a moderator to a user.
 			/modcast - Send a broadcast to every moderated group.
 		]]
 
@@ -43,8 +32,6 @@ local commands = {
 	end,
 
 	['^/modlist[@'..bot.username..']*$'] = function(msg)
-
-		local moddat = load_data('moderation.json')
 
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
@@ -84,8 +71,6 @@ local commands = {
 			return config.errors.not_admin
 		end
 
-		local moddat = load_data('moderation.json')
-
 		for k,v in pairs(moddat) do
 			sendMessage(k, message)
 		end
@@ -99,8 +84,6 @@ local commands = {
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
 		end
-
-		local moddat = load_data('moderation.json')
 
 		if moddat[msg.chat.id_str] then
 			return 'I am already moderating this group.'
@@ -118,8 +101,6 @@ local commands = {
 			return config.errors.not_admin
 		end
 
-		local moddat = load_data('moderation.json')
-
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
 		end
@@ -131,8 +112,6 @@ local commands = {
 	end,
 
 	['^/modprom[@'..bot.username..']*$'] = function(msg)
-
-		local moddat = load_data('moderation.json')
 
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
@@ -165,8 +144,6 @@ local commands = {
 	end,
 
 	['^/moddem[@'..bot.username..']*'] = function(msg)
-
-		local moddat = load_data('moderation.json')
 
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
@@ -204,8 +181,6 @@ local commands = {
 
 	['/modkick[@'..bot.username..']*'] = function(msg)
 
-		local moddat = load_data('moderation.json')
-
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
 		end
@@ -239,8 +214,6 @@ local commands = {
 	end,
 
 	['^/modban[@'..bot.username..']*'] = function(msg)
-
-		local moddat = load_data('moderation.json')
 
 		if not moddat[msg.chat.id_str] then
 			return config.errors.moderation
@@ -276,21 +249,61 @@ local commands = {
 
 }
 
+if config.antisquig then
+	commands['[\216-\219][\128-\191]'] = function(msg)
+
+		if not moddat[msg.chat.id_str] then return true end
+		if config.moderation.admins[msg.from.id_str] then return true end
+		if moddat[msg.chat.id_str][msg.from.id_str] then return true end
+
+		if antisquig[msg.from.id] == true then
+			return
+		end
+		antisquig[msg.from.id] = true
+
+		sendReply(msg, config.errors.antisquig)
+		sendMessage(config.moderation.admin_group, '/kick ' .. msg.from.id .. ' from ' .. math.abs(msg.chat.id))
+		sendMessage(config.moderation.admin_group, 'ANTISQUIG: ' .. msg.from.first_name .. ' kicked from ' .. msg.chat.title .. '.')
+
+
+	end
+end
+
+local triggers = {}
+for k,v in pairs(commands) do
+	table.insert(triggers, k)
+end
+
 local action = function(msg)
 
 	for k,v in pairs(commands) do
 		if string.match(msg.text_lower, k) then
 			local output = v(msg)
-			if output then
+			if output == true then
+				return true
+			elseif output then
 				sendReply(msg, output)
 			end
 			return
 		end
 	end
 
+	return true
+
+end
+
+ -- When a user is kicked for squigglies, his ID is added to this table.
+ -- That user will not be kicked again as long as his ID is in the table.
+ -- The table is emptied every five seconds.
+ -- Thus the bot will not spam the group or admin group when a user posts more than one infringing messages.
+local cron = function()
+
+	antisquig = {}
+
 end
 
 return {
 	action = action,
-	triggers = triggers
+	triggers = triggers,
+	cron = cron
 }

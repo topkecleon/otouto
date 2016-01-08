@@ -4,7 +4,8 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/[poke]*dex[@'..bot.username..']*'
+	'^/pokedex[@'..bot.username..']*',
+	'^/dex[@'..bot.username..']*'
 }
 
 local action = function(msg)

@@ -4,8 +4,9 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/r[eddit]*[@'..bot.username..']*$',
-	'^/r[eddit]*[@'..bot.username..']* ',
+	'^/reddit[@'..bot.username..']*',
+	'^/r[@'..bot.username..']*$',
+	'^/r[@'..bot.username..']* ',
 	'^/r/'
 }
 

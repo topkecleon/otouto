@@ -25,7 +25,9 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/h[earth]*s[tone]*[@'..bot.username..']*'
+	'^/hearthstone[@'..bot.username..']*',
+	'^/hs[@'..bot.username..']*$',
+	'^/hs[@'..bot.username..']* '
 }
 
 local format_card = function(card)

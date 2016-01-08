@@ -6,7 +6,9 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/y[ou]*t[ube]*[@'..bot.username..']*'
+	'^/youtube[@'..bot.username..']*',
+	'^/yt[@'..bot.username..']*$',
+	'^/yt[@'..bot.username..']* '
 }
 
 local action = function(msg)

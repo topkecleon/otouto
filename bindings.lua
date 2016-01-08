@@ -95,15 +95,9 @@ forwardMessage = function(chat_id, from_chat_id, message_id)
 end
 
 curlRequest = function(curl_command)
+ -- Use at your own risk. Will not check for success.
 
-	local dat = io.popen(curl_command):read('*all')
-	local tab = JSON.decode(dat)
-
-	if not tab.ok then
-		return false, tab.description
-	end
-
-	return tab
+	io.popen(curl_command)
 
 end
 

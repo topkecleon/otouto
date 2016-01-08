@@ -8,6 +8,7 @@ return {
 	thecatapi_key = '',
 	time_offset = 0,
 	lang = 'en',
+	cli_port = 4567,
 	admin = 00000000,
 	admin_name = 'John Smith',
 	about_text = [[
@@ -94,6 +95,7 @@ telegram.me/otouto
 		'bandersnatch.lua',
 		'currency.lua',
 		'cats.lua',
+		'hearthstone.lua',
 		'shout.lua',
 		-- Put new plugins here.
 		'help.lua',

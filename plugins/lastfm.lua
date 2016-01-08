@@ -43,12 +43,16 @@ local action = function(msg)
 	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
 	local username
+	local output = ''
 	if input then
 		username = input
 	elseif lastfm[msg.from.id_str] then
 		username = lastfm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
+		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
+		lastfm[msg.from.id_str] = username
+		save_data('lastfm.json', lastfm)
 	else
 		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
@@ -64,13 +68,13 @@ local action = function(msg)
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, jdat.error)
+		sendReply(msg, config.errors.results)
 		return
 	end
 
 	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.')
+		sendReply(msg, 'No history for this user.' .. output)
 		return
 	end
 
@@ -89,7 +93,7 @@ local action = function(msg)
 		artist = jdat.artist['#text']
 	end
 
-	message = message .. title .. ' - ' .. artist
+	message = message .. title .. ' - ' .. artist .. output
 	sendMessage(msg.chat.id, message)
 
 end

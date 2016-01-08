@@ -4,8 +4,10 @@ local doc = [[
 ]]
 
 local triggers = {
-	'^/w[iki[pedia]*]*[@'..bot.username..']*$',
-	'^/w[iki[pedia]*]*[@'..bot.username..']* '
+	'^/wikipedia[@'..bot.username..']*',
+	'^/wiki[@'..bot.username..']*',
+	'^/w[@'..bot.username..']*$',
+	'^/w[@'..bot.username..']* '
 }
 
 local action = function(msg)

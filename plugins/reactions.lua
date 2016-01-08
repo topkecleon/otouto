@@ -9,13 +9,13 @@ local triggers = {
 	['(╯°□°）╯︵ ┻━┻'] = '/flip$',
 	['┌（┌　＾o＾）┐'] = '/homo$',
 	['ಠ_ಠ'] = '/look$',
-	['SHOTS FIRED'] = '/shot$'
+	['SHOTS FIRED'] = '/shots?$'
 }
 
  -- Generate a "help" message triggered by "/reactions".
 local help = ''
 for k,v in pairs(triggers) do
-	help = help .. v:gsub('%$', ': ') .. k .. '\n'
+	help = help .. v:gsub('%$', ': '):gsub('?', '') .. k .. '\n'
 end
 triggers[help] = '^/reactions$'
 

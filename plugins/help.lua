@@ -13,7 +13,8 @@ end
 local help_text = help_text .. 'Arguments: <required> [optional]'
 
 local triggers = {
-	'^/h[elp]*[@'..bot.username..']*$',
+	'^/help[@'..bot.username..']*',
+	'^/h[@'..bot.username..']*$',
 	'^/start[@'..bot.username..']*'
 }
 

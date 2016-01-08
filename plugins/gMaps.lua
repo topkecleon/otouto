@@ -4,8 +4,9 @@ local doc = [[
 ]]
 
 triggers = {
-	'^/loc[ation]*[@'..bot.username..']*$',
-	'^/loc[ation]*[@'..bot.username..']* '
+	'^/location[@'..bot.username..']*',
+	'^/loc[@'..bot.username..']* ',
+	'^/loc[@'..bot.username..']*$'
 }
 
 local action = function(msg)

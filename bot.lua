@@ -3,13 +3,13 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-version = '3.0.1'
+version = '3.1'
 
 bot_init = function() -- The function run when the bot is started or reloaded.
 
-	config = dofile("config.lua") -- Load configuration file.
-	dofile("bindings.lua") -- Load Telegram bindings.
-	dofile("utilities.lua") -- Load miscellaneous and cross-plugin functions.
+	config = dofile('config.lua') -- Load configuration file.
+	dofile('bindings.lua') -- Load Telegram bindings.
+	dofile('utilities.lua') -- Load miscellaneous and cross-plugin functions.
 
 	bot = nil
 	while not bot do -- Get bot info and retry if unable to connect.
@@ -19,7 +19,7 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 
 	plugins = {} -- Load plugins.
 	for i,v in ipairs(config.plugins) do
-		local p = dofile("plugins/"..v)
+		local p = dofile('plugins/'..v)
 		table.insert(plugins, p)
 	end
 
@@ -39,6 +39,10 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 	if not msg.text then msg.text = msg.caption or '' end
+
+	if msg.text:match('^/start .+') then
+		msg.text = '/' .. msg.text:input()
+	end
 
 	for i,v in ipairs(plugins) do
 		for k,w in pairs(v.triggers) do
