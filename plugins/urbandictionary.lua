@@ -1,7 +1,9 @@
-local doc = [[
-	/urbandictionary <query>
-	Returns a definition from Urban Dictionary.
-]]
+local command = 'urbandictionary <query>'
+local doc = [[```
+/urbandictionary <query>
+Returns a definition from Urban Dictionary.
+Aliases: /ud, /urban
+```]]
 
 local triggers = {
 	'^/urbandictionary[@'..bot.username..']*',
@@ -17,7 +19,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -36,17 +38,20 @@ local action = function(msg)
 		return
 	end
 
-	local message = '"' .. jdat.list[1].word .. '"\n' .. jdat.list[1].definition:trim()
+	local output = '*' .. jdat.list[1].word .. '*\n\n' .. jdat.list[1].definition:trim()
 	if string.len(jdat.list[1].example) > 0 then
-		message = message .. '\n\nExample:\n' .. jdat.list[1].example:trim()
+		output = output .. '_\n\n' .. jdat.list[1].example:trim() .. '_'
 	end
 
-	sendReply(msg, message)
+	output = output:gsub('%[', ''):gsub('%]', '')
+
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

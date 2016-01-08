@@ -1,7 +1,8 @@
-local doc = [[
-	/nick <nickname>
-	Set your nickname. Use "/whoami" to check your nickname and "/nick -" to delete it.
-]]
+local command = 'nick <nickname>'
+local doc = [[```
+/nick <nickname>
+Set your nickname. Use "/whoami" to check your nickname and "/nick -" to delete it.
+```]]
 
 local triggers = {
 	'^/nick[@'..bot.username..']*'
@@ -11,7 +12,7 @@ local action = function(msg)
 
 	local input = msg.text:input()
 	if not input then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return true
 	end
 
@@ -38,5 +39,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

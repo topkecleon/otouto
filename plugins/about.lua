@@ -1,7 +1,5 @@
-local doc = [[
-	/about
-	Get info about the bot.
-]]
+local command = 'about'
+local doc = '`Returns information about the bot.`'
 
 local triggers = {
 	''
@@ -26,5 +24,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

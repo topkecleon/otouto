@@ -1,7 +1,8 @@
-local doc = [[
-	/shout <term>
-	Shout something!
-]]
+local command = 'shout <text>'
+local doc = [[```
+/shout <text>
+Shouts something.
+```]]
 
 local triggers = {
 	'^/shout[@'..bot.username..']*'
@@ -12,7 +13,7 @@ local action = function(msg)
 	local input = msg.text:input()
 
 	if not input then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 	input = input:trim()
@@ -44,5 +45,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

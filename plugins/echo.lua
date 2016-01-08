@@ -1,7 +1,8 @@
-local doc = [[
-	/echo <text>
-	Repeat a string of text!
-]]
+local command = 'echo <text>'
+local doc = [[```
+/echo <text>
+Repeats a string of text.
+```]]
 
 local triggers = {
 	'^/echo[@'..bot.username..']*'
@@ -14,7 +15,7 @@ local action = function(msg)
 	if input then
 		sendMessage(msg.chat.id, latcyr(input))
 	else
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 	end
 
 end
@@ -22,5 +23,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

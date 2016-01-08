@@ -1,3 +1,9 @@
+local command = 'whoami'
+local doc = [[```
+Returns user and chat info for you or the replied-to message.
+Alias: /who
+```]]
+
 local triggers = {
 	'^/who[ami]*[@'..bot.username..']*$'
 }
@@ -37,5 +43,7 @@ end
 
 return {
 	action = action,
-	triggers = triggers
+	triggers = triggers,
+	doc = doc,
+	command = command
 }

@@ -1,7 +1,9 @@
-local doc = [[
-	/google <query>
-	Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
-]]
+local command = 'google <query>'
+local doc = [[```
+/google <query>
+Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
+Alias: /g
+```]]
 
 local triggers = {
 	'^/g[@'..bot.username..']*$',
@@ -17,7 +19,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -43,22 +45,36 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
-	if #jdat.responseData.results < 1 then
+	if not jdat.responseData then
+		sendReply(msg, config.errors.connection)
+		return
+	end
+	if not jdat.responseData.results[1] then
 		sendReply(msg, config.errors.results)
 		return
 	end
 
-	local message = ''
+	local output = '*Google: Results for* _' .. input .. '_ *:*\n'
 	for i,v in ipairs(jdat.responseData.results) do
-		message = message .. jdat.responseData.results[i].titleNoFormatting .. '\n ' .. jdat.responseData.results[i].unescapedUrl .. '\n'
+		local title = jdat.responseData.results[i].titleNoFormatting:gsub('%[.+%]', ''):gsub('&amp;', '&')
+		if title:len() > 48 then
+			title = title:sub(1, 45) .. '...'
+		end
+		local url = jdat.responseData.results[i].unescapedUrl
+		if url:find('%)') then
+			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
+		else
+			output = output .. '• [' .. title .. '](' .. url .. ')\n'
+		end
 	end
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

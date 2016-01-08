@@ -1,7 +1,5 @@
-local doc = [[
-	/8ball
-	Returns an answer from a magic 8-ball!
-]]
+local command = '8ball'
+local doc = '`Returns an answer from a magic 8-ball!`'
 
 local triggers = {
 	'^/8ball',
@@ -60,5 +58,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

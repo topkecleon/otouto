@@ -1,7 +1,8 @@
-local doc = [[
-	/slap [target]
-	Give someone a good slap (or worse) through reply or specification of a target.
-]]
+local command = 'slap [target]'
+local doc = [[```
+/slap [target]
+Slap somebody.
+```]]
 
 local triggers = {
 	'^/slap[@'..bot.username..']*'
@@ -125,5 +126,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

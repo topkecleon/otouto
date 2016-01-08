@@ -1,8 +1,9 @@
-local doc = [[
-	/cash [amount] <from> to <to>
-	Example: /cash 5 USD to EUR
-	Returns exchange rates for various currencies.
-]]
+local command = 'cash [amount] <from> to <to>'
+local doc = [[```
+/cash [amount] <from> to <to>
+Example: /cash 5 USD to EUR
+Returns exchange rates for various currencies.
+```]]
 
 local triggers = {
 	'^/cash[@'..bot.username..']*'
@@ -12,7 +13,7 @@ local action = function(msg)
 
 	local input = msg.text:upper()
 	if not input:match('%a%a%a TO %a%a%a') then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 
@@ -42,13 +43,17 @@ local action = function(msg)
 
 	end
 
-	local message = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to
-	sendReply(msg, message)
+	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n'
+	output = output .. os.date('!%F %T UTC')
+	output = '`' .. output .. '`'
+
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

@@ -19,10 +19,12 @@ if not hs_dat then
 
 end
 
-local doc = [[
-	/hearthstone <query>
-	Returns Hearthstone card info.
-]]
+local command = 'hearthstone <query>'
+local doc = [[```
+/hearthstone <query>
+Returns Hearthstone card info.
+Alias: /hn
+```]]
 
 local triggers = {
 	'^/hearthstone[@'..bot.username..']*',
@@ -65,7 +67,7 @@ local format_card = function(card)
 	if card.text then
 		info = card.text:gsub('</?.->',''):gsub('%$','')
 		if card.flavor then
-			info = info .. '\n' .. card.flavor
+			info = info .. '\n_' .. card.flavor .. '_'
 		end
 	elseif card.flavor then
 		info = card.flavor
@@ -73,7 +75,7 @@ local format_card = function(card)
 		info = nil
 	end
 
-	local s = card.name .. '\n' .. ctype
+	local s = '*' .. card.name .. '*\n' .. ctype
 	if stats then
 		s = s .. '\n' .. stats
 	end
@@ -89,7 +91,7 @@ local action = function(msg)
 
 	local input = msg.text_lower:input()
 	if not input then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 
@@ -106,12 +108,13 @@ local action = function(msg)
 		return
 	end
 
-	sendReply(msg, output)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

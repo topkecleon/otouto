@@ -1,7 +1,5 @@
-local doc = [[
-	/pun
-	Returns a pun.
-]]
+local command = 'pun'
+local doc = '`Returns a pun.`'
 
 local triggers = {
 	'^/pun[@'..bot.username..']*'
@@ -140,5 +138,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

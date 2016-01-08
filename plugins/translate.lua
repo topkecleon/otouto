@@ -1,7 +1,8 @@
-local doc = [[
-	/translate [text]
-	Translates input or the replied-to message into the bot's language.
-]]
+local command = 'translate [text]'
+local doc = [[```
+/translate [text]
+Translates input or the replied-to message into the bot's language.
+```]]
 
 local triggers = {
 	'^/translate[@'..bot.username..']*'
@@ -14,7 +15,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -36,5 +37,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

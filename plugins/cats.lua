@@ -3,10 +3,8 @@ if not config.thecatapi_key then
 	print('cats.lua will be enabled, but there are more features with a key.')
 end
 
-local doc = [[
-	/cat
-	Returns a cat!
-]]
+local command = 'cat'
+local doc = '`Returns a cat!`'
 
 local triggers = {
 	'^/cat[@'..bot.username..']*$'
@@ -34,5 +32,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

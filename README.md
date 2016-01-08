@@ -119,13 +119,14 @@ For support for otouto and bots in general, join my Bot Development group. Follo
 ##Development
 Everybody is free to contribute to otouto. Here I will explain various things that are important to know about the plugin system.
 
-A plugin can have four components, and two of them are optional: action, triggers, doc, cron.
+A plugin can have five components, and three of them are optional: action, triggers, doc, command, and cron.
 
 | Component | Description | Optional? |
 |-----------|-------------|-----------|
 | action | The main function of a plugin. It accepts the `msg` table. | No. |
 | triggers | A table of strings which, when one is matched in a message's text, will cause `action` to be run. | No. |
-| doc | The help text to be returned when a plugin is run with improper syntax or arguments. The first line is also what goes in the help text. | Yes |
+| doc | The help text to be returned when a plugin is run with improper syntax or arguments. | Yes |
+| command | The command with its syntax, without the slash. This is used to generate the help text. | Yes |
 | cron | A function to be run every five seconds. | Yes |
 
 The on_msg_receive function adds a few variables to the "msg" table: msg.from.id_str, msg.to.id_str, msg.text_lower. These are self-explanatory and can make your code a lot neater.

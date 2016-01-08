@@ -4,13 +4,14 @@ if not config.lastfm_api_key then
 	return
 end
 
-local doc = [[
-	/lastfm
-	/np [username]
-	Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
-	/fmset <username>
-	Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
-]]
+local command = 'lastfm'
+local doc = [[```
+/np [username]
+Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
+
+/fmset <username>
+Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
+```]]
 
 local triggers = {
 	'^/lastfm[@'..bot.username..']*',
@@ -28,7 +29,7 @@ local action = function(msg)
 		return
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		elseif input == '-' then
 			lastfm[msg.from.id_str] = nil
 			sendReply(msg, 'Your last.fm username has been forgotten.')
@@ -101,5 +102,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

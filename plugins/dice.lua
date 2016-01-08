@@ -1,7 +1,8 @@
-local doc = [[
-	/roll <nDr>
-	Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
-]]
+local command = 'roll <nDr>'
+local doc = [[```
+/roll <nDr>
+Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
+```]]
 
 local triggers = {
 	'^/roll[@'..bot.username..']*'
@@ -11,7 +12,7 @@ local action = function(msg)
 
 	local input = msg.text_lower:input()
 	if not input then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 
@@ -22,7 +23,7 @@ local action = function(msg)
 		count = 1
 		range = input:match('^d?([%d]+)$')
 	else
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 
@@ -38,17 +39,19 @@ local action = function(msg)
 		return
 	end
 
-	local message = ''
+	local output = '*' .. count .. 'd' .. range .. '*\n`'
 	for i = 1, count do
-		message = message .. math.random(range) .. '\t'
+		output = output .. math.random(range) .. '\t'
 	end
+	output = output .. '`'
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

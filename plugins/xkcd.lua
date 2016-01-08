@@ -1,7 +1,8 @@
-local doc = [[
-	/xkcd [query]
-	Returns an xkcd strip and its alt text. If there is no query, it will be randomized.
-]]
+local command = 'xkcd [query]'
+local doc = [[```
+/xkcd [query]
+Returns an xkcd strip and its alt text. If there is no query, it will be randomized.
+```]]
 
 local triggers = {
 	'^/xkcd[@'..bot.username..']*'
@@ -44,13 +45,15 @@ local action = function(msg)
 	end
 	local jdat = JSON.decode(jstr)
 
-	local message = '[' .. jdat.num .. '] ' .. jdat.alt .. '\n' .. jdat.img
-	sendMessage(msg.chat.id, message, false, msg.message_id)
+	local output = '[' .. jdat.num .. '](' .. jdat.img .. ')\n' .. jdat.alt
+
+	sendMessage(msg.chat.id, output, false, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

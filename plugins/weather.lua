@@ -4,10 +4,11 @@ if not config.owm_api_key then
 	return
 end
 
-local doc = [[
-	/weather <location>
-	Returns the current weather conditions for a given location.
-]]
+local command = 'weather <location>'
+local doc = [[```
+/weather <location>
+Returns the current weather conditions for a given location.
+```]]
 
 local triggers = {
 	'^/weather[@'..bot.username..']*'
@@ -20,7 +21,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -52,5 +53,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

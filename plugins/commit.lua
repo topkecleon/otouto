@@ -1,9 +1,7 @@
  -- Commits from https://github.com/ngerakines/commitment.
 
-local doc = [[
-	/commit
-	Returns a commit message from whatthecommit.com.
-]]
+local command = 'commit'
+local doc = '`Returns a commit message from whatthecommit.com.`'
 
 local triggers = {
 	'^/commit[@'..bot.username..']*'
@@ -414,12 +412,13 @@ local commits = {
 
 local action = function(msg)
 
-	sendMessage(msg.chat.id, commits[math.random(#commits)])
+	sendMessage(msg.chat.id, '`'..commits[math.random(#commits)]..'`', true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

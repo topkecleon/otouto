@@ -1,7 +1,8 @@
-local doc = [[
-	/hackernews
-	Returns four (if group) or eight (if private message) top stories from Hacker News.
-]]
+local command = 'hackernews'
+local doc = [[```
+Returns four (if group) or eight (if private message) top stories from Hacker News.
+Alias: /hn
+```]]
 
 local triggers = {
 	'^/hackernews[@'..bot.username..']*',
@@ -25,7 +26,7 @@ local action = function(msg)
 		res_count = 8
 	end
 
-	local message = ''
+	local output = '*Hacker News:*\n'
 	for i = 1, res_count do
 		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
 		jstr, res = HTTPS.request(res_url)
@@ -34,15 +35,26 @@ local action = function(msg)
 			return
 		end
 		local res_jdat = JSON.decode(jstr)
-		message = message .. res_jdat.title .. '\n ' .. res_jdat.url .. '\n'
+		local title = res_jdat.title:gsub('%[.+%]', ''):gsub('%(.+%)', ''):gsub('&amp;', '&')
+		if title:len() > 48 then
+			title = title:sub(1, 45) .. '...'
+		end
+		local url = res_jdat.url
+		if url:find('%(') then
+			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
+		else
+			output = output .. '• [' .. title .. '](' .. url .. ')\n'
+		end
+
 	end
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

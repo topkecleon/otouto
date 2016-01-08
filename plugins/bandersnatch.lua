@@ -1,7 +1,8 @@
-local doc = [[
-	/bandersnatch
-	Shun the frumious Bandersnatch.
-]]
+local command = 'bandersnatch'
+local doc = [[```
+Shun the frumious Bandersnatch.
+Alias: /bc
+```]]
 
 local triggers = {
 	'^/bandersnatch[@'..bot.username..']*',
@@ -31,5 +32,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	command = command,
+	desc = desc
 }

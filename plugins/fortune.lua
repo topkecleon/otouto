@@ -7,10 +7,8 @@ if s:match('fortune: command not found') then
 	return
 end
 
-local doc = [[
-	/fortune
-	Returns a UNIX fortune.
-]]
+local command = 'fortune'
+local doc = '`Returns a UNIX fortune.`'
 
 local triggers = {
 	'^/fortune[@'..bot.username..']*'
@@ -26,5 +24,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

@@ -4,10 +4,12 @@ if not config.biblia_api_key then
 	return
 end
 
-local doc = [[
-	/bible <reference>
-	Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
-]]
+local command = 'bible <reference>'
+local doc = [[```
+/bible <reference>
+Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
+Alias: /b
+```]]
 
 local triggers = {
 	'^/bible*[@'..bot.username..']*',
@@ -19,7 +21,7 @@ local action = function(msg)
 
 	local input = msg.text:input()
 	if not input then
-		sendReply(msg, doc)
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	end
 
@@ -47,5 +49,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
+	command = command,
 	doc = doc
 }

@@ -11,10 +11,12 @@ elseif not config.google_cse_key then
 	return
 end
 
-local doc = [[
-	/image <query>
-	Returns a randomized top result from Google Images. Safe search is enabled by default; use "/insfw" to disable it. NSFW results will not display an image preview.
-]]
+local command = 'image <query>'
+local doc = [[```
+/image <query>
+Returns a randomized top result from Google Images. Safe search is enabled by default; use "/insfw" to disable it. NSFW results will not display an image preview.
+Alias: /i
+```]]
 
 local triggers = {
 	'^/image[@'..bot.username..']*',
@@ -30,7 +32,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -69,5 +71,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

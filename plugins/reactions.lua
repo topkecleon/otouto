@@ -1,7 +1,5 @@
-local doc = [[
-	/reactions
-	Returns a list of "reaction" emoticon commands.
-]]
+local command = 'reactions'
+local doc = '`Returns a list of "reaction" emoticon commands.`'
 
 local triggers = {
 	['¯\\_(ツ)_/¯'] = '/shrug$',
@@ -33,5 +31,6 @@ end
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

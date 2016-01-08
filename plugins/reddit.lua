@@ -1,7 +1,9 @@
-local doc = [[
-	/reddit [r/subreddit | query]
-	Returns the four (if group) or eight (if private message) top posts for the given subreddit or query, or from the frontpage.
-]]
+local command = 'reddit [r/subreddit | query]'
+local doc = [[```
+/reddit [r/subreddit | query]
+Returns the four (if group) or eight (if private message) top posts for the given subreddit or query, or from the frontpage.
+Aliases: /r, /r/[subreddit]
+```]]
 
 local triggers = {
 	'^/reddit[@'..bot.username..']*',
@@ -21,14 +23,18 @@ local action = function(msg)
 		limit = 8
 	end
 
+	local source
 	if input then
-		if input:match('^r/') then
+		if input:match('^r/.') then
 			url = 'http://www.reddit.com/' .. input .. '/.json?limit=' .. limit
+			source = '*/r/' .. input:match('^r/(.+)') .. '*\n'
 		else
 			url = 'http://www.reddit.com/search.json?q=' .. input .. '&limit=' .. limit
+			source = '*reddit: Results for* _' .. input .. '_ *:*\n'
 		end
 	else
 		url = 'http://www.reddit.com/.json?limit=' .. limit
+		source = '*/r/all*\n'
 	end
 
 	local jstr, res = HTTP.request(url)
@@ -43,25 +49,31 @@ local action = function(msg)
 		return
 	end
 
-	local message = ''
+	local output = ''
 	for i,v in ipairs(jdat.data.children) do
+		local title = v.data.title:gsub('%[.+%]', ''):gsub('&amp;', '&')
+		if title:len() > 48 then
+			title = title:sub(1,45) .. '...'
+		end
 		if v.data.over_18 then
-			message = message .. '[NSFW] '
+			v.data.is_self = true
 		end
-		local long_url = '\n'
+		local short_url = 'redd.it/' .. v.data.id
+		output = output .. '• [' .. title .. '](' .. short_url .. ')\n'
 		if not v.data.is_self then
-			long_url = '\n' .. v.data.url .. '\n'
+			output = output .. v.data.url:gsub('_', '\\_') .. '\n'
 		end
-		local short_url = '[redd.it/' .. v.data.id .. '] '
-		message = message .. short_url .. v.data.title .. long_url
 	end
 
-	sendReply(msg, message)
+	output = source .. output
+
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }

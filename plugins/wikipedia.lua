@@ -1,7 +1,9 @@
-local doc = [[
-	/wikipedia <query>
-	Returns an article from Wikipedia.
-]]
+local command = 'wikipedia <query>'
+local doc = [[```
+/wikipedia <query>
+Returns an article from Wikipedia.
+Aliases: /w, /wiki
+```]]
 
 local triggers = {
 	'^/wikipedia[@'..bot.username..']*',
@@ -17,7 +19,7 @@ local action = function(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendReply(msg, doc)
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -32,6 +34,10 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
+	if not jdat.responseData then
+		sendReply(msg, config.errors.connection)
+		return
+	end
 	if not jdat.responseData.results[1] then
 		sendReply(msg, config.errors.results)
 		return
@@ -61,14 +67,24 @@ local action = function(msg)
 	if l then
 		text = text:sub(1, l-1)
 	end
-	text = text .. '\n' .. url
 
-	sendReply(msg, text)
+	title = title:gsub('%(.+%)', '')
+	--local output = '[' .. title .. '](' .. url .. ')\n' .. text:gsub('%[.+]%','')
+	--local output = '*' .. title .. '*\n' .. text:gsub('%[.+]%','') .. '\n[Read more.](' .. url .. ')'
+	local output = text:gsub('%[.+%]',''):gsub(title, '*'..title..'*') .. '\n'
+	if url:find('%(') then
+		output = output .. url:gsub('_', '\\_')
+	else
+		output = output .. '[Read more.](' .. url .. ')'
+	end
+
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	doc = doc
+	doc = doc,
+	command = command
 }
