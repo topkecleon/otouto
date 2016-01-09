@@ -25,7 +25,7 @@ local action = function(msg)
 	local input = msg.text:input()
 
 	if string.match(msg.text, '^/lastfm') then
-		sendReply(msg, doc:sub(10))
+		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		return
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
