@@ -109,13 +109,6 @@ You may also start the bot with `lua bot.lua`, but then it will not restart auto
 
 * * *
 
-##Support
-Do not attempt to contact any developer privately for support. You will be blocked and likely reported.
-
-For support for otouto and bots in general, join my Bot Development group. Follow [this link](http://telegram.me/mokubot?start=glist) and follow the Bot Development link.
-
-* * *
-
 ##Development
 Everybody is free to contribute to otouto. Here I will explain various things that are important to know about the plugin system.
 
