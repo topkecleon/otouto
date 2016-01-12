@@ -9,7 +9,8 @@ for i,v in ipairs(plugins) do
 	end
 end
 
-help_text = help_text .. [[\n
+help_text = help_text .. [[
+
  /help <command>
 Arguments: <required> \[optional]
 ]]

@@ -8,6 +8,7 @@ return {
 	thecatapi_key = '',
 	time_offset = 0,
 	lang = 'en',
+	antisquig = false,
 	cli_port = 4567,
 	admin = 00000000,
 	admin_name = 'John Smith',

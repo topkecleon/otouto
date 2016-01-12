@@ -54,7 +54,7 @@ local action = function(msg)
 		return
 	end
 
-	local output = '*Google: Results for* _' .. input .. '_ *:*\n'
+	local output = '*Google results for* _' .. input .. '_ *:*\n'
 	for i,v in ipairs(jdat.responseData.results) do
 		local title = jdat.responseData.results[i].titleNoFormatting:gsub('%[.+%]', ''):gsub('&amp;', '&')
 		if title:len() > 48 then

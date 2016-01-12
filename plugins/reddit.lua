@@ -30,7 +30,7 @@ local action = function(msg)
 			source = '*/r/' .. input:match('^r/(.+)') .. '*\n'
 		else
 			url = 'http://www.reddit.com/search.json?q=' .. input .. '&limit=' .. limit
-			source = '*reddit: Results for* _' .. input .. '_ *:*\n'
+			source = '*reddit results for* _' .. input .. '_ *:*\n'
 		end
 	else
 		url = 'http://www.reddit.com/.json?limit=' .. limit

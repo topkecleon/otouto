@@ -15,10 +15,12 @@ local action = function(msg)
 	end
 
 	local output = loadstring(input)()
-	if not output then
+	if output == nil then
 		output = 'Done!'
+	elseif type(output) == 'table' then
+		output = 'Done! Table returned.'
 	else
-		output = '```\n' .. output .. '\n```'
+		output = '```\n' .. tostring(output) .. '\n```'
 	end
 	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 

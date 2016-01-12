@@ -10,10 +10,10 @@ local action = function(msg)
 	local message = config.about_text .. '\nBased on otouto v'..version..' by topkecleon.\notouto v3 is licensed under the GPLv2.\ntopkecleon.github.io/otouto'
 
 	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
-		sendMessage(msg.chat.id, message)
+		sendMessage(msg.chat.id, message, true)
 		return
 	elseif string.match(msg.text_lower, '^/about[@'..bot.username..']*') then
-		sendMessage(msg.chat.id, message)
+		sendMessage(msg.chat.id, message, true)
 		return
 	end
 

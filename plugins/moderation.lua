@@ -10,9 +10,7 @@ local commands = {
 
 	['^/modhelp[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		local message = [[
 			/modlist - List the moderators and administrators of this group.
@@ -33,9 +31,7 @@ local commands = {
 
 	['^/modlist[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		local message = ''
 
@@ -113,9 +109,7 @@ local commands = {
 
 	['^/modprom[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -145,9 +139,7 @@ local commands = {
 
 	['^/moddem[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -181,9 +173,7 @@ local commands = {
 
 	['/modkick[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		if not moddat[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then
@@ -215,9 +205,7 @@ local commands = {
 
 	['^/modban[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then
-			return config.errors.moderation
-		end
+		if not moddat[msg.chat.id_str] then return end
 
 		if not moddat[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then

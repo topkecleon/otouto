@@ -3,6 +3,7 @@ local doc = [[```
 /cash [amount] <from> to <to>
 Example: /cash 5 USD to EUR
 Returns exchange rates for various currencies.
+Source: Google Finance.
 ```]]
 
 local triggers = {
@@ -19,7 +20,8 @@ local action = function(msg)
 
 	local from = input:match('(%a%a%a) TO')
 	local to = input:match('TO (%a%a%a)')
-	local amount = input:match('([%d]+) %a%a%a TO %a%a%a') or 1
+	local amount = get_word(input, 2)
+	amount = tonumber(amount) or 1
 	local result = 1
 
 	local url = 'https://www.google.com/finance/converter'
@@ -39,12 +41,12 @@ local action = function(msg)
 			return
 		end
 
-		result = str:format('%.2f')
+		result = string.format('%.2f', str)
 
 	end
 
-	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n'
-	output = output .. os.date('!%F %T UTC')
+	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n\n'
+	output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance'
 	output = '`' .. output .. '`'
 
 	sendMessage(msg.chat.id, output, true, nil, true)
