@@ -140,3 +140,16 @@ resolve_username = function(target)
 	end
 
 end
+
+handle_exception = function(err, message)
+
+	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. bot.username .. ': ' .. err .. '\n' .. message .. '\n'
+
+	if config.log_chat then
+		output = '```' .. output .. '```'
+		sendMessage(config.log_chat, output, true, nil, true)
+	else
+		print(output)
+	end
+
+end

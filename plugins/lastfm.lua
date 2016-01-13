@@ -69,7 +69,7 @@ local action = function(msg)
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, config.errors.results)
+		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
 	end
 

@@ -1,5 +1,11 @@
  -- Thanks to @TiagoDanin for writing the original plugin.
 
+if not config.google_api_key then
+	print('Missing config value: google_api_key.')
+	print('youtube.lua will not be enabled.')
+	return
+end
+
 local command = 'youtube <query>'
 local doc = [[```
 /youtube <query>
@@ -25,7 +31,7 @@ local action = function(msg)
 		end
 	end
 
-	local url = 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyAfe7SI8kwQqaoouvAmevBfKumaLf-3HzI&type=video&part=snippet&maxResults=1&q=' .. URL.escape(input)
+	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=1&q=' .. URL.escape(input)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
@@ -35,9 +41,9 @@ local action = function(msg)
 
 	local jdat = JSON.decode(jstr)
 
-	local message = 'https://www.youtube.com/watch?v=' .. jdat.items[1].id.videoId
+	local output = '[​](https://www.youtube.com/watch?v=' .. jdat.items[1].id.videoId .. ')'
 
-	sendMessage(msg.chat.id, message, false, msg.message_id)
+	sendMessage(msg.chat.id, output, false, nil, true)
 
 end
 

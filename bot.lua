@@ -61,7 +61,7 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 				end)
 				if not success then
 					sendReply(msg, 'An unexpected error occurred.')
-					print(msg.text, result)
+					handle_exception(result, msg.text)
 					return
 				end
 				-- If the action returns a table, make that table msg.
@@ -95,7 +95,9 @@ while is_started do -- Start a loop while the bot should be running.
 		for i,v in ipairs(plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.
 				local res, err = pcall(function() v.cron() end)
-				if not res then print('ERROR: '..err) end
+				if not res then
+					handle_exception(err, 'CRON: ' .. i)
+				end
 			end
 		end
 		last_cron = os.time() -- And finally, update the variable.

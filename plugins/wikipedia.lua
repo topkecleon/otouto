@@ -42,7 +42,7 @@ local action = function(msg)
 		sendReply(msg, config.errors.results)
 		return
 	end
-
+--
 	local url = jdat.responseData.results[1].url
 	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
 
@@ -79,6 +79,13 @@ local action = function(msg)
 	end
 
 	sendMessage(msg.chat.id, output, true, nil, true)
+--
+--[[ Comment the previous block and uncomment this one for full-message,
+ -- "unlinked" link previews.
+	-- Invisible zero-width, non-joiner.
+	local output = '[​](' .. jdat.responseData.results[1].url .. ')'
+	sendMessage(msg.chat.id, output, false, nil, true)
+]]--
 
 end
 
