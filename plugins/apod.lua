@@ -46,7 +46,7 @@ local action = function(msg)
 
 	--local weburl = 'http://apod.nasa.gov/apod/ap' .. date_url .. '.html'
 	--output = date .. '[' .. jdat.title  .. '](' .. weburl .. ')\n'
-	output = date .. '[' .. jdat.title  .. '](' .. jdat.url .. ')\n'
+	output = date .. '[' .. jdat.title  .. '](' .. jdat.hdurl .. ')\n'
 
 	if jdat.copyright then
 		output = output .. 'Copyright: ' .. jdat.copyright

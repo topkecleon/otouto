@@ -94,7 +94,7 @@ Where the key is the preconfigured response (where #NAME will be replaced with t
 ##Setup
 You **must** have Lua (5.2+), LuaSocket, and LuaSec installed. For uploading photos and other files, you must have curl installed. The fortune.lua plugin requires that fortune is installed.
 
-For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for [OpenWeatherMap](http://openweathermap.org), [last.fm](http://last.fm), and [Biblia.com](http://biblia.com), respectively. cats.lua uses an API key (via [The Cat API](http://thecatapi.com)) to get more results, though it is not required. apod.lua uses an API key (via [NASA API](https://api.nasa.gov/)) to have more queries per minute, but it can be used with a demo API key (DEMO_KEY).
+For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for [OpenWeatherMap](http://openweathermap.org), [last.fm](http://last.fm), and [Biblia.com](http://biblia.com), respectively. cats.lua uses an API key (via [The Cat API](http://thecatapi.com)) to get more results, though it is not required. apod.lua uses an API key (via [NASA API](https://api.nasa.gov/)) to have more queries per minute, though it is not required.
 
 **Before you do anything, open config.lua in a text editor and make the following changes:**
 
@@ -146,5 +146,5 @@ otouto uses dkjson, a pure-Lua JSON parser. This is provided with the code and d
 ##Contributors
 The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:topkecleon@outlook.com).
 
-Other developers who have contributed to otouto are [Juan Potato](http://github.com/JuanPotato), [Tiago Danin](http://github.com/TiagoDanin), [Ender](http://github.com/luksireiku), [Iman Daneshi](http://github.com/Imandaneshi) and [HeitorPB](https://github.com/heitorPB).
+Other developers who have contributed to otouto are [Juan Potato](http://github.com/JuanPotato), [Tiago Danin](http://github.com/TiagoDanin), [Ender](http://github.com/luksireiku), [Iman Daneshi](http://github.com/Imandaneshi), and [HeitorPB](https://github.com/heitorPB).
 
