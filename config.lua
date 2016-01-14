@@ -6,7 +6,7 @@ return {
 	owm_api_key = '',
 	biblia_api_key = '',
 	thecatapi_key = '',
-	nasaapi_key = '',
+	nasa_api_key = '',
 	time_offset = 0,
 	lang = 'en',
 	antisquig = false,
