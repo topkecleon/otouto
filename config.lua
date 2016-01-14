@@ -6,6 +6,7 @@ return {
 	owm_api_key = '',
 	biblia_api_key = '',
 	thecatapi_key = '',
+	nasaapi_key = '',
 	time_offset = 0,
 	lang = 'en',
 	antisquig = false,
@@ -99,7 +100,8 @@ telegram.me/otouto
 		'cats.lua',
 		'hearthstone.lua',
 		'shout.lua',
-		-- Put new plugins here.
+		'apod.lua',
+		-- Put new plugins above this line.
 		'help.lua',
 		'greetings.lua'
 	}
