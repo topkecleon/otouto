@@ -15,7 +15,7 @@ return {
 	admin_name = 'John Smith',
 	log_chat = nil,
 	about_text = [[
-I am otouto, the plugin-wielding, multi-purpose Telegram bot written by topkecleon.
+I am otouto, the plugin-wielding, multi-purpose Telegram bot.
 
 Send /help to get started.
 

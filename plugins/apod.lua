@@ -26,7 +26,7 @@ local action = function(msg)
 		url = url .. '&date=' .. URL.escape(input)
 		date = date .. input
 	else
-		date = date .. os.date("%Y-%m-%d")
+		date = date .. os.date("%F")
 	end
 
 	date = date .. '*\n'
@@ -44,9 +44,8 @@ local action = function(msg)
 		return
 	end
 
-	--local weburl = 'http://apod.nasa.gov/apod/ap' .. date_url .. '.html'
-	--output = date .. '[' .. jdat.title  .. '](' .. weburl .. ')\n'
-	output = date .. '[' .. jdat.title  .. '](' .. jdat.hdurl .. ')\n'
+	local img_url = jdat.hdurl or jdat.url
+	output = date .. '[' .. jdat.title  .. '](' .. img_url .. ')\n'
 
 	if jdat.copyright then
 		output = output .. 'Copyright: ' .. jdat.copyright
