@@ -101,6 +101,7 @@ telegram.me/otouto
 		'hearthstone.lua',
 		'shout.lua',
 		'apod.lua',
+		'librefm.lua',
 		-- Put new plugins above this line.
 		'help.lua',
 		'greetings.lua'
