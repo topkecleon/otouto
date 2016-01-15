@@ -4,7 +4,7 @@ local doc = [[```
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
 /lfmset <username>
-Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
+Sets your libre.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
 ```]]
 
 local triggers = {
@@ -26,10 +26,10 @@ local action = function(msg)
 			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		elseif input == '-' then
 			lastfm[msg.from.id_str] = nil
-			sendReply(msg, 'Your last.fm username has been forgotten.')
+			sendReply(msg, 'Your libre.fm username has been forgotten.')
 		else
 			lastfm[msg.from.id_str] = input
-			sendReply(msg, 'Your last.fm username has been set to "' .. input .. '".')
+			sendReply(msg, 'Your libre.fm username has been set to "' .. input .. '".')
 		end
 		save_data('librefm.json', lastfm)
 		return
@@ -49,7 +49,7 @@ local action = function(msg)
 		lastfm[msg.from.id_str] = username
 		save_data('lastfm.json', lastfm)
 	else
-		sendReply(msg, 'Please specify your last.fm username or set it with /lfmset.')
+		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
@@ -63,7 +63,7 @@ local action = function(msg)
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, 'Please specify your last.fm username or set it with /lfmset.')
+		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
