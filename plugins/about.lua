@@ -7,6 +7,10 @@ local triggers = {
 
 local action = function(msg)
 
+	-- Filthy hack, but here is where we'll stop forwarded messages from hitting
+	-- other plugins.
+	if msg.forward_from then return end
+
 	local message = config.about_text .. '\nBased on otouto v'..version..' by topkecleon.\notouto v3 is licensed under the GPLv2.\ntopkecleon.github.io/otouto'
 
 	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then

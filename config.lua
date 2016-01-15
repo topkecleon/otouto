@@ -68,10 +68,10 @@ telegram.me/otouto
 		realm_name = 'My Realm'
 	},
 	plugins = {
-		'blacklist.lua',
-		'floodcontrol.lua',
 		'control.lua',
+		'blacklist.lua',
 		'about.lua',
+		'floodcontrol.lua',
 		'ping.lua',
 		'whoami.lua',
 		'nick.lua',

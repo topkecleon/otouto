@@ -31,7 +31,8 @@ local action = function(msg)
 
 	floodcontrol[input.groupid] = os.time() + input.duration
 
-	print(input.groupid .. ' silenced for ' .. input.duration .. ' seconds.')
+	local output = input.groupid .. ' silenced for ' .. input.duration .. ' seconds.'
+	handle_exception('floodcontrol.lua', output)
 
 end
 
