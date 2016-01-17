@@ -1,7 +1,7 @@
  -- Requires that the "fortune" program is installed on your computer.
 
 local s = io.popen('fortune'):read('*all')
-if s:match('fortune: command not found') then
+if s:match('fortune: command not found') or ('fortune: not found') then
 	print('fortune is not installed on this computer.')
 	print('fortune.lua will not be enabled.')
 	return
