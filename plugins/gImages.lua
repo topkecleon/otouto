@@ -59,11 +59,13 @@ local action = function(msg)
 
 	local i = math.random(jdat.queries.request[1].count)
 	local result = jdat.items[i].link
+	local output = '[​]('..result..')'
+
 
 	if string.match(msg.text, '^/i[mage]*nsfw') then
 		sendReply(msg, result)
 	else
-		sendMessage(msg.chat.id, result, false, msg.message_id)
+		sendMessage(msg.chat.id, output, false, nil, true)
 	end
 
 end

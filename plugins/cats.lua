@@ -24,8 +24,9 @@ local action = function(msg)
 	end
 
 	str = str:match('<img src="(.*)">')
+	local output = '[​]('..str..')'
 
-	sendMessage(msg.chat.id, str)
+	sendMessage(msg.chat.id, output, false, nil, true)
 
 end
 
