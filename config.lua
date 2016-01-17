@@ -18,9 +18,6 @@ return {
 I am otouto, the plugin-wielding, multi-purpose Telegram bot.
 
 Send /help to get started.
-
-Join my channel for news about updates!
-telegram.me/otouto
 ]]	,
 	errors = {
 		connection = 'Connection error.',
