@@ -31,7 +31,7 @@ local action = function(msg)
 		end
 	end
 
-	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=1&q=' .. URL.escape(input)
+	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
@@ -40,8 +40,13 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
+	if jdat.pageInfo.totalResults == 0 then
+		sendReply(msg, config.errors.results)
+		return
+	end
 
-	local output = '[​](https://www.youtube.com/watch?v=' .. jdat.items[1].id.videoId .. ')'
+	local i = math.random(jdat.pageInfo.resultsPerPage)
+	local output = '[​](https://www.youtube.com/watch?v=' .. jdat.items[i].id.videoId .. ')'
 
 	sendMessage(msg.chat.id, output, false, nil, true)
 
