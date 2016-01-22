@@ -23,8 +23,13 @@ local action = function(msg)
 	local url = 'https://api.nasa.gov/planetary/apod?api_key=' .. config.nasa_api_key
 
 	if input then
-		url = url .. '&date=' .. URL.escape(input)
-		date = date .. input
+		if input:match('(%d+)%-(%d+)%-(%d+)$') then
+			url = url .. '&date=' .. URL.escape(input)
+			date = date .. input
+		else
+			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			return
+		end
 	else
 		date = date .. os.date("%F")
 	end
