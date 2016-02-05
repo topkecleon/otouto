@@ -9,6 +9,8 @@ local action = function(msg)
 	end
 
 	local input = msg.text:input()
+	input = input:gsub('—', '--')
+	
 	if not input then
 		sendReply(msg, 'Please specify a command to run.')
 		return
