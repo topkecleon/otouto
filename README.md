@@ -104,6 +104,7 @@ For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for [
 
 You may also want to set your time_offset (a positive or negative number, in seconds, representing your computer's difference from UTC), your lang (lowercase, two-letter code representing your language), and modify your about_text. Some plugins will not be enabled by default, as they are for specific uses. If you want to use them, add them to the plugins table.
 
+To install luarocks,LuaSocket and LuaSec run `./launch.sh install`.
 To start the bot, run `./launch.sh`. To stop the bot, press Ctrl+c twice.
 
 You may also start the bot with `lua bot.lua`, but then it will not restart automatically.
@@ -147,4 +148,3 @@ otouto uses dkjson, a pure-Lua JSON parser. This is provided with the code and d
 The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:topkecleon@outlook.com).
 
 Other developers who have contributed to otouto are [Juan Potato](http://github.com/JuanPotato), [Tiago Danin](http://github.com/TiagoDanin), [Ender](http://github.com/luksireiku), [Iman Daneshi](http://github.com/Imandaneshi), and [HeitorPB](https://github.com/heitorPB).
-
