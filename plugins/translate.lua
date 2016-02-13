@@ -19,16 +19,22 @@ local action = function(msg)
 			return
 		end
 	end
-
-	local url = 'https://translate.google.com/translate_a/single?client=t&ie=UTF-8&oe=UTF-8&hl=en&dt=t&sl=auto&tl=' .. config.lang .. '&text=' .. URL.escape(input)
-
+	
+	local url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=' .. config.yandex_key .. '&lang=' .. config.lang .. '&text=' .. URL.escape(input)
+	
 	local str, res = HTTPS.request(url)
 	if res ~= 200 then
 		sendReply(msg, config.errors.connection)
 		return
 	end
-
-	local output = latcyr(str:gmatch("%[%[%[\"(.*)\"")():gsub("\"(.*)", ""))
+	
+	local jdat = JSON.decode(str)
+	if jdat.code ~= 200 then
+		sendReply(msg, config.errors.connection)
+		return
+	end
+	
+	local output = jdat.text[1]
 
 	sendReply(msg.reply_to_message or msg, output)
 
