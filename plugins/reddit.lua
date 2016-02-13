@@ -26,10 +26,10 @@ local action = function(msg)
 	local source
 	if input then
 		if input:match('^r/.') then
-			url = 'http://www.reddit.com/' .. input .. '/.json?limit=' .. limit
+			url = 'http://www.reddit.com/' .. URL.escape(input) .. '/.json?limit=' .. limit
 			source = '*/r/' .. input:match('^r/(.+)') .. '*\n'
 		else
-			url = 'http://www.reddit.com/search.json?q=' .. input .. '&limit=' .. limit
+			url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input) .. '&limit=' .. limit
 			source = '*reddit results for* _' .. input .. '_ *:*\n'
 		end
 	else
