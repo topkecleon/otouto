@@ -3,7 +3,15 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
 
-version = '3.2'
+local f=io.open('/usr/bin/git',"r")
+if f==nil then
+	version = '3.2-nogit'
+else
+	local f = assert(io.popen('/usr/bin/git describe --tags', 'r'))
+	version = assert(f:read('*a'))
+	f:close()
+end
+
 
 bot_init = function() -- The function run when the bot is started or reloaded.
 
