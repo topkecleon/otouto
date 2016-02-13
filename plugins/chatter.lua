@@ -1,5 +1,11 @@
  -- Put this absolutely at the end, even after greetings.lua.
 
+if not config.simsimi_key then
+	print('Missing config value: simsimi_key.')
+	print('chatter.lua will not be enabled.')
+	return
+end
+
 local triggers = {
 	'',
 	'^' .. bot.first_name .. ',',
@@ -27,8 +33,14 @@ local action = function(msg)
 	local input = msg.text_lower
 	input = input:gsub(bot.first_name, 'simsimi')
 	input = input:gsub('@'..bot.username, 'simsimi')
+	
+	if config.simsimi_trial then
+		sandbox = 'sandbox.'
+	else
+		sandbox = '' -- NO Sandbox
+	end
 
-	local url = 'http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' .. URL.escape(input)
+	local url = 'http://' ..sandbox.. 'api.simsimi.com/request.p?key=' ..config.simsimi_key.. '&lc=' ..config.lang.. '&ft=1.0&text=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
@@ -37,7 +49,11 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
-	local message = jdat.res.msg
+	if not jdat.response then
+		sendMessage(msg.chat.id, config.errors.chatter_response)
+		return
+	end
+	local message = jdat.response
 
 	if message:match('^I HAVE NO RESPONSE.') then
 		message = config.errors.chatter_response
