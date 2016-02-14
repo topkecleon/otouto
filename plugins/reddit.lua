@@ -16,6 +16,12 @@ local action = function(msg)
 
 	msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
 	local input = msg.text_lower:input()
+	if msg.text_lower:match('^/r/') then
+		msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
+		input = get_word(msg.text_lower, 1)
+	else
+		input = msg.text_lower:input()
+	end
 	local url
 
 	local limit = 4
@@ -26,10 +32,10 @@ local action = function(msg)
 	local source
 	if input then
 		if input:match('^r/.') then
-			url = 'http://www.reddit.com/' .. input .. '/.json?limit=' .. limit
+			url = 'http://www.reddit.com/' .. URL.escape(input) .. '/.json?limit=' .. limit
 			source = '*/r/' .. input:match('^r/(.+)') .. '*\n'
 		else
-			url = 'http://www.reddit.com/search.json?q=' .. input .. '&limit=' .. limit
+			url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input) .. '&limit=' .. limit
 			source = '*reddit results for* _' .. input .. '_ *:*\n'
 		end
 	else
@@ -51,7 +57,7 @@ local action = function(msg)
 
 	local output = ''
 	for i,v in ipairs(jdat.data.children) do
-		local title = v.data.title:gsub('%[.+%]', ''):gsub('&amp;', '&')
+		local title = v.data.title:gsub('%[', '('):gsub('%]', ')'):gsub('&amp;', '&')
 		if title:len() > 48 then
 			title = title:sub(1,45) .. '...'
 		end
