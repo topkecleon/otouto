@@ -2,6 +2,7 @@ HTTP = require('socket.http')
 HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('dkjson')
+serpent = require('serpent')
 
 version = '3.2'
 
@@ -36,6 +37,8 @@ end
 
 on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
+  print(serpent.block(msg, {comment=false}))
+  
 	if msg.from.username then
 		usernames[msg.from.username:lower()] = msg.from.id
 	end
