@@ -1,9 +1,10 @@
 -- utilities.lua
 -- Functions shared among plugins.
 
-HTTP = require('socket.http')
-HTTPS = require('ssl.https')
-JSON = require('dkjson')
+ -- you're welcome, brayden :^)
+local HTTP = HTTP or require('socket.http')
+local HTTPS = HTTPS or require('ssl.https')
+local JSON = JSON or require('dkjson')
 
  -- get the indexed word in a string
 get_word = function(s, i)

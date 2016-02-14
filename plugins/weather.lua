@@ -41,6 +41,10 @@ local action = function(msg)
 	end
 
 	local jdat = JSON.decode(jstr)
+	if jdat.cod ~= 200 then
+		sendReply(msg, 'Error: City not found.')
+		return
+	end
 
 	local celsius = string.format('%.2f', jdat.main.temp - 273.15)
 	local fahrenheit = string.format('%.2f', celsius * (9/5) + 32)

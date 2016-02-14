@@ -407,7 +407,13 @@ local commits = {
 	"First Blood",
 	"Fixed the fuck out of #526!",
 	"I'm too old for this shit!",
-	"One little whitespace gets its very own commit! Oh, life is so erratic!"
+	"One little whitespace gets its very own commit! Oh, life is so erratic!",
+	"please dont let this be the problem",
+	"good: no crash. bad: nothing happens",
+	"trying",
+	"trying harder",
+	"i tried",
+	"fml"
 }
 
 local action = function(msg)

@@ -27,6 +27,11 @@ local triggers = {
 
 local action = function(msg)
 
+	do
+		sendReply(msg, 'This feature is deprecated! Please use @pic or @bing instead.')
+		return
+	end
+
 	local input = msg.text:input()
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then

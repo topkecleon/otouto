@@ -8,7 +8,7 @@ Sets your libre.fm username. Otherwise, /np will use your Telegram username. Use
 ```]]
 
 local triggers = {
-	'^/libre[@'..bot.username..']*',
+	'^/librefm[@'..bot.username..']*',
 	'^/lnp[@'..bot.username..']*',
 	'^/lfmset[@'..bot.username..']*'
 }
