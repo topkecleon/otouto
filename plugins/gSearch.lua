@@ -57,9 +57,11 @@ local action = function(msg)
 	local output = '*Google results for* _' .. input .. '_ *:*\n'
 	for i,v in ipairs(jdat.responseData.results) do
 		local title = jdat.responseData.results[i].titleNoFormatting:gsub('%[.+%]', ''):gsub('&amp;', '&')
+--[[
 		if title:len() > 48 then
 			title = title:sub(1, 45) .. '...'
 		end
+]]--
 		local url = jdat.responseData.results[i].unescapedUrl
 		if url:find('%)') then
 			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
