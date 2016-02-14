@@ -24,6 +24,8 @@ sendRequest = function(url)
 		return false, tab.description
 	end
 
+	print(serpent.block(tab, {comment=false}))
+	
 	return tab
 
 end
