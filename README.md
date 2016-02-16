@@ -51,6 +51,7 @@ Here is a list of most otouto plugins.
 | currency.lua | /cash [amount] <currency> to <currency> | Converts one currency to another. |
 | cats.lua | /cat | Returns a cat picture. |
 | reactions.lua | /reactions | Returns a list of reaction emoticons which can be used through the bot. |
+| apod.lua | /apod [date] | Returns the NASA Astronomy Picture of the Day. |
 | control.lua | /reload | Reloads all plugins, libraries, and configuration files. |
 | control.lua | /halt | Stops the bot. If the bot was run with launch.sh, this will restart it. |
 | blacklist.lua | /blacklist <ID> | Blacklists or unblacklists a user, via reply or ID, from using your bot. |
