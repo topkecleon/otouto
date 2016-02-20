@@ -64,7 +64,7 @@ local get_rank = function(target, chat)
 		return 4
 	end
 
-	if chat then
+	if chat and admindata[chat] then
 		if admindata[chat].govs[target] then
 			return 3
 		elseif admindata[chat].mods[target] then
