@@ -12,6 +12,7 @@ return {
 	time_offset = 0,
 	lang = 'en',
 	antisquig = false,
+	-- If you change this, make sure you also modify launch-tg.sh.
 	cli_port = 4567,
 	admin = 00000000,
 	admin_name = 'John Smith',

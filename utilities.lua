@@ -148,6 +148,8 @@ end
 
 handle_exception = function(err, message)
 
+	if not err then err = '' end
+
 	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. bot.username .. ': ' .. err .. '\n' .. message .. '\n'
 
 	if config.log_chat then

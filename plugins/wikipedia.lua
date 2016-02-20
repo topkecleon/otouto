@@ -63,7 +63,7 @@ local action = function(msg)
 	end
 
 	text = text:gsub('</?.->', '')
-	local l = text:find('\n')
+	local l = text:find('<h2>')
 	if l then
 		text = text:sub(1, l-1)
 	end
@@ -78,14 +78,14 @@ local action = function(msg)
 		output = output .. '[Read more.](' .. url .. ')'
 	end
 
-	sendMessage(msg.chat.id, output, true, nil, true)
 --
 --[[ Comment the previous block and uncomment this one for full-message,
  -- "unlinked" link previews.
 	-- Invisible zero-width, non-joiner.
 	local output = '[​](' .. jdat.responseData.results[1].url .. ')'
-	sendMessage(msg.chat.id, output, false, nil, true)
 ]]--
+
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 

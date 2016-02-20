@@ -60,6 +60,69 @@ Here is a list of most otouto plugins.
 
 * * *
 
+## administration.lua
+The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups. This works by sending TCP commands to an instance of tg running on the owner's account.
+
+To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
+
+Once the installation is finished, enable `administration.lua` in your config file. You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
+
+While tg is running, you may start/reload otouto with administration.lua enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
+
+| Command | Function | Privilege | Internal? |
+|---------|----------|-----------|-----------|
+| /groups | Returns a list of administrated groups (except those flagged "unlisted". | 1 | N |
+| /ahelp | Returns a list of administrative commands and their required privileges. | 1 | Y |
+| /ops | Returns a list of moderators, governors, and administrators. | 1 | Y |
+| /rules | Returns the rules of a group. | 1 | Y |
+| /motd | Returns a group's "Message of the Day". | 1 | Y |
+| /link | Returns the link for a group. | 1 | Y |
+| /leave | Removes the user from the group. | 1 | Y |
+| /kick | Removes the target from the group. | 2 | Y |
+| /ban | Bans the target from the group. | 2 | Y |
+| /unban | Unbans the target from the group. | 2 | Y |
+| /setrules | Sets the rules for a group. | 3 | Y |
+| /setmotd | Sets a group's "Message of the Day". | 3 | Y |
+| /setlink | Sets a group's link. | 3 | Y |
+| /flag | Returns a list of available flags and their settings, or toggles a flag. | 3 | Y |
+| /mod | Promotes a user to a moderator. | 3 | Y |
+| /demod | Demotes a moderator to a user. | 3 | Y |
+| /gov | Promotes a user to a governor. | 4 | Y |
+| /degov | Demotes a governor to a user. | 4 | Y |
+| /hammer | Bans a user from all groups. | 4 | N |
+| /unhammer | Removes a global ban. | 4 | N |
+| /admin | Promotes a user to an administrator. | 5 | N |
+| /deadmin | Demotes an administrator to a user. | 5 | N |
+| /gadd | Adds a group to the administrative system. | 5 | N |
+| /grem | Removes a group from the administrative system | 5 | Y |
+| /broadcast | Broadcasts a message to all administrated groups. | 5 | N |
+
+Internal commands can only be run within an administrated group.
+
+###Description of Privileges
+
+| # | Title | Description | Scope |
+|------|-------|-------------|-------|
+| 0 | Banned | Cannot enter the group(s). | Either |
+| 1 | User | Default rank. | Local |
+| 2 | Moderator | Can kick/ban/unban users from a group. | Local |
+| 3 | Governor | Can set rules/motd/link. Can promote/demote moderators. Can modify flags. | Local |
+| 4 | Administrator | Can globally ban/unban users. Can promote/demote governors. | Global |
+| 5 | Owner | Can add/remove groups. Can broadcast. Can promote/demote administrators. | Global |
+
+Obviously, each greater rank inherits the privileges of the lower, positive ranks.
+
+###Flags
+
+| # | Name | Description |
+|---|------|-------------|
+| 1 | unlisted | Removes a group from the /groups listing. |
+| 2 | antisquig | Automatically removes users for posting Arabic script or RTL characters. |
+| 3 | antisquig Strict | Automatically removes users whose names contain Arabic script or RTL characters. |
+| 4 | antibot | Prevents bots from being added by non-moderators. |
+
+* * *
+
 ##Liberbot Plugins
 Some plugins are only useful when the bot is used in a Liberbot group, like floodcontrol.lua and moderation.lua.
 

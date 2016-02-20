@@ -54,12 +54,16 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 				msg.chat.id_str = tostring(msg.chat.id)
 				msg.from.id_str = tostring(msg.from.id)
 				msg.text_lower = msg.text:lower()
+				msg.from.name = msg.from.first_name
+				if msg.from.last_name then
+					msg.from.name = msg.from.first_name .. ' ' .. msg.from.last_name
+				end
 
 				local success, result = pcall(function()
 					return v.action(msg)
 				end)
 				if not success then
-					sendReply(msg, 'An unexpected error occurred.')
+					sendReply(msg, 'Sorry, an unexpected error occurred.')
 					handle_exception(result, msg.text)
 					return
 				end
