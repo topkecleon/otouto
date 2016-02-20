@@ -62,11 +62,11 @@ local action = function(msg)
 		return
 	end
 
-	text = text:gsub('</?.->', '')
 	local l = text:find('<h2>')
 	if l then
 		text = text:sub(1, l-1)
 	end
+	text = text:gsub('</?.->', '')
 
 	title = title:gsub('%(.+%)', '')
 	--local output = '[' .. title .. '](' .. url .. ')\n' .. text:gsub('%[.+]%','')
