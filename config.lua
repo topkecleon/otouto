@@ -7,6 +7,7 @@ return {
 	biblia_api_key = '',
 	thecatapi_key = '',
 	nasa_api_key = '',
+	yandex_key = '',
 	simsimi_key = '',
 	simsimi_trial = true,
 	time_offset = 0,
