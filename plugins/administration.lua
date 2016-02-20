@@ -229,7 +229,7 @@ local commands = {
 				end
 
 				-- antibot
-				if msg.new_chat_participant.username:match('bot$') then
+				if msg.new_chat_participant.username and msg.new_chat_participant.username:match('bot$') then
 					if rank < 2 and group.flags[4] == true then
 						kick_user(msg.new_chat_participant.id, msg.chat.id)
 						return
