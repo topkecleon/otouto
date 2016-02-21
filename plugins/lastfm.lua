@@ -4,6 +4,10 @@ if not config.lastfm_api_key then
 	return
 end
 
+if not database.lastfm then
+	database.lastfm = {}
+end
+
 local command = 'lastfm'
 local doc = [[```
 /np [username]
@@ -21,7 +25,6 @@ local triggers = {
 
 local action = function(msg)
 
-	lastfm = load_data('lastfm.json')
 	local input = msg.text:input()
 
 	if string.match(msg.text, '^/lastfm') then
@@ -31,13 +34,12 @@ local action = function(msg)
 		if not input then
 			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		elseif input == '-' then
-			lastfm[msg.from.id_str] = nil
+			database.lastfm[msg.from.id_str] = nil
 			sendReply(msg, 'Your last.fm username has been forgotten.')
 		else
-			lastfm[msg.from.id_str] = input
+			database.lastfm[msg.from.id_str] = input
 			sendReply(msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
-		save_data('lastfm.json', lastfm)
 		return
 	end
 
@@ -47,13 +49,12 @@ local action = function(msg)
 	local output = ''
 	if input then
 		username = input
-	elseif lastfm[msg.from.id_str] then
-		username = lastfm[msg.from.id_str]
+	elseif database.lastfm[msg.from.id_str] then
+		username = database.lastfm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
 		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
-		lastfm[msg.from.id_str] = username
-		save_data('lastfm.json', lastfm)
+		database.lastfm[msg.from.id_str] = username
 	else
 		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
 		return

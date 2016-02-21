@@ -3,14 +3,17 @@
  -- Put this near the top, after blacklist.
  -- If you want to enable antisquig, put that at the top, before blacklist.
 
-moddat = load_data('moderation.json')
+if not database.moderation then
+	database.moderation = {}
+end
+
 antisquig = {}
 
 local commands = {
 
 	['^/modhelp[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
 		local message = [[
 			/modlist - List the moderators and administrators of this group.
@@ -31,11 +34,11 @@ local commands = {
 
 	['^/modlist[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
 		local message = ''
 
-		for k,v in pairs(moddat[msg.chat.id_str]) do
+		for k,v in pairs(database.moderation[msg.chat.id_str]) do
 			message = message .. ' - ' .. v .. ' (' .. k .. ')\n'
 		end
 
@@ -67,7 +70,7 @@ local commands = {
 			return config.errors.not_admin
 		end
 
-		for k,v in pairs(moddat) do
+		for k,v in pairs(database.moderation) do
 			sendMessage(k, message)
 		end
 
@@ -81,12 +84,11 @@ local commands = {
 			return config.errors.not_admin
 		end
 
-		if moddat[msg.chat.id_str] then
+		if database.moderation[msg.chat.id_str] then
 			return 'I am already moderating this group.'
 		end
 
-		moddat[msg.chat.id_str] = {}
-		save_data('moderation.json', moddat)
+		database.moderation[msg.chat.id_str] = {}
 		return 'I am now moderating this group.'
 
 	end,
@@ -97,19 +99,18 @@ local commands = {
 			return config.errors.not_admin
 		end
 
-		if not moddat[msg.chat.id_str] then
+		if not database.moderation[msg.chat.id_str] then
 			return config.errors.moderation
 		end
 
-		moddat[msg.chat.id_str] = nil
-		save_data('moderation.json', moddat)
+		database.moderation[msg.chat.id_str] = nil
 		return 'I am no longer moderating this group.'
 
 	end,
 
 	['^/modprom[@'..bot.username..']*$'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -126,12 +127,11 @@ local commands = {
 			return modname .. ' is already an administrator.'
 		end
 
-		if moddat[msg.chat.id_str][modid] then
+		if database.moderation[msg.chat.id_str][modid] then
 			return modname .. ' is already a moderator.'
 		end
 
-		moddat[msg.chat.id_str][modid] = modname
-		save_data('moderation.json', moddat)
+		database.moderation[msg.chat.id_str][modid] = modname
 
 		return modname .. ' is now a moderator.'
 
@@ -139,7 +139,7 @@ local commands = {
 
 	['^/moddem[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
 			return config.errors.not_admin
@@ -159,13 +159,12 @@ local commands = {
 			return config.moderation.admins[modid] .. ' is an administrator.'
 		end
 
-		if not moddat[msg.chat.id_str][modid] then
+		if not database.moderation[msg.chat.id_str][modid] then
 			return 'User is not a moderator.'
 		end
 
-		local modname = moddat[msg.chat.id_str][modid]
-		moddat[msg.chat.id_str][modid] = nil
-		save_data('moderation.json', moddat)
+		local modname = database.moderation[msg.chat.id_str][modid]
+		database.moderation[msg.chat.id_str][modid] = nil
 
 		return modname .. ' is no longer a moderator.'
 
@@ -173,9 +172,9 @@ local commands = {
 
 	['/modkick[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
-		if not moddat[msg.chat.id_str][msg.from.id_str] then
+		if not database.moderation[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then
 				return config.errors.not_mod
 			end
@@ -193,7 +192,7 @@ local commands = {
 			return 'Kicks must be done via reply or specification of a user/bot\'s ID or username.'
 		end
 
-		if moddat[msg.chat.id_str][userid] or config.moderation.admins[userid] then
+		if database.moderation[msg.chat.id_str][userid] or config.moderation.admins[userid] then
 			return 'You cannot kick a moderator.'
 		end
 
@@ -205,9 +204,9 @@ local commands = {
 
 	['^/modban[@'..bot.username..']*'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return end
+		if not database.moderation[msg.chat.id_str] then return end
 
-		if not moddat[msg.chat.id_str][msg.from.id_str] then
+		if not database.moderation[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then
 				return config.errors.not_mod
 			end
@@ -225,7 +224,7 @@ local commands = {
 			return 'Kicks must be done via reply or specification of a user/bot\'s ID or username.'
 		end
 
-		if moddat[msg.chat.id_str][userid] or config.moderation.admins[userid] then
+		if database.moderation[msg.chat.id_str][userid] or config.moderation.admins[userid] then
 			return 'You cannot ban a moderator.'
 		end
 
@@ -240,9 +239,9 @@ local commands = {
 if config.antisquig then
 	commands['[\216-\219][\128-\191]'] = function(msg)
 
-		if not moddat[msg.chat.id_str] then return true end
+		if not database.moderation[msg.chat.id_str] then return true end
 		if config.moderation.admins[msg.from.id_str] then return true end
-		if moddat[msg.chat.id_str][msg.from.id_str] then return true end
+		if database.moderation[msg.chat.id_str][msg.from.id_str] then return true end
 
 		if antisquig[msg.from.id] == true then
 			return

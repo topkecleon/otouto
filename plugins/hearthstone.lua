@@ -1,21 +1,28 @@
  -- Plugin for the Hearthstone database provided by hearthstonejson.com.
 
-if not hs_dat then
+if not database.hearthstone or os.time() > database.hearthstone.expiration then
 
-	hs_dat = {}
+	print('Downloading Hearthstone database...')
+
+	database.hearthstone = {}
 
 	local jstr, res = HTTPS.request('http://hearthstonejson.com/json/AllSets.json')
 	if res ~= 200 then
 		print('Error connecting to hearthstonejson.com.')
 		print('hearthstone.lua will not be enabled.')
+		return
 	end
 	local jdat = JSON.decode(jstr)
 
 	for k,v in pairs(jdat) do
 		for key,val in pairs(v) do
-			table.insert(hs_dat, val)
+			table.insert(database.hearthstone, val)
 		end
 	end
+
+	database.hearthstone.expiration = os.time() + 600000
+
+	print('Download complete! It will be permanently stored.')
 
 end
 
@@ -96,7 +103,7 @@ local action = function(msg)
 	end
 
 	local output = ''
-	for k,v in pairs(hs_dat) do
+	for k,v in pairs(database.hearthstone) do
 		if string.lower(v.name):match(input) then
 			output = output .. format_card(v) .. '\n\n'
 		end

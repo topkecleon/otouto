@@ -1,8 +1,9 @@
-admindata = load_data('administration.json')
-if not admindata.global then
-	admindata.global = {
-		bans = {},
-		admins = {}
+if not database.administration then
+	database.administration = {
+		global = {
+			bans = {},
+			admins = {}
+		}
 	}
 end
 
@@ -59,21 +60,21 @@ local get_rank = function(target, chat)
 		return 5
 	end
 
-	if admindata.global.admins[target] then
+	if database.administration.global.admins[target] then
 		return 4
 	end
 
-	if chat and admindata[chat] then
-		if admindata[chat].govs[target] then
+	if chat and database.administration[chat] then
+		if database.administration[chat].govs[target] then
 			return 3
-		elseif admindata[chat].mods[target] then
+		elseif database.administration[chat].mods[target] then
 			return 2
-		elseif admindata[chat].bans[target] then
+		elseif database.administration[chat].bans[target] then
 			return 0
 		end
 	end
 
-	if admindata.global.bans[target] then
+	if database.administration.global.bans[target] then
 		return 0
 	end
 
@@ -119,7 +120,7 @@ local kick_user = function(target, chat)
 	target = tonumber(target)
 	chat = tostring(chat)
 
-	if admindata[chat].grouptype == 'group' then
+	if database.administration[chat].grouptype == 'group' then
 		tg:chat_del_user(tonumber(chat), target)
 	else
 		tg:channel_kick(chat, target)
@@ -154,7 +155,7 @@ local commands = {
 			if get_rank(msg.from.id, msg.chat.id) > 1 then
 				return true
 			end
-			if not admindata[msg.chat.id_str].flags[2] == true then
+			if not database.administration[msg.chat.id_str].flags[2] == true then
 				return true
 			end
 			kick_user(msg.from.id, msg.chat.id)
@@ -173,7 +174,7 @@ local commands = {
 		action = function(msg)
 
 			local rank = get_rank(msg.from.id, msg.chat.id)
-			local group = admindata[msg.chat.id_str]
+			local group = database.administration[msg.chat.id_str]
 
 			-- banned
 			if rank == 0 then
@@ -302,7 +303,7 @@ local commands = {
 
 		action = function(msg)
 			local output = ''
-			for k,v in pairs(admindata) do
+			for k,v in pairs(database.administration) do
 				-- no "global" or unlisted groups
 				if tonumber(k) and not v.flags[1] then
 					if v.link then
@@ -348,21 +349,21 @@ local commands = {
 
 		action = function(msg)
 			local modstring = ''
-			for k,v in pairs(admindata[msg.chat.id_str].mods) do
+			for k,v in pairs(database.administration[msg.chat.id_str].mods) do
 				modstring = modstring .. '• ' .. v .. ' (' .. k .. ')\n'
 			end
 			if modstring ~= '' then
 				modstring = '*Moderators for* _' .. msg.chat.title .. '_ *:*\n' .. modstring
 			end
 			local govstring = ''
-			for k,v in pairs(admindata[msg.chat.id_str].govs) do
+			for k,v in pairs(database.administration[msg.chat.id_str].govs) do
 				govstring = govstring .. '• ' .. v .. ' (' .. k .. ')\n'
 			end
 			if govstring ~= '' then
 				govstring = '*Governors for* _' .. msg.chat.title .. '_ *:*\n' .. govstring
 			end
 			local adminstring = '*Administrators:*\n• ' .. config.admin_name .. ' (' .. config.admin .. ')\n'
-			for k,v in pairs(admindata.global.admins) do
+			for k,v in pairs(database.administration.global.admins) do
 				adminstring = adminstring .. '• ' .. v .. ' (' .. k .. ')\n'
 			end
 			local output = modstring .. govstring .. adminstring
@@ -382,8 +383,8 @@ local commands = {
 
 		action = function(msg)
 			local output = 'No rules have been set for ' .. msg.chat.title .. '.'
-			if admindata[msg.chat.id_str].rules then
-				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. admindata[msg.chat.id_str].rules
+			if database.administration[msg.chat.id_str].rules then
+				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. database.administration[msg.chat.id_str].rules
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -401,8 +402,8 @@ local commands = {
 
 		action = function(msg)
 			local output = 'No MOTD has been set for ' .. msg.chat.title .. '.'
-			if admindata[msg.chat.id_str].motd then
-				output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. admindata[msg.chat.id_str].motd
+			if database.administration[msg.chat.id_str].motd then
+				output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. database.administration[msg.chat.id_str].motd
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -419,8 +420,8 @@ local commands = {
 
 		action = function(msg)
 			local output = 'No link has been set for ' .. msg.chat.title .. '.'
-			if admindata[msg.chat.id_str].link then
-				output = '[' .. msg.chat.title .. '](' .. admindata[msg.chat.id_str].link .. ')'
+			if database.administration[msg.chat.id_str].link then
+				output = '[' .. msg.chat.title .. '](' .. database.administration[msg.chat.id_str].link .. ')'
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -491,12 +492,12 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be banned: Too privileged.')
 				return
 			end
-			if admindata[msg.chat.id_str].bans[target.id_str] then
+			if database.administration[msg.chat.id_str].bans[target.id_str] then
 				sendReply(msg, target.name .. ' is already banned.')
 				return
 			end
 			kick_user(target.id, msg.chat.id)
-			admindata[msg.chat.id_str].bans[target.id_str] = true
+			database.administration[msg.chat.id_str].bans[target.id_str] = true
 			sendMessage(msg.chat.id, target.name .. ' has been banned.')
 		end
 	},
@@ -516,15 +517,15 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			end
-			if not admindata[msg.chat.id_str].bans[target.id_str] then
-				if admindata.global.bans[target.id_str] then
+			if not database.administration[msg.chat.id_str].bans[target.id_str] then
+				if database.administration.global.bans[target.id_str] then
 					sendReply(msg, target.name .. ' is banned globally.')
 				else
 					sendReply(msg, target.name .. ' is not banned.')
 				end
 				return
 			end
-			admindata[msg.chat.id_str].bans[target.id_str] = nil
+			database.administration[msg.chat.id_str].bans[target.id_str] = nil
 			sendMessage(msg.chat.id, target.name .. ' has been unbanned.')
 		end
 	},
@@ -551,7 +552,7 @@ local commands = {
 				i = i + 1
 				output = output .. '*' .. i .. '.* ' .. m:trim() .. '\n'
 			end
-			admindata[msg.chat.id_str].rules = output
+			database.administration[msg.chat.id_str].rules = output
 			output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. output
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -573,7 +574,7 @@ local commands = {
 				return
 			end
 			input = input:trim()
-			admindata[msg.chat.id_str].motd = input
+			database.administration[msg.chat.id_str].motd = input
 			local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -594,7 +595,7 @@ local commands = {
 				sendReply(msg, '/' .. command)
 				return
 			end
-			admindata[msg.chat.id_str].link = input
+			database.administration[msg.chat.id_str].link = input
 			local output = '[' .. msg.chat.title .. '](' .. input .. ')'
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -619,18 +620,18 @@ local commands = {
 			if not input then
 				local output = '*Flags for* _' .. msg.chat.title .. '_ *:*\n'
 				for i,v in ipairs(flags) do
-					local status = admindata[msg.chat.id_str].flags[i] or false
+					local status = database.administration[msg.chat.id_str].flags[i] or false
 					output = output .. '`[' .. i .. ']` *' .. v.name .. '* = `' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
 				end
 				sendMessage(msg.chat.id, output, true, nil, true)
 				return
 			end
 			local output
-			if admindata[msg.chat.id_str].flags[input] == true then
-				admindata[msg.chat.id_str].flags[input] = false
+			if database.administration[msg.chat.id_str].flags[input] == true then
+				database.administration[msg.chat.id_str].flags[input] = false
 				sendReply(msg, flags[input].disabled)
 			else
-				admindata[msg.chat.id_str].flags[input] = true
+				database.administration[msg.chat.id_str].flags[input] = true
 				sendReply(msg, flags[input].enabled)
 			end
 		end
@@ -655,10 +656,10 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
 				return
 			end
-			if admindata[msg.chat.id_str].grouptype == 'supergroup' then
+			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
 				tg:channel_set_admin(msg.chat.id, target, 1)
 			end
-			admindata[msg.chat.id_str].mods[target.id_str] = target.name
+			database.administration[msg.chat.id_str].mods[target.id_str] = target.name
 			sendReply(msg, target.name .. ' is now a moderator.')
 		end
 	},
@@ -682,10 +683,10 @@ local commands = {
 				sendReply(msg, target.name .. ' is not a moderator.')
 				return
 			end
-			if admindata[msg.chat.id_str].grouptype == 'supergroup' then
+			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
 				tg:channel_set_admin(msg.chat.id, target, 0)
 			end
-			admindata[msg.chat.id_str].mods[target.id_str] = nil
+			database.administration[msg.chat.id_str].mods[target.id_str] = nil
 			sendReply(msg, target.name .. ' is no longer a moderator.')
 		end
 
@@ -710,12 +711,12 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
 				return
 			elseif target.rank == 2 then
-				admindata[msg.chat.id_str].mods[target.id_str] = nil
+				database.administration[msg.chat.id_str].mods[target.id_str] = nil
 			end
-			if admindata[msg.chat.id_str].grouptype == 'supergroup' then
+			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
 				tg:channel_set_admin(msg.chat.id, target, 1)
 			end
-			admindata[msg.chat.id_str].govs[target.id_str] = target.name
+			database.administration[msg.chat.id_str].govs[target.id_str] = target.name
 			sendReply(msg, target.name .. ' is now a governor.')
 		end
 	},
@@ -739,10 +740,10 @@ local commands = {
 				sendReply(msg, target.name .. ' is not a governor.')
 				return
 			end
-			if admindata[msg.chat.id_str].grouptype == 'supergroup' then
+			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
 				tg:channel_set_admin(msg.chat.id, target, 0)
 			end
-			admindata[msg.chat.id_str].govs[target.id_str] = nil
+			database.administration[msg.chat.id_str].govs[target.id_str] = nil
 			sendReply(msg, target.name .. ' is no longer a governor.')
 		end
 	},
@@ -767,16 +768,16 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be banned: Too privileged.')
 				return
 			end
-			if admindata.global.bans[target.id_str] then
+			if database.administration.global.bans[target.id_str] then
 				sendReply(msg, target.name .. ' is already banned globally.')
 				return
 			end
-			for k,v in pairs(admindata) do
+			for k,v in pairs(database.administration) do
 				if tonumber(k) then
 					kick_user(target.id, k)
 				end
 			end
-			admindata.global.bans[target.id_str] = true
+			database.administration.global.bans[target.id_str] = true
 			sendReply(msg, target.name .. ' has been globally banned.')
 		end
 	},
@@ -797,11 +798,11 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			end
-			if not admindata.global.bans[target.id_str] then
+			if not database.administration.global.bans[target.id_str] then
 				sendReply(msg, target.name .. ' is not banned globally.')
 				return
 			end
-			admindata.global.bans[target.id_str] = nil
+			database.administration.global.bans[target.id_str] = nil
 			sendReply(msg, target.name .. ' has been globally unbanned.')
 		end
 	},
@@ -825,11 +826,11 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
 				return
 			elseif target.rank == 2 then
-				admindata[msg.chat.id_str].mods[target.id_str] = nil
+				database.administration[msg.chat.id_str].mods[target.id_str] = nil
 			elseif target.rank == 3 then
-				admindata[msg.chat.id_str].govs[target.id_str] = nil
+				database.administration[msg.chat.id_str].govs[target.id_str] = nil
 			end
-			admindata.global.admins[target.id_str] = target.name
+			database.administration.global.admins[target.id_str] = target.name
 			sendReply(msg, target.name .. ' is now an administrator.')
 		end
 	},
@@ -849,7 +850,7 @@ local commands = {
 				sendReply(msg, target.name .. ' is not an administrator.')
 				return
 			end
-			admindata.global.admins[target.id_str] = nil
+			database.administration.global.admins[target.id_str] = nil
 			sendReply(msg, target.name .. ' is no longer an administrator.')
 		end
 	},
@@ -864,11 +865,11 @@ local commands = {
 		interior = false,
 
 		action = function(msg)
-			if admindata[msg.chat.id_str] then
+			if database.administration[msg.chat.id_str] then
 				sendReply(msg, 'I am already administrating this group.')
 				return
 			end
-			admindata[msg.chat.id_str] = {
+			database.administration[msg.chat.id_str] = {
 				mods = {},
 				govs = {},
 				bans = {},
@@ -878,8 +879,8 @@ local commands = {
 				founded = os.time()
 			}
 			if msg.chat.type == 'group' then
-				admindata[msg.chat.id_str].photo = get_photo(msg.chat.id)
-				admindata[msg.chat.id_str].link = tg:export_chat_link(msg.chat.id)
+				database.administration[msg.chat.id_str].photo = get_photo(msg.chat.id)
+				database.administration[msg.chat.id_str].link = tg:export_chat_link(msg.chat.id)
 			end
 			sendReply(msg, 'I am now administrating this group.')
 		end
@@ -900,7 +901,7 @@ local commands = {
 			if not input then
 				input = msg.chat.id_str
 			end
-			admindata[input] = nil
+			database.administration[input] = nil
 			sendReply(msg, 'I am no longer administrating this group.')
 		end
 	},
@@ -921,7 +922,7 @@ local commands = {
 				return
 			end
 			input = '*Admin Broadcast:*\n' .. input
-			for k,v in pairs(admindata) do
+			for k,v in pairs(database.administration) do
 				if tonumber(k) then
 					sendMessage(k, input, true, nil, true)
 				end
@@ -952,7 +953,7 @@ local action = function(msg) -- wee nesting
 	for i,v in ipairs(commands) do
 		for key,val in pairs(v.triggers) do
 			if msg.text_lower:match(val) then
-				if v.interior and not admindata[msg.chat.id_str] then
+				if v.interior and not database.administration[msg.chat.id_str] then
 					break
 				end
 				if msg.chat.type ~= 'private' and get_rank(msg.from.id, msg.chat.id) < v.privilege then
@@ -972,7 +973,6 @@ local cron = function()
 	if os.date('%M', os.time()) ~= last_admin_cron then
 		last_admin_cron = os.date('%M', os.time())
 		tg = sender(localhost, config.cli_port)
-		save_data('administration.json', admindata)
 	end
 end
 

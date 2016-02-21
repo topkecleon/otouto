@@ -32,9 +32,8 @@ local action = function(msg)
 
 	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name
 
-	local nicks = load_data('nicknames.json')
-	if nicks[msg.from.id_str] then
-		message = message .. '\nYour nickname is ' .. nicks[msg.from.id_str] .. '.'
+	if database.nicknames[msg.from.id_str] then
+		message = message .. '\nYour nickname is ' .. database.nicknames[msg.from.id_str] .. '.'
 	end
 
 	sendReply(msg, message)

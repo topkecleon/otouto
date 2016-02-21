@@ -139,7 +139,7 @@ resolve_username = function(target)
 	local input = tostring(target):lower()
 	if input:match('^@') then
 		local uname = input:gsub('^@', '')
-		return usernames[uname]
+		return database.usernames[uname]
 	else
 		return tonumber(target) or false
 	end

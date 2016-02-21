@@ -1,3 +1,7 @@
+if not database.nicknames then
+	database.nicknames = {}
+end
+
 local command = 'nick <nickname>'
 local doc = [[```
 /nick <nickname>
@@ -21,17 +25,14 @@ local action = function(msg)
 		return true
 	end
 
-	nicks = load_data('nicknames.json')
-
 	if input == '-' then
-		nicks[msg.from.id_str] = nil
+		database.nicknames[msg.from.id_str] = nil
 		sendReply(msg, 'Your nickname has been deleted.')
 	else
-		nicks[msg.from.id_str] = input
+		database.nicknames[msg.from.id_str] = input
 		sendReply(msg, 'Your nickname has been set to "' .. input .. '".')
 	end
 
-	save_data('nicknames.json', nicks)
 	return true
 
 end

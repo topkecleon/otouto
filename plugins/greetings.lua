@@ -6,9 +6,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local nicks = load_data('nicknames.json')
-
-	local nick = nicks[msg.from.id_str] or msg.from.first_name
+	local nick = database.nicknames[msg.from.id_str] or msg.from.first_name
 
 	for k,v in pairs(config.greetings) do
 		for key,val in pairs(v) do
