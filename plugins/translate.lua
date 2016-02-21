@@ -5,7 +5,8 @@ Translates input or the replied-to message into the bot's language.
 ```]]
 
 local triggers = {
-	'^/translate[@'..bot.username..']*'
+	'^/translate[@'..bot.username..']*',
+	'^/tl[@'..bot.username..']*'
 }
 
 local action = function(msg)
@@ -19,22 +20,23 @@ local action = function(msg)
 			return
 		end
 	end
-	
+
 	local url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=' .. config.yandex_key .. '&lang=' .. config.lang .. '&text=' .. URL.escape(input)
-	
+
 	local str, res = HTTPS.request(url)
 	if res ~= 200 then
 		sendReply(msg, config.errors.connection)
 		return
 	end
-	
+
 	local jdat = JSON.decode(str)
 	if jdat.code ~= 200 then
 		sendReply(msg, config.errors.connection)
 		return
 	end
-	
+
 	local output = jdat.text[1]
+	output = latcyr(output)
 
 	sendReply(msg.reply_to_message or msg, output)
 

@@ -4,7 +4,6 @@ if not admindata.global then
 		bans = {},
 		admins = {}
 	}
-	save_data('administration.json', admindata)
 end
 
 local sender = dofile('lua-tg/sender.lua')
@@ -259,7 +258,6 @@ local commands = {
 					tg:rename_chat(msg.chat.id, group.name)
 				else
 					group.name = msg.new_chat_title
-					save_data('administration.json', admindata)
 				end
 				return
 
@@ -270,7 +268,6 @@ local commands = {
 						tg:chat_set_photo(msg.chat.id, group.photo)
 					else
 						group.photo = get_photo(msg.chat.id)
-						save_data('administration.json', admindata)
 					end
 				end
 				return
@@ -282,7 +279,6 @@ local commands = {
 						tg:chat_set_photo(msg.chat.id, group.photo)
 					else
 						group.photo = nil
-						save_data('administration.json', admindata)
 					end
 				end
 				return
@@ -501,7 +497,6 @@ local commands = {
 			end
 			kick_user(target.id, msg.chat.id)
 			admindata[msg.chat.id_str].bans[target.id_str] = true
-			save_data('administration.json', admindata)
 			sendMessage(msg.chat.id, target.name .. ' has been banned.')
 		end
 	},
@@ -530,7 +525,6 @@ local commands = {
 				return
 			end
 			admindata[msg.chat.id_str].bans[target.id_str] = nil
-			save_data('administration.json', admindata)
 			sendMessage(msg.chat.id, target.name .. ' has been unbanned.')
 		end
 	},
@@ -558,7 +552,6 @@ local commands = {
 				output = output .. '*' .. i .. '.* ' .. m:trim() .. '\n'
 			end
 			admindata[msg.chat.id_str].rules = output
-			save_data('administration.json', admindata)
 			output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. output
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -581,7 +574,6 @@ local commands = {
 			end
 			input = input:trim()
 			admindata[msg.chat.id_str].motd = input
-			save_data('administration.json', admindata)
 			local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -603,7 +595,6 @@ local commands = {
 				return
 			end
 			admindata[msg.chat.id_str].link = input
-			save_data('administration.json', admindata)
 			local output = '[' .. msg.chat.title .. '](' .. input .. ')'
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -637,11 +628,9 @@ local commands = {
 			local output
 			if admindata[msg.chat.id_str].flags[input] == true then
 				admindata[msg.chat.id_str].flags[input] = false
-				save_data('administration.json', admindata)
 				sendReply(msg, flags[input].disabled)
 			else
 				admindata[msg.chat.id_str].flags[input] = true
-				save_data('administration.json', admindata)
 				sendReply(msg, flags[input].enabled)
 			end
 		end
@@ -670,7 +659,6 @@ local commands = {
 				tg:channel_set_admin(msg.chat.id, target, 1)
 			end
 			admindata[msg.chat.id_str].mods[target.id_str] = target.name
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is now a moderator.')
 		end
 	},
@@ -698,7 +686,6 @@ local commands = {
 				tg:channel_set_admin(msg.chat.id, target, 0)
 			end
 			admindata[msg.chat.id_str].mods[target.id_str] = nil
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is no longer a moderator.')
 		end
 
@@ -729,7 +716,6 @@ local commands = {
 				tg:channel_set_admin(msg.chat.id, target, 1)
 			end
 			admindata[msg.chat.id_str].govs[target.id_str] = target.name
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is now a governor.')
 		end
 	},
@@ -757,7 +743,6 @@ local commands = {
 				tg:channel_set_admin(msg.chat.id, target, 0)
 			end
 			admindata[msg.chat.id_str].govs[target.id_str] = nil
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is no longer a governor.')
 		end
 	},
@@ -792,7 +777,6 @@ local commands = {
 				end
 			end
 			admindata.global.bans[target.id_str] = true
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' has been globally banned.')
 		end
 	},
@@ -818,7 +802,6 @@ local commands = {
 				return
 			end
 			admindata.global.bans[target.id_str] = nil
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' has been globally unbanned.')
 		end
 	},
@@ -847,7 +830,6 @@ local commands = {
 				admindata[msg.chat.id_str].govs[target.id_str] = nil
 			end
 			admindata.global.admins[target.id_str] = target.name
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is now an administrator.')
 		end
 	},
@@ -868,7 +850,6 @@ local commands = {
 				return
 			end
 			admindata.global.admins[target.id_str] = nil
-			save_data('administration.json', admindata)
 			sendReply(msg, target.name .. ' is no longer an administrator.')
 		end
 	},
@@ -900,7 +881,6 @@ local commands = {
 				admindata[msg.chat.id_str].photo = get_photo(msg.chat.id)
 				admindata[msg.chat.id_str].link = tg:export_chat_link(msg.chat.id)
 			end
-			save_data('administration.json', admindata)
 			sendReply(msg, 'I am now administrating this group.')
 		end
 	},
@@ -921,7 +901,6 @@ local commands = {
 				input = msg.chat.id_str
 			end
 			admindata[input] = nil
-			save_data('administration.json', admindata)
 			sendReply(msg, 'I am no longer administrating this group.')
 		end
 	},
@@ -993,6 +972,7 @@ local cron = function()
 	if os.date('%M', os.time()) ~= last_admin_cron then
 		last_admin_cron = os.date('%M', os.time())
 		tg = sender(localhost, config.cli_port)
+		save_data('administration.json', admindata)
 	end
 end
 

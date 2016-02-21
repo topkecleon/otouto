@@ -2,9 +2,9 @@
 -- Functions shared among plugins.
 
  -- you're welcome, brayden :^)
-local HTTP = HTTP or require('socket.http')
-local HTTPS = HTTPS or require('ssl.https')
-local JSON = JSON or require('dkjson')
+HTTP = HTTP or require('socket.http')
+HTTPS = HTTPS or require('ssl.https')
+JSON = JSON or require('cjson')
 
  -- get the indexed word in a string
 get_word = function(s, i)

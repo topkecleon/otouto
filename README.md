@@ -156,7 +156,7 @@ Where the key is the preconfigured response (where #NAME will be replaced with t
 * * *
 
 ##Setup
-You **must** have Lua (5.2+), LuaSocket, and LuaSec installed. For uploading photos and other files, you must have curl installed. The fortune.lua plugin requires that fortune is installed.
+You **must** have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. For uploading photos and other files, you must have curl installed. The fortune.lua plugin requires that fortune is installed.
 
 For weather.lua, lastfm.lua, and bible.lua to work, you must have API keys for [OpenWeatherMap](http://openweathermap.org), [last.fm](http://last.fm), and [Biblia.com](http://biblia.com), respectively. cats.lua uses an API key (via [The Cat API](http://thecatapi.com)) to get more results, though it is not required. apod.lua uses an API key (via [NASA API](https://api.nasa.gov/)) to have more queries per minute, though it is not required.
 
@@ -202,8 +202,6 @@ There are three functions which are not API methods: sendRequest, curlRequest, a
 * * *
 
 Several functions and methods used by multiple plugins and possibly the main script are kept in utilities.lua. Refer to that file for documentation.
-
-otouto uses dkjson, a pure-Lua JSON parser. This is provided with the code and does not need to be downloaded or installed separately.
 
 * * *
 
