@@ -187,18 +187,9 @@ local commands = {
 
 				-- antisquig Strict
 				if group.flags[3] == true then
-					if msg.from.name:match('[\216-\219][\128-\191]') then
+					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') then
 						kick_user(msg.from.id, msg.chat.id)
 						sendMessage(msg.from.id, flags[3].kicked:gsub('GROUPNAME', msg.chat.title))
-						return
-					end
-				end
-
-				-- antirtl
-				if group.flags[3] == true then
-					if msg.from.name:match('‮') then
-						kick_user(msg.from.id, msg.chat.id)
-						sendMessage(msg.from.id, flags[4].kicked:gsub('GROUPNAME', msg.chat.title))
 						return
 					end
 				end
