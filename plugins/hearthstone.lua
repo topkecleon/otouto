@@ -104,7 +104,7 @@ local action = function(msg)
 
 	local output = ''
 	for k,v in pairs(database.hearthstone) do
-		if string.lower(v.name):match(input) then
+		if type(v) == 'table' and string.lower(v.name):match(input) then
 			output = output .. format_card(v) .. '\n\n'
 		end
 	end
