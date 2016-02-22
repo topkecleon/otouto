@@ -97,7 +97,6 @@ while is_started do -- Start a loop while the bot should be running.
 			last_update = v.update_id
 			on_msg_receive(v.message)
 		end
-		save_data('otouto.db', database)
 	else
 		print(config.errors.connection)
 	end
@@ -111,6 +110,7 @@ while is_started do -- Start a loop while the bot should be running.
 				end
 			end
 		end
+		save_data('otouto.db', database) -- Save the database.
 		last_cron = os.time() -- And finally, update the variable.
 	end
 
