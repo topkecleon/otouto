@@ -65,7 +65,7 @@ local action = function(msg)
 	text = text:gsub('</?.->', '')
 	local l = text:find('\n')
 	if l then
-		text = text:sub(1, l-2)
+		text = text:sub(1, l-1)
 	end
 
 	title = title:gsub('%(.+%)', '')

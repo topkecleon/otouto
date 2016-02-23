@@ -12,7 +12,7 @@ local action = function(msg)
 	local output = msg.reply_to_message.text:gsub(
 		msg.text:match('^/s/(.-)/(.-)/?$')
 	)
-	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"?'
+	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
 	sendReply(msg.reply_to_message, output)
 
 end
