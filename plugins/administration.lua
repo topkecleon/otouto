@@ -930,7 +930,7 @@ for i,v in ipairs(commands) do
 	end
 end
 
-help_text = ''
+local help_text = ''
 for i = 1, 5 do
 	help_text = help_text .. '*' .. ranks[i] .. ':*\n'
 	for ind,val in pairs(commands) do

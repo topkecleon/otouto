@@ -7,7 +7,7 @@ if not database.moderation then
 	database.moderation = {}
 end
 
-antisquig = {}
+local antisquig = {}
 
 local commands = {
 
@@ -15,20 +15,22 @@ local commands = {
 
 		if not database.moderation[msg.chat.id_str] then return end
 
-		local message = [[
-			/modlist - List the moderators and administrators of this group.
-			Moderator commands:
-			/modkick - Kick a user from this group.
-			/modban - Ban a user from this group.
-			Administrator commands:
-			/modadd - Add this group to the moderation system.
-			/modrem - Remove this group from the moderation system.
-			/modprom - Promote a user to a moderator.
-			/moddem - Demote a moderator to a user.
-			/modcast - Send a broadcast to every moderated group.
+		local output = [[
+			*Users:*
+			• /modlist - List the moderators and administrators of this group.
+			*Moderators:*
+			• /modkick - Kick a user from this group.
+			• /modban - Ban a user from this group.
+			*Administrators:*
+			• /modadd - Add this group to the moderation system.
+			• /modrem - Remove this group from the moderation system.
+			• /modprom - Promote a user to a moderator.
+			• /moddem - Demote a moderator to a user.
+			• /modcast - Send a broadcast to every moderated group.
 		]]
+		output = output:gsub('\t', '')
 
-		return message
+		sendMessage(msg.chat.id, output, true, nil, true)
 
 	end,
 
@@ -36,29 +38,29 @@ local commands = {
 
 		if not database.moderation[msg.chat.id_str] then return end
 
-		local message = ''
+		local output = ''
 
 		for k,v in pairs(database.moderation[msg.chat.id_str]) do
-			message = message .. ' - ' .. v .. ' (' .. k .. ')\n'
+			output = output .. '• ' .. v .. ' (' .. k .. ')\n'
 		end
 
-		if message ~= '' then
-			message = 'Moderators for ' .. msg.chat.title .. ':\n' .. message .. '\n'
+		if output ~= '' then
+			output = '*Moderators for* _' .. msg.chat.title .. '_ *:*\n' .. output
 		end
 
-		message = message .. 'Administrators for ' .. config.moderation.realm_name .. ':\n'
+		output = output .. '*Administrators for* _' .. config.moderation.realm_name .. '_ *:*\n'
 		for k,v in pairs(config.moderation.admins) do
-			message = message .. ' - ' .. v .. ' (' .. k .. ')\n'
+			output = output .. '• ' .. v .. ' (' .. k .. ')\n'
 		end
 
-		return message
+		sendMessage(msg.chat.id, output, true, nil, true)
 
 	end,
 
 	['^/modcast[@'..bot.username..']*'] = function(msg)
 
-		local message = msg.text:input()
-		if not message then
+		local output = msg.text:input()
+		if not output then
 			return 'You must include a message.'
 		end
 
@@ -67,11 +69,13 @@ local commands = {
 		end
 
 		if not config.moderation.admins[msg.from.id_str] then
-			return config.errors.not_admin
+			return config.moderation.errors.not_admin
 		end
 
+		output = '*Admin Broadcast:*\n' .. output
+
 		for k,v in pairs(database.moderation) do
-			sendMessage(k, message)
+			sendMessage(k, output, true, nil, true)
 		end
 
 		return 'Your broadcast has been sent.'
@@ -81,7 +85,7 @@ local commands = {
 	['^/modadd[@'..bot.username..']*$'] = function(msg)
 
 		if not config.moderation.admins[msg.from.id_str] then
-			return config.errors.not_admin
+			return config.moderation.errors.not_admin
 		end
 
 		if database.moderation[msg.chat.id_str] then
@@ -96,11 +100,11 @@ local commands = {
 	['^/modrem[@'..bot.username..']*$'] = function(msg)
 
 		if not config.moderation.admins[msg.from.id_str] then
-			return config.errors.not_admin
+			return config.moderation.errors.not_admin
 		end
 
 		if not database.moderation[msg.chat.id_str] then
-			return config.errors.moderation
+			return config.moderation.errors.moderation
 		end
 
 		database.moderation[msg.chat.id_str] = nil
@@ -113,7 +117,7 @@ local commands = {
 		if not database.moderation[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
-			return config.errors.not_admin
+			return config.moderation.errors.not_admin
 		end
 
 		if not msg.reply_to_message then
@@ -142,7 +146,7 @@ local commands = {
 		if not database.moderation[msg.chat.id_str] then return end
 
 		if not config.moderation.admins[msg.from.id_str] then
-			return config.errors.not_admin
+			return config.moderation.errors.not_admin
 		end
 
 		local modid = msg.text:input()
@@ -176,7 +180,7 @@ local commands = {
 
 		if not database.moderation[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then
-				return config.errors.not_mod
+				return config.moderation.errors.not_mod
 			end
 		end
 
@@ -208,7 +212,7 @@ local commands = {
 
 		if not database.moderation[msg.chat.id_str][msg.from.id_str] then
 			if not config.moderation.admins[msg.from.id_str] then
-				return config.errors.not_mod
+				return config.moderation.errors.not_mod
 			end
 		end
 
@@ -236,7 +240,7 @@ local commands = {
 
 }
 
-if config.antisquig then
+if config.moderation.antisquig then
 	commands['[\216-\219][\128-\191]'] = function(msg)
 
 		if not database.moderation[msg.chat.id_str] then return true end
@@ -248,10 +252,9 @@ if config.antisquig then
 		end
 		antisquig[msg.from.id] = true
 
-		sendReply(msg, config.errors.antisquig)
+		sendReply(msg, config.moderation.errors.antisquig)
 		sendMessage(config.moderation.admin_group, '/kick ' .. msg.from.id .. ' from ' .. math.abs(msg.chat.id))
 		sendMessage(config.moderation.admin_group, 'ANTISQUIG: ' .. msg.from.first_name .. ' kicked from ' .. msg.chat.title .. '.')
-
 
 	end
 end
@@ -279,7 +282,7 @@ local action = function(msg)
 
 end
 
- -- When a user is kicked for squigglies, his ID is added to this table.
+ -- When a user is kicked for squiggles, his ID is added to this table.
  -- That user will not be kicked again as long as his ID is in the table.
  -- The table is emptied every five seconds.
  -- Thus the bot will not spam the group or admin group when a user posts more than one infringing messages.
