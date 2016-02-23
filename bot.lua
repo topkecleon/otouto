@@ -11,10 +11,8 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	dofile('bindings.lua') -- Load Telegram bindings.
 	dofile('utilities.lua') -- Load miscellaneous and cross-plugin functions.
 
-	-- Save the database if it exists. Load it otherwise.
-	if database then
-		save_data('otouto.db', database)
-	else
+	-- Load the "database"! ;)
+	if not database then
 		database = load_data('otouto.db')
 	end
 
@@ -28,7 +26,7 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 		table.insert(plugins, p)
 	end
 
-	print('@'..bot.username .. ', AKA ' .. bot.first_name ..' ('..bot.id..')')
+	print('@' .. bot.username .. ', AKA ' .. bot.first_name ..' ('..bot.id..')')
 
 	-- Generate a random seed and "pop" the first random number. :)
 	math.randomseed(os.time())

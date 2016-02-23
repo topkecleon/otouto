@@ -1,10 +1,39 @@
+--[[
+	administration.lua
+	Version 1.1
+	Part of the otouto project.
+	© 2016 topkecleon <drew@otou.to>
+	GNU General Public License, version 2
+
+	This plugin provides self-hosted, single-realm group administration.
+	It requires tg (http://github.com/vysheng/tg) with supergroup support.
+	For more documentation, view the readme or the manual (otou.to/rtfm).
+
+	Important notices about updates will be here!
+	Remember to load this before blacklist.lua.
+	The global banlist has been merged with the blacklist. This merge will occur
+	automatically on versions 1.1 and 1.2.
+]]--
+
+ -- Build the administration db if nonexistent.
 if not database.administration then
 	database.administration = {
 		global = {
-			bans = {},
 			admins = {}
 		}
 	}
+end
+
+ -- Create the blacklist db if nonexistant.
+database.blacklist = database.blacklist or {}
+
+ -- Migration code: Remove this in v1.3.
+ -- Global ban list has been merged with blacklist.
+if database.administration.global.bans then
+	for k in pairs(database.administration.global.bans) do
+		database.blacklist[k] = true
+	end
+	database.administration.global.bans = nil
 end
 
 local sender = dofile('lua-tg/sender.lua')
@@ -74,7 +103,7 @@ local get_rank = function(target, chat)
 		end
 	end
 
-	if database.administration.global.bans[target] then
+	if database.blacklist[target] then
 		return 0
 	end
 
@@ -137,6 +166,25 @@ local get_photo = function(chat)
 	end
 	filename = filename:gsub('Saved to ', '')
 	return filename
+
+end
+
+local get_desc = function(chat_id)
+
+	local group = database.administration[tostring(chat_id)]
+	local output
+	if group.link then
+		output = '*Welcome to* [' .. group.name .. '](' .. group.link .. ')*!*'
+	else
+		output = '*Welcome to* _' .. group.name .. '_*!*'
+	end
+	if group.motd then
+		output = output .. '\n\n*Message of the Day:*\n' .. group.motd
+	end
+	if group.rules then
+		output = output .. '\n\n*Rules:*\n' .. group.rules
+	end
+	return output
 
 end
 
@@ -226,18 +274,7 @@ local commands = {
 						return
 					end
 				else
-					local output
-					if group.link then
-						output = '*Welcome to* [' .. msg.chat.title .. '](' .. group.link .. ')*!*'
-					else
-						output = '*Welcome to* _' .. msg.chat.title .. '_*!*'
-					end
-					if group.motd then
-						output = output .. '\n\n*Message of the Day:*\n' .. group.motd
-					end
-					if group.rules then
-						output = output .. '\n\n*Rules:*\n' .. group.rules
-					end
+					local output = get_desc(msg.chat.id)
 					if not sendMessage(msg.new_chat_participant.id, output, true, nil, true) then
 						sendMessage(msg.chat.id, output, true, nil, true)
 					end
@@ -323,7 +360,7 @@ local commands = {
 		interior = true,
 
 		action = function(msg)
-			sendMessage(msg.chat.id, help_text, true, nil, true)
+			sendMessage(msg.chat.id, database.administration.global.help, true, nil, true)
 		end
 	},
 
@@ -363,9 +400,25 @@ local commands = {
 
 	},
 
+	{ -- desc
+		triggers = {
+			'^/desc[@'..bot.username..']*$',
+			'^/description[@'..bot.username..']*$'
+		},
+
+		command = 'description',
+		privilege = 1,
+		interior = true,
+
+		action = function(msg)
+			local output = get_desc(msg.chat.id)
+			sendMessage(msg.chat.id, output, true, nil, true)
+		end
+	},
+
 	{ -- rules
 		triggers = {
-			'^/rules[@'..bot.username..']*'
+			'^/rules[@'..bot.username..']*$'
 		},
 
 		command = 'rules',
@@ -509,7 +562,7 @@ local commands = {
 				return
 			end
 			if not database.administration[msg.chat.id_str].bans[target.id_str] then
-				if database.administration.global.bans[target.id_str] then
+				if database.blacklist[target.id_str] then
 					sendReply(msg, target.name .. ' is banned globally.')
 				else
 					sendReply(msg, target.name .. ' is not banned.')
@@ -759,7 +812,7 @@ local commands = {
 				sendReply(msg, target.name .. ' cannot be banned: Too privileged.')
 				return
 			end
-			if database.administration.global.bans[target.id_str] then
+			if database.blacklist[target.id_str] then
 				sendReply(msg, target.name .. ' is already banned globally.')
 				return
 			end
@@ -768,7 +821,7 @@ local commands = {
 					kick_user(target.id, k)
 				end
 			end
-			database.administration.global.bans[target.id_str] = true
+			database.blacklist[target.id_str] = true
 			sendReply(msg, target.name .. ' has been globally banned.')
 		end
 	},
@@ -789,11 +842,11 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			end
-			if not database.administration.global.bans[target.id_str] then
+			if not database.blacklist[target.id_str] then
 				sendReply(msg, target.name .. ' is not banned globally.')
 				return
 			end
-			database.administration.global.bans[target.id_str] = nil
+			database.blacklist[target.id_str] = nil
 			sendReply(msg, target.name .. ' has been globally unbanned.')
 		end
 	},
@@ -923,6 +976,7 @@ local commands = {
 
 }
 
+ -- Generate trigger table.
 local triggers = {}
 for i,v in ipairs(commands) do
 	for key,val in pairs(v.triggers) do
@@ -930,15 +984,17 @@ for i,v in ipairs(commands) do
 	end
 end
 
+ -- Generate help text, and store it so we don't have to use a global variable.
 local help_text = ''
 for i = 1, 5 do
 	help_text = help_text .. '*' .. ranks[i] .. ':*\n'
-	for ind,val in pairs(commands) do
-		if val.privilege == i and val.command then
-			help_text = help_text .. '• /' .. val.command .. '\n'
+	for k,v in pairs(commands) do
+		if v.privilege == i and v.command then
+			help_text = help_text .. '• /' .. v.command .. '\n'
 		end
 	end
 end
+database.administration.global.help = help_text
 
 local action = function(msg) -- wee nesting
 	for i,v in ipairs(commands) do
