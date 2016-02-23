@@ -104,6 +104,7 @@ Send /help to get started.
 		'hearthstone.lua',
 		'shout.lua',
 		'apod.lua',
+		'patterns.lua',
 		-- Put new plugins above this line.
 		'help.lua',
 		'greetings.lua'
