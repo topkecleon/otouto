@@ -12,9 +12,9 @@ You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upl
 
 You may want to set: `admin`, your Telegram ID; `time_offset`, a positive or negative number, denoting the difference, in seconds, of your system clock to UTC; and `lang`, a lowercase, two-letter code representing your language. Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` table (before help.lua).
 
-Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys.
-
 To start the bot, run `./launch.sh`. To stop the bot, send "/halt" from your admin account, and then Ctrl+C out of the loop. If you terminate the bot manually, you risk data loss. If you do not wish the bot to restart automatically, run it with `lua bot.lua`.
+
+Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
 
  - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key
  - lastfm.lua: [last.fm](http://last.fm) API key
