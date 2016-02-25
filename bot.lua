@@ -33,8 +33,7 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	math.random()
 
 	last_update = last_update or 0 -- Set loop variables: Update offset,
-	last_cron = last_cron or os.time() -- the time of the last cron job,
-	last_db_save = os.date('%M', os.time())
+	last_cron = last_cron or os.date('%M', os.time()) -- the time of the last cron job,
 	is_started = true -- and whether or not the bot should be running.
 	database.usernames = database.usernames or {} -- Table to cache usernames by user ID.
 
@@ -100,8 +99,9 @@ while is_started do -- Start a loop while the bot should be running.
 		print(config.errors.connection)
 	end
 
-	if last_cron < os.time() - 5 then -- Run cron jobs if the time has come.
-		last_cron = os.time() -- Update the timer variable.
+	if last_cron ~= os.date('%M', os.time()) then -- Run cron jobs every minute.
+		last_cron = os.date('%M', os.time())
+		save_data('otouto.db', database) -- Save the database.
 		for i,v in ipairs(plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.
 				local res, err = pcall(function() v.cron() end)
@@ -109,11 +109,6 @@ while is_started do -- Start a loop while the bot should be running.
 					handle_exception(err, 'CRON: ' .. i)
 				end
 			end
-		end
-		-- Save the database.
-		if last_db_save ~= os.date('%M', os.time()) then
-			last_db_save = os.date('%M', os.time())
-			save_data('otouto.db', database)
 		end
 	end
 

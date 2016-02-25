@@ -1117,10 +1117,7 @@ local action = function(msg) -- wee nesting
 end
 
 local cron = function()
-	if os.date('%M', os.time()) ~= last_admin_cron then
-		last_admin_cron = os.date('%M', os.time())
-		tg = sender(localhost, config.cli_port)
-	end
+	tg = sender(localhost, config.cli_port)
 end
 
 local command = 'groups'

@@ -5,7 +5,7 @@ Returns a location from Google Maps.
 Alias: /loc
 ```]]
 
-triggers = {
+local triggers = {
 	'^/location[@'..bot.username..']*',
 	'^/loc[@'..bot.username..']* ',
 	'^/loc[@'..bot.username..']*$'
