@@ -6,27 +6,25 @@ The plugin-wielding, multipurpose Telegram bot.
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
 ## Setup {#Setup}
-You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed. Different plugins may require various API keys.
-
-| Plugin | API Key | Required? |
-|:-------|:--------|:----------|
-| weather.lua | [OpenWeatherMap](http://openweathermap.org) API key | Y |
-| lastfm.lua | [last.fm](http://last.fm) API key | Y |
-| bible.lua | [Biblia](http://biblia.com) API key | Y |
-| cats.lua | [The Cat API](http://thecatapi.com) API key (optional) | N |
-| gImages.lua | [Google](http://console.developers.google.com) API and CSE keys | Y |
-| youtube.lua | [Google](http://console.developers.google.com) API key | Y |
-| apod.lua | [NASA](http://api.nasa.gov) API key | N |
-| translate.lua | [Yandex](https://tech.yandex.com/keys/get/?service=trnsl) API key | Y |
-| chatter.lua | [SimSimi](http://developer.simsimi.com/signUp) API key | N |
-
-Certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled.
+You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
 **Before doing anything**, open config.lua and set `bot_api_key` to the authentication token you received from the Botfather.
 
 You may want to set: `admin`, your Telegram ID; `time_offset`, a positive or negative number, denoting the difference, in seconds, of your system clock to UTC; and `lang`, a lowercase, two-letter code representing your language. Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` table (before help.lua).
 
+Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys.
+
 To start the bot, run `./launch.sh`. To stop the bot, send "/halt" from your admin account, and then Ctrl+C out of the loop. If you terminate the bot manually, you risk data loss. If you do not wish the bot to restart automatically, run it with `lua bot.lua`.
+
+ - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key
+ - lastfm.lua: [last.fm](http://last.fm) API key
+ - bible.lua: [Biblia](http://biblia.com) API key
+ - cats.lua: [The Cat API](http://thecatapi.com) API key (optional)
+ - gImages.lua: [Google](http://console.developers.google.com) API and CSE keys
+ - youtube.lua: [Google](http://console.developers.google.com) API key
+ - apod.lua: [NASA](http://api.nasa.gov) API key
+ - translate.lua: [Yandex](https://tech.yandex.com/keys/get/?service=trnsl) API key
+ - chatter.lua: [SimSimi](http://developer.simsimi.com/signUp) API key
 
 * * *
 
@@ -127,7 +125,7 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 ### Flags
 
 | # | Name | Description |
-|:-:|:----:|:-----------:|
+|:-:|:-----|:------------|
 | 1 | unlisted | Removes a group from the /groups listing. |
 | 2 | antisquig | Automatically removes users for posting Arabic script or RTL characters. |
 | 3 | antisquig Strict | Automatically removes users whose names contain Arabic script or RTL characters. |
