@@ -1,4 +1,4 @@
-local command = 'apod [query]'
+local command = 'apod [date]'
 local doc = [[```
 /apod [query]
 Returns the Astronomy Picture of the Day.

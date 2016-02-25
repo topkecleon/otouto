@@ -14,11 +14,12 @@ end
 sendRequest = function(url)
 
 	local dat, res = HTTPS.request(url)
-	local tab = JSON.decode(dat)
 
 	if res ~= 200 then
 		return false, res
 	end
+
+	local tab = JSON.decode(dat)
 
 	if not tab.ok then
 		return false, tab.description

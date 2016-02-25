@@ -5,13 +5,13 @@ local help_text = '*Available commands:*'
 
 for i,v in ipairs(plugins) do
 	if v.command then
-		help_text = help_text .. '\n /' .. v.command:gsub('%[', '\\[')
+		help_text = help_text .. '\n• /' .. v.command:gsub('%[', '\\[')
 	end
 end
 
 help_text = help_text .. [[
 
- /help <command>
+• /help <command>
 Arguments: <required> \[optional]
 ]]
 

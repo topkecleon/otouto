@@ -46,7 +46,10 @@ local action = function(msg)
 	end
 
 	local i = math.random(jdat.pageInfo.resultsPerPage)
-	local output = '[​](https://www.youtube.com/watch?v=' .. jdat.items[i].id.videoId .. ')'
+	local vid_url = 'https://www.youtube.com/watch?v=' .. jdat.items[i].id.videoId
+	local vid_title = jdat.items[i].snippet.title
+	vid_title = vid_title:gsub('%(.+%)',''):gsub('%[.+%]','')
+	local output = '[' .. vid_title .. '](' .. vid_url .. ')'
 
 	sendMessage(msg.chat.id, output, false, nil, true)
 

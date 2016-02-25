@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.1
+	Version 1.2
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -11,8 +11,12 @@
 
 	Important notices about updates will be here!
 	Remember to load this before blacklist.lua.
+
 	The global banlist has been merged with the blacklist. This merge will occur
 	automatically on versions 1.1 and 1.2.
+
+	Group rules will now be stored in tables rather than pre-numbered strings.
+	Automatic migration will be in effect in versions 1.2 and 1.3.
 ]]--
 
  -- Build the administration db if nonexistent.
@@ -36,6 +40,18 @@ if database.administration.global.bans then
 	database.administration.global.bans = nil
 end
 
+ -- Migration code: Remove this in v1.4.
+ -- Rule lists have been converted from strings to tables.
+for k,v in pairs(database.administration) do
+	if type(v.rules) == 'string' then
+		local t = {}
+		for l in v.rules:gmatch('(.-)\n') do
+			table.insert(t, l:sub(6))
+		end
+		v.rules = t
+	end
+end
+
 local sender = dofile('lua-tg/sender.lua')
 tg = sender(localhost, config.cli_port)
 local last_admin_cron = os.date('%M', os.time())
@@ -44,26 +60,30 @@ local flags = {
 	[1] = {
 		name = 'unlisted',
 		desc = 'Removes this group from the group listing.',
+		short = 'This group is unlisted.',
 		enabled = 'This group is no longer listed in /groups.',
 		disabled = 'This group is now listed in /groups.'
 	},
 	[2] = {
 		name = 'antisquig',
 		desc = 'Automatically removes users who post Arabic script or RTL characters.',
+		short = 'This group does not allow Arabic script or RTL characters.',
 		enabled = 'Users will now be removed automatically for posting Arabic script and/or RTL characters.',
 		disabled = 'Users will no longer be removed automatically for posting Arabic script and/or RTL characters..',
-		kicked = 'You were kicked from GROUPNAME for posting Arabic script and/or RTL characters.'
+		kicked = 'You were automatically kicked from GROUPNAME for posting Arabic script and/or RTL characters.'
 	},
 	[3] = {
 		name = 'antisquig Strict',
 		desc = 'Automatically removes users whose names contain Arabic script or RTL characters.',
+		short = 'This group does not allow users whose names contain Arabic script or RTL characters.',
 		enabled = 'Users whose names contain Arabic script and/or RTL characters will now be removed automatically.',
 		disabled = 'Users whose names contain Arabic script and/or RTL characters will no longer be removed automatically.',
-		kicked = 'You were kicked from GROUPNAME for having a name which contains Arabic script and/or RTL characters.'
+		kicked = 'You were automatically kicked from GROUPNAME for having a name which contains Arabic script and/or RTL characters.'
 	},
 	[4] = {
 		name = 'antibot',
 		desc = 'Prevents the addition of bots by non-moderators. Only useful in non-supergroups.',
+		short = 'This group does not allow users to add bots.',
 		enabled = 'Non-moderators will no longer be able to add bots.',
 		disabled = 'Non-moderators will now be able to add bots.'
 	}
@@ -182,7 +202,18 @@ local get_desc = function(chat_id)
 		output = output .. '\n\n*Message of the Day:*\n' .. group.motd
 	end
 	if group.rules then
-		output = output .. '\n\n*Rules:*\n' .. group.rules
+		output = output .. '\n\n*Rules:*\n'
+		for i,v in ipairs(group.rules) do
+			output = output .. '*' .. i .. '.* ' .. v .. '\n'
+		end
+	end
+	if group.flags then
+		output = output .. '\n*Flags:*\n'
+		for i = 1, #flags do
+			if group.flags[i] then
+				output = output .. '• ' .. flags[i].short .. '\n'
+			end
+		end
 	end
 	return output
 
@@ -193,7 +224,8 @@ local commands = {
 	{ -- antisquig
 		triggers = {
 			'[\216-\219][\128-\191]', -- arabic
-			'‮' -- rtl
+			'‮', -- rtl
+			'‏', -- other rtl
 		},
 
 		privilege = 0,
@@ -235,7 +267,7 @@ local commands = {
 
 				-- antisquig Strict
 				if group.flags[3] == true then
-					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') then
+					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
 						kick_user(msg.from.id, msg.chat.id)
 						sendMessage(msg.from.id, flags[3].kicked:gsub('GROUPNAME', msg.chat.title))
 						return
@@ -260,7 +292,7 @@ local commands = {
 
 				-- antisquig Strict
 				if group.flags[3] == true then
-					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') then
+					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
 						kick_user(msg.new_chat_participant.id, msg.chat.id)
 						sendMessage(msg.new_chat_participant.id, flags[3].kicked:gsub('GROUPNAME', msg.chat.title))
 						return
@@ -275,9 +307,7 @@ local commands = {
 					end
 				else
 					local output = get_desc(msg.chat.id)
-					if not sendMessage(msg.new_chat_participant.id, output, true, nil, true) then
-						sendMessage(msg.chat.id, output, true, nil, true)
-					end
+					sendMessage(msg.new_chat_participant.id, output, true, nil, true)
 					return
 				end
 
@@ -360,7 +390,18 @@ local commands = {
 		interior = true,
 
 		action = function(msg)
-			sendMessage(msg.chat.id, database.administration.global.help, true, nil, true)
+			local rank = get_rank(msg.from.id, msg.chat.id)
+			local output = '*Commands for ' .. ranks[rank] .. ':*\n'
+			for i = 1, rank do
+				for ind, val in ipairs(database.administration.global.help[i]) do
+					output = output .. '• /' .. val .. '\n'
+				end
+			end
+			if sendMessage(msg.from.id, output, true, nil, true) then
+				sendReply(msg, 'I have sent you the requested information in a private message.')
+			else
+				sendMessage(msg.chat.id, output, true, nil, true)
+			end
 		end
 	},
 
@@ -412,7 +453,11 @@ local commands = {
 
 		action = function(msg)
 			local output = get_desc(msg.chat.id)
-			sendMessage(msg.chat.id, output, true, nil, true)
+			if sendMessage(msg.from.id, output, true, nil, true) then
+				sendReply(msg, 'I have sent you the requested information in a private message.')
+			else
+				sendMessage(msg.chat.id, output, true, nil, true)
+			end
 		end
 	},
 
@@ -428,7 +473,10 @@ local commands = {
 		action = function(msg)
 			local output = 'No rules have been set for ' .. msg.chat.title .. '.'
 			if database.administration[msg.chat.id_str].rules then
-				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. database.administration[msg.chat.id_str].rules
+				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
+				for i,v in ipairs(database.administration[msg.chat.id_str].rules) do
+					output = output .. '*' .. i .. '.* ' .. v .. '\n'
+				end
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -574,6 +622,59 @@ local commands = {
 		end
 	},
 
+	{ -- changerule
+		triggers = {
+			'^/changerule',
+			'^/changerule@' .. bot.username
+		},
+
+		command = 'changerule <i> <newrule>',
+		privilege = 3,
+		interior = true,
+
+		action = function(msg)
+			local usage = 'usage: `/changerule <i> <newrule>`\n`/changerule <i> -- `deletes.'
+			local input = msg.text:input()
+			if not input then
+				sendMessage(msg.chat.id, usage, true, msg.message_id, true)
+				return
+			end
+			local rule_num = input:match('^%d+')
+			if not rule_num then
+				local output = 'Please specify which rule you want to change.\n' .. usage
+				sendMessage(msg.chat.id, output, true, msg.message_id, true)
+				return
+			end
+			rule_num = tonumber(rule_num)
+			local rule_new = input:input()
+			if not rule_new then
+				local output = 'Please specify the new rule.\n' .. usage
+				sendMessage(msg.chat.id, output, true, msg.message_id, true)
+				return
+			end
+			if not database.administration[msg.chat.id_str].rules then
+				local output = 'Sorry, there are no rules to change. Please use /setrules.\n' .. usage
+				sendMessage(msg.chat.id, output, true, msg.message_id, true)
+				return
+			end
+			if not database.administration[msg.chat.id_str].rules[rule_num] then
+				rule_num = #database.administration[msg.chat.id_str].rules + 1
+			end
+			if rule_new == '--' or rule_new == '—' then
+				if database.administration[msg.chat.id_str].rules[rule_num] then
+					table.remove(database.administration[msg.chat.id_str].rules, rule_num)
+					sendReply(msg, 'That rule has been deleted.')
+				else
+					sendReply(msg, 'There is no rule with that number.')
+				end
+				return
+			end
+			database.administration[msg.chat.id_str].rules[rule_num] = rule_new
+			local output = '*' .. rule_num .. '*. ' .. rule_new
+			sendMessage(msg.chat.id, output, true, nil, true)
+		end
+	},
+
 	{ -- setrules
 		triggers = {
 			'^/setrules[@'..bot.username..']*'
@@ -589,15 +690,15 @@ local commands = {
 				sendReply(msg, '/setrules [rule]\n<rule>\n[rule]\n...')
 				return
 			end
+			database.administration[msg.chat.id_str].rules = {}
 			input = input:trim() .. '\n'
-			local output = ''
-			local i = 0
-			for m in input:gmatch('(.-)\n') do
+			local output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
+			local i = 1
+			for l in input:gmatch('(.-)\n') do
+				output = output .. '*' .. i .. '.* ' .. l .. '\n'
 				i = i + 1
-				output = output .. '*' .. i .. '.* ' .. m:trim() .. '\n'
+				table.insert(database.administration[msg.chat.id_str].rules, l:trim())
 			end
-			database.administration[msg.chat.id_str].rules = output
-			output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n' .. output
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
 	},
@@ -665,7 +766,7 @@ local commands = {
 				local output = '*Flags for* _' .. msg.chat.title .. '_ *:*\n'
 				for i,v in ipairs(flags) do
 					local status = database.administration[msg.chat.id_str].flags[i] or false
-					output = output .. '`[' .. i .. ']` *' .. v.name .. '* = `' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
+					output = output .. '`[' .. i .. ']` *' .. v.name .. '*` = ' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
 				end
 				sendMessage(msg.chat.id, output, true, nil, true)
 				return
@@ -984,17 +1085,16 @@ for i,v in ipairs(commands) do
 	end
 end
 
- -- Generate help text, and store it so we don't have to use a global variable.
-local help_text = ''
-for i = 1, 5 do
-	help_text = help_text .. '*' .. ranks[i] .. ':*\n'
-	for k,v in pairs(commands) do
-		if v.privilege == i and v.command then
-			help_text = help_text .. '• /' .. v.command .. '\n'
-		end
+database.administration.global.help = {}
+for i,v in pairs(ranks) do
+	database.administration.global.help[i] = {}
+end
+for i,v in ipairs(commands) do
+	if v.command then
+		table.insert(database.administration.global.help[v.privilege], v.command)
 	end
 end
-database.administration.global.help = help_text
+
 
 local action = function(msg) -- wee nesting
 	for i,v in ipairs(commands) do

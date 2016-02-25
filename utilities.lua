@@ -187,14 +187,12 @@ download_file = function(url, filename)
 
 	if code ~= 200 then return false end
 
-	filename = filename or os.time()
+	filename = filename or '/tmp/' .. os.time()
 
-	local file_path = '/tmp/'..filename
-
-	file = io.open(file_path, 'w+')
+	local file = io.open(filename, 'w+')
 	file:write(table.concat(respbody))
 	file:close()
 
-	return file_path
+	return filename
 
 end
