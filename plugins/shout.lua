@@ -25,11 +25,11 @@ local action = function(msg)
 	input = input:upper()
 	local output = ''
 	local inc = 0
-	for match in input:gmatch('.') do
+	for match in input:gmatch('([%z\1-\127\194-\244][\128-\191]*)') do
 		output = output .. match .. ' '
 	end
 	output = output .. '\n'
-	for match in input:sub(2):gmatch('.') do
+	for match in input:sub(2):gmatch('([%z\1-\127\194-\244][\128-\191]*)') do
 		local spacing = ''
 		for i = 1, inc do
 			spacing = spacing .. '  '
