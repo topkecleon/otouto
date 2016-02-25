@@ -1,7 +1,7 @@
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-[Public Bot](http://telegram.me/mokubot) ¦ [Official Channel](http://telegram.me/otouto) ¦ [Development Group](http://telegram.me/BotDevelopment)
+[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment) | [Owner's Manual](http://otou.to/rtfm)
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
@@ -202,6 +202,10 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 | patterns.lua | /s/<from>/<to>/ | Fixed that for you. :^) |
 
 * * *
+
+## Style {#Style}
+Bot output from every plugin should follow a consistent style. This style is easily observed interacting with the bot.
+Titles should be either **bold** (along with their colons) or a [link](http://otou.to) (with plaintext colons) to the content's source. Names should be _italic_. Numbered lists should use bold numbers followed by a bold period followed by a space. Unnumbered lists should use the • bullet point followed by a space. Descriptions and information should be in plaintext, although "flavor" text should be italic. Technical information should be `monospace`. Links should be named.
 
 ## Contributors {#Contributors}
 Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests.. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.
