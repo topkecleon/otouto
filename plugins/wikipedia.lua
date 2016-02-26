@@ -43,7 +43,7 @@ local action = function(msg)
 		return
 	end
 --
-	local url = jdat.responseData.results[1].url
+	local url = URL.unescape(jdat.responseData.results[1].url)
 	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
 
 	jstr, res = HTTPS.request(wurl .. URL.escape(title))
