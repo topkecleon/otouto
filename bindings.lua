@@ -48,7 +48,7 @@ getUpdates = function(offset)
 
 end
 
-sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
+sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, disable_notification)
 
 	local url = BASE_URL .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. URL.escape(text)
 
@@ -62,6 +62,10 @@ sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message
 
 	if use_markdown then
 		url = url .. '&parse_mode=Markdown'
+	end
+
+	if disable_notification then
+		url = url .. '&disable_notification='..disable_notification
 	end
 
 	return sendRequest(url)
@@ -82,7 +86,7 @@ sendChatAction = function(chat_id, action)
 
 end
 
-sendLocation = function(chat_id, latitude, longitude, reply_to_message_id)
+sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendLocation?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude
 
@@ -90,13 +94,21 @@ sendLocation = function(chat_id, latitude, longitude, reply_to_message_id)
 		url = url .. '&reply_to_message_id=' .. reply_to_message_id
 	end
 
+	if disable_notification then
+		url = url .. '&disable_notification='..disable_notification
+	end
+
 	return sendRequest(url)
 
 end
 
-forwardMessage = function(chat_id, from_chat_id, message_id)
+forwardMessage = function(chat_id, from_chat_id, message_id, disable_notification)
 
 	local url = BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
+
+	if disable_notification then
+		url = url .. '&disable_notification='..disable_notification
+	end
 
 	return sendRequest(url)
 
@@ -109,7 +121,7 @@ curlRequest = function(curl_command)
 
 end
 
-sendPhoto = function(chat_id, photo, caption, reply_to_message_id)
+sendPhoto = function(chat_id, photo, caption, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendPhoto'
 
@@ -123,11 +135,15 @@ sendPhoto = function(chat_id, photo, caption, reply_to_message_id)
 		curl_command = curl_command .. ' -F "caption=' .. caption .. '"'
 	end
 
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+	end
+
 	return curlRequest(curl_command)
 
 end
 
-sendDocument = function(chat_id, document, reply_to_message_id)
+sendDocument = function(chat_id, document, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendDocument'
 
@@ -137,11 +153,15 @@ sendDocument = function(chat_id, document, reply_to_message_id)
 		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
 	end
 
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+	end
+
 	return curlRequest(curl_command)
 
 end
 
-sendSticker = function(chat_id, sticker, reply_to_message_id)
+sendSticker = function(chat_id, sticker, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendSticker'
 
@@ -151,11 +171,15 @@ sendSticker = function(chat_id, sticker, reply_to_message_id)
 		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
 	end
 
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+	end
+
 	return curlRequest(curl_command)
 
 end
 
-sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, title)
+sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, title, disable_notification)
 
 	local url = BASE_URL .. '/sendAudio'
 
@@ -177,11 +201,15 @@ sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, t
 		curl_command = curl_command .. ' -F "title=' .. title .. '"'
 	end
 
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+	end
+
 	return curlRequest(curl_command)
 
 end
 
-sendVideo = function(chat_id, video, reply_to_message_id, duration, performer, title)
+sendVideo = function(chat_id, video, reply_to_message_id, duration, caption, disable_notification)
 
 	local url = BASE_URL .. '/sendVideo'
 
@@ -199,11 +227,15 @@ sendVideo = function(chat_id, video, reply_to_message_id, duration, performer, t
 		curl_command = curl_command .. ' -F "duration=' .. duration .. '"'
 	end
 
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+	end
+
 	return curlRequest(curl_command)
 
 end
 
-sendVoice = function(chat_id, voice, reply_to_message_id)
+sendVoice = function(chat_id, voice, reply_to_message_id, duration, disable_notification)
 
 	local url = BASE_URL .. '/sendVoice'
 
@@ -215,6 +247,10 @@ sendVoice = function(chat_id, voice, reply_to_message_id)
 
 	if duration then
 		curl_command = curl_command .. ' -F "duration=' .. duration .. '"'
+	end
+
+	if disable_notification then
+		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
 	end
 
 	return curlRequest(curl_command)
