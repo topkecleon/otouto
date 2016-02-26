@@ -43,10 +43,11 @@ local action = function(msg)
 		return
 	end
 --
-	local url = URL.unescape(jdat.responseData.results[1].url)
+	local url = jdat.responseData.results[1].unescapedUrl
 	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
 
-	jstr, res = HTTPS.request(wurl .. URL.escape(title))
+	-- 'https://en.wikipedia.org/wiki/':len ≡ 30
+	jstr, res = HTTPS.request(wurl .. url:sub(31))
 	if res ~= 200 then
 		sendReply(msg, config.error.connection)
 		return
