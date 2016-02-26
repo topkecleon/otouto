@@ -72,7 +72,8 @@ local action = function(msg)
 	title = title:gsub('%(.+%)', '')
 	--local output = '[' .. title .. '](' .. url .. ')\n' .. text:gsub('%[.+]%','')
 	--local output = '*' .. title .. '*\n' .. text:gsub('%[.+]%','') .. '\n[Read more.](' .. url .. ')'
-	local output = text:gsub('%[.+%]',''):gsub(title, '*'..title..'*') .. '\n'
+	local esctitle = title:gsub("[%^$()%%.%[%]*+%-?]","%%%1")
+	local output = text:gsub('%[.+%]',''):gsub(esctitle, '*%1*') .. '\n'
 	if url:find('%(') then
 		output = output .. url:gsub('_', '\\_')
 	else
