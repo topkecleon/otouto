@@ -65,7 +65,7 @@ sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message
 	end
 
 	if disable_notification then
-		url = url .. '&disable_notification='..disable_notification
+		url = url .. '&disable_notification=true'
 	end
 
 	return sendRequest(url)
@@ -95,7 +95,7 @@ sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disab
 	end
 
 	if disable_notification then
-		url = url .. '&disable_notification='..disable_notification
+		url = url .. '&disable_notification=true'
 	end
 
 	return sendRequest(url)
@@ -107,7 +107,7 @@ forwardMessage = function(chat_id, from_chat_id, message_id, disable_notificatio
 	local url = BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
 
 	if disable_notification then
-		url = url .. '&disable_notification='..disable_notification
+		url = url .. '&disable_notification=true'
 	end
 
 	return sendRequest(url)
@@ -136,7 +136,7 @@ sendPhoto = function(chat_id, photo, caption, reply_to_message_id, disable_notif
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
@@ -154,7 +154,7 @@ sendDocument = function(chat_id, document, reply_to_message_id, disable_notifica
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
@@ -172,7 +172,7 @@ sendSticker = function(chat_id, sticker, reply_to_message_id, disable_notificati
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
@@ -202,7 +202,7 @@ sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, t
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
@@ -228,7 +228,7 @@ sendVideo = function(chat_id, video, reply_to_message_id, duration, caption, dis
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
@@ -250,7 +250,7 @@ sendVoice = function(chat_id, voice, reply_to_message_id, duration, disable_noti
 	end
 
 	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=' .. disable_notification .. '"'
+		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
 	return curlRequest(curl_command)
