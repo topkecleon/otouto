@@ -42,11 +42,11 @@ local action = function(msg)
 		sendReply(msg, config.errors.results)
 		return
 	end
---
+
 	local url = jdat.responseData.results[1].unescapedUrl
 	local title = jdat.responseData.results[1].titleNoFormatting:gsub(' %- Wikipedia, the free encyclopedia', '')
 
-	-- 'https://en.wikipedia.org/wiki/':len ≡ 30
+	-- 'https://en.wikipedia.org/wiki/':len() == 30
 	jstr, res = HTTPS.request(wurl .. url:sub(31))
 	if res ~= 200 then
 		sendReply(msg, config.error.connection)
@@ -70,8 +70,6 @@ local action = function(msg)
 	end
 
 	title = title:gsub('%(.+%)', '')
-	--local output = '[' .. title .. '](' .. url .. ')\n' .. text:gsub('%[.+]%','')
-	--local output = '*' .. title .. '*\n' .. text:gsub('%[.+]%','') .. '\n[Read more.](' .. url .. ')'
 	local esctitle = title:gsub("[%^$()%%.%[%]*+%-?]","%%%1")
 	local output = text:gsub('%[.+%]',''):gsub(esctitle, '*%1*') .. '\n'
 	if url:find('%(') then
@@ -79,13 +77,6 @@ local action = function(msg)
 	else
 		output = output .. '[Read more.](' .. url .. ')'
 	end
-
---
---[[ Comment the previous block and uncomment this one for full-message,
- -- "unlinked" link previews.
-	-- Invisible zero-width, non-joiner.
-	local output = '[​](' .. jdat.responseData.results[1].url .. ')'
-]]--
 
 	sendMessage(msg.chat.id, output, true, nil, true)
 
