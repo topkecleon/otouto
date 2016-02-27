@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.2
+	Version 1.3
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -53,7 +53,7 @@ for k,v in pairs(database.administration) do
 end
 
 local sender = dofile('lua-tg/sender.lua')
-tg = sender(localhost, config.cli_port)
+local tg = sender(localhost, config.cli_port)
 local last_admin_cron = os.date('%M', os.time())
 
 local flags = {
@@ -135,10 +135,16 @@ local get_target = function(msg)
 
 	local target = {}
 	if msg.reply_to_message then
-		target.id = msg.reply_to_message.from.id
-		target.name = msg.reply_to_message.from.first_name
-		if msg.reply_to_message.from.last_name then
-			target.name = target.name .. ' ' .. msg.reply_to_message.from.last_name
+		local user = msg.reply_to_message.from
+		if msg.reply_to_message.new_chat_participant then
+			user = msg.reply_to_message.new_chat_participant
+		elseif msg.reply_to_message.left_chat_participant then
+			user = msg.reply_to_message.left_chat_participant
+		end
+		target.id = user.id
+		target.name = user.first_name
+		if user.last_name then
+			target.name = user.first_name .. ' ' .. user.last_name
 		end
 	else
 		target.name = 'User'
@@ -557,7 +563,7 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			elseif target.rank > 1 then
-				sendReply(msg, target.name .. ' cannot be kicked: Too privileged.')
+				sendReply(msg, target.name .. ' is too privileged to be kicked.')
 				return
 			end
 			kick_user(target.id, msg.chat.id)
@@ -581,7 +587,7 @@ local commands = {
 				return
 			end
 			if target.rank > 1 then
-				sendReply(msg, target.name .. ' cannot be banned: Too privileged.')
+				sendReply(msg, target.name .. ' is too privileged to be banned.')
 				return
 			end
 			if database.administration[msg.chat.id_str].bans[target.id_str] then
@@ -611,7 +617,7 @@ local commands = {
 			end
 			if not database.administration[msg.chat.id_str].bans[target.id_str] then
 				if database.blacklist[target.id_str] then
-					sendReply(msg, target.name .. ' is banned globally.')
+					sendReply(msg, target.name .. ' is globally banned.')
 				else
 					sendReply(msg, target.name .. ' is not banned.')
 				end
@@ -798,7 +804,7 @@ local commands = {
 			end
 			local target = get_target(msg)
 			if target.rank > 1 then
-				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
+				sendReply(msg, target.name .. ' is already a moderator or greater.')
 				return
 			end
 			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
@@ -853,7 +859,7 @@ local commands = {
 			end
 			local target = get_target(msg)
 			if target.rank > 2 then
-				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
+				sendReply(msg, target.name .. ' is already a governor or greater.')
 				return
 			elseif target.rank == 2 then
 				database.administration[msg.chat.id_str].mods[target.id_str] = nil
@@ -910,11 +916,11 @@ local commands = {
 				return
 			end
 			if target.rank > 3 then
-				sendReply(msg, target.name .. ' cannot be banned: Too privileged.')
+				sendReply(msg, target.name .. ' is too privileged to be globally banned.')
 				return
 			end
 			if database.blacklist[target.id_str] then
-				sendReply(msg, target.name .. ' is already banned globally.')
+				sendReply(msg, target.name .. ' is already globally banned.')
 				return
 			end
 			for k,v in pairs(database.administration) do
@@ -944,7 +950,7 @@ local commands = {
 				return
 			end
 			if not database.blacklist[target.id_str] then
-				sendReply(msg, target.name .. ' is not banned globally.')
+				sendReply(msg, target.name .. ' is not globally banned.')
 				return
 			end
 			database.blacklist[target.id_str] = nil
@@ -968,7 +974,7 @@ local commands = {
 			end
 			local target = get_target(msg)
 			if target.rank > 3 then
-				sendReply(msg, target.name .. ' cannot be promoted: Already privileged.')
+				sendReply(msg, target.name .. ' is already an administrator or greater.')
 				return
 			elseif target.rank == 2 then
 				database.administration[msg.chat.id_str].mods[target.id_str] = nil
@@ -1043,11 +1049,21 @@ local commands = {
 
 		action = function(msg)
 			local input = msg.text:input()
-			if not input then
-				input = msg.chat.id_str
+			if input then
+				if database.administration[input] then
+					database.administration[input] = nil
+					sendReply(msg, 'I am no longer administrating that group.')
+				else
+					sendReply(msg, 'I do not administrate that group.')
+				end
+			else
+				if database.administration[msg.chat.id_str] then
+					database.administration[msg.chat.id_str] = nil
+					sendReply(msg, 'I am no longer administrating this group.')
+				else
+					sendReply(msg, 'I do not administrate this group.')
+				end
 			end
-			database.administration[input] = nil
-			sendReply(msg, 'I am no longer administrating this group.')
 		end
 	},
 
@@ -1096,7 +1112,7 @@ for i,v in ipairs(commands) do
 end
 
 
-local action = function(msg) -- wee nesting
+local action = function(msg)
 	for i,v in ipairs(commands) do
 		for key,val in pairs(v.triggers) do
 			if msg.text_lower:match(val) then
