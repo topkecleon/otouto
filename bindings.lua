@@ -114,6 +114,28 @@ forwardMessage = function(chat_id, from_chat_id, message_id, disable_notificatio
 
 end
 
+sendPhotoID = function(chat_id, file_id, caption, reply_to_message_id, disable_notification)
+
+	local url = BASE_URL .. '/sendPhoto?chat_id=' .. chat_id .. '&photo=' .. file_id
+
+	if caption then
+		url = url .. '&caption=' .. URL.escape(caption)
+	end
+
+	if reply_to_message_id then
+		url = url .. '&reply_to_message_id=' .. reply_to_message_id
+	end
+
+	if disable_notification then
+		url = url .. '&disable_notification=true'
+	end
+
+	return sendRequest(url)
+
+end
+
+ -- TODO: More of this.
+
 curlRequest = function(curl_command)
  -- Use at your own risk. Will not check for success.
 
