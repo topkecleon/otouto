@@ -11,12 +11,15 @@ local action = function(msg)
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local message = config.about_text .. '\nBased on otouto v'..version..' by topkecleon.\notouto is licensed under the GPLv2.\ngithub.com/topkecleon/otouto'
+	local message = config.about_text .. '\nBased on @otouto v'..version..' by topkecleon.'
 
 	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
 		sendMessage(msg.chat.id, message, true)
 		return
-	elseif string.match(msg.text_lower, '^/about[@'..bot.username..']*') then
+	elseif msg.text_lower:match('^/about[@'..bot.username..']*') then
+		sendMessage(msg.chat.id, message, true)
+		return
+	elseif msg.text_lower:match('^/start') then
 		sendMessage(msg.chat.id, message, true)
 		return
 	end

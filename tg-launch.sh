@@ -6,5 +6,6 @@
 while true; do
 	tg/bin/telegram-cli -P 4567 -E
 	rm ~/.telegram-cli/state
-	sleep 2s
+	echo 'tg has stopped. ^C to exit.'
+	sleep 5s
 done

@@ -1,4 +1,6 @@
-plugins/CUSTOM.lua
-*.json
-lua-tg/*
-tg/*
+plugins/mokubot.lua
+plugins/qtbot.lua
+plugins/weeabot.lua
+*.db
+lua-tg
+tg

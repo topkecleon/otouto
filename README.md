@@ -217,10 +217,20 @@ There are a a few ways to contribute if you are not a programmer. For one, your 
 
 Contributions are appreciated in any form. Monetary contributions will go toward server costs. Both programmers and donators will be eternally honored (at their discretion) on this page.
 
-| Developers | Donators |
-|:-----------|:---------|
-| [Juan Potato](http://github.com/JuanPotato) | [n8](http://telegram.me/n8_c00) |
-| [Tiago Danin](http://github.com/TiagoDanin) | [Alex](http://telegram.me/sandu) |
-| [Ender](http://github.com/luksireiku) | [Brayden Banks](http://telegram.me/bb010g) |
+| Contributors |
+|:-----------|
+| [Juan Potato](http://github.com/JuanPotato) |
+| [Tiago Danin](http://github.com/TiagoDanin) |
+| [bb010g](http://github.com/bb010g) |
+| [Ender](http://github.com/luksireiku) |
 | [Iman Daneshi](http://github.com/Imandaneshi) |
-| [HeitorPB](https://github.com/heitorPB) |
+| [HeitorPB](http://github.com/heitorPB) |
+| [Akronix](http://github.com/Akronix) |
+| [Ville](http://github.com/cwxda) |
+| [dogtopus](http://github.com/dogtopus) |
+
+| Donators |
+|:---------|
+| [n8](http://telegram.me/n8_c00) |
+| [Alex](http://telegram.me/sandu) |
+| [Brayden Banks](http://telegram.me/bb010g) |

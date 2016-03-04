@@ -22,7 +22,7 @@ if not database.hearthstone or os.time() > database.hearthstone.expiration then
 
 	database.hearthstone.expiration = os.time() + 600000
 
-	print('Download complete! It will be permanently stored.')
+	print('Download complete! It will be stored for a week.')
 
 end
 

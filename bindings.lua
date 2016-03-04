@@ -114,6 +114,8 @@ forwardMessage = function(chat_id, from_chat_id, message_id, disable_notificatio
 
 end
 
+ -- TODO: More of this.
+
 sendPhotoID = function(chat_id, file_id, caption, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendPhoto?chat_id=' .. chat_id .. '&photo=' .. file_id
@@ -133,8 +135,6 @@ sendPhotoID = function(chat_id, file_id, caption, reply_to_message_id, disable_n
 	return sendRequest(url)
 
 end
-
- -- TODO: More of this.
 
 curlRequest = function(curl_command)
  -- Use at your own risk. Will not check for success.

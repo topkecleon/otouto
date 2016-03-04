@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.3
+	Version 1.4
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -9,8 +9,9 @@
 	It requires tg (http://github.com/vysheng/tg) with supergroup support.
 	For more documentation, view the readme or the manual (otou.to/rtfm).
 
-	Important notices about updates will be here!
 	Remember to load this before blacklist.lua.
+
+	Important notices about updates will be here!
 
 	The global banlist has been merged with the blacklist. This merge will occur
 	automatically on versions 1.1 and 1.2.
@@ -53,8 +54,7 @@ for k,v in pairs(database.administration) do
 end
 
 local sender = dofile('lua-tg/sender.lua')
-local tg = sender(localhost, config.cli_port)
-local last_admin_cron = os.date('%M', os.time())
+tg = sender('localhost', config.cli_port)
 
 local flags = {
 	[1] = {
@@ -208,13 +208,13 @@ local get_desc = function(chat_id)
 		output = output .. '\n\n*Message of the Day:*\n' .. group.motd
 	end
 	if group.rules then
-		output = output .. '\n\n*Rules:*\n'
+		output = output .. '\n\n*Rules:*'
 		for i,v in ipairs(group.rules) do
-			output = output .. '*' .. i .. '.* ' .. v .. '\n'
+			output = output .. '\n*' .. i .. '.* ' .. v
 		end
 	end
 	if group.flags then
-		output = output .. '\n*Flags:*\n'
+		output = output .. '\n\n*Flags:*\n'
 		for i = 1, #flags do
 			if group.flags[i] then
 				output = output .. '• ' .. flags[i].short .. '\n'
@@ -872,7 +872,7 @@ local commands = {
 		end
 	},
 
-	{ --degov
+	{ -- degov
 		triggers = {
 			'^/degov[@'..bot.username..']*'
 		},
@@ -1096,13 +1096,13 @@ local commands = {
  -- Generate trigger table.
 local triggers = {}
 for i,v in ipairs(commands) do
-	for key,val in pairs(v.triggers) do
+	for ind, val in ipairs(v.triggers) do
 		table.insert(triggers, val)
 	end
 end
 
 database.administration.global.help = {}
-for i,v in pairs(ranks) do
+for i,v in ipairs(ranks) do
 	database.administration.global.help[i] = {}
 end
 for i,v in ipairs(commands) do
@@ -1133,7 +1133,7 @@ local action = function(msg)
 end
 
 local cron = function()
-	tg = sender(localhost, config.cli_port)
+	tg = sender(localhost, config.cldgmi_port)
 end
 
 local command = 'groups'

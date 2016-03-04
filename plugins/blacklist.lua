@@ -23,21 +23,38 @@ local triggers = {
 		return -- End if the user isn't admin.
 	end
 
-	local input = msg.text:input()
-	if not input then
-		if msg.reply_to_message then
-			input = tostring(msg.reply_to_message.from.id)
+	local target, input
+	if msg.reply_to_message then
+		target = msg.reply_to_message.from.id
+	else
+		input = msg.text:input()
+		if input then
+			input = get_word(input, 1)
+			if tonumber(input) then
+				target = input
+			else
+				target = resolve_username(input)
+				if target == nil then
+					sendReply(msg, 'Sorry, I do not recognize that username.')
+					return
+				elseif target == false then
+					sendReply(msg, 'Invalid ID or username.')
+					return
+				end
+			end
 		else
-			sendReply(msg, 'You must use this command via reply or by specifying a user\'s ID.')
+			sendReply(msg, 'You must use this command via reply or by specifying an ID or username.')
 			return
 		end
 	end
 
-	if database.blacklist[input] then
-		database.blacklist[input] = nil
+	target = tostring(target)
+
+	if database.blacklist[target] then
+		database.blacklist[target] = nil
 		sendReply(msg, input .. ' has been removed from the blacklist.')
 	else
-		database.blacklist[input] = true
+		database.blacklist[target] = true
 		sendReply(msg, input .. ' has been added to the blacklist.')
 	end
 

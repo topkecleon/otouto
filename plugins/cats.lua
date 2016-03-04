@@ -23,7 +23,7 @@ local action = function(msg)
 		return
 	end
 
-	str = str:match('<img src="(.*)">')
+	str = str:match('<img src="(.-)">')
 	local output = '[Cat!]('..str..')'
 
 	sendMessage(msg.chat.id, output, false, nil, true)

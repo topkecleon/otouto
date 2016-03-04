@@ -17,8 +17,7 @@ Arguments: <required> \[optional]
 
 local triggers = {
 	'^/help[@'..bot.username..']*',
-	'^/h[@'..bot.username..']*$',
-	'^/start[@'..bot.username..']*'
+	'^/h[@'..bot.username..']*$'
 }
 
 local action = function(msg)
