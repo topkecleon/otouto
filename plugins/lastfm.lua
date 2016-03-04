@@ -8,6 +8,9 @@ if not database.lastfm then
 	database.lastfm = {}
 end
 
+local HTTP = require('socket.http')
+HTTP.TIMEOUT = 1
+
 local command = 'lastfm'
 local doc = [[```
 /np [username]
@@ -62,7 +65,7 @@ local action = function(msg)
 
 	url = url .. URL.escape(username)
 
-	jstr, res = HTTPS.request(url)
+	jstr, res = HTTP.request(url)
 	if res ~= 200 then
 		sendReply(msg, config.errors.connection)
 		return
