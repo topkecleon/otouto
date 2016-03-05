@@ -1133,7 +1133,7 @@ local action = function(msg)
 end
 
 local cron = function()
-	tg = sender(localhost, config.cldgmi_port)
+	tg = sender(localhost, config.cli_port)
 end
 
 local command = 'groups'
