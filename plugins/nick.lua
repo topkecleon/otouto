@@ -5,7 +5,7 @@ end
 local command = 'nick <nickname>'
 local doc = [[```
 /nick <nickname>
-Set your nickname. Use "/whoami" to check your nickname and "/nick -" to delete it.
+Set your nickname. Use "/nick --" to delete it.
 ```]]
 
 local triggers = {
@@ -14,26 +14,36 @@ local triggers = {
 
 local action = function(msg)
 
+	local target = msg.from
+
+	if msg.from.id == config.admin and msg.reply_to_message then
+		target = msg.reply_to_message.from
+		target.id_str = tostring(target.id)
+		target.name = target.first_name
+		if target.last_name then
+			target.name = target.first_name .. ' ' .. target.last_name
+		end
+	end
+
+	local output
 	local input = msg.text:input()
 	if not input then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
-		return true
-	end
-
-	if string.len(input) > 32 then
-		sendReply(msg, 'The character limit for nicknames is 32.')
-		return true
-	end
-
-	if input == '-' then
-		database.nicknames[msg.from.id_str] = nil
-		sendReply(msg, 'Your nickname has been deleted.')
+		if database.nicknames[target.id_str] then
+			output = target.name .. '\'s nickname is "' .. database.nicknames[target.id_str] .. '".'
+		else
+			output = target.name .. ' currently has no nickname.'
+		end
+	elseif string.len(input) > 32 then
+		output = 'The character limit for nicknames is 32.'
+	elseif input == '--' or input == '—' then
+		database.nicknames[target.id_str] = nil
+		output = target.name .. '\'s nickname has been deleted.'
 	else
-		database.nicknames[msg.from.id_str] = input
-		sendReply(msg, 'Your nickname has been set to "' .. input .. '".')
+		database.nicknames[target.id_str] = input
+		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
 	end
 
-	return true
+	sendReply(msg, output)
 
 end
 

@@ -8,8 +8,8 @@ local triggers = {
 local action = function(msg)
 
 	if not msg.reply_to_message then return end
-	msg.reply_to_message.text = msg.reply_to_message.text or ''
-	local output = msg.reply_to_message.text:gsub(
+	local output = msg.reply_to_message.text or ''
+	output = output:gsub(
 		msg.text:match('^/s/(.-)/(.-)/?$')
 	)
 	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
