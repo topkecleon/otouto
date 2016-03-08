@@ -109,7 +109,7 @@ while is_started do -- Start a loop while the bot should be running.
 
 	if last_cron ~= os.date('%M', os.time()) then -- Run cron jobs every minute.
 		last_cron = os.date('%M', os.time())
-		save_data('otouto.db', database) -- Save the database.
+		save_data(bot.username..'.db', database) -- Save the database.
 		for i,v in ipairs(plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.
 				local res, err = pcall(function() v.cron() end)
@@ -123,5 +123,5 @@ while is_started do -- Start a loop while the bot should be running.
 end
 
  -- Save the database before exiting.
-save_data('otouto.db', database)
+save_data(bot.username..'.db', database)
 print('Halted.')
