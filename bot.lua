@@ -11,14 +11,14 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	dofile('bindings.lua') -- Load Telegram bindings.
 	dofile('utilities.lua') -- Load miscellaneous and cross-plugin functions.
 
-	-- Load the "database"! ;)
-	if not database then
-		database = load_data('otouto.db')
-	end
-
 	-- Fetch bot information. Try until it succeeds.
 	repeat bot = getMe() until bot
 	bot = bot.result
+
+	-- Load the "database"! ;)
+	if not database then
+		database = load_data(bot.username..'.db')
+	end
 
 	plugins = {} -- Load plugins.
 	for i,v in ipairs(config.plugins) do
@@ -36,6 +36,7 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	last_cron = last_cron or os.date('%M', os.time()) -- the time of the last cron job,
 	is_started = true -- and whether or not the bot should be running.
 	database.usernames = database.usernames or {} -- Table to cache usernames by user ID.
+	database.users = database.users or {} -- Table to cache userdata.
 
 end
 
@@ -43,6 +44,13 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
 	if msg.from.username then
 		database.usernames[msg.from.username:lower()] = msg.from.id
+	end
+
+	if not database.users[tostring(msg.from.id)] then
+		database.users[tostring(msg.from.id)] = {}
+	end
+	for k,v in pairs(msg.from) do
+		database.users[tostring(msg.from.id)][k] = v
 	end
 
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.

@@ -1,6 +1,6 @@
-plugins/mokubot.lua
-plugins/qtbot.lua
-plugins/weeabot.lua
+plugins/mokubot*
+plugins/qtbot*
+plugins/weeabot*
 *.db
 lua-tg
 tg
