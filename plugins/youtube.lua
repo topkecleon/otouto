@@ -45,9 +45,8 @@ local action = function(msg)
 		return
 	end
 
-	local i = math.random(jdat.pageInfo.resultsPerPage)
-	local vid_url = 'https://www.youtube.com/watch?v=' .. jdat.items[i].id.videoId
-	local vid_title = jdat.items[i].snippet.title
+	local vid_url = 'https://www.youtube.com/watch?v=' .. jdat.items[1].id.videoId
+	local vid_title = jdat.items[1].snippet.title
 	vid_title = vid_title:gsub('%(.+%)',''):gsub('%[.+%]','')
 	local output = '[' .. vid_title .. '](' .. vid_url .. ')'
 

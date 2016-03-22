@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.4
+	Version 1.5
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -13,44 +13,41 @@
 
 	Important notices about updates will be here!
 
-	The global banlist has been merged with the blacklist. This merge will occur
-	automatically on versions 1.1 and 1.2.
-
-	Group rules will now be stored in tables rather than pre-numbered strings.
-	Automatic migration will be in effect in versions 1.2 and 1.3.
+	Rules lists always exist, empty if there are no rules. Group arrays are now
+	stored in a "groups" array rather than at the top level. Global data is now
+	stored at the top level rather than in a "global" array. Automatic migration
+	will occur in versions 1.5 and 1.6.
 ]]--
 
  -- Build the administration db if nonexistent.
 if not database.administration then
 	database.administration = {
-		global = {
-			admins = {}
-		}
+		admins = {},
+		groups = {}
 	}
 end
 
- -- Create the blacklist db if nonexistant.
-database.blacklist = database.blacklist or {}
-
- -- Migration code: Remove this in v1.3.
- -- Global ban list has been merged with blacklist.
-if database.administration.global.bans then
-	for k in pairs(database.administration.global.bans) do
-		database.blacklist[k] = true
-	end
-	database.administration.global.bans = nil
-end
-
- -- Migration code: Remove this in v1.4.
- -- Rule lists have been converted from strings to tables.
-for k,v in pairs(database.administration) do
-	if type(v.rules) == 'string' then
-		local t = {}
-		for l in v.rules:gmatch('(.-)\n') do
-			table.insert(t, l:sub(6))
+ -- Migration code: Remove this in v1.7.
+ -- Group data is now stored in a "groups" array.
+if not database.administration.groups then
+	database.administration.groups = {}
+	for k,v in pairs(database.administration) do
+		if tonumber(k) then
+			database.administration.groups[k] = v
+			database.administration[k] = nil
 		end
-		v.rules = t
 	end
+end
+ -- Global data is stored at the top level.
+if database.administration.global then
+	for k,v in pairs(database.administration.global) do
+		database.administration[k] = v
+	end
+	database.administration.global = nil
+end
+ -- Rule lists remain empty, rather than nil, when there are no rules.
+for k,v in pairs(database.administration.groups) do
+	v.rules = v.rules or {}
 end
 
 local sender = dofile('lua-tg/sender.lua')
@@ -82,7 +79,7 @@ local flags = {
 	},
 	[4] = {
 		name = 'antibot',
-		desc = 'Prevents the addition of bots by non-moderators. Only useful in non-supergroups.',
+		desc = 'Prevents the addition of bots by non-moderators.',
 		short = 'This group does not allow users to add bots.',
 		enabled = 'Non-moderators will no longer be able to add bots.',
 		disabled = 'Non-moderators will now be able to add bots.'
@@ -109,16 +106,16 @@ local get_rank = function(target, chat)
 		return 5
 	end
 
-	if database.administration.global.admins[target] then
+	if database.administration.admins[target] then
 		return 4
 	end
 
-	if chat and database.administration[chat] then
-		if database.administration[chat].govs[target] then
+	if chat and database.administration.groups[chat] then
+		if database.administration.groups[chat].govs[target] then
 			return 3
-		elseif database.administration[chat].mods[target] then
+		elseif database.administration.groups[chat].mods[target] then
 			return 2
-		elseif database.administration[chat].bans[target] then
+		elseif database.administration.groups[chat].bans[target] then
 			return 0
 		end
 	end
@@ -133,59 +130,40 @@ end
 
 local get_target = function(msg)
 
-	local target = {}
-	if msg.reply_to_message then
-		local user = msg.reply_to_message.from
-		if msg.reply_to_message.new_chat_participant then
-			user = msg.reply_to_message.new_chat_participant
-		elseif msg.reply_to_message.left_chat_participant then
-			user = msg.reply_to_message.left_chat_participant
-		end
-		target.id = user.id
-		target.name = user.first_name
-		if user.last_name then
-			target.name = user.first_name .. ' ' .. user.last_name
-		end
-	else
-		target.name = 'User'
-		local input = get_word(msg.text, 2)
-		if not input then
-			target.err = 'Please provide a username or ID.'
-		else
-			target.id = resolve_username(input)
-			if target.id == nil then
-				target.err = 'Sorry, I do not recognize that username.'
-			elseif target.id == false then
-				target.err = 'Invalid ID or username.'
-			end
-		end
-	end
-
+	local target = user_from_message(msg)
 	if target.id then
-		target.id_str = tostring(target.id)
 		target.rank = get_rank(target.id, msg.chat.id)
 	end
-
 	return target
 
 end
 
-local kick_user = function(target, chat)
+local kick_user = function(chat, target)
 
-	target = tonumber(target)
-	chat = tostring(chat)
+	chat = math.abs(chat)
 
-	if database.administration[chat].grouptype == 'group' then
-		tg:chat_del_user(tonumber(chat), target)
+	if chat > 1000000000000 then
+		chat = chat - 1000000000000
+		tg:_send('channel_kick channel#' .. chat .. ' user#' .. target .. '\n')
 	else
-		tg:channel_kick(chat, target)
+		tg:_send('chat_del_user chat#' .. chat .. ' user#' .. target .. '\n')
 	end
 
 end
 
 local get_photo = function(chat)
 
-	local filename = tg:load_chat_photo(chat)
+	chat = math.abs(chat)
+
+	local filename
+
+	if chat > 1000000000000 then
+		chat = chat - 1000000000000
+		filename = tg:_send('load_channel_photo channel#' .. chat .. '\n', true)
+	else
+		filename = tg:_send('load_chat_photo chat#' .. chat .. '\n', true)
+	end
+
 	if filename:find('FAIL') then
 		print('Error downloading photo for group ' .. chat .. '.')
 		return
@@ -195,9 +173,21 @@ local get_photo = function(chat)
 
 end
 
+local get_link = function(chat)
+
+	chat = math.abs(chat)
+	if chat > 1000000000000 then
+		chat = chat - 1000000000000
+		return tg:_send('export_channel_link channel#' .. chat .. '\n', true)
+	else
+		return tg:_send('export_chat_link chat#' .. chat .. '\n', true)
+	end
+
+end
+
 local get_desc = function(chat_id)
 
-	local group = database.administration[tostring(chat_id)]
+	local group = database.administration.groups[tostring(chat_id)]
 	local output
 	if group.link then
 		output = '*Welcome to* [' .. group.name .. '](' .. group.link .. ')*!*'
@@ -207,7 +197,7 @@ local get_desc = function(chat_id)
 	if group.motd then
 		output = output .. '\n\n*Message of the Day:*\n' .. group.motd
 	end
-	if group.rules then
+	if #group.rules > 0 then
 		output = output .. '\n\n*Rules:*'
 		for i,v in ipairs(group.rules) do
 			output = output .. '\n*' .. i .. '.* ' .. v
@@ -237,15 +227,16 @@ local commands = {
 		privilege = 0,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			if get_rank(msg.from.id, msg.chat.id) > 1 then
 				return true
 			end
-			if not database.administration[msg.chat.id_str].flags[2] == true then
+			if not group.flags[2] then
 				return true
 			end
-			kick_user(msg.from.id, msg.chat.id)
-			sendMessage(msg.from.id, flags[2].kicked:gsub('GROUPNAME', msg.chat.title))
+			kick_user(msg.chat.id, msg.from.id)
+			local output = flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
+			sendMessage(msg.from.id, output)
 		end
 	},
 
@@ -257,14 +248,13 @@ local commands = {
 		privilege = 0,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 
 			local rank = get_rank(msg.from.id, msg.chat.id)
-			local group = database.administration[msg.chat.id_str]
 
 			-- banned
 			if rank == 0 then
-				kick_user(msg.from.id, msg.chat.id)
+				kick_user(msg.chat.id, msg.from.id)
 				sendMessage(msg.from.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
 				return
 			end
@@ -274,8 +264,9 @@ local commands = {
 				-- antisquig Strict
 				if group.flags[3] == true then
 					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
-						kick_user(msg.from.id, msg.chat.id)
-						sendMessage(msg.from.id, flags[3].kicked:gsub('GROUPNAME', msg.chat.title))
+						kick_user(msg.chat.id, msg.from.id)
+						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
+						sendMessage(msg.from.id, output)
 						return
 					end
 				end
@@ -291,7 +282,7 @@ local commands = {
 
 				-- banned
 				if get_rank(msg.new_chat_participant.id, msg.chat.id) == 0 then
-					kick_user(msg.new_chat_participant.id, msg.chat.id)
+					kick_user(msg.chat.id, msg.new_chat_participant.id)
 					sendMessage(msg.new_chat_participant.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
 					return
 				end
@@ -299,8 +290,9 @@ local commands = {
 				-- antisquig Strict
 				if group.flags[3] == true then
 					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
-						kick_user(msg.new_chat_participant.id, msg.chat.id)
-						sendMessage(msg.new_chat_participant.id, flags[3].kicked:gsub('GROUPNAME', msg.chat.title))
+						kick_user(msg.chat.id, msg.new_chat_participant.id)
+						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
+						sendMessage(msg.new_chat_participant.id, output)
 						return
 					end
 				end
@@ -308,7 +300,7 @@ local commands = {
 				-- antibot
 				if msg.new_chat_participant.username and msg.new_chat_participant.username:match('bot$') then
 					if rank < 2 and group.flags[4] == true then
-						kick_user(msg.new_chat_participant.id, msg.chat.id)
+						kick_user(msg.chat.id, msg.new_chat_participant.id)
 						return
 					end
 				else
@@ -334,6 +326,8 @@ local commands = {
 					else
 						group.photo = get_photo(msg.chat.id)
 					end
+				else
+					group.photo = get_photo(msg.chat.id)
 				end
 				return
 
@@ -345,6 +339,8 @@ local commands = {
 					else
 						group.photo = nil
 					end
+				else
+					group.photo = nil
 				end
 				return
 
@@ -367,9 +363,9 @@ local commands = {
 
 		action = function(msg)
 			local output = ''
-			for k,v in pairs(database.administration) do
-				-- no "global" or unlisted groups
-				if tonumber(k) and not v.flags[1] then
+			for k,v in pairs(database.administration.groups) do
+				-- no unlisted groups
+				if not v.flags[1] then
 					if v.link then
 						output = output .. '• [' .. v.name .. '](' .. v.link .. ')\n'
 					else
@@ -399,7 +395,7 @@ local commands = {
 			local rank = get_rank(msg.from.id, msg.chat.id)
 			local output = '*Commands for ' .. ranks[rank] .. ':*\n'
 			for i = 1, rank do
-				for ind, val in ipairs(database.administration.global.help[i]) do
+				for ind, val in ipairs(database.administration.help[i]) do
 					output = output .. '• /' .. val .. '\n'
 				end
 			end
@@ -422,24 +418,33 @@ local commands = {
 		privilege = 1,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
+			local mod_format = function(id)
+				id = tostring(id)
+				local user = database.users[id] or { first_name = 'Unknown' }
+				local name = user.first_name
+				if user.last_name then name = user.first_name .. ' ' .. user.last_name end
+				name = markdown_escape(name)
+				local output = '• ' .. name .. ' `[' .. id .. ']`\n'
+				return output
+			end
 			local modstring = ''
-			for k,v in pairs(database.administration[msg.chat.id_str].mods) do
-				modstring = modstring .. '• ' .. v .. ' (' .. k .. ')\n'
+			for k,v in pairs(group.mods) do
+				modstring = modstring .. mod_format(k)
 			end
 			if modstring ~= '' then
 				modstring = '*Moderators for* _' .. msg.chat.title .. '_ *:*\n' .. modstring
 			end
 			local govstring = ''
-			for k,v in pairs(database.administration[msg.chat.id_str].govs) do
-				govstring = govstring .. '• ' .. v .. ' (' .. k .. ')\n'
+			for k,v in pairs(group.govs) do
+				govstring = govstring .. mod_format(k)
 			end
 			if govstring ~= '' then
 				govstring = '*Governors for* _' .. msg.chat.title .. '_ *:*\n' .. govstring
 			end
-			local adminstring = '*Administrators:*\n• ' .. config.admin_name .. ' (' .. config.admin .. ')\n'
-			for k,v in pairs(database.administration.global.admins) do
-				adminstring = adminstring .. '• ' .. v .. ' (' .. k .. ')\n'
+			local adminstring = '*Administrators:*\n' .. mod_format(config.admin)
+			for k,v in pairs(database.administration.admins) do
+				adminstring = adminstring .. mod_format(k)
 			end
 			local output = modstring .. govstring .. adminstring
 			sendMessage(msg.chat.id, output, true, nil, true)
@@ -476,11 +481,11 @@ local commands = {
 		privilege = 1,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local output = 'No rules have been set for ' .. msg.chat.title .. '.'
-			if database.administration[msg.chat.id_str].rules then
+			if #group.rules > 0 then
 				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
-				for i,v in ipairs(database.administration[msg.chat.id_str].rules) do
+				for i,v in ipairs(group.rules) do
 					output = output .. '*' .. i .. '.* ' .. v .. '\n'
 				end
 			end
@@ -498,10 +503,10 @@ local commands = {
 		privilege = 1,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local output = 'No MOTD has been set for ' .. msg.chat.title .. '.'
-			if database.administration[msg.chat.id_str].motd then
-				output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. database.administration[msg.chat.id_str].motd
+			if group.motd then
+				output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. group.motd
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -516,10 +521,10 @@ local commands = {
 		privilege = 1,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local output = 'No link has been set for ' .. msg.chat.title .. '.'
-			if database.administration[msg.chat.id_str].link then
-				output = '[' .. msg.chat.title .. '](' .. database.administration[msg.chat.id_str].link .. ')'
+			if group.link then
+				output = '[' .. msg.chat.title .. '](' .. group.link .. ')'
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -543,7 +548,7 @@ local commands = {
 				local output = 'Leave this group manually or you will be unable to rejoin.'
 				sendMessage(msg.chat.id, output, true, nil, true)
 			else
-				kick_user(msg.from.id, msg.chat.id)
+				kick_user(msg.chat.id, msg.from.id)
 			end
 		end
 	},
@@ -566,21 +571,22 @@ local commands = {
 				sendReply(msg, target.name .. ' is too privileged to be kicked.')
 				return
 			end
-			kick_user(target.id, msg.chat.id)
+			kick_user(msg.chat.id, target.id)
 			sendMessage(msg.chat.id, target.name .. ' has been kicked.')
 		end
 	},
 
 	{ -- ban
 		triggers = {
-			'^/ban[@'..bot.username..']*'
+			'^/ban',
+			'^/unban'
 		},
 
 		command = 'ban <user>',
 		privilege = 2,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local target = get_target(msg)
 			if target.err then
 				sendReply(msg, target.err)
@@ -590,41 +596,14 @@ local commands = {
 				sendReply(msg, target.name .. ' is too privileged to be banned.')
 				return
 			end
-			if database.administration[msg.chat.id_str].bans[target.id_str] then
-				sendReply(msg, target.name .. ' is already banned.')
-				return
+			if group.bans[target.id_str] then
+				group.bans[target.id_str] = nil
+				sendReply(msg, target.name .. ' has been unbanned.')
+			else
+				group.bans[target.id_str] = true
+				kick_user(msg.chat.id, target.id)
+				sendReply(msg, target.name .. ' has been banned.')
 			end
-			kick_user(target.id, msg.chat.id)
-			database.administration[msg.chat.id_str].bans[target.id_str] = true
-			sendMessage(msg.chat.id, target.name .. ' has been banned.')
-		end
-	},
-
-	{ -- unban
-		triggers = {
-			'^/unban[@'..bot.username..']*'
-		},
-
-		command = 'unban <user>',
-		privilege = 2,
-		interior = true,
-
-		action = function(msg)
-			local target = get_target(msg)
-			if target.err then
-				sendReply(msg, target.err)
-				return
-			end
-			if not database.administration[msg.chat.id_str].bans[target.id_str] then
-				if database.blacklist[target.id_str] then
-					sendReply(msg, target.name .. ' is globally banned.')
-				else
-					sendReply(msg, target.name .. ' is not banned.')
-				end
-				return
-			end
-			database.administration[msg.chat.id_str].bans[target.id_str] = nil
-			sendMessage(msg.chat.id, target.name .. ' has been unbanned.')
 		end
 	},
 
@@ -638,7 +617,7 @@ local commands = {
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local usage = 'usage: `/changerule <i> <newrule>`\n`/changerule <i> -- `deletes.'
 			local input = msg.text:input()
 			if not input then
@@ -658,24 +637,24 @@ local commands = {
 				sendMessage(msg.chat.id, output, true, msg.message_id, true)
 				return
 			end
-			if not database.administration[msg.chat.id_str].rules then
+			if not group.rules then
 				local output = 'Sorry, there are no rules to change. Please use /setrules.\n' .. usage
 				sendMessage(msg.chat.id, output, true, msg.message_id, true)
 				return
 			end
-			if not database.administration[msg.chat.id_str].rules[rule_num] then
-				rule_num = #database.administration[msg.chat.id_str].rules + 1
+			if not group.rules[rule_num] then
+				rule_num = #group.rules + 1
 			end
 			if rule_new == '--' or rule_new == '—' then
-				if database.administration[msg.chat.id_str].rules[rule_num] then
-					table.remove(database.administration[msg.chat.id_str].rules, rule_num)
+				if group.rules[rule_num] then
+					table.remove(group.rules, rule_num)
 					sendReply(msg, 'That rule has been deleted.')
 				else
 					sendReply(msg, 'There is no rule with that number.')
 				end
 				return
 			end
-			database.administration[msg.chat.id_str].rules[rule_num] = rule_new
+			group.rules[rule_num] = rule_new
 			local output = '*' .. rule_num .. '*. ' .. rule_new
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -690,20 +669,24 @@ local commands = {
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
-			local input = msg.text:match('^/setrules[@'..bot.username..']*(.+)')
+		action = function(msg, group)
+			local input = msg.text:match('^/setrules[@'..bot.username..']* (.+)')
 			if not input then
 				sendReply(msg, '/setrules [rule]\n<rule>\n[rule]\n...')
 				return
+			elseif input == '--' or input == '—' then
+				group.rules = {}
+				sendReply(msg, 'The rules have been cleared.')
+				return
 			end
-			database.administration[msg.chat.id_str].rules = {}
+			group.rules = {}
 			input = input:trim() .. '\n'
 			local output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
 			local i = 1
 			for l in input:gmatch('(.-)\n') do
 				output = output .. '*' .. i .. '.* ' .. l .. '\n'
 				i = i + 1
-				table.insert(database.administration[msg.chat.id_str].rules, l:trim())
+				table.insert(group.rules, l:trim())
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -718,14 +701,18 @@ local commands = {
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local input = msg.text:input()
 			if not input then
-				sendReply(msg, '/' .. command)
+				sendReply(msg, 'Please specify the new message of the day.')
+				return
+			elseif input == '--' or input == '—' then
+				group.motd = nil
+				sendReply(msg, 'The MOTD has been cleared.')
 				return
 			end
 			input = input:trim()
-			database.administration[msg.chat.id_str].motd = input
+			group.motd = input
 			local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -740,13 +727,17 @@ local commands = {
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local input = msg.text:input()
 			if not input then
-				sendReply(msg, '/' .. command)
+				sendReply(msg, 'Please specify the new link.')
+				return
+			elseif input == '--' or input == '—' then
+				group.link = get_link(msg.chat.id)
+				sendReply(msg, 'The link has been regenerated.')
 				return
 			end
-			database.administration[msg.chat.id_str].link = input
+			group.link = input
 			local output = '[' .. msg.chat.title .. '](' .. input .. ')'
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
@@ -761,7 +752,7 @@ local commands = {
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
+		action = function(msg, group)
 			local input = msg.text:input()
 			if input then
 				input = get_word(input, 1)
@@ -771,18 +762,18 @@ local commands = {
 			if not input then
 				local output = '*Flags for* _' .. msg.chat.title .. '_ *:*\n'
 				for i,v in ipairs(flags) do
-					local status = database.administration[msg.chat.id_str].flags[i] or false
+					local status = group.flags[i] or false
 					output = output .. '`[' .. i .. ']` *' .. v.name .. '*` = ' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
 				end
 				sendMessage(msg.chat.id, output, true, nil, true)
 				return
 			end
 			local output
-			if database.administration[msg.chat.id_str].flags[input] == true then
-				database.administration[msg.chat.id_str].flags[input] = false
+			if group.flags[input] == true then
+				group.flags[input] = false
 				sendReply(msg, flags[input].disabled)
 			else
-				database.administration[msg.chat.id_str].flags[input] = true
+				group.flags[input] = true
 				sendReply(msg, flags[input].enabled)
 			end
 		end
@@ -790,119 +781,83 @@ local commands = {
 
 	{ -- mod
 		triggers = {
-			'^/mod[@'..bot.username..']*$'
+			'^/mod',
+			'^/demod'
 		},
 
 		command = 'mod <user>',
 		privilege = 3,
 		interior = true,
 
-		action = function(msg)
-			if not msg.reply_to_message then
-				sendReply(msg, 'This command must be run via reply.')
-				return
-			end
-			local target = get_target(msg)
-			if target.rank > 1 then
-				sendReply(msg, target.name .. ' is already a moderator or greater.')
-				return
-			end
-			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
-				tg:channel_set_admin(msg.chat.id, target, 1)
-			end
-			database.administration[msg.chat.id_str].mods[target.id_str] = target.name
-			sendReply(msg, target.name .. ' is now a moderator.')
-		end
-	},
-
-	{ -- demod
-		triggers = {
-			'^/demod[@'..bot.username..']*'
-		},
-
-		command = 'demod <user>',
-		privilege = 3,
-		interior = true,
-
-		action = function(msg)
+		action = function(msg, group)
 			local target = get_target(msg)
 			if target.err then
 				sendReply(msg, target.err)
 				return
 			end
-			if target.rank ~= 2 then
-				sendReply(msg, target.name .. ' is not a moderator.')
-				return
+			if group.mods[target.id_str] then
+				if group.grouptype == 'supergroup' then
+					tg:channel_set_admin(msg.chat.id, target, 0)
+				end
+				group.mods[target.id_str] = nil
+				sendReply(msg, target.name .. ' is no longer a moderator.')
+			else
+				if target.rank > 2 then
+					sendReply(msg, target.name .. ' is greater than a moderator.')
+					return
+				end
+				if group.grouptype == 'supergroup' then
+					tg:channel_set_admin(msg.chat.id, target, 1)
+				end
+				group.mods[target.id_str] = true
+				sendReply(msg, target.name .. ' is now a moderator.')
 			end
-			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
-				tg:channel_set_admin(msg.chat.id, target, 0)
-			end
-			database.administration[msg.chat.id_str].mods[target.id_str] = nil
-			sendReply(msg, target.name .. ' is no longer a moderator.')
 		end
-
 	},
 
 	{ -- gov
 		triggers = {
-			'^/gov[@'..bot.username..']*$'
+			'^/gov',
+			'^/degov'
 		},
 
 		command = 'gov <user>',
 		privilege = 4,
 		interior = true,
 
-		action = function(msg)
-			if not msg.reply_to_message then
-				sendReply(msg, 'This command must be run via reply.')
-				return
-			end
-			local target = get_target(msg)
-			if target.rank > 2 then
-				sendReply(msg, target.name .. ' is already a governor or greater.')
-				return
-			elseif target.rank == 2 then
-				database.administration[msg.chat.id_str].mods[target.id_str] = nil
-			end
-			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
-				tg:channel_set_admin(msg.chat.id, target, 1)
-			end
-			database.administration[msg.chat.id_str].govs[target.id_str] = target.name
-			sendReply(msg, target.name .. ' is now a governor.')
-		end
-	},
-
-	{ -- degov
-		triggers = {
-			'^/degov[@'..bot.username..']*'
-		},
-
-		command = 'degov <user>',
-		privilege = 4,
-		interior = true,
-
-		action = function(msg)
+		action = function(msg, group)
 			local target = get_target(msg)
 			if target.err then
 				sendReply(msg, target.err)
 				return
 			end
-			if target.rank ~= 3 then
-				sendReply(msg, target.name .. ' is not a governor.')
-				return
+			if group.govs[target.id_str] then
+				if group.grouptype == 'supergroup' then
+					tg:channel_set_admin(msg.chat.id, target, 0)
+				end
+				group.govs[target.id_str] = nil
+				sendReply(msg, target.name .. ' is no longer a governor.')
+			else
+				if target.rank > 3 then
+					sendReply(msg, target.name .. ' is greater than a governor.')
+					return
+				end
+				if target.rank == 2 then
+					group.mods[target.id_str] = nil
+				end
+				if group.grouptype == 'supergroup' then
+					tg:channel_set_admin(msg.chat.id, target, 1)
+				end
+				group.govs[target.id_str] = true
+				sendReply(msg, target.name .. ' is now a governor.')
 			end
-			if database.administration[msg.chat.id_str].grouptype == 'supergroup' then
-				tg:channel_set_admin(msg.chat.id, target, 0)
-			end
-			database.administration[msg.chat.id_str].govs[target.id_str] = nil
-			sendReply(msg, target.name .. ' is no longer a governor.')
 		end
 	},
 
 	{ -- hammer
 		triggers = {
-			'^/hammer[@'..bot.username..']*',
-			'^/banall[@'..bot.username..']*'
+			'^/hammer',
+			'^/unhammer'
 		},
 
 		command = 'hammer <user>',
@@ -920,27 +875,26 @@ local commands = {
 				return
 			end
 			if database.blacklist[target.id_str] then
-				sendReply(msg, target.name .. ' is already globally banned.')
-				return
-			end
-			for k,v in pairs(database.administration) do
-				if tonumber(k) then
-					kick_user(target.id, k)
+				database.blacklist[target.id_str] = nil
+				sendReply(msg, target.name .. ' has been globally unbanned.')
+			else
+				database.blacklist[target.id_str] = true
+				for k,v in pairs(database.administration.groups) do
+					kick_user(k, target.id)
 				end
+				sendReply(msg, target.name .. ' has been globally banned.')
 			end
-			database.blacklist[target.id_str] = true
-			sendReply(msg, target.name .. ' has been globally banned.')
 		end
 	},
 
-	{ -- unhammer
+	{ -- admin
 		triggers = {
-			'^/unhammer[@'..bot.username..']*',
-			'^/unbanall[@'..bot.username..']*'
+			'^/admin',
+			'^/deadmin'
 		},
 
-		command = 'unhammer <user>',
-		privilege = 4,
+		command = 'admin <user',
+		privilege = 5,
 		interior = false,
 
 		action = function(msg)
@@ -949,60 +903,21 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			end
-			if not database.blacklist[target.id_str] then
-				sendReply(msg, target.name .. ' is not globally banned.')
-				return
+			if database.administration.admins[target.id_str] then
+				database.administration.admins[target.id_str] = nil
+				sendReply(msg, target.name .. ' is no longer an administrator.')
+			else
+				if target.rank == 5 then
+					sendReply(msg, target.name .. ' is greater than an administrator.')
+					return
+				end
+				for k,v in pairs(database.administration.groups) do
+					v.mods[target.id_str] = nil
+					v.govs[target.id_str] = nil
+				end
+				database.administration.admins[target.id_str] = true
+				sendReply(msg, target.name .. ' is now an administrator.')
 			end
-			database.blacklist[target.id_str] = nil
-			sendReply(msg, target.name .. ' has been globally unbanned.')
-		end
-	},
-
-	{ -- admin
-		triggers = {
-			'^/admin[@'..bot.username..']*$'
-		},
-
-		command = 'admin <user>',
-		privilege = 5,
-		interior = false,
-
-		action = function(msg)
-			if not msg.reply_to_message then
-				sendReply(msg, 'This command must be run via reply.')
-				return
-			end
-			local target = get_target(msg)
-			if target.rank > 3 then
-				sendReply(msg, target.name .. ' is already an administrator or greater.')
-				return
-			elseif target.rank == 2 then
-				database.administration[msg.chat.id_str].mods[target.id_str] = nil
-			elseif target.rank == 3 then
-				database.administration[msg.chat.id_str].govs[target.id_str] = nil
-			end
-			database.administration.global.admins[target.id_str] = target.name
-			sendReply(msg, target.name .. ' is now an administrator.')
-		end
-	},
-
-	{ -- deadmin
-		triggers = {
-			'^/deadmin[@'..bot.username..']*'
-		},
-
-		command = 'deadmin <user>',
-		privilege = 5,
-		interior = false,
-
-		action = function(msg)
-			local target = get_target(msg)
-			if target.rank ~= 4 then
-				sendReply(msg, target.name .. ' is not an administrator.')
-				return
-			end
-			database.administration.global.admins[target.id_str] = nil
-			sendReply(msg, target.name .. ' is no longer an administrator.')
 		end
 	},
 
@@ -1016,23 +931,22 @@ local commands = {
 		interior = false,
 
 		action = function(msg)
-			if database.administration[msg.chat.id_str] then
+			if database.administration.groups[msg.chat.id_str] then
 				sendReply(msg, 'I am already administrating this group.')
 				return
 			end
-			database.administration[msg.chat.id_str] = {
+			database.administration.groups[msg.chat.id_str] = {
 				mods = {},
 				govs = {},
 				bans = {},
 				flags = {},
+				rules = {},
 				grouptype = msg.chat.type,
 				name = msg.chat.title,
+				link = get_link(msg.chat.id),
+				photo = get_photo(msg.chat.id),
 				founded = os.time()
 			}
-			if msg.chat.type == 'group' then
-				database.administration[msg.chat.id_str].photo = get_photo(msg.chat.id)
-				database.administration[msg.chat.id_str].link = tg:export_chat_link(msg.chat.id)
-			end
 			sendReply(msg, 'I am now administrating this group.')
 		end
 	},
@@ -1050,15 +964,15 @@ local commands = {
 		action = function(msg)
 			local input = msg.text:input()
 			if input then
-				if database.administration[input] then
-					database.administration[input] = nil
+				if database.administration.groups[input] then
+					database.administration.groups[input] = nil
 					sendReply(msg, 'I am no longer administrating that group.')
 				else
 					sendReply(msg, 'I do not administrate that group.')
 				end
 			else
-				if database.administration[msg.chat.id_str] then
-					database.administration[msg.chat.id_str] = nil
+				if database.administration.groups[msg.chat.id_str] then
+					database.administration.groups[msg.chat.id_str] = nil
 					sendReply(msg, 'I am no longer administrating this group.')
 				else
 					sendReply(msg, 'I do not administrate this group.')
@@ -1083,7 +997,7 @@ local commands = {
 				return
 			end
 			input = '*Admin Broadcast:*\n' .. input
-			for k,v in pairs(database.administration) do
+			for k,v in pairs(database.administration.groups) do
 				if tonumber(k) then
 					sendMessage(k, input, true, nil, true)
 				end
@@ -1101,28 +1015,27 @@ for i,v in ipairs(commands) do
 	end
 end
 
-database.administration.global.help = {}
+database.administration.help = {}
 for i,v in ipairs(ranks) do
-	database.administration.global.help[i] = {}
+	database.administration.help[i] = {}
 end
 for i,v in ipairs(commands) do
 	if v.command then
-		table.insert(database.administration.global.help[v.privilege], v.command)
+		table.insert(database.administration.help[v.privilege], v.command)
 	end
 end
-
 
 local action = function(msg)
 	for i,v in ipairs(commands) do
 		for key,val in pairs(v.triggers) do
 			if msg.text_lower:match(val) then
-				if v.interior and not database.administration[msg.chat.id_str] then
+				if v.interior and not database.administration.groups[msg.chat.id_str] then
 					break
 				end
 				if msg.chat.type ~= 'private' and get_rank(msg.from.id, msg.chat.id) < v.privilege then
 					break
 				end
-				local res = v.action(msg)
+				local res = v.action(msg, database.administration.groups[msg.chat.id_str])
 				if res ~= true then
 					return res
 				end

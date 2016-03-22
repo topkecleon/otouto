@@ -3,7 +3,7 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('cjson')
 
-version = '3.4'
+version = '3.5'
 
 bot_init = function() -- The function run when the bot is started or reloaded.
 
@@ -33,22 +33,39 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	math.random()
 
 	last_update = last_update or 0 -- Set loop variables: Update offset,
-	last_cron = last_cron or os.date('%M', os.time()) -- the time of the last cron job,
+	last_cron = last_cron or os.date('%M') -- the time of the last cron job,
 	is_started = true -- and whether or not the bot should be running.
-	database.usernames = database.usernames or {} -- Table to cache usernames by user ID.
 	database.users = database.users or {} -- Table to cache userdata.
+	database.users[tostring(bot.id)] = bot
+
+	-- Migration code. Remove in 3.6.
+	if database.lastfm then
+		for k,v in pairs(database.lastfm) do
+			if not database.users[k] then database.users[k] = {} end
+			database.users[k].lastfm = v
+		end
+	end
+
+	-- Migration code. Remove in 3.6.
+	if database.nicknames then
+		for k,v in pairs(database.nicknames) do
+			if not database.users[k] then database.users[k] = {} end
+			database.users[k].nickname = v
+		end
+	end
 
 end
 
 on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
-	if msg.from.username then
-		database.usernames[msg.from.username:lower()] = msg.from.id
-	end
-
+	-- Create a user entry if it does not exist.
 	if not database.users[tostring(msg.from.id)] then
 		database.users[tostring(msg.from.id)] = {}
 	end
+	-- Clear things that no longer exist.
+	database.users[tostring(msg.from.id)].username = nil
+	database.users[tostring(msg.from.id)].last_name = nil
+	-- Wee.
 	for k,v in pairs(msg.from) do
 		database.users[tostring(msg.from.id)][k] = v
 	end
@@ -77,7 +94,7 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 				end)
 				if not success then
 					sendReply(msg, 'Sorry, an unexpected error occurred.')
-					handle_exception(result, msg.text)
+					handle_exception(result, msg.from.id .. ': ' .. msg.text)
 					return
 				end
 				-- If the action returns a table, make that table msg.
@@ -107,8 +124,8 @@ while is_started do -- Start a loop while the bot should be running.
 		print(config.errors.connection)
 	end
 
-	if last_cron ~= os.date('%M', os.time()) then -- Run cron jobs every minute.
-		last_cron = os.date('%M', os.time())
+	if last_cron ~= os.date('%M') then -- Run cron jobs every minute.
+		last_cron = os.date('%M')
 		save_data(bot.username..'.db', database) -- Save the database.
 		for i,v in ipairs(plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.

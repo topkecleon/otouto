@@ -32,10 +32,6 @@ local action = function(msg)
 
 	local message = 'You are ' .. from_name .. ' and you are messaging ' .. to_name
 
-	if database.nicknames[msg.from.id_str] then
-		message = message .. '\nYour nickname is ' .. database.nicknames[msg.from.id_str] .. '.'
-	end
-
 	sendReply(msg, message)
 
 end

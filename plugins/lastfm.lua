@@ -4,10 +4,6 @@ if not config.lastfm_api_key then
 	return
 end
 
-if not database.lastfm then
-	database.lastfm = {}
-end
-
 local HTTP = require('socket.http')
 HTTP.TIMEOUT = 1
 
@@ -17,7 +13,7 @@ local doc = [[```
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
 /fmset <username>
-Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
+Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.
 ```]]
 
 local triggers = {
@@ -36,11 +32,11 @@ local action = function(msg)
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
 			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
-		elseif input == '-' then
-			database.lastfm[msg.from.id_str] = nil
+		elseif input == '--' or input == '—' then
+			database.users[msg.from.id_str].lastfm = nil
 			sendReply(msg, 'Your last.fm username has been forgotten.')
 		else
-			database.lastfm[msg.from.id_str] = input
+			database.users[msg.from.id_str].lastfm = input
 			sendReply(msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
 		return
@@ -52,12 +48,12 @@ local action = function(msg)
 	local output = ''
 	if input then
 		username = input
-	elseif database.lastfm[msg.from.id_str] then
-		username = database.lastfm[msg.from.id_str]
+	elseif database.users[msg.from.id_str].lastfm then
+		username = database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
 		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
-		database.lastfm[msg.from.id_str] = username
+		database.users[msg.from.id_str].lastfm = username
 	else
 		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
 		return

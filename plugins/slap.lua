@@ -96,16 +96,16 @@ local action = function(msg)
 
 	local victim = msg.text:input()
 	if msg.reply_to_message then
-		if database.nicknames[tostring(msg.reply_to_message.from.id)] then
-			victim = database.nicknames[tostring(msg.reply_to_message.from.id)]
+		if database.users[tostring(msg.reply_to_message.from.id)].nickname then
+			victim = database.users[tostring(msg.reply_to_message.from.id)].nickname
 		else
 			victim = msg.reply_to_message.from.first_name
 		end
 	end
 
 	local victor = msg.from.first_name
-	if database.nicknames[msg.from.id_str] then
-		victor = database.nicknames[msg.from.id_str]
+	if database.users[msg.from.id_str].nickname then
+		victor = database.users[msg.from.id_str].nickname
 	end
 
 	if not victim then
@@ -116,6 +116,8 @@ local action = function(msg)
 	local message = slaps[math.random(#slaps)]
 	message = message:gsub('VICTIM', victim)
 	message = message:gsub('VICTOR', victor)
+
+	message = latcyr(message)
 
 	sendMessage(msg.chat.id, message)
 

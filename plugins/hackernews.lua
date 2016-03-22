@@ -40,6 +40,10 @@ local action = function(msg)
 			title = title:sub(1, 45) .. '...'
 		end
 		local url = res_jdat.url
+		if not url then
+			sendReply(msg, config.errors.connection)
+			return
+		end
 		if url:find('%(') then
 			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
 		else

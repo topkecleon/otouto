@@ -130,19 +130,58 @@ table_size = function(tab)
 
 end
 
-resolve_username = function(target)
- -- If $target is a known username, returns associated ID.
- -- If $target is an unknown username, returns nil.
- -- If $target is a number, returns that number.
- -- Otherwise, returns false.
+resolve_username = function(input)
 
-	local input = tostring(target):lower()
-	if input:match('^@') then
-		local uname = input:gsub('^@', '')
-		return database.usernames[uname]
-	else
-		return tonumber(target) or false
+	input = input:gsub('^@', '')
+	for k,v in pairs(database.users) do
+		if v.username and v.username:lower() == input:lower() then
+			return v
+		end
 	end
+
+end
+
+user_from_message = function(msg)
+
+	local input = msg.text_lower:input()
+	local target = {}
+	if msg.reply_to_message then
+		target = msg.reply_to_message.from
+	elseif input and tonumber(input) then
+		target.id = input
+		if database.users[input] then
+			for k,v in pairs(database.users[input]) do
+				target[k] = v
+			end
+		end
+	elseif input and input:match('^@') then
+		local uname = input:gsub('^@', '')
+		for k,v in pairs(database.users) do
+			if v.username and uname == v.username:lower() then
+				for key, val in pairs(v) do
+					target[key] = val
+				end
+			end
+		end
+		if not target.id then
+			target.err = 'Sorry, I don\'t recognize that username.'
+		end
+	else
+		target.err = 'Please specify a user via reply, ID, or username.'
+	end
+
+	if target.id then
+		target.id_str = tostring(target.id)
+	end
+
+	if not target.first_name then target.first_name = 'User' end
+
+	target.name = target.first_name
+	if target.last_name then
+		target.name = target.first_name .. ' ' .. target.last_name
+	end
+
+	return target
 
 end
 
@@ -194,5 +233,15 @@ download_file = function(url, filename)
 	file:close()
 
 	return filename
+
+end
+
+markdown_escape = function(text)
+
+	text = text:gsub('_', '\\_')
+	text = text:gsub('%[', '\\[')
+	text = text:gsub('%*', '\\*')
+	text = text:gsub('`', '\\`')
+	return text
 
 end

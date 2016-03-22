@@ -7,7 +7,7 @@ assert(JSON)
 
 local BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key
 
-if not config.bot_api_key then
+if config.bot_api_key == '' then
 	error('You did not set your bot token in config.lua!')
 end
 
@@ -87,6 +87,9 @@ sendChatAction = function(chat_id, action)
 end
 
 sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disable_notification)
+
+	if latitude == 0 then latitude = 0.001 end
+	if longitude == 0 then longitude = 0.001 end
 
 	local url = BASE_URL .. '/sendLocation?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude
 
