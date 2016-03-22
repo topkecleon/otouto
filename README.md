@@ -5,15 +5,16 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-**The Manual**
- - [Setup](#setup)
- - [Plugins](#plugins)
- - [Control plugins](#control-plugins)
- - [administration.lua](#administrationlua)
- - [Liberbot-related plugins](#liberbot-related-plugins)
- - [List of plugins](#list-of-plugins)
- - [Style](#style)
- - [Contributors](#contributors)
+| The Manual |
+|:-----------|
+| [Setup](#setup) |
+| [Plugins](#plugins) |
+| [Control plugins](#control-plugins) |
+| [administration.lua](#administrationlua) |
+| [Liberbot-related plugins](#liberbot-related-plugins) |
+| [List of plugins](#list-of-plugins) |
+| [Style](#style) |
+| [Contributors](#contributors) |
 
 ## Setup
 You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
