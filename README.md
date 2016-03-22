@@ -5,10 +5,7 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-## the manual
-Read this!
-
-** Contents **
+**The Manual**
  - [Setup](#setup)
  - [Plugins](#plugins)
  - [Control plugins](#control-plugins)
