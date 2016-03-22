@@ -1,11 +1,24 @@
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment) | [Owner's Manual](http://otou.to/rtfm)
+[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-## Setup {#Setup}
+## the manual
+Read this!
+
+** Contents **
+ - [Setup](#setup)
+ - [Plugins](#plugins)
+ - [Control plugins](#control-plugins)
+ - [administration.lua](#administrationlua)
+ - [Liberbot-related plugins](#liberbot-related-plugins)
+ - [List of plugins](#list-of-plugins)
+ - [Style](#style)
+ - [Contributors](#contributors)
+
+## Setup
 You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
 **Before doing anything**, open config.lua and set `bot_api_key` to the authentication token you received from the Botfather.
@@ -28,7 +41,7 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
 
 * * *
 
-## Plugins {#Plugins}
+## Plugins
 otouto uses a robust plugin system, similar to that of yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
 
 Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#Liberbot-related_plugins), or for [use by the bot's owner](#Control_plugins). See [Development](#Development) for a breakdown of the components of a plugin, or [here](#List_of_plugins) for a list of plugins.
@@ -55,7 +68,7 @@ Several functions used in multiple plugins are defined in utilities.lua. Refer t
 
 * * *
 
-## Control plugins {#Control_plugins}
+## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
 
 | Plugin | Command | Function |
@@ -68,7 +81,7 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 
 * * *
 
-## administration.lua {#administration.lua}
+## administration.lua
 The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups. This works by sending TCP commands to an instance of tg running on the owner's account.
 
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
@@ -133,7 +146,7 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 
 * * *
 
-# Liberbot-related plugins {#Liberbot-related_plugins}
+# Liberbot-related plugins
 **Note:** This section may be out of date. The Liberbot-related plugins have not changed in very long time.
 Some plugins are only useful when the bot is used in a Liberbot group, like floodcontrol.lua and moderation.lua.
 
@@ -160,7 +173,7 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 
 * * *
 
-## List of plugins {#List_of_plugins}
+## List of plugins
 
 | Plugin | Command | Function | Aliases |
 |:-------|:--------|:---------|:--------|
@@ -203,11 +216,11 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 
 * * *
 
-## Style {#Style}
+## Style
 Bot output from every plugin should follow a consistent style. This style is easily observed interacting with the bot.
 Titles should be either **bold** (along with their colons) or a [link](http://otou.to) (with plaintext colons) to the content's source. Names should be _italic_. Numbered lists should use bold numbers followed by a bold period followed by a space. Unnumbered lists should use the • bullet point followed by a space. Descriptions and information should be in plaintext, although "flavor" text should be italic. Technical information should be `monospace`. Links should be named.
 
-## Contributors {#Contributors}
+## Contributors
 Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests.. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.
 
 The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
