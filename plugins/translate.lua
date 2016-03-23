@@ -36,7 +36,7 @@ local action = function(msg)
 	end
 
 	local output = jdat.text[1]
-	output = latcyr(output)
+	output = 'Translation:\n"' .. output .. '"'
 
 	sendReply(msg.reply_to_message or msg, output)
 

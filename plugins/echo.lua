@@ -12,11 +12,18 @@ local action = function(msg)
 
 	local input = msg.text:input()
 
-	if input then
-		sendMessage(msg.chat.id, latcyr(input))
-	else
+	if not input then
 		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+	else
+		local output
+		if msg.chat.type == 'supergroup' then
+			output = 'Echo:\n"' .. input .. '"'
+		else
+			output = latcyr(input)
+		end
+		sendMessage(msg.chat.id, output, true)
 	end
+
 
 end
 
