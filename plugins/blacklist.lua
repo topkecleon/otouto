@@ -12,6 +12,7 @@ local triggers = {
  local action = function(msg)
 
 	if database.blacklist[msg.from.id_str] then return end
+	if database.blacklist[msg.chat.id_str] then return end
 	if not msg.text:match('^/blacklist') then return true end
 	if msg.from.id ~= config.admin then return end
 
@@ -19,6 +20,10 @@ local triggers = {
 	if target.err then
 		sendReply(msg, target.err)
 		return
+	end
+
+	if tonumber(target.id) < 0 then
+		target.name = 'Group'
 	end
 
 	if database.blacklist[tostring(target.id)] then

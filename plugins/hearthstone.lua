@@ -30,7 +30,7 @@ local command = 'hearthstone <query>'
 local doc = [[```
 /hearthstone <query>
 Returns Hearthstone card info.
-Alias: /hn
+Alias: /hs
 ```]]
 
 local triggers = {

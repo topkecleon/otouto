@@ -998,9 +998,7 @@ local commands = {
 			end
 			input = '*Admin Broadcast:*\n' .. input
 			for k,v in pairs(database.administration.groups) do
-				if tonumber(k) then
-					sendMessage(k, input, true, nil, true)
-				end
+				sendMessage(k, input, true, nil, true)
 			end
 		end
 	}

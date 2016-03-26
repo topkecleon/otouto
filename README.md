@@ -175,42 +175,43 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 
 | Plugin | Command | Function | Aliases |
 |:-------|:--------|:---------|:--------|
-| help.lua | /help | Returns a list of commands. | /h |
+| help.lua | /help [command] | Returns a list of commands or command-specific help. | /h |
 | about.lua | /about | Returns the about text as configured in config.lua. |
 | ping.lua | /ping | The simplest plugin ever! |
-| echo.lua | /echo <text> | Repeats a string of text. |
-| gSearch.lua | /google <query> | Returns Google web results. | /g, /gnsfw |
-| gImages.lua | /images <query> | Returns a Google image result. | /i, /insfw |
-| gMaps.lua | /location <query> | Returns location data from Google Maps. | /loc |
-| youtube.lua | /youtube <query> | Returns the top video result from YouTube. | /yt |
-| wikipedia.lua | /wikipedia <query> | Returns the summary of a Wikipedia article. | /wiki |
+| echo.lua | /echo &lt;text&gt; | Repeats a string of text. |
+| gSearch.lua | /google &lt;query&gt; | Returns Google web results. | /g, /gnsfw |
+| gImages.lua | /images &lt;query&gt; | Returns a Google image result. | /i, /insfw |
+| gMaps.lua | /location &lt;query&gt; | Returns location data from Google Maps. | /loc |
+| youtube.lua | /youtube &lt;query&gt; | Returns the top video result from YouTube. | /yt |
+| wikipedia.lua | /wikipedia &lt;query&gt; | Returns the summary of a Wikipedia article. | /wiki |
 | lastfm.lua | /np [username] | Returns the song you are currently listening to. |
 | lastfm.lua | /fmset [username] | Sets your username for /np. /fmset -- will delete it. |
 | hackernews.lua | /hackernews | Returns the latest posts from Hacker News. | /hn |
-| imdb.lua | /imdb <query> | Returns film information from IMDb. |
-| hearthstone.lua | /hearthstone <query> | Returns data for Hearthstone cards matching the query. | /hs |
-| calc.lua | /calc <expression> | Returns solutions to math expressions and conversions between common units. |
-| bible.lua | /bible <reference> | Returns a Bible verse. | /b |
-| urbandictionary.lua | /urbandictionary <query> | Returns the top definition from Urban Dictionary. | /ud, /urban |
-| time.lua | /time <query> | Returns the time, date, and a timezone for a location. |
-| weather.lua | /weather <query> | Returns current weather conditions for a given location. |
-| nick.lua | /nick <nickname> | Set your nickname. /nick - will delete it. |
+| imdb.lua | /imdb &lt;query&gt; | Returns film information from IMDb. |
+| hearthstone.lua | /hearthstone &lt;query&gt; | Returns data for Hearthstone cards matching the query. | /hs |
+| calc.lua | /calc &lt;expression&gt; | Returns solutions to math expressions and conversions between common units. |
+| bible.lua | /bible &lt;reference&gt; | Returns a Bible verse. | /b |
+| urbandictionary.lua | /urbandictionary &lt;query&gt; | Returns the top definition from Urban Dictionary. | /ud, /urban |
+| time.lua | /time &lt;query&gt; | Returns the time, date, and a timezone for a location. |
+| weather.lua | /weather &lt;query&gt; | Returns current weather conditions for a given location. |
+| nick.lua | /nick &lt;nickname&gt; | Set your nickname. /nick - will delete it. |
 | whoami.lua | /whoami | Returns user and chat info for you or the replied-to user. | /who |
 | eightball.lua | /8ball | Returns an answer from a magic 8-ball. |
-| dice.lua | /roll <nDr> | Returns RNG dice rolls. Uses D&D notation. |
+| dice.lua | /roll &lt;nDr&gt; | Returns RNG dice rolls. Uses D&D notation. |
 | reddit.lua | /reddit [r/subreddit ¦ query] | Returns the top results from a given subreddit, query, or r/all. | /r |
 | xkcd.lua | /xkcd [query] | Returns an xkcd strip and its alt text. |
-| slap.lua | /slap <target> | Gives someone a slap (or worse). |
+| slap.lua | /slap &lt;target&gt; | Gives someone a slap (or worse). |
 | commit.lua | /commit | Returns a commit message from whatthecommit.com. |
 | fortune.lua | /fortune | Returns a UNIX fortune. |
 | pun.lua | /pun | Returns a pun. |
-| pokedex.lua | /pokedex <query> | Returns a Pokedex entry. | /dex |
-| currency.lua | /cash [amount] <currency> to <currency> | Converts one currency to another. |
+| pokedex.lua | /pokedex &lt;query&gt; | Returns a Pokedex entry. | /dex |
+| currency.lua | /cash [amount] &lt;currency&gt; to &lt;currency&gt; | Converts one currency to another. |
 | cats.lua | /cat | Returns a cat picture. |
 | reactions.lua | /reactions | Returns a list of reaction emoticons which can be used through the bot. |
 | apod.lua | /apod [date] | Returns the NASA Astronomy Picture of the Day. |
 | dilbert.lua | /dilbert [date] | Returns a Dilbert strip. |
-| patterns.lua | /s/<from>/<to>/ | Fixed that for you. :^) |
+| patterns.lua | /s/&lt;from&gt;/&lt;to&gt;/ | Fixed that for you. :^) |
+| me.lua | /me | Returns user-specific data stored by the bot. |
 
 * * *
 
