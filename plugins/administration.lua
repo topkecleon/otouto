@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.5
+	Version 1.6
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -17,13 +17,16 @@
 	stored in a "groups" array rather than at the top level. Global data is now
 	stored at the top level rather than in a "global" array. Automatic migration
 	will occur in versions 1.5 and 1.6.
+
+	/groups will now list groups according to activity.
 ]]--
 
  -- Build the administration db if nonexistent.
 if not database.administration then
 	database.administration = {
 		admins = {},
-		groups = {}
+		groups = {},
+		activity = {}
 	}
 end
 
@@ -50,8 +53,17 @@ for k,v in pairs(database.administration.groups) do
 	v.rules = v.rules or {}
 end
 
-local sender = dofile('lua-tg/sender.lua')
-tg = sender('localhost', config.cli_port)
+ -- Migration code: Remove this in v1.8.
+ -- Most recent group activity is now cached for group listings.
+if not database.administration.activity then
+	database.administration.activity = {}
+	for k,v in pairs(database.administration.groups) do
+		table.insert(database.administration.activity, k)
+	end
+end
+
+drua = dofile('drua-tg/drua-tg.lua')
+drua.PORT = config.cli_port or 4567
 
 local flags = {
 	[1] = {
@@ -138,53 +150,6 @@ local get_target = function(msg)
 
 end
 
-local kick_user = function(chat, target)
-
-	chat = math.abs(chat)
-
-	if chat > 1000000000000 then
-		chat = chat - 1000000000000
-		tg:_send('channel_kick channel#' .. chat .. ' user#' .. target .. '\n')
-	else
-		tg:_send('chat_del_user chat#' .. chat .. ' user#' .. target .. '\n')
-	end
-
-end
-
-local get_photo = function(chat)
-
-	chat = math.abs(chat)
-
-	local filename
-
-	if chat > 1000000000000 then
-		chat = chat - 1000000000000
-		filename = tg:_send('load_channel_photo channel#' .. chat .. '\n', true)
-	else
-		filename = tg:_send('load_chat_photo chat#' .. chat .. '\n', true)
-	end
-
-	if filename:find('FAIL') then
-		print('Error downloading photo for group ' .. chat .. '.')
-		return
-	end
-	filename = filename:gsub('Saved to ', '')
-	return filename
-
-end
-
-local get_link = function(chat)
-
-	chat = math.abs(chat)
-	if chat > 1000000000000 then
-		chat = chat - 1000000000000
-		return tg:_send('export_channel_link channel#' .. chat .. '\n', true)
-	else
-		return tg:_send('export_chat_link chat#' .. chat .. '\n', true)
-	end
-
-end
-
 local get_desc = function(chat_id)
 
 	local group = database.administration.groups[tostring(chat_id)]
@@ -234,16 +199,14 @@ local commands = {
 			if not group.flags[2] then
 				return true
 			end
-			kick_user(msg.chat.id, msg.from.id)
+			drua.kick_user(msg.chat.id, msg.from.id)
 			local output = flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
 			sendMessage(msg.from.id, output)
 		end
 	},
 
 	{ -- generic
-		triggers = {
-			''
-		},
+		triggers = { '' },
 
 		privilege = 0,
 		interior = true,
@@ -254,7 +217,7 @@ local commands = {
 
 			-- banned
 			if rank == 0 then
-				kick_user(msg.chat.id, msg.from.id)
+				drua.kick_user(msg.chat.id, msg.from.id)
 				sendMessage(msg.from.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
 				return
 			end
@@ -264,7 +227,7 @@ local commands = {
 				-- antisquig Strict
 				if group.flags[3] == true then
 					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
-						kick_user(msg.chat.id, msg.from.id)
+						drua.kick_user(msg.chat.id, msg.from.id)
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
 						return
@@ -282,7 +245,7 @@ local commands = {
 
 				-- banned
 				if get_rank(msg.new_chat_participant.id, msg.chat.id) == 0 then
-					kick_user(msg.chat.id, msg.new_chat_participant.id)
+					drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
 					sendMessage(msg.new_chat_participant.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
 					return
 				end
@@ -290,7 +253,7 @@ local commands = {
 				-- antisquig Strict
 				if group.flags[3] == true then
 					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
-						kick_user(msg.chat.id, msg.new_chat_participant.id)
+						drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.new_chat_participant.id, output)
 						return
@@ -300,7 +263,7 @@ local commands = {
 				-- antibot
 				if msg.new_chat_participant.username and msg.new_chat_participant.username:match('bot$') then
 					if rank < 2 and group.flags[4] == true then
-						kick_user(msg.chat.id, msg.new_chat_participant.id)
+						drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
 						return
 					end
 				else
@@ -312,7 +275,7 @@ local commands = {
 			elseif msg.new_chat_title then
 
 				if rank < 3 then
-					tg:rename_chat(msg.chat.id, group.name)
+					drua.rename_chat(msg.chat.id, group.name)
 				else
 					group.name = msg.new_chat_title
 				end
@@ -322,12 +285,12 @@ local commands = {
 
 				if group.grouptype == 'group' then
 					if rank < 3 then
-						tg:chat_set_photo(msg.chat.id, group.photo)
+						drua.set_photo(msg.chat.id, group.photo)
 					else
-						group.photo = get_photo(msg.chat.id)
+						group.photo = drua.get_photo(msg.chat.id)
 					end
 				else
-					group.photo = get_photo(msg.chat.id)
+					group.photo = drua.get_photo(msg.chat.id)
 				end
 				return
 
@@ -335,7 +298,7 @@ local commands = {
 
 				if group.grouptype == 'group' then
 					if rank < 3 then
-						tg:chat_set_photo(msg.chat.id, group.photo)
+						drua.set_photo(msg.chat.id, group.photo)
 					else
 						group.photo = nil
 					end
@@ -346,6 +309,14 @@ local commands = {
 
 			end
 
+			-- Last active time for group listing.
+			for i,v in pairs(database.administration.activity) do
+				if v == msg.chat.id_str then
+					table.remove(database.administration.activity, i)
+					table.insert(database.administration.activity, 1, msg.chat.id_str)
+				end
+			end
+
 			return true
 
 		end
@@ -353,8 +324,7 @@ local commands = {
 
 	{ -- groups
 		triggers = {
-			'^/groups[@'..bot.username..']*$',
-			'^/glist[@'..bot.username..']*$'
+			'^/groups[@'..bot.username..']*$'
 		},
 
 		command = 'groups',
@@ -363,13 +333,13 @@ local commands = {
 
 		action = function(msg)
 			local output = ''
-			for k,v in pairs(database.administration.groups) do
-				-- no unlisted groups
-				if not v.flags[1] then
-					if v.link then
-						output = output .. '• [' .. v.name .. '](' .. v.link .. ')\n'
+			for i,v in ipairs(database.administration.activity) do
+				local group = database.administration.groups[v]
+				if not group.flags[1] then -- no unlisted groups
+					if group.link then
+						output = output ..  '• [' .. group.name .. '](' .. group.link .. ')\n'
 					else
-						output = output .. '• ' .. v.name .. '\n'
+						output = output ..  '• ' .. group.name .. '\n'
 					end
 				end
 			end
@@ -495,8 +465,7 @@ local commands = {
 
 	{ -- motd
 		triggers = {
-			'^/motd[@'..bot.username..']*',
-			'^/description[@'..bot.username..']*'
+			'^/motd[@'..bot.username..']*'
 		},
 
 		command = 'motd',
@@ -548,7 +517,7 @@ local commands = {
 				local output = 'Leave this group manually or you will be unable to rejoin.'
 				sendMessage(msg.chat.id, output, true, nil, true)
 			else
-				kick_user(msg.chat.id, msg.from.id)
+				drua.kick_user(msg.chat.id, msg.from.id)
 			end
 		end
 	},
@@ -571,7 +540,7 @@ local commands = {
 				sendReply(msg, target.name .. ' is too privileged to be kicked.')
 				return
 			end
-			kick_user(msg.chat.id, target.id)
+			drua.kick_user(msg.chat.id, target.id)
 			sendMessage(msg.chat.id, target.name .. ' has been kicked.')
 		end
 	},
@@ -601,7 +570,7 @@ local commands = {
 				sendReply(msg, target.name .. ' has been unbanned.')
 			else
 				group.bans[target.id_str] = true
-				kick_user(msg.chat.id, target.id)
+				drua.kick_user(msg.chat.id, target.id)
 				sendReply(msg, target.name .. ' has been banned.')
 			end
 		end
@@ -733,7 +702,7 @@ local commands = {
 				sendReply(msg, 'Please specify the new link.')
 				return
 			elseif input == '--' or input == '—' then
-				group.link = get_link(msg.chat.id)
+				group.link = drua.export_link(msg.chat.id)
 				sendReply(msg, 'The link has been regenerated.')
 				return
 			end
@@ -797,7 +766,7 @@ local commands = {
 			end
 			if group.mods[target.id_str] then
 				if group.grouptype == 'supergroup' then
-					tg:channel_set_admin(msg.chat.id, target, 0)
+					drua.channel_set_admin(msg.chat.id, target.id, 0)
 				end
 				group.mods[target.id_str] = nil
 				sendReply(msg, target.name .. ' is no longer a moderator.')
@@ -807,7 +776,7 @@ local commands = {
 					return
 				end
 				if group.grouptype == 'supergroup' then
-					tg:channel_set_admin(msg.chat.id, target, 1)
+					drua.channel_set_admin(msg.chat.id, target.id, 1)
 				end
 				group.mods[target.id_str] = true
 				sendReply(msg, target.name .. ' is now a moderator.')
@@ -833,7 +802,7 @@ local commands = {
 			end
 			if group.govs[target.id_str] then
 				if group.grouptype == 'supergroup' then
-					tg:channel_set_admin(msg.chat.id, target, 0)
+					drua.channel_set_admin(msg.chat.id, target.id, 0)
 				end
 				group.govs[target.id_str] = nil
 				sendReply(msg, target.name .. ' is no longer a governor.')
@@ -846,7 +815,7 @@ local commands = {
 					group.mods[target.id_str] = nil
 				end
 				if group.grouptype == 'supergroup' then
-					tg:channel_set_admin(msg.chat.id, target, 1)
+					drua.channel_set_admin(msg.chat.id, target.id, 1)
 				end
 				group.govs[target.id_str] = true
 				sendReply(msg, target.name .. ' is now a governor.')
@@ -880,7 +849,7 @@ local commands = {
 			else
 				database.blacklist[target.id_str] = true
 				for k,v in pairs(database.administration.groups) do
-					kick_user(k, target.id)
+					drua.kick_user(k, target.id)
 				end
 				sendReply(msg, target.name .. ' has been globally banned.')
 			end
@@ -943,10 +912,11 @@ local commands = {
 				rules = {},
 				grouptype = msg.chat.type,
 				name = msg.chat.title,
-				link = get_link(msg.chat.id),
-				photo = get_photo(msg.chat.id),
+				link = drua.export_link(msg.chat.id),
+				photo = drua.get_photo(msg.chat.id),
 				founded = os.time()
 			}
+			table.insert(database.administration.activity, msg.chat.id_str)
 			sendReply(msg, 'I am now administrating this group.')
 		end
 	},
@@ -1043,17 +1013,12 @@ local action = function(msg)
 	return true
 end
 
-local cron = function()
-	tg = sender(localhost, config.cli_port)
-end
-
 local command = 'groups'
 local doc = '`Returns a list of administrated groups.\nUse /ahelp for more administrative commands.`'
 
 return {
 	action = action,
 	triggers = triggers,
-	cron = cron,
 	doc = doc,
 	command = command
 }

@@ -4,6 +4,7 @@
 
 assert(HTTPS)
 assert(JSON)
+assert(URL)
 
 local BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key
 

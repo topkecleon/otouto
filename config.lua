@@ -55,20 +55,6 @@ Send /help to get started.
 			'thank you'
 		}
 	},
-	moderation = {
-		admins = {
-			['00000000'] = 'You'
-		},
-		errors = {
-			antisquig = 'This group is English-only.',
-			moderation = 'I do not moderate this group.',
-			not_mod = 'This command must be run by a moderator.',
-			not_admin = 'This command must be run by an administrator.',
-		},
-		admin_group = -00000000,
-		realm_name = 'My Realm',
-		antisquig = false
-	},
 	plugins = {
 		'control.lua',
 		'blacklist.lua',

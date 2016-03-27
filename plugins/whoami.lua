@@ -23,9 +23,14 @@ local action = function(msg)
 	end
 	from_name = from_name .. ' (' .. msg.from.id .. ')'
 
+	local chat_id = math.abs(msg.chat.id)
+	if chat_id > 1000000000000 then
+		chat_id = chat_id - 1000000000000
+	end
+
 	local to_name
 	if msg.chat.title then
-		to_name = msg.chat.title .. ' (' .. math.abs(msg.chat.id) .. ').'
+		to_name = msg.chat.title .. ' (' .. chat_id .. ').'
 	else
 		to_name = '@' .. bot.username .. ', AKA ' .. bot.first_name .. ' (' .. bot.id .. ').'
 	end
