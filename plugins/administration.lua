@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.6
+	Version 1.6.1
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -150,33 +150,59 @@ local get_target = function(msg)
 
 end
 
+local mod_format = function(id)
+	id = tostring(id)
+	local user = database.users[id] or { first_name = 'Unknown' }
+	local name = user.first_name
+	if user.last_name then name = user.first_name .. ' ' .. user.last_name end
+	name = markdown_escape(name)
+	local output = '• ' .. name .. ' `[' .. id .. ']`\n'
+	return output
+end
+
 local get_desc = function(chat_id)
 
 	local group = database.administration.groups[tostring(chat_id)]
-	local output
+	local t = {}
 	if group.link then
-		output = '*Welcome to* [' .. group.name .. '](' .. group.link .. ')*!*'
+		table.insert(t, '*Welcome to* [' .. group.name .. '](' .. group.link .. ')*!*')
 	else
-		output = '*Welcome to* _' .. group.name .. '_*!*'
+		table.insert(t, '*Welcome to* _' .. group.name .. '_*!*')
 	end
 	if group.motd then
-		output = output .. '\n\n*Message of the Day:*\n' .. group.motd
+		table.insert(t, '*Message of the Day:*\n' .. group.motd)
 	end
 	if #group.rules > 0 then
-		output = output .. '\n\n*Rules:*'
+		local rulelist = '*Rules:*\n'
 		for i,v in ipairs(group.rules) do
-			output = output .. '\n*' .. i .. '.* ' .. v
+			rulelist = rulelist .. '*' .. i .. '.* ' .. v .. '\n'
+		end
+		table.insert(t, rulelist:trim())
+	end
+	local flaglist = ''
+	for i = 1, #flags do
+		if group.flags[i] then
+			output = output .. '• ' .. flags[i].short .. '\n'
 		end
 	end
-	if group.flags then
-		output = output .. '\n\n*Flags:*\n'
-		for i = 1, #flags do
-			if group.flags[i] then
-				output = output .. '• ' .. flags[i].short .. '\n'
-			end
-		end
+	if flaglist ~= '' then
+		table.insert(t, '*Flags:*\n' .. flaglist:trim())
 	end
-	return output
+	local modstring = ''
+	for k,v in pairs(group.mods) do
+		modstring = modstring .. mod_format(k)
+	end
+	if modstring ~= '' then
+		table.insert(t, '*Moderators:*\n' .. modstring:trim())
+	end
+	local govstring = ''
+	for k,v in pairs(group.govs) do
+		govstring = govstring .. mod_format(k)
+	end
+	if govstring ~= '' then
+		table.insert(t, '*Governors:*\n' .. govstring:trim())
+	end
+	return table.concat(t, '\n\n')
 
 end
 
@@ -389,15 +415,6 @@ local commands = {
 		interior = true,
 
 		action = function(msg, group)
-			local mod_format = function(id)
-				id = tostring(id)
-				local user = database.users[id] or { first_name = 'Unknown' }
-				local name = user.first_name
-				if user.last_name then name = user.first_name .. ' ' .. user.last_name end
-				name = markdown_escape(name)
-				local output = '• ' .. name .. ' `[' .. id .. ']`\n'
-				return output
-			end
 			local modstring = ''
 			for k,v in pairs(group.mods) do
 				modstring = modstring .. mod_format(k)
@@ -412,11 +429,10 @@ local commands = {
 			if govstring ~= '' then
 				govstring = '*Governors for* _' .. msg.chat.title .. '_ *:*\n' .. govstring
 			end
-			local adminstring = '*Administrators:*\n' .. mod_format(config.admin)
-			for k,v in pairs(database.administration.admins) do
-				adminstring = adminstring .. mod_format(k)
+			local output = modstring .. govstring
+			if output == '' then
+				output = 'There are currently no moderators for this group.'
 			end
-			local output = modstring .. govstring .. adminstring
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
 
@@ -634,14 +650,14 @@ local commands = {
 			'^/setrules[@'..bot.username..']*'
 		},
 
-		command = 'setrules <rule1> \\n \\[rule2] ...',
+		command = 'setrules\\n<rule1>\\n\\[rule2]\\n...',
 		privilege = 3,
 		interior = true,
 
 		action = function(msg, group)
 			local input = msg.text:match('^/setrules[@'..bot.username..']* (.+)')
 			if not input then
-				sendReply(msg, '/setrules [rule]\n<rule>\n[rule]\n...')
+				sendMessage(msg.chat.id, '```\n/setrules\n<rule1>\n[rule2]\n...\n```', true, msg.message_id, true)
 				return
 			elseif input == '--' or input == '—' then
 				group.rules = {}
@@ -807,10 +823,6 @@ local commands = {
 				group.govs[target.id_str] = nil
 				sendReply(msg, target.name .. ' is no longer a governor.')
 			else
-				if target.rank > 3 then
-					sendReply(msg, target.name .. ' is greater than a governor.')
-					return
-				end
 				if target.rank == 2 then
 					group.mods[target.id_str] = nil
 				end
@@ -932,21 +944,17 @@ local commands = {
 		interior = true,
 
 		action = function(msg)
-			local input = msg.text:input()
-			if input then
-				if database.administration.groups[input] then
-					database.administration.groups[input] = nil
-					sendReply(msg, 'I am no longer administrating that group.')
-				else
-					sendReply(msg, 'I do not administrate that group.')
+			local input = msg.text:input() or msg.chat.id_str
+			if database.administration.groups[input] then
+				database.administration.groups[input] = nil
+				for i,v in ipairs(database.administration.activity) do
+					if v == input then
+						table.remove(database.administration.activity, i)
+					end
 				end
+				sendReply(msg, 'I am no longer administrating that group.')
 			else
-				if database.administration.groups[msg.chat.id_str] then
-					database.administration.groups[msg.chat.id_str] = nil
-					sendReply(msg, 'I am no longer administrating this group.')
-				else
-					sendReply(msg, 'I do not administrate this group.')
-				end
+				sendReply(msg, 'I do not administrate that group.')
 			end
 		end
 	},
