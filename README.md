@@ -150,6 +150,7 @@ antiflood (flag 5) provides a system of automatic flood protection by removing u
 **Default antiflood values:**
 
 | Type | Points |
+|:-----|:------:|
 | text | 5 |
 | contact | 5 |
 | audio | 5 |
