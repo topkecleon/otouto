@@ -29,12 +29,12 @@ local action = function(msg)
 
 	local message, res = HTTP.request(url)
 
-	if message:len() == 0 then
+	if not message or res ~= 200 or message:len() == 0 then
 		url = 'http://api.biblia.com/v1/bible/content/KJVAPOC.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
 		message, res = HTTP.request(url)
 	end
 
-	if res ~= 200 then
+	if not message or res ~= 200  or message:len() == 0 then
 		message = config.errors.results
 	end
 

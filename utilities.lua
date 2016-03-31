@@ -21,6 +21,16 @@ get_word = function(s, i)
 
 end
 
+ -- Like get_word(), but better.
+ -- Returns the actual index.
+function string:index()
+	local t = {}
+	for w in s:gmatch('%g+') do
+		table.insert(t, w)
+	end
+	return t
+end
+
  -- Returns the string after the first space.
 function string:input()
 	if not self:find(' ') then

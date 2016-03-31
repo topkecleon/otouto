@@ -30,6 +30,11 @@ if not database.administration then
 	}
 end
 
+admin_temp = {
+	help = {},
+	flood = {}
+}
+
  -- Migration code: Remove this in v1.7.
  -- Group data is now stored in a "groups" array.
 if not database.administration.groups then
@@ -82,7 +87,7 @@ local flags = {
 		kicked = 'You were automatically kicked from GROUPNAME for posting Arabic script and/or RTL characters.'
 	},
 	[3] = {
-		name = 'antisquig Strict',
+		name = 'antisquig++',
 		desc = 'Automatically removes users whose names contain Arabic script or RTL characters.',
 		short = 'This group does not allow users whose names contain Arabic script or RTL characters.',
 		enabled = 'Users whose names contain Arabic script and/or RTL characters will now be removed automatically.',
@@ -95,7 +100,27 @@ local flags = {
 		short = 'This group does not allow users to add bots.',
 		enabled = 'Non-moderators will no longer be able to add bots.',
 		disabled = 'Non-moderators will now be able to add bots.'
+	},
+	[5] = {
+		name = 'antiflood',
+		desc = 'Prevents flooding by rate-limiting messages per user.',
+		short = 'This group automatically removes users who flood.',
+		enabled = 'Users will now be removed automatically for excessive messages. Use /antiflood to configure limits.',
+		disabled = 'Users will no longer be removed automatically for excessive messages.',
+		kicked = 'You were automatically kicked from GROUPNAME for flooding.'
 	}
+}
+
+local antiflood = {
+	text = 5,
+	voice = 5,
+	audio = 5,
+	contact = 5,
+	photo = 10,
+	video = 10,
+	location = 10,
+	document = 10,
+	sticker = 20
 }
 
 local ranks = {
@@ -182,7 +207,7 @@ local get_desc = function(chat_id)
 	local flaglist = ''
 	for i = 1, #flags do
 		if group.flags[i] then
-			output = output .. '• ' .. flags[i].short .. '\n'
+			flaglist = flaglist .. '• ' .. flags[i].short .. '\n'
 		end
 	end
 	if flaglist ~= '' then
@@ -256,6 +281,45 @@ local commands = {
 						drua.kick_user(msg.chat.id, msg.from.id)
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
+						return
+					end
+				end
+
+				-- antiflood
+				if group.flags[5] == true then
+					if not group.antiflood then
+						group.antiflood = JSON.decode(JSON.encode(antiflood))
+					end
+					if not admin_temp.flood[msg.chat.id_str] then
+						admin_temp.flood[msg.chat.id_str] = {}
+					end
+					if not admin_temp.flood[msg.chat.id_str][msg.from.id_str] then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = 0
+					end
+					if msg.sticker then -- Thanks Brazil for discarding switches.
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.sticker
+					elseif msg.photo then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.photo
+					elseif msg.document then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.document
+					elseif msg.audio then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.audio
+					elseif msg.contact then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.contact
+					elseif msg.video then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.video
+					elseif msg.location then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.location
+					elseif msg.voice then
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.voice
+					else
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.text
+					end
+					if admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
+						drua.kick_user(msg.chat.id, msg.from.id)
+						local output = flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
+						sendMessage(msg.from.id, output)
+						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
 						return
 					end
 				end
@@ -350,7 +414,8 @@ local commands = {
 
 	{ -- groups
 		triggers = {
-			'^/groups[@'..bot.username..']*$'
+			'^/groups$',
+			'^/groups@'..bot.username
 		},
 
 		command = 'groups',
@@ -380,7 +445,8 @@ local commands = {
 
 	{ -- ahelp
 		triggers = {
-			'^/ahelp[@'..bot.username..']*$'
+			'^/ahelp$',
+			'^/ahelp@'..bot.username
 		},
 
 		command = 'ahelp',
@@ -391,7 +457,7 @@ local commands = {
 			local rank = get_rank(msg.from.id, msg.chat.id)
 			local output = '*Commands for ' .. ranks[rank] .. ':*\n'
 			for i = 1, rank do
-				for ind, val in ipairs(database.administration.help[i]) do
+				for ind, val in ipairs(admin_temp.help[i]) do
 					output = output .. '• /' .. val .. '\n'
 				end
 			end
@@ -405,9 +471,10 @@ local commands = {
 
 	{ -- alist
 		triggers = {
-			'^/alist[@'..bot.username..']*$',
-			'^/ops[@'..bot.username..']*$',
-			'^/oplist[@'..bot.username..']*$'
+			'^/ops$',
+			'^/ops@'..bot.username,
+			'^/oplist$',
+			'^/oplist@'..bot.username
 		},
 
 		command = 'ops',
@@ -440,8 +507,8 @@ local commands = {
 
 	{ -- desc
 		triggers = {
-			'^/desc[@'..bot.username..']*$',
-			'^/description[@'..bot.username..']*$'
+			'^/desc[ription]*$',
+			'^/desc[ription]*@'..bot.username
 		},
 
 		command = 'description',
@@ -460,7 +527,8 @@ local commands = {
 
 	{ -- rules
 		triggers = {
-			'^/rules[@'..bot.username..']*$'
+			'^/rules$',
+			'^/rules@'..bot.username
 		},
 
 		command = 'rules',
@@ -481,7 +549,8 @@ local commands = {
 
 	{ -- motd
 		triggers = {
-			'^/motd[@'..bot.username..']*'
+			'^/motd$',
+			'^/motd@'..bot.username
 		},
 
 		command = 'motd',
@@ -499,7 +568,8 @@ local commands = {
 
 	{ -- link
 		triggers = {
-			'^/link[@'..bot.username..']*'
+			'^/link$',
+			'^/link@'..bot.username
 		},
 
 		command = 'link',
@@ -598,7 +668,7 @@ local commands = {
 			'^/changerule@' .. bot.username
 		},
 
-		command = 'changerule <i> <newrule>',
+		command = 'changerule <i> <rule>',
 		privilege = 3,
 		interior = true,
 
@@ -650,16 +720,16 @@ local commands = {
 			'^/setrules[@'..bot.username..']*'
 		},
 
-		command = 'setrules\\n<rule1>\\n\\[rule2]\\n...',
+		command = 'setrules <rules>',
 		privilege = 3,
 		interior = true,
 
 		action = function(msg, group)
-			local input = msg.text:match('^/setrules[@'..bot.username..']* (.+)')
+			local input = msg.text:match('^/setrules[@'..bot.username..']*(.+)')
 			if not input then
-				sendMessage(msg.chat.id, '```\n/setrules\n<rule1>\n[rule2]\n...\n```', true, msg.message_id, true)
+				sendMessage(msg.chat.id, '```\n/setrules [rule]\n<rule>\n[rule]\n...\n```', true, msg.message_id, true)
 				return
-			elseif input == '--' or input == '—' then
+			elseif input == ' --' or input == ' —' then
 				group.rules = {}
 				sendReply(msg, 'The rules have been cleared.')
 				return
@@ -689,8 +759,12 @@ local commands = {
 		action = function(msg, group)
 			local input = msg.text:input()
 			if not input then
-				sendReply(msg, 'Please specify the new message of the day.')
-				return
+				if msg.reply_to_message and msg.reply_to_message.text then
+					input = msg.reply_to_message.text
+				else
+					sendReply(msg, 'Please specify the new message of the day.')
+					return
+				end
 			elseif input == '--' or input == '—' then
 				group.motd = nil
 				sendReply(msg, 'The MOTD has been cleared.')
@@ -764,6 +838,44 @@ local commands = {
 		end
 	},
 
+	{ -- antiflood
+		triggers = {
+			'^/antiflood',
+			'^/antiflood@'..bot.username
+		},
+
+		command = 'antiflood <type> <i>',
+		privilege = 3,
+		interior = true,
+
+		action = function(msg, group)
+			if not group.flags[5] then
+				sendMessage(msg.chat.id, 'antiflood is not enabled. Use `/flag 5` to enable it.', true, nil, true)
+				return
+			end
+			if not group.antiflood then
+				group.antiflood = JSON.decode(JSON.encode(antiflood))
+			end
+			local input = msg.text_lower:input()
+			local output
+			if input then
+				local key, val = input:match('(%a+) (%d+)')
+				if not group.antiflood[key] or not tonumber(val) then
+					output = 'Not a valid message type or number.'
+				else
+					group.antiflood[key] = val
+					output = 'A *' .. key .. '* message is now worth *' .. val .. '* points.'
+				end
+			else
+				output = 'usage: `/antiflood <type> <i>`\nexample: `/antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
+				for k,v in pairs(group.antiflood) do
+					output = output .. '*'..k..':* `'..v..'`\n'
+				end
+			end
+			sendMessage(msg.chat.id, output, true, msg.message_id, true)
+		end
+	},
+
 	{ -- mod
 		triggers = {
 			'^/mod',
@@ -792,7 +904,7 @@ local commands = {
 					return
 				end
 				if group.grouptype == 'supergroup' then
-					drua.channel_set_admin(msg.chat.id, target.id, 1)
+					drua.channel_set_admin(msg.chat.id, target.id, 2)
 				end
 				group.mods[target.id_str] = true
 				sendReply(msg, target.name .. ' is now a moderator.')
@@ -827,7 +939,7 @@ local commands = {
 					group.mods[target.id_str] = nil
 				end
 				if group.grouptype == 'supergroup' then
-					drua.channel_set_admin(msg.chat.id, target.id, 1)
+					drua.channel_set_admin(msg.chat.id, target.id, 2)
 				end
 				group.govs[target.id_str] = true
 				sendReply(msg, target.name .. ' is now a governor.')
@@ -993,11 +1105,11 @@ end
 
 database.administration.help = {}
 for i,v in ipairs(ranks) do
-	database.administration.help[i] = {}
+	admin_temp.help[i] = {}
 end
 for i,v in ipairs(commands) do
 	if v.command then
-		table.insert(database.administration.help[v.privilege], v.command)
+		table.insert(admin_temp.help[v.privilege], v.command)
 	end
 end
 
@@ -1021,12 +1133,17 @@ local action = function(msg)
 	return true
 end
 
+local cron = function()
+	admin_temp.flood = {}
+end
+
 local command = 'groups'
 local doc = '`Returns a list of administrated groups.\nUse /ahelp for more administrative commands.`'
 
 return {
 	action = action,
 	triggers = triggers,
+	cron = cron,
 	doc = doc,
 	command = command
 }

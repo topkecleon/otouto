@@ -4,7 +4,9 @@ if not database.hearthstone or os.time() > database.hearthstone.expiration then
 
 	print('Downloading Hearthstone database...')
 
-	database.hearthstone = {}
+	database.hearthstone = {
+		expiration = os.time() + 600000
+	}
 
 	local jstr, res = HTTPS.request('http://hearthstonejson.com/json/AllSets.json')
 	if res ~= 200 then
@@ -19,8 +21,6 @@ if not database.hearthstone or os.time() > database.hearthstone.expiration then
 			table.insert(database.hearthstone, val)
 		end
 	end
-
-	database.hearthstone.expiration = os.time() + 600000
 
 	print('Download complete! It will be stored for a week.')
 

@@ -106,6 +106,7 @@ While tg is running, you may start/reload otouto with administration.lua enabled
 | /setmotd | Sets a group's "Message of the Day". | 3 | Y |
 | /setlink | Sets a group's link. | 3 | Y |
 | /flag | Returns a list of available flags and their settings, or toggles a flag. | 3 | Y |
+| /antiflood | Configures antiflood (flag 5) settings. | 3 | Y |
 | /mod | Promotes a user to a moderator. | 3 | Y |
 | /demod | Demotes a moderator to a user. | 3 | Y |
 | /gov | Promotes a user to a governor. | 4 | Y |
@@ -141,6 +142,23 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 | 2 | antisquig | Automatically removes users for posting Arabic script or RTL characters. |
 | 3 | antisquig Strict | Automatically removes users whose names contain Arabic script or RTL characters. |
 | 4 | antibot | Prevents bots from being added by non-moderators. |
+| 5 | antiflood | Prevents flooding by rate-limiting messages per user. |
+
+#### antiflood
+antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
+
+**Default antiflood values:**
+
+| Type | Points |
+| text | 5 |
+| contact | 5 |
+| audio | 5 |
+| voice | 5 |
+| photo | 10 |
+| document | 10 |
+| location | 10 |
+| video | 10 |
+| sticker | 20 |
 
 * * *
 
