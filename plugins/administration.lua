@@ -1117,10 +1117,11 @@ local action = function(msg)
 	for i,v in ipairs(commands) do
 		for key,val in pairs(v.triggers) do
 			if msg.text_lower:match(val) then
+				if msg.chat.type == 'private' then break end
 				if v.interior and not database.administration.groups[msg.chat.id_str] then
 					break
 				end
-				if msg.chat.type ~= 'private' and get_rank(msg.from.id, msg.chat.id) < v.privilege then
+				if get_rank(msg.from.id, msg.chat.id) < v.privilege then
 					break
 				end
 				local res = v.action(msg, database.administration.groups[msg.chat.id_str])
