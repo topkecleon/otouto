@@ -1158,7 +1158,6 @@ local action = function(msg)
 	for i,v in ipairs(commands) do
 		for key,val in pairs(v.triggers) do
 			if msg.text_lower:match(val) then
-				if msg.chat.type == 'private' then break end
 				if v.interior and not database.administration.groups[msg.chat.id_str] then
 					break
 				end
