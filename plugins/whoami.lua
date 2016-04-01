@@ -27,7 +27,7 @@ local action = function(msg)
 
 	local user = 'You are @%s, also known as *%s* `[%s]`'
 	if msg.from.username then
-		user = user:format(msg.from.username, msg.from.name, msg.from.id)
+		user = user:format(markdown_escape(msg.from.username), msg.from.name, msg.from.id)
 	else
 		user = 'You are *%s* `[%s]`,'
 		user = user:format(msg.from.name, msg.from.id)
@@ -35,9 +35,9 @@ local action = function(msg)
 
 	local group = '@%s, also known as *%s* `[%s]`.'
 	if msg.chat.type == 'private' then
-		group = group:format(bot.username, bot.first_name, bot.id)
+		group = group:format(markdown_escape(bot.username), bot.first_name, bot.id)
 	elseif msg.chat.username then
-		group = group:format(msg.chat.username, msg.chat.title, chat_id)
+		group = group:format(markdown_escape(msg.chat.username), msg.chat.title, chat_id)
 	else
 		group = '*%s* `[%s]`.'
 		group = group:format(msg.chat.title, chat_id)

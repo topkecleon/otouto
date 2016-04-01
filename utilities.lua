@@ -255,3 +255,21 @@ markdown_escape = function(text)
 	return text
 
 end
+
+function string:md_escape()
+	local text = self
+	text = text:gsub('_', '\\_')
+	text = text:gsub('%[', '\\[')
+	text = text:gsub('%*', '\\*')
+	text = text:gsub('`', '\\`')
+	return text
+end
+
+ -- Just an easy way to get a user's full name.
+build_name = function(first, last)
+	if last then
+		return first .. ' ' .. last
+	else
+		return first
+	end
+end

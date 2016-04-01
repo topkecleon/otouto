@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.6.1
+	Version 1.7
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -13,12 +13,11 @@
 
 	Important notices about updates will be here!
 
-	Rules lists always exist, empty if there are no rules. Group arrays are now
-	stored in a "groups" array rather than at the top level. Global data is now
-	stored at the top level rather than in a "global" array. Automatic migration
-	will occur in versions 1.5 and 1.6.
+	1.7 - Added antiflood (flag 5). Fixed security flaw. Renamed flag 3
+	("antisquig Strict" -> "antisquig++"). Added /alist for governors to list
+	administrators. Back to single-governor groups as originally intended. Auto-
+	matic migration through 1.8.
 
-	/groups will now list groups according to activity.
 ]]--
 
  -- Build the administration db if nonexistent.
@@ -35,29 +34,6 @@ admin_temp = {
 	flood = {}
 }
 
- -- Migration code: Remove this in v1.7.
- -- Group data is now stored in a "groups" array.
-if not database.administration.groups then
-	database.administration.groups = {}
-	for k,v in pairs(database.administration) do
-		if tonumber(k) then
-			database.administration.groups[k] = v
-			database.administration[k] = nil
-		end
-	end
-end
- -- Global data is stored at the top level.
-if database.administration.global then
-	for k,v in pairs(database.administration.global) do
-		database.administration[k] = v
-	end
-	database.administration.global = nil
-end
- -- Rule lists remain empty, rather than nil, when there are no rules.
-for k,v in pairs(database.administration.groups) do
-	v.rules = v.rules or {}
-end
-
  -- Migration code: Remove this in v1.8.
  -- Most recent group activity is now cached for group listings.
 if not database.administration.activity then
@@ -65,6 +41,18 @@ if not database.administration.activity then
 	for k,v in pairs(database.administration.groups) do
 		table.insert(database.administration.activity, k)
 	end
+end
+
+ -- Migration code: Remove this in v1.9.
+ -- Groups have single governors now.
+for k,v in pairs(database.administration.groups) do
+	if v.govs and table_size(v.govs) > 0 then
+		for key, val in pairs(v.govs) do
+			v.governor = key
+			break
+		end
+	end
+	v.govs = nil
 end
 
 drua = dofile('drua-tg/drua-tg.lua')
@@ -148,7 +136,7 @@ local get_rank = function(target, chat)
 	end
 
 	if chat and database.administration.groups[chat] then
-		if database.administration.groups[chat].govs[target] then
+		if database.administration.groups[chat].governor == tonumber(target) then
 			return 3
 		elseif database.administration.groups[chat].mods[target] then
 			return 2
@@ -220,12 +208,10 @@ local get_desc = function(chat_id)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. modstring:trim())
 	end
-	local govstring = ''
-	for k,v in pairs(group.govs) do
-		govstring = govstring .. mod_format(k)
-	end
-	if govstring ~= '' then
-		table.insert(t, '*Governors:*\n' .. govstring:trim())
+	if group.governor then
+		local gov = database.users[tostring(group.governor)]
+		local s = build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`'
+		table.insert(t, '*Governor:* ' .. s)
 	end
 	return table.concat(t, '\n\n')
 
@@ -451,7 +437,7 @@ local commands = {
 
 		command = 'ahelp',
 		privilege = 1,
-		interior = true,
+		interior = false,
 
 		action = function(msg)
 			local rank = get_rank(msg.from.id, msg.chat.id)
@@ -462,7 +448,9 @@ local commands = {
 				end
 			end
 			if sendMessage(msg.from.id, output, true, nil, true) then
-				sendReply(msg, 'I have sent you the requested information in a private message.')
+				if msg.from.id ~= msg.chat.id then
+					sendReply(msg, 'I have sent you the requested information in a private message.')
+				end
 			else
 				sendMessage(msg.chat.id, output, true, nil, true)
 			end
@@ -490,14 +478,12 @@ local commands = {
 				modstring = '*Moderators for* _' .. msg.chat.title .. '_ *:*\n' .. modstring
 			end
 			local govstring = ''
-			for k,v in pairs(group.govs) do
-				govstring = govstring .. mod_format(k)
+			if group.governor then
+				local gov = database.users[tostring(group.governor)]
+				govstring = '*Governor:* ' .. build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`'
 			end
-			if govstring ~= '' then
-				govstring = '*Governors for* _' .. msg.chat.title .. '_ *:*\n' .. govstring
-			end
-			local output = modstring .. govstring
-			if output == '' then
+			local output = modstring:trim() ..'\n\n' .. govstring:trim()
+			if output == '\n\n' then
 				output = 'There are currently no moderators for this group.'
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
@@ -518,7 +504,9 @@ local commands = {
 		action = function(msg)
 			local output = get_desc(msg.chat.id)
 			if sendMessage(msg.from.id, output, true, nil, true) then
-				sendReply(msg, 'I have sent you the requested information in a private message.')
+				if msg.from.id ~= msg.chat.id then
+					sendReply(msg, 'I have sent you the requested information in a private message.')
+				end
 			else
 				sendMessage(msg.chat.id, output, true, nil, true)
 			end
@@ -802,9 +790,29 @@ local commands = {
 		end
 	},
 
+	{ -- alist
+		triggers = {
+			'^/alist$',
+			'^/alist@'..bot.username
+		},
+
+		command = 'alist',
+		privilege = 3,
+		interior = true,
+
+		action = function(msg)
+			local output = '*Administrators:*\n'
+			output = output .. mod_format(config.admin):gsub('\n', ' ★\n')
+			for k,v in pairs(database.administration.admins) do
+				output = output .. mod_format(k)
+			end
+			sendMessage(msg.chat.id, output, true, nil, true)
+		end
+	},
+
 	{ -- flags
 		triggers = {
-			'^/flags?[@'..bot.username..']*'
+			'^/flags?'
 		},
 
 		command = 'flag <i>',
@@ -840,8 +848,7 @@ local commands = {
 
 	{ -- antiflood
 		triggers = {
-			'^/antiflood',
-			'^/antiflood@'..bot.username
+			'^/antiflood'
 		},
 
 		command = 'antiflood <type> <i>',
@@ -864,7 +871,7 @@ local commands = {
 					output = 'Not a valid message type or number.'
 				else
 					group.antiflood[key] = val
-					output = 'A *' .. key .. '* message is now worth *' .. val .. '* points.'
+					output = '*' .. key:gsub('^%l', string.upper) .. '* messages are now worth *' .. val .. '* points.'
 				end
 			else
 				output = 'usage: `/antiflood <type> <i>`\nexample: `/antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
@@ -928,21 +935,24 @@ local commands = {
 				sendReply(msg, target.err)
 				return
 			end
-			if group.govs[target.id_str] then
+			if group.governor and group.governor == target.id then
 				if group.grouptype == 'supergroup' then
 					drua.channel_set_admin(msg.chat.id, target.id, 0)
 				end
-				group.govs[target.id_str] = nil
-				sendReply(msg, target.name .. ' is no longer a governor.')
+				group.governor = nil
+				sendReply(msg, target.name .. ' is no longer the governor.')
 			else
+				if group.grouptype == 'supergroup' then
+					if group.governor then
+						drua.channel_set_admin(msg.chat.id, group.governor, 0)
+					end
+					drua.channel_set_admin(msg.chat.id, target.id, 2)
+				end
 				if target.rank == 2 then
 					group.mods[target.id_str] = nil
 				end
-				if group.grouptype == 'supergroup' then
-					drua.channel_set_admin(msg.chat.id, target.id, 2)
-				end
-				group.govs[target.id_str] = true
-				sendReply(msg, target.name .. ' is now a governor.')
+				group.governor = target.id
+				sendReply(msg, target.name .. ' is the new governor.')
 			end
 		end
 	},
@@ -1006,7 +1016,6 @@ local commands = {
 				end
 				for k,v in pairs(database.administration.groups) do
 					v.mods[target.id_str] = nil
-					v.govs[target.id_str] = nil
 				end
 				database.administration.admins[target.id_str] = true
 				sendReply(msg, target.name .. ' is now an administrator.')
@@ -1016,7 +1025,8 @@ local commands = {
 
 	{ -- gadd
 		triggers = {
-			'^/gadd[@'..bot.username..']*$'
+			'^/gadd$',
+			'^/gadd@'..bot.username
 		},
 
 		command = 'gadd',
@@ -1030,7 +1040,7 @@ local commands = {
 			end
 			database.administration.groups[msg.chat.id_str] = {
 				mods = {},
-				govs = {},
+				governor = msg.from.id,
 				bans = {},
 				flags = {},
 				rules = {},
@@ -1071,9 +1081,40 @@ local commands = {
 		end
 	},
 
+	{ -- glist
+		triggers = {
+			'^/glist$',
+			'^/glist@'..bot.username
+		},
+
+		command = 'glist',
+		privilege = 5,
+		interior = false,
+
+		action = function(msg)
+			local output = ''
+			if table_size(database.administration.groups) > 0 then
+				for k,v in pairs(database.administration.groups) do
+					output = output .. '[' .. v.name:md_escape() .. '](' .. v.link .. ') `[' .. k .. ']`\n'
+					if v.governor then
+						local gov = database.users[tostring(v.governor)]
+						output = output .. '• Governor: ' .. build_name(gov.first_name, gov.last_name):md_escape() .. ' `[' .. gov.id .. ']`\n'
+					end
+				end
+			else
+				output = 'There are no groups.'
+			end
+			if sendMessage(msg.from.id, output, true, nil, true) then
+				if msg.from.id ~= msg.chat.id then
+					sendReply(msg, 'I have sent you the requested information in a private message.')
+				end
+			end
+		end
+	},
+
 	{ -- broadcast
 		triggers = {
-			'^/broadcast[@'..bot.username..']*'
+			'^/broadcast'
 		},
 
 		command = 'broadcast <message>',
@@ -1120,7 +1161,7 @@ local action = function(msg)
 				if v.interior and not database.administration.groups[msg.chat.id_str] then
 					break
 				end
-				if msg.chat.type ~= 'private' and get_rank(msg.from.id, msg.chat.id) < v.privilege then
+				if get_rank(msg.from.id, msg.chat.id) < v.privilege then
 					break
 				end
 				local res = v.action(msg, database.administration.groups[msg.chat.id_str])
