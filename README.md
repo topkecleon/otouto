@@ -5,16 +5,16 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-| The Manual |
-|:-----------|
-| [Setup](#setup) |
-| [Plugins](#plugins) |
-| [Control plugins](#control-plugins) |
-| [administration.lua](#administrationlua) |
+| The Manual                                            |
+|:------------------------------------------------------|
+| [Setup](#setup)                                       |
+| [Plugins](#plugins)                                   |
+| [Control plugins](#control-plugins)                   |
+| [administration.lua](#administrationlua)              |
 | [Liberbot-related plugins](#liberbot-related-plugins) |
-| [List of plugins](#list-of-plugins) |
-| [Style](#style) |
-| [Contributors](#contributors) |
+| [List of plugins](#list-of-plugins)                   |
+| [Style](#style)                                       |
+| [Contributors](#contributors)                         |
 
 ## Setup
 You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
@@ -46,13 +46,13 @@ Most plugins are intended for public use, but a few are for other purposes, like
 
 A plugin can have five components, and two of them are required:
 
-| Component | Description | Required? |
-|:----------|:------------|:----------|
-| action | The main function. It accepts the `msg` table as an argument. | Y |
-| triggers | A table of commands to be used for the plugin. Use Lua patterns. | Y |
-| cron | An optional function to be called approximately every minute. | N |
-| command | The basic command and syntax. This is listed in the help text. | N |
-| doc | Usage and other info for the plugin. This is returned with "/help command" | N |
+| Component | Description                                  | Required? |
+|:----------|:---------------------------------------------|:----------|
+| action    | Main function. Expects `msg` table as an argument.   | Y |
+| triggers  | Table of triggers for the plugin. Uses Lua patterns. | Y |
+| cron      | Optional function to be called every minute.         | N |
+| command   | Basic command and syntax. Listed in the help text.   | N |
+| doc       | Usage for the plugin. Returned by "/help $command".  | N |
 
 The `on_msg_receive()` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 
@@ -69,13 +69,13 @@ Several functions used in multiple plugins are defined in utilities.lua. Refer t
 ## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
 
-| Plugin | Command | Function |
-|:-------|:--------|:---------|
-| control.lua | /reload | Reloads all plugins and configuration. |
-| control.lua | /halt | Saves the database and shuts down the bot properly. |
-| blacklist.lua | /blacklist | Allows the admin to list people the bot will ignore. |
-| shell.lua | /run | Executes shell commands on the host operating system. |
-| luarun.lua | /lua | Executes Lua commands in the bot's environement. |
+| Plugin        | Command    | Function                                        |
+|:--------------|:-----------|:------------------------------------------------|
+| control.lua   | /reload    | Reloads all plugins and configuration.          |
+| control.lua   | /halt      | Shuts down the bot after saving the database.   |
+| blacklist.lua | /blacklist | Blocks people from using the bot.               |
+| shell.lua     | /run       | Executes shell commands on the host system.     |
+| luarun.lua    | /lua       | Executes Lua commands in the bot's environment. |
 
 * * *
 
@@ -88,61 +88,57 @@ Once the installation is finished, enable `administration.lua` in your config fi
 
 While tg is running, you may start/reload otouto with administration.lua enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
 
-| Command | Function | Privilege | Internal? |
-|:--------|:---------|:----------|:----------|
-| /groups | Returns a list of administrated groups (except those flagged "unlisted". | 1 | N |
-| /ahelp | Returns a list of administrative commands and their required privileges. | 1 | Y |
-| /ops | Returns a list of moderators, governors, and administrators. | 1 | Y |
-| /desc | Returns the link, rules, MOTD, and enabled flags of a group. | 1 | Y |
-| /rules | Returns the rules of a group. | 1 | Y |
-| /motd | Returns a group's "Message of the Day". | 1 | Y |
-| /link | Returns the link for a group. | 1 | Y |
-| /leave | Removes the user from the group. | 1 | Y |
-| /kick | Removes the target from the group. | 2 | Y |
-| /ban | Bans the target from the group. | 2 | Y |
-| /unban | Unbans the target from the group. | 2 | Y |
-| /changerule | Changes an individual group rule. | 3 | Y |
-| /setrules | Sets the rules for a group. | 3 | Y |
-| /setmotd | Sets a group's "Message of the Day". | 3 | Y |
-| /setlink | Sets a group's link. | 3 | Y |
-| /flag | Returns a list of available flags and their settings, or toggles a flag. | 3 | Y |
-| /antiflood | Configures antiflood (flag 5) settings. | 3 | Y |
-| /mod | Promotes a user to a moderator. | 3 | Y |
-| /demod | Demotes a moderator to a user. | 3 | Y |
-| /gov | Promotes a user to a governor. | 4 | Y |
-| /degov | Demotes a governor to a user. | 4 | Y |
-| /hammer | Bans a user globally, and blacklists him. | 4 | N |
-| /unhammer | Removes a user's global ban, and unblacklists him. | 4 | N |
-| /admin | Promotes a user to an administrator. | 5 | N |
-| /deadmin | Demotes an administrator to a user. | 5 | N |
-| /gadd | Adds a group to the administrative system. | 5 | N |
-| /grem | Removes a group from the administrative system | 5 | Y |
-| /broadcast | Broadcasts a message to all administrated groups. | 5 | N |
+| Command     | Function                                        | Privilege | Internal? |
+|:------------|:------------------------------------------------|:----------|:----------|
+| /groups     | Returns a list of administrated groups (except the unlisted).   | 1 | N |
+| /ahelp      | Returns a list of accessible administrative commands.           | 1 | Y |
+| /ops        | Returns a list of the moderators and governor of a group.       | 1 | Y |
+| /desc       | Returns detailed information for a group.                       | 1 | Y |
+| /rules      | Returns the rules of a group.                                   | 1 | Y |
+| /motd       | Returns the message of the day of a group.                      | 1 | Y |
+| /link       | Returns the link for a group.                                   | 1 | Y |
+| /kick       | Removes the target from the group.                              | 2 | Y |
+| /(un)ban    | Bans the target from the group or vice-versa.                   | 2 | Y |
+| /changerule | Changes an individual group rule.                               | 3 | Y |
+| /setrules   | Sets the rules for a group.                                     | 3 | Y |
+| /setmotd    | Sets the message of the day for a group.                        | 3 | Y |
+| /setlink    | Sets the link for a group.                                      | 3 | Y |
+| /alist      | Returns a list of administrators.                               | 3 | Y |
+| /flags      | Returns a list of flags and their states, or toggles one.       | 3 | Y |
+| /antiflood  | Configures antiflood (flag 5) settings.                         | 3 | Y |
+| /(de)mod    | Promotes a user to a moderator or vice-versa.                   | 3 | Y |
+| /(de)gov    | Promotes a user to the governor or vice-versa.                  | 4 | Y |
+| /(un)hammer | Bans a user globally and blacklists him or vice-versa.          | 4 | N |
+| /(de)admin  | Promotes a user to an administrator or vice-versa.              | 5 | N |
+| /gadd       | Adds a group to the administrative system.                      | 5 | N |
+| /grem       | Removes a group from the administrative system.                 | 5 | Y |
+| /glist      | Returns a list of all administrated groups and their governors. | 5 | N |
+| /broadcast  | Broadcasts a message to all administrated groups.               | 5 | N |
 
 Internal commands can only be run within an administrated group.
 
 ### Description of Privileges
 
-| # | Title | Description | Scope |
-|:-:|:------|:------------|:------|
-| 0 | Banned | Cannot enter the group(s). | Either |
-| 1 | User | Default rank. | Local |
-| 2 | Moderator | Can kick/ban/unban users from a group. | Local |
-| 3 | Governor | Can set rules/motd/link. Can promote/demote moderators. Can modify flags. | Local |
-| 4 | Administrator | Can globally ban/unban users. Can promote/demote governors. | Global |
-| 5 | Owner | Can add/remove groups. Can broadcast. Can promote/demote administrators. | Global |
+| # | Title         | Description                                                       | Scope  |
+|:-:|:--------------|:------------------------------------------------------------------|:-------|
+| 0 | Banned        | Cannot enter the group(s).                                        | Either |
+| 1 | User          | Default rank.                                                     | Local  |
+| 2 | Moderator     | Can kick/ban/unban users.                                         | Local  |
+| 3 | Governor      | Can set rules/motd/link, promote/demote moderators, modify flags. | Local  |
+| 4 | Administrator | Can globally ban/unban users, promote/demote governors.           | Global |
+| 5 | Owner         | Can add/remove groups, broadcast, promote/demote administrators.  | Global |
 
 Obviously, each greater rank inherits the privileges of the lower, positive ranks.
 
 ### Flags
 
-| # | Name | Description |
-|:-:|:-----|:------------|
-| 1 | unlisted | Removes a group from the /groups listing. |
-| 2 | antisquig | Automatically removes users for posting Arabic script or RTL characters. |
-| 3 | antisquig Strict | Automatically removes users whose names contain Arabic script or RTL characters. |
-| 4 | antibot | Prevents bots from being added by non-moderators. |
-| 5 | antiflood | Prevents flooding by rate-limiting messages per user. |
+| # | Name        | Description                                                                      |
+|:-:|:------------|:---------------------------------------------------------------------------------|
+| 1 | unlisted    | Removes a group from the /groups listing.                                        |
+| 2 | antisquig   | Automatically removes users for posting Arabic script or RTL characters.         |
+| 3 | antisquig++ | Automatically removes users whose names contain Arabic script or RTL characters. |
+| 4 | antibot     | Prevents bots from being added by non-moderators.                                |
+| 5 | antiflood   | Prevents flooding by rate-limiting messages per user.                            |
 
 #### antiflood
 antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
@@ -151,15 +147,15 @@ antiflood (flag 5) provides a system of automatic flood protection by removing u
 
 | Type | Points |
 |:-----|:------:|
-| text | 5 |
-| contact | 5 |
-| audio | 5 |
-| voice | 5 |
-| photo | 10 |
+| text     | 5  |
+| contact  | 5  |
+| audio    | 5  |
+| voice    | 5  |
+| photo    | 10 |
 | document | 10 |
 | location | 10 |
-| video | 10 |
-| sticker | 20 |
+| video    | 10 |
+| sticker  | 20 |
 
 * * *
 
@@ -192,45 +188,45 @@ Once this is set up, put your bot in the admin group and run `/modadd` and `/mod
 
 ## List of plugins
 
-| Plugin | Command | Function | Aliases |
-|:-------|:--------|:---------|:--------|
-| help.lua | /help [command] | Returns a list of commands or command-specific help. | /h |
-| about.lua | /about | Returns the about text as configured in config.lua. |
-| ping.lua | /ping | The simplest plugin ever! |
-| echo.lua | /echo &lt;text&gt; | Repeats a string of text. |
-| gSearch.lua | /google &lt;query&gt; | Returns Google web results. | /g, /gnsfw |
-| gImages.lua | /images &lt;query&gt; | Returns a Google image result. | /i, /insfw |
-| gMaps.lua | /location &lt;query&gt; | Returns location data from Google Maps. | /loc |
-| youtube.lua | /youtube &lt;query&gt; | Returns the top video result from YouTube. | /yt |
-| wikipedia.lua | /wikipedia &lt;query&gt; | Returns the summary of a Wikipedia article. | /wiki |
-| lastfm.lua | /np [username] | Returns the song you are currently listening to. |
-| lastfm.lua | /fmset [username] | Sets your username for /np. /fmset -- will delete it. |
-| hackernews.lua | /hackernews | Returns the latest posts from Hacker News. | /hn |
-| imdb.lua | /imdb &lt;query&gt; | Returns film information from IMDb. |
-| hearthstone.lua | /hearthstone &lt;query&gt; | Returns data for Hearthstone cards matching the query. | /hs |
-| calc.lua | /calc &lt;expression&gt; | Returns solutions to math expressions and conversions between common units. |
-| bible.lua | /bible &lt;reference&gt; | Returns a Bible verse. | /b |
-| urbandictionary.lua | /urbandictionary &lt;query&gt; | Returns the top definition from Urban Dictionary. | /ud, /urban |
-| time.lua | /time &lt;query&gt; | Returns the time, date, and a timezone for a location. |
-| weather.lua | /weather &lt;query&gt; | Returns current weather conditions for a given location. |
-| nick.lua | /nick &lt;nickname&gt; | Set your nickname. /nick - will delete it. |
-| whoami.lua | /whoami | Returns user and chat info for you or the replied-to user. | /who |
-| eightball.lua | /8ball | Returns an answer from a magic 8-ball. |
-| dice.lua | /roll &lt;nDr&gt; | Returns RNG dice rolls. Uses D&D notation. |
-| reddit.lua | /reddit [r/subreddit ¦ query] | Returns the top results from a given subreddit, query, or r/all. | /r |
-| xkcd.lua | /xkcd [query] | Returns an xkcd strip and its alt text. |
-| slap.lua | /slap &lt;target&gt; | Gives someone a slap (or worse). |
-| commit.lua | /commit | Returns a commit message from whatthecommit.com. |
-| fortune.lua | /fortune | Returns a UNIX fortune. |
-| pun.lua | /pun | Returns a pun. |
-| pokedex.lua | /pokedex &lt;query&gt; | Returns a Pokedex entry. | /dex |
-| currency.lua | /cash [amount] &lt;currency&gt; to &lt;currency&gt; | Converts one currency to another. |
-| cats.lua | /cat | Returns a cat picture. |
-| reactions.lua | /reactions | Returns a list of reaction emoticons which can be used through the bot. |
-| apod.lua | /apod [date] | Returns the NASA Astronomy Picture of the Day. |
-| dilbert.lua | /dilbert [date] | Returns a Dilbert strip. |
-| patterns.lua | /s/&lt;from&gt;/&lt;to&gt;/ | Fixed that for you. :^) |
-| me.lua | /me | Returns user-specific data stored by the bot. |
+| Plugin              | Command                       | Function                                                | Aliases |
+|:--------------------|:------------------------------|:--------------------------------------------------------|:--------|
+| help.lua            | /help [command]               | Returns a list of commands or command-specific help.       | /h   |
+| about.lua           | /about                        | Returns the about text as configured in config.lua.               |
+| ping.lua            | /ping                         | The simplest plugin ever!                                         |
+| echo.lua            | /echo ‹text›                  | Repeats a string of text.                                         |
+| gSearch.lua         | /google ‹query›               | Returns Google web results.                                | /g   |
+| gImages.lua         | /images ‹query›               | Returns a Google image result.                             | /i   |
+| gMaps.lua           | /location ‹query›             | Returns location data from Google Maps.                    | /loc |
+| youtube.lua         | /youtube ‹query›              | Returns the top video result from YouTube.                 | /yt  |
+| wikipedia.lua       | /wikipedia ‹query›            | Returns the summary of a Wikipedia article.                | /w   |
+| lastfm.lua          | /np [username]                | Returns the song you are currently listening to.                  |
+| lastfm.lua          | /fmset [username]             | Sets your username for /np. /fmset -- will delete it.             |
+| hackernews.lua      | /hackernews                   | Returns the latest posts from Hacker News.                 | /hn  |
+| imdb.lua            | /imdb ‹query›                 | Returns film information from IMDb.                               |
+| hearthstone.lua     | /hearthstone ‹query›          | Returns data for Hearthstone cards matching the query.     | /hs  |
+| calc.lua            | /calc ‹expression›            | Returns conversions and solutions to math expressions.            |
+| bible.lua           | /bible ‹reference›            | Returns a Bible verse.                                     | /b   |
+| urbandictionary.lua | /urban ‹query›                | Returns the top definition from Urban Dictionary.          | /ud  |
+| time.lua            | /time ‹query›                 | Returns the time, date, and a timezone for a location.            |
+| weather.lua         | /weather ‹query›              | Returns current weather conditions for a given location.          |
+| nick.lua            | /nick ‹nickname›              | Set your nickname. /nick - will delete it.                        |
+| whoami.lua          | /whoami                       | Returns user and chat info for you or the replied-to user. | /who |
+| eightball.lua       | /8ball                        | Returns an answer from a magic 8-ball.                            |
+| dice.lua            | /roll ‹nDr›                   | Returns RNG dice rolls. Uses D&D notation.                        |
+| reddit.lua          | /reddit [r/subreddit ¦ query] | Returns the top results from a subreddit, query, or r/all. | /r   |
+| xkcd.lua            | /xkcd [query]                 | Returns an xkcd strip and its alt text.                           |
+| slap.lua            | /slap ‹target›                | Gives someone a slap (or worse).                                  |
+| commit.lua          | /commit                       | Returns a commit message from whatthecommit.com.                  |
+| fortune.lua         | /fortune                      | Returns a UNIX fortune.                                           |
+| pun.lua             | /pun                          | Returns a pun.                                                    |
+| pokedex.lua         | /pokedex ‹query›              | Returns a Pokedex entry.                                   | /dex |
+| currency.lua        | /cash [amount] ‹cur› to ‹cur› | Converts one currency to another.                                 |
+| cats.lua            | /cat                          | Returns a cat picture.                                            |
+| reactions.lua       | /reactions                    | Returns a list of emoticons which can be posted by the bot.       |
+| apod.lua            | /apod [date]                  | Returns the NASA Astronomy Picture of the Day.                    |
+| dilbert.lua         | /dilbert [date]               | Returns a Dilbert strip.                                          |
+| patterns.lua        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                            |
+| me.lua              | /me                           | Returns user-specific data stored by the bot.                     |
 
 * * *
 
@@ -248,20 +244,20 @@ There are a a few ways to contribute if you are not a programmer. For one, your 
 
 Contributions are appreciated in any form. Monetary contributions will go toward server costs. Both programmers and donators will be eternally honored (at their discretion) on this page.
 
-| Contributors |
-|:-----------|
-| [Juan Potato](http://github.com/JuanPotato) |
-| [Tiago Danin](http://github.com/TiagoDanin) |
-| [bb010g](http://github.com/bb010g) |
-| [Ender](http://github.com/luksireiku) |
+| Contributors                                  |
+|:----------------------------------------------|
+| [Juan Potato](http://github.com/JuanPotato)   |
+| [Tiago Danin](http://github.com/TiagoDanin)   |
+| [bb010g](http://github.com/bb010g)            |
+| [Ender](http://github.com/luksireiku)         |
 | [Iman Daneshi](http://github.com/Imandaneshi) |
-| [HeitorPB](http://github.com/heitorPB) |
-| [Akronix](http://github.com/Akronix) |
-| [Ville](http://github.com/cwxda) |
-| [dogtopus](http://github.com/dogtopus) |
+| [HeitorPB](http://github.com/heitorPB)        |
+| [Akronix](http://github.com/Akronix)          |
+| [Ville](http://github.com/cwxda)              |
+| [dogtopus](http://github.com/dogtopus)        |
 
-| Donators |
-|:---------|
-| [n8](http://telegram.me/n8_c00) |
-| [Alex](http://telegram.me/sandu) |
-| [Brayden Banks](http://telegram.me/bb010g) |
+| Donators                                      |
+|:----------------------------------------------|
+| [n8](http://telegram.me/n8_c00)               |
+| [Alex](http://telegram.me/sandu)              |
+| [Brayden Banks](http://telegram.me/bb010g)    |
