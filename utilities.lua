@@ -77,7 +77,7 @@ local lc_list = {
  -- Replaces letters with corresponding Cyrillic characters.
 latcyr = function(str)
 	for k,v in pairs(lc_list) do
-		str = string.gsub(str, k, v)
+		str = str:gsub(k, v)
 	end
 	return str
 end
@@ -140,6 +140,15 @@ table_size = function(tab)
 
 end
 
+ -- Just an easy way to get a user's full name.
+build_name = function(first, last)
+	if last then
+		return first .. ' ' .. last
+	else
+		return first
+	end
+end
+
 resolve_username = function(input)
 
 	input = input:gsub('^@', '')
@@ -186,10 +195,7 @@ user_from_message = function(msg)
 
 	if not target.first_name then target.first_name = 'User' end
 
-	target.name = target.first_name
-	if target.last_name then
-		target.name = target.first_name .. ' ' .. target.last_name
-	end
+	target.name = build_name(target.first_name, target.last_name)
 
 	return target
 
@@ -263,13 +269,4 @@ function string:md_escape()
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text
-end
-
- -- Just an easy way to get a user's full name.
-build_name = function(first, last)
-	if last then
-		return first .. ' ' .. last
-	else
-		return first
-	end
 end

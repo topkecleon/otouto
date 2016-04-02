@@ -12,12 +12,7 @@ local action = function(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
-	end
-
-	if msg.from.last_name then
-		msg.from.name = msg.from.first_name .. ' ' .. msg.from.last_name
-	else
-		msg.from.name = msg.from.first_name
+		msg.from.name = build_name(msg.from.first_name, msg.from.last_name)
 	end
 
 	local chat_id = math.abs(msg.chat.id)

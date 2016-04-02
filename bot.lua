@@ -84,10 +84,7 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 				msg.chat.id_str = tostring(msg.chat.id)
 				msg.from.id_str = tostring(msg.from.id)
 				msg.text_lower = msg.text:lower()
-				msg.from.name = msg.from.first_name
-				if msg.from.last_name then
-					msg.from.name = msg.from.first_name .. ' ' .. msg.from.last_name
-				end
+				msg.from.name = build_name(msg.from.first_name, msg.from.last_name)
 
 				local success, result = pcall(function()
 					return v.action(msg)
