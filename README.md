@@ -19,23 +19,27 @@ otouto is an independently-developed Telegram API bot written in Lua. Originally
 ## Setup
 You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
-**Before doing anything**, open config.lua and set `bot_api_key` to the authentication token you received from the Botfather.
+Clone the repository and set the following values in `config.lua`:
 
-You may want to set: `admin`, your Telegram ID; `time_offset`, a positive or negative number, denoting the difference, in seconds, of your system clock to UTC; and `lang`, a lowercase, two-letter code representing your language. Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` table (before help.lua).
+ - `bot_api_key` as your bot authorization token from the BotFather.
+ - `admin` as your Telegram ID.
+ - `time_offset` as the difference, in seconds, of your system clock to UTC.
+ - `lang` as the two-letter code representing your language.
 
-To start the bot, run `./launch.sh`. To stop the bot, send "/halt" from your admin account, and then Ctrl+C out of the loop. If you terminate the bot manually, you risk data loss. If you do not wish the bot to restart automatically, run it with `lua bot.lua`.
+Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` array.
+
+When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/halt" through Telegram. If you terminate the bot manually, you risk data loss. If you do you not want the bot to restart automatically, run it with `lua bot.lua`.
 
 Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
 
- - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key
- - lastfm.lua: [last.fm](http://last.fm) API key
- - bible.lua: [Biblia](http://biblia.com) API key
- - cats.lua: [The Cat API](http://thecatapi.com) API key (optional)
- - gImages.lua: [Google](http://console.developers.google.com) API and CSE keys
- - youtube.lua: [Google](http://console.developers.google.com) API key
- - apod.lua: [NASA](http://api.nasa.gov) API key
- - translate.lua: [Yandex](https://tech.yandex.com/keys/get/?service=trnsl) API key
- - chatter.lua: [SimSimi](http://developer.simsimi.com/signUp) API key
+ - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key (`owm_api_key`)
+ - lastfm.lua: [last.fm](http://last.fm) API key (`lastfm_api_key`)
+ - bible.lua: [Biblia](http://biblia.com) API key (`biblia_api_key`)
+ - cats.lua: [The Cat API](http://thecatapi.com) API key (optional) (`thecatapi_key`)
+ - gImages.lua: [Google](http://console.developers.google.com) API and CSE keys (`google_api_key`, `google_cse_key`)
+ - apod.lua: [NASA](http://api.nasa.gov) API key (`nasa_api_key`)
+ - translate.lua: [Yandex](https://tech.yandex.com/keys/get/?service=trnsl) API key (`yandex_key`)
+ - chatter.lua: [SimSimi](http://developer.simsimi.com/signUp) API key (`simsimi_key`)
 
 * * *
 
