@@ -1,4 +1,35 @@
  -- Put this on the bottom of your plugin list, after help.lua.
+ -- If you want to configure your own greetings, copy the following table
+ -- (without the "config.") to your config.lua file.
+
+if not config.greetings then
+	config.greetings = {
+		['Hello, #NAME.'] = {
+			'hello',
+			'hey',
+			'sup',
+			'hi',
+			'good morning',
+			'good day',
+			'good afternoon',
+			'good evening'
+		},
+		['Goodbye, #NAME.'] = {
+			'bye',
+			'later',
+			'see ya',
+			'good night'
+		},
+		['Welcome back, #NAME.'] = {
+			'i\'m home',
+			'i\'m back'
+		},
+		['You\'re welcome, #NAME.'] = {
+			'thanks',
+			'thank you'
+		}
+	}
+end
 
 local triggers = {
 	bot.first_name .. '%p*$'

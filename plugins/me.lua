@@ -17,7 +17,7 @@ local action = function(msg)
 
 	local output = ''
 	for k,v in pairs(target) do
-		output = output .. '*' .. k .. ':* `' .. v .. '`\n'
+		output = output .. '*' .. k .. ':* `' .. tostring(v) .. '`\n'
 	end
 	sendMessage(msg.chat.id, output, true, nil, true)
 

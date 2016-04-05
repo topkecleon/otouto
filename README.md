@@ -32,13 +32,13 @@ When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/
 
 Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
 
+ - gImages.lua & youtube.lua: Google [API](http://console.developers.google.com) and [CSE](https://cse.google.com/cse) keys (`google_api_key`, `google_cse_key`)
  - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key (`owm_api_key`)
- - lastfm.lua: [last.fm](http://last.fm) API key (`lastfm_api_key`)
- - bible.lua: [Biblia](http://biblia.com) API key (`biblia_api_key`)
+ - lastfm.lua: [last.fm](http://last.fm/api) API key (`lastfm_api_key`)
+ - bible.lua: [Biblia](http://api.biblia.com) API key (`biblia_api_key`)
  - cats.lua: [The Cat API](http://thecatapi.com) API key (optional) (`thecatapi_key`)
- - gImages.lua: Google [API](http://console.developers.google.com) and [CSE](https://cse.google.com/cse) keys (`google_api_key`, `google_cse_key`)
  - apod.lua: [NASA](http://api.nasa.gov) API key (`nasa_api_key`)
- - translate.lua: [Yandex](https://tech.yandex.com/keys/get/?service=trnsl) API key (`yandex_key`)
+ - translate.lua: [Yandex](http://tech.yandex.com/keys/get/?service=trnsl) API key (`yandex_key`)
  - chatter.lua: [SimSimi](http://developer.simsimi.com/signUp) API key (`simsimi_key`)
 
 * * *

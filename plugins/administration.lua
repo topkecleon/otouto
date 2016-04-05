@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.8
+	Version 1.8.1
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -20,6 +20,8 @@
 
 	1.8 - Group descriptions will be updated automatically. Fixed markdown
 	stuff. Removed /kickme.
+
+	1.8.1 - /rule <i> will return that numbered rule, if it exists.
 
 ]]--
 
@@ -530,8 +532,8 @@ local commands = {
 
 	{ -- rules
 		triggers = {
-			'^/rules$',
-			'^/rules@'..bot.username
+			'^/rules?',
+			'^/rules?@'..bot.username
 		},
 
 		command = 'rules',
@@ -539,12 +541,20 @@ local commands = {
 		interior = true,
 
 		action = function(msg, group)
-			local output = 'No rules have been set for ' .. msg.chat.title .. '.'
+			local output
+			local input = get_word(msg.text_lower, 2)
+			input = tonumber(input)
 			if #group.rules > 0 then
-				output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
-				for i,v in ipairs(group.rules) do
-					output = output .. '*' .. i .. '.* ' .. v .. '\n'
+				if input and group.rules[input] then
+					output = '*' .. input .. '.* ' .. group.rules[input]
+				else
+					output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
+					for i,v in ipairs(group.rules) do
+						output = output .. '*' .. i .. '.* ' .. v .. '\n'
+					end
 				end
+			else
+				output = 'No rules have been set for ' .. msg.chat.title .. '.'
 			end
 			sendMessage(msg.chat.id, output, true, nil, true)
 		end
