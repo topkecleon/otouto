@@ -75,7 +75,7 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 
 	if msg.reply_to_message and msg.reply_to_message.caption then
 		msg.reply_to_message.text = msg.reply_to_message.caption
-	end -- If the reply_to_msg contains a caption, set it as its text
+	end -- If the replied-to message has a caption, make that its text.
 
 	if msg.text:match('^/start .+') then
 		msg.text = '/' .. msg.text:input()
