@@ -23,6 +23,9 @@ Clone the repository and set the following values in `config.lua`:
 
  - `bot_api_key` as your bot authorization token from the BotFather.
  - `admin` as your Telegram ID.
+
+Optionally:
+
  - `time_offset` as the difference, in seconds, of your system clock to UTC.
  - `lang` as the two-letter code representing your language.
 
@@ -38,7 +41,7 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
  - bible.lua: [Biblia](http://api.biblia.com) API key (`biblia_api_key`)
  - cats.lua: [The Cat API](http://thecatapi.com) API key (optional) (`thecatapi_key`)
  - apod.lua: [NASA](http://api.nasa.gov) API key (`nasa_api_key`)
- - translate.lua: [Yandex](http://tech.yandex.com/keys/get/?service=trnsl) API key (`yandex_key`)
+ - translate.lua: [Yandex](http://tech.yandex.com/keys/get) API key (`yandex_key`)
  - chatter.lua: [SimSimi](http://developer.simsimi.com/signUp) API key (`simsimi_key`)
 
 * * *

@@ -35,13 +35,13 @@ Send /help to get started.
 	thecatapi_key = '',
 	-- http://api.nasa.gov
 	nasa_api_key = '',
-	-- http://tech.yandex.com/keys/get/?service=trnsl
+	-- http://tech.yandex.com/keys/get
 	yandex_key = '',
 	-- http://developer.simsimi.com/signUp
 	simsimi_key = '',
 	simsimi_trial = true,
 
-	errors = {
+	errors = { -- Generic error messages used in various plugins.
 		connection = 'Connection error.',
 		results = 'No results found.',
 		argument = 'Invalid argument.',
@@ -50,7 +50,7 @@ Send /help to get started.
 		chatter_response = 'I don\'t know what to say to that.'
 	},
 
-	plugins = {
+	plugins = { -- To enable a plugin, add its name to the list.
 		'control.lua',
 		'blacklist.lua',
 		'about.lua',
@@ -59,9 +59,7 @@ Send /help to get started.
 		'nick.lua',
 		'echo.lua',
 		'gSearch.lua',
-		'gImages.lua',
 		'gMaps.lua',
-		'youtube.lua',
 		'wikipedia.lua',
 		'hackernews.lua',
 		'imdb.lua',
@@ -69,20 +67,15 @@ Send /help to get started.
 		'urbandictionary.lua',
 		'time.lua',
 		'eightball.lua',
-		'reactions.lua',
 		'dice.lua',
 		'reddit.lua',
 		'xkcd.lua',
 		'slap.lua',
 		'commit.lua',
 		'pun.lua',
-		'pokedex.lua',
-		'bandersnatch.lua',
 		'currency.lua',
 		'cats.lua',
-		'hearthstone.lua',
 		'shout.lua',
-		'apod.lua',
 		'patterns.lua',
 		-- Put new plugins above this line.
 		'help.lua',
