@@ -46,7 +46,9 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
 ## Plugins
 otouto uses a robust plugin system, similar to that of yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
 
-Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#Liberbot-related_plugins), or for [use by the bot's owner](#Control_plugins). See [Development](#Development) for a breakdown of the components of a plugin, or [here](#List_of_plugins) for a list of plugins.
+Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#liberbot-related-plugins), or for [use by the bot's owner](#control-plugins). See [Development](#user-content-#development) for a breakdown of the components of a plugin, or [here](#list-of-plugins) for a list of plugins.
+
+<a id="#development"></a>
 
 A plugin can have five components, and two of them are required:
 
