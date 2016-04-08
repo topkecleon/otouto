@@ -53,13 +53,13 @@ Most plugins are intended for public use, but a few are for other purposes, like
 
 A plugin can have five components, and two of them are required:
 
-| Component | Description                                  | Required? |
-|:----------|:---------------------------------------------|:----------|
-| action    | Main function. Expects `msg` table as an argument.   | Y |
-| triggers  | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| cron      | Optional function to be called every minute.         | N |
-| command   | Basic command and syntax. Listed in the help text.   | N |
-| doc       | Usage for the plugin. Returned by "/help $command".  | N |
+| Component | Description                                          | Required? |
+|:----------|:-----------------------------------------------------|:----------|
+| action    | Main function. Expects `msg` table as an argument.   | Y         |
+| triggers  | Table of triggers for the plugin. Uses Lua patterns. | Y         |
+| cron      | Optional function to be called every minute.         | N         |
+| command   | Basic command and syntax. Listed in the help text.   | N         |
+| doc       | Usage for the plugin. Returned by "/help $command".  | N         |
 
 The `on_msg_receive()` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 

@@ -8,7 +8,7 @@ local action = function(msg)
 		return
 	end
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	input = input:gsub('—', '--')
 	
 	if not input then

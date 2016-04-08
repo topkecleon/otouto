@@ -16,7 +16,7 @@ local action = function(msg)
 
 	sendChatAction(msg.chat.id, 'upload_photo')
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then input = os.date('%F') end
 	if not input:match('^%d%d%d%d%-%d%d%-%d%d$') then input = os.date('%F') end
 

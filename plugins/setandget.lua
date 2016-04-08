@@ -15,7 +15,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	database.setandget[msg.chat.id_str] = database.setandget[msg.chat.id_str] or {}
 
 	if msg.text_lower:match('^/set') then
@@ -26,7 +26,7 @@ local action = function(msg)
 		end
 
 		local name = get_word(input:lower(), 1)
-		local value = input:input()
+		local value = utilities.input(input)
 
 		if not name or not value then
 			sendMessage(msg.chat.id, doc, true, nil, true)

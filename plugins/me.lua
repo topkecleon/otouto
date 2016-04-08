@@ -7,7 +7,7 @@ local action = function(msg)
 
 	local target = database.users[msg.from.id_str]
 
-	if msg.from.id == config.admin and (msg.reply_to_message or msg.text:input()) then
+	if msg.from.id == config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
 		target = user_from_message(msg)
 		if target.err then
 			sendReply(msg, target.err)

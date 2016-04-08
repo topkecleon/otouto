@@ -1,24 +1,31 @@
  -- This plugin will allow the admin to blacklist users who will be unable to
  -- use the bot. This plugin should be at the top of your plugin list in config.
 
-if not database.blacklist then
-	database.blacklist = {}
+local blacklist = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function blacklist:init()
+	if not self.database.blacklist then
+		self.database.blacklist = {}
+	end
 end
 
-local triggers = {
+blacklist.triggers = {
 	''
 }
 
- local action = function(msg)
+function blacklist:action(msg)
 
-	if database.blacklist[msg.from.id_str] then return end
-	if database.blacklist[msg.chat.id_str] then return end
+	if self.database.blacklist[msg.from.id_str] then return end
+	if self.database.blacklist[msg.chat.id_str] then return end
 	if not msg.text:match('^/blacklist') then return true end
-	if msg.from.id ~= config.admin then return end
+	if msg.from.id ~= self.config.admin then return end
 
-	local target = user_from_message(msg)
+	local target = utilities.user_from_message(self, msg)
 	if target.err then
-		sendReply(msg, target.err)
+		bindings.sendReply(self, msg, target.err)
 		return
 	end
 
@@ -26,17 +33,14 @@ local triggers = {
 		target.name = 'Group'
 	end
 
-	if database.blacklist[tostring(target.id)] then
-		database.blacklist[tostring(target.id)] = nil
-		sendReply(msg, target.name .. ' has been removed from the blacklist.')
+	if self.database.blacklist[tostring(target.id)] then
+		self.database.blacklist[tostring(target.id)] = nil
+		bindings.sendReply(self, msg, target.name .. ' has been removed from the blacklist.')
 	else
-		database.blacklist[tostring(target.id)] = true
-		sendReply(msg, target.name .. ' has been added to the blacklist.')
+		self.database.blacklist[tostring(target.id)] = true
+		bindings.sendReply(self, msg, target.name .. ' has been added to the blacklist.')
 	end
 
  end
 
- return {
-	action = action,
-	triggers = triggers
-}
+ return blacklist

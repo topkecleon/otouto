@@ -94,7 +94,7 @@ local slaps = {
 
 local action = function(msg)
 
-	local victim = msg.text:input()
+	local victim = utilities.input(msg.text)
 	if msg.reply_to_message then
 		if database.users[tostring(msg.reply_to_message.from.id)].nickname then
 			victim = database.users[tostring(msg.reply_to_message.from.id)].nickname

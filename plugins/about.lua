@@ -1,26 +1,30 @@
-local command = 'about'
-local doc = '`Returns information about the bot.`'
+local about = {}
 
-local triggers = {
+local bindings = require('bindings')
+
+about.command = 'about'
+about.doc = '`Returns information about the bot.`'
+
+about.triggers = {
 	''
 }
 
-local action = function(msg)
+function about:action(msg)
 
 	-- Filthy hack, but here is where we'll stop forwarded messages from hitting
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local message = config.about_text .. '\nBased on @otouto v'..version..' by topkecleon.'
+	local message = self.config.about_text .. '\nBased on @otouto v'..self.version..' by topkecleon.'
 
-	if msg.new_chat_participant and msg.new_chat_participant.id == bot.id then
-		sendMessage(msg.chat.id, message, true)
+	if msg.new_chat_participant and msg.new_chat_participant.id == self.info.id then
+		bindings.sendMessage(self, msg.chat.id, message, true)
 		return
-	elseif msg.text_lower:match('^/about[@'..bot.username..']*') then
-		sendMessage(msg.chat.id, message, true)
+	elseif msg.text_lower:match('^/about[@'..self.info.username..']*') then
+		bindings.sendMessage(self, msg.chat.id, message, true)
 		return
 	elseif msg.text_lower:match('^/start') then
-		sendMessage(msg.chat.id, message, true)
+		bindings.sendMessage(self, msg.chat.id, message, true)
 		return
 	end
 
@@ -28,9 +32,4 @@ local action = function(msg)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return about

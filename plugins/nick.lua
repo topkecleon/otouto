@@ -22,7 +22,7 @@ local action = function(msg)
 	end
 
 	local output
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if database.users[target.id_str].nickname then
 			output = target.name .. '\'s nickname is "' .. database.users[target.id_str].nickname .. '".'

@@ -1,13 +1,17 @@
 -- utilities.lua
 -- Functions shared among plugins.
 
- -- you're welcome, brayden :^)
-HTTP = HTTP or require('socket.http')
-HTTPS = HTTPS or require('ssl.https')
-JSON = JSON or require('cjson')
+local utilities = {}
+
+local HTTP = require('socket.http')
+local ltn12 = require('ltn12')
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('cjson')
+local bindings = require('bindings')
 
  -- get the indexed word in a string
-get_word = function(s, i)
+function utilities.get_word(s, i)
 
 	s = s or ''
 	i = i or 1
@@ -23,7 +27,7 @@ end
 
  -- Like get_word(), but better.
  -- Returns the actual index.
-function string:index()
+function utilities.index(s)
 	local t = {}
 	for w in s:gmatch('%g+') do
 		table.insert(t, w)
@@ -32,16 +36,16 @@ function string:index()
 end
 
  -- Returns the string after the first space.
-function string:input()
-	if not self:find(' ') then
+function utilities.input(s)
+	if not s:find(' ') then
 		return false
 	end
-	return self:sub(self:find(' ')+1)
+	return s:sub(s:find(' ')+1)
 end
 
  -- I swear, I copied this from PIL, not yago! :)
-function string:trim() -- Trims whitespace from a string.
-	local s = self:gsub('^%s*(.-)%s*$', '%1')
+function utilities.trim(str) -- Trims whitespace from a string.
+	local s = str:gsub('^%s*(.-)%s*$', '%1')
 	return s
 end
 
@@ -75,7 +79,7 @@ local lc_list = {
 }
 
  -- Replaces letters with corresponding Cyrillic characters.
-latcyr = function(str)
+function utilities.latcyr(str)
 	for k,v in pairs(lc_list) do
 		str = str:gsub(k, v)
 	end
@@ -83,7 +87,7 @@ latcyr = function(str)
 end
 
  -- Loads a JSON file as a table.
-load_data = function(filename)
+function utilities.load_data(filename)
 
 	local f = io.open(filename)
 	if not f then
@@ -98,7 +102,7 @@ load_data = function(filename)
 end
 
  -- Saves a table to a JSON file.
-save_data = function(filename, data)
+function utilities.save_data(filename, data)
 
 	local s = JSON.encode(data)
 	local f = io.open(filename, 'w')
@@ -108,18 +112,18 @@ save_data = function(filename, data)
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
-get_coords = function(input)
+function utilities:get_coords(input)
 
 	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return config.errors.connection
+		return self.config.errors.connection
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.status == 'ZERO_RESULTS' then
-		return config.errors.results
+		return self.config.errors.results
 	end
 
 	return {
@@ -130,10 +134,10 @@ get_coords = function(input)
 end
 
  -- Get the number of values in a key/value table.
-table_size = function(tab)
+function utilities.table_size(tab)
 
 	local i = 0
-	for k,v in pairs(tab) do
+	for _,_ in pairs(tab) do
 		i = i + 1
 	end
 	return i
@@ -141,7 +145,7 @@ table_size = function(tab)
 end
 
  -- Just an easy way to get a user's full name.
-build_name = function(first, last)
+function utilities.build_name(first, last)
 	if last then
 		return first .. ' ' .. last
 	else
@@ -149,10 +153,10 @@ build_name = function(first, last)
 	end
 end
 
-resolve_username = function(input)
+function utilities:resolve_username(input)
 
 	input = input:gsub('^@', '')
-	for k,v in pairs(database.users) do
+	for _,v in pairs(self.database.users) do
 		if v.username and v.username:lower() == input:lower() then
 			return v
 		end
@@ -160,22 +164,22 @@ resolve_username = function(input)
 
 end
 
-user_from_message = function(msg)
+function utilities:user_from_message(msg)
 
-	local input = msg.text_lower:input()
+	local input = utilities.input(msg.text_lower)
 	local target = {}
 	if msg.reply_to_message then
 		target = msg.reply_to_message.from
 	elseif input and tonumber(input) then
 		target.id = input
-		if database.users[input] then
-			for k,v in pairs(database.users[input]) do
+		if self.database.users[input] then
+			for k,v in pairs(self.database.users[input]) do
 				target[k] = v
 			end
 		end
 	elseif input and input:match('^@') then
 		local uname = input:gsub('^@', '')
-		for k,v in pairs(database.users) do
+		for _,v in pairs(self.database.users) do
 			if v.username and uname == v.username:lower() then
 				for key, val in pairs(v) do
 					target[key] = val
@@ -195,21 +199,21 @@ user_from_message = function(msg)
 
 	if not target.first_name then target.first_name = 'User' end
 
-	target.name = build_name(target.first_name, target.last_name)
+	target.name = utilities.build_name(target.first_name, target.last_name)
 
 	return target
 
 end
 
-handle_exception = function(err, message)
+function utilities:handle_exception(err, message)
 
 	if not err then err = '' end
 
-	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. bot.username .. ': ' .. err .. '\n' .. message .. '\n'
+	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
 
-	if config.log_chat then
+	if self.config.log_chat then
 		output = '```' .. output .. '```'
-		sendMessage(config.log_chat, output, true, nil, true)
+		bindings.sendMessage(self, self.config.log_chat, output, true, nil, true)
 	else
 		print(output)
 	end
@@ -218,7 +222,7 @@ end
 
  -- Okay, this one I actually did copy from yagop.
  -- https://github.com/yagop/telegram-bot/blob/master/bot/utils.lua
-download_file = function(url, filename)
+function utilities.download_file(url, filename)
 
 	local respbody = {}
 	local options = {
@@ -227,7 +231,7 @@ download_file = function(url, filename)
 		redirect = true
 	}
 
-	local response = nil
+	local response
 
 	if url:match('^https') then
 		options.redirect = false
@@ -252,7 +256,7 @@ download_file = function(url, filename)
 
 end
 
-markdown_escape = function(text)
+function utilities.markdown_escape(text)
 
 	text = text:gsub('_', '\\_')
 	text = text:gsub('%[', '\\[')
@@ -262,11 +266,30 @@ markdown_escape = function(text)
 
 end
 
-function string:md_escape()
-	local text = self
-	text = text:gsub('_', '\\_')
-	text = text:gsub('%[', '\\[')
-	text = text:gsub('%*', '\\*')
-	text = text:gsub('`', '\\`')
-	return text
+function utilities.md_escape(s)
+	s = s:gsub('_', '\\_')
+	s = s:gsub('%[', '\\[')
+	s = s:gsub('%*', '\\*')
+	s = s:gsub('`', '\\`')
+	return s
+end
+
+utilities.INVOCATION_PATTERN = '/'
+
+utilities.triggers_metatable = {}
+function utilities.triggers_metatable:t(pattern, has_args)
+	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'$')
+	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'$')
+	if has_args then
+		self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
+		self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'%s+[^%s]*')
+	end
+	return self
+end
+
+function utilities.triggers(username)
+	local self = setmetatable({}, utilities.triggers_metatable)
+	self.username = username
+	self.table = {}
+	return self
 end

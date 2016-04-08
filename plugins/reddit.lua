@@ -15,12 +15,12 @@ local triggers = {
 local action = function(msg)
 
 	msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
-	local input = msg.text_lower:input()
+	local input = utilities.input(msg.text_lower)
 	if msg.text_lower:match('^/r/') then
 		msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
 		input = get_word(msg.text_lower, 1)
 	else
-		input = msg.text_lower:input()
+		input = utilities.input(msg.text_lower)
 	end
 	local url
 

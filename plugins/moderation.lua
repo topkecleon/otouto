@@ -59,7 +59,7 @@ local commands = {
 
 	['^/modcast[@'..bot.username..']*'] = function(msg)
 
-		local output = msg.text:input()
+		local output = utilities.input(msg.text)
 		if not output then
 			return 'You must include a message.'
 		end
@@ -149,7 +149,7 @@ local commands = {
 			return config.moderation.errors.not_admin
 		end
 
-		local modid = msg.text:input()
+		local modid = utilities.input(msg.text)
 
 		if not modid then
 			if msg.reply_to_message then
@@ -184,7 +184,7 @@ local commands = {
 			end
 		end
 
-		local userid = msg.text:input()
+		local userid = utilities.input(msg.text)
 		local usernm = userid
 
 		if msg.reply_to_message then
@@ -216,7 +216,7 @@ local commands = {
 			end
 		end
 
-		local userid = msg.text:input()
+		local userid = utilities.input(msg.text)
 		local usernm = userid
 
 		if msg.reply_to_message then

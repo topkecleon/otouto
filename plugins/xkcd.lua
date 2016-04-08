@@ -10,7 +10,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then

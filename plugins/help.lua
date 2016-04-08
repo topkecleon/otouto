@@ -22,7 +22,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text_lower:input()
+	local input = utilities.input(msg.text_lower)
 
 	-- Attempts to send the help message via PM.
 	-- If msg is from a group, it tells the group whether the PM was successful.

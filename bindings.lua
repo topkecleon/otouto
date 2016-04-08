@@ -2,17 +2,13 @@
 -- Bindings for the Telegram bot API.
 -- https://core.telegram.org/bots/api
 
-assert(HTTPS)
-assert(JSON)
-assert(URL)
+local bindings = {}
 
-local BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key
+local HTTPS = require('ssl.https')
+local JSON = require('cjson')
+local URL = require('socket.url')
 
-if config.bot_api_key == '' then
-	error('You did not set your bot token in config.lua!')
-end
-
-sendRequest = function(url)
+function bindings.sendRequest(url)
 
 	local dat, res = HTTPS.request(url)
 
@@ -30,28 +26,28 @@ sendRequest = function(url)
 
 end
 
-getMe = function()
+function bindings:getMe()
 
-	local url = BASE_URL .. '/getMe'
-	return sendRequest(url)
+	local url = self.BASE_URL .. '/getMe'
+	return bindings.sendRequest(url)
 
 end
 
-getUpdates = function(offset)
+function bindings:getUpdates(offset)
 
-	local url = BASE_URL .. '/getUpdates?timeout=20'
+	local url = self.BASE_URL .. '/getUpdates?timeout=20'
 
 	if offset then
 		url = url .. '&offset=' .. offset
 	end
 
-	return sendRequest(url)
+	return bindings.sendRequest(url)
 
 end
 
-sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, disable_notification)
+function bindings:sendMessage(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, disable_notification)
 
-	local url = BASE_URL .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. URL.escape(text)
+	local url = self.BASE_URL .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. URL.escape(text)
 
 	if disable_web_page_preview == true then
 		url = url .. '&disable_web_page_preview=true'
@@ -69,30 +65,30 @@ sendMessage = function(chat_id, text, disable_web_page_preview, reply_to_message
 		url = url .. '&disable_notification=true'
 	end
 
-	return sendRequest(url)
+	return bindings.sendRequest(url)
 
 end
 
-sendReply = function(msg, text)
+function bindings:sendReply(msg, text)
 
-	return sendMessage(msg.chat.id, text, true, msg.message_id)
+	return bindings.sendMessage(self, msg.chat.id, text, true, msg.message_id)
 
 end
 
-sendChatAction = function(chat_id, action)
+function bindings:sendChatAction(chat_id, action)
  -- Support actions are typing, upload_photo, record_video, upload_video, record_audio, upload_audio, upload_document, find_location
 
-	local url = BASE_URL .. '/sendChatAction?chat_id=' .. chat_id .. '&action=' .. action
-	return sendRequest(url)
+	local url = self.BASE_URL .. '/sendChatAction?chat_id=' .. chat_id .. '&action=' .. action
+	return bindings.sendRequest(self, url)
 
 end
 
-sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disable_notification)
+function bindings:sendLocation(chat_id, latitude, longitude, reply_to_message_id, disable_notification)
 
 	if latitude == 0 then latitude = 0.001 end
 	if longitude == 0 then longitude = 0.001 end
 
-	local url = BASE_URL .. '/sendLocation?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude
+	local url = self.BASE_URL .. '/sendLocation?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude
 
 	if reply_to_message_id then
 		url = url .. '&reply_to_message_id=' .. reply_to_message_id
@@ -102,27 +98,27 @@ sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disab
 		url = url .. '&disable_notification=true'
 	end
 
-	return sendRequest(url)
+	return bindings.sendRequest(self, url)
 
 end
 
-forwardMessage = function(chat_id, from_chat_id, message_id, disable_notification)
+function bindings:forwardMessage(chat_id, from_chat_id, message_id, disable_notification)
 
-	local url = BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
+	local url = self.BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
 
 	if disable_notification then
 		url = url .. '&disable_notification=true'
 	end
 
-	return sendRequest(url)
+	return bindings.sendRequest(self, url)
 
 end
 
  -- TODO: More of this.
 
-sendPhotoID = function(chat_id, file_id, caption, reply_to_message_id, disable_notification)
+function bindings:sendPhotoID(chat_id, file_id, caption, reply_to_message_id, disable_notification)
 
-	local url = BASE_URL .. '/sendPhoto?chat_id=' .. chat_id .. '&photo=' .. file_id
+	local url = self.BASE_URL .. '/sendPhoto?chat_id=' .. chat_id .. '&photo=' .. file_id
 
 	if caption then
 		url = url .. '&caption=' .. URL.escape(caption)
@@ -136,20 +132,20 @@ sendPhotoID = function(chat_id, file_id, caption, reply_to_message_id, disable_n
 		url = url .. '&disable_notification=true'
 	end
 
-	return sendRequest(url)
+	return bindings.sendRequest(self, url)
 
 end
 
-curlRequest = function(curl_command)
+function bindings.curlRequest(curl_command)
  -- Use at your own risk. Will not check for success.
 
 	io.popen(curl_command)
 
 end
 
-sendPhoto = function(chat_id, photo, caption, reply_to_message_id, disable_notification)
+function bindings:sendPhoto(chat_id, photo, caption, reply_to_message_id, disable_notification)
 
-	local url = BASE_URL .. '/sendPhoto'
+	local url = self.BASE_URL .. '/sendPhoto'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "photo=@' .. photo .. '"'
 
@@ -165,13 +161,13 @@ sendPhoto = function(chat_id, photo, caption, reply_to_message_id, disable_notif
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
 
-sendDocument = function(chat_id, document, reply_to_message_id, disable_notification)
+function bindings:sendDocument(chat_id, document, reply_to_message_id, disable_notification)
 
-	local url = BASE_URL .. '/sendDocument'
+	local url = self.BASE_URL .. '/sendDocument'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "document=@' .. document .. '"'
 
@@ -183,13 +179,13 @@ sendDocument = function(chat_id, document, reply_to_message_id, disable_notifica
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
 
-sendSticker = function(chat_id, sticker, reply_to_message_id, disable_notification)
+function bindings:sendSticker(chat_id, sticker, reply_to_message_id, disable_notification)
 
-	local url = BASE_URL .. '/sendSticker'
+	local url = self.BASE_URL .. '/sendSticker'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "sticker=@' .. sticker .. '"'
 
@@ -201,13 +197,13 @@ sendSticker = function(chat_id, sticker, reply_to_message_id, disable_notificati
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
 
-sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, title, disable_notification)
+function bindings:sendAudio(chat_id, audio, reply_to_message_id, duration, performer, title, disable_notification)
 
-	local url = BASE_URL .. '/sendAudio'
+	local url = self.BASE_URL .. '/sendAudio'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "audio=@' .. audio .. '"'
 
@@ -231,13 +227,13 @@ sendAudio = function(chat_id, audio, reply_to_message_id, duration, performer, t
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
 
-sendVideo = function(chat_id, video, reply_to_message_id, duration, caption, disable_notification)
+function bindings:sendVideo(chat_id, video, reply_to_message_id, duration, caption, disable_notification)
 
-	local url = BASE_URL .. '/sendVideo'
+	local url = self.BASE_URL .. '/sendVideo'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "video=@' .. video .. '"'
 
@@ -257,13 +253,13 @@ sendVideo = function(chat_id, video, reply_to_message_id, duration, caption, dis
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
 
-sendVoice = function(chat_id, voice, reply_to_message_id, duration, disable_notification)
+function bindings:sendVoice(chat_id, voice, reply_to_message_id, duration, disable_notification)
 
-	local url = BASE_URL .. '/sendVoice'
+	local url = self.BASE_URL .. '/sendVoice'
 
 	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "voice=@' .. voice .. '"'
 
@@ -279,6 +275,8 @@ sendVoice = function(chat_id, voice, reply_to_message_id, duration, disable_noti
 		curl_command = curl_command .. ' -F "disable_notification=true"'
 	end
 
-	return curlRequest(curl_command)
+	return bindings.curlRequest(curl_command)
 
 end
+
+return bindings

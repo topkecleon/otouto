@@ -21,7 +21,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text

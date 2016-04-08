@@ -19,7 +19,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	if string.match(msg.text, '^/librefm') then
 		sendMessage(msg.chat.id, doc, true, msg.message_id, true)

@@ -10,7 +10,7 @@ local triggers = {
 
 local action = function(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	if not input then
 		sendMessage(msg.chat.id, doc, true, nil, true)
