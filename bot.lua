@@ -138,7 +138,7 @@ while instance.is_started do -- Start a loop while the bot should be running.
 		utilities.save_data(instance.info.username..'.db', instance.database) -- Save the database.
 		for i,v in ipairs(instance.plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.
-				local res, err = pcall(function() v.cron() end)
+				local res, err = pcall(function() v.cron(instance) end)
 				if not res then
 					utilities.handle_exception(instance, err, 'CRON: ' .. i)
 				end
