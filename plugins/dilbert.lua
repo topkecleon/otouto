@@ -1,20 +1,25 @@
-dilbert = dilbert or {}
+local dilbert = {}
 
-local command = 'dilbert [date]'
-local doc = [[```
+local HTTP = require('socket.http')
+local URL = require('socket.url')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+dilbert.command = 'dilbert [date]'
+dilbert.doc = [[```
 /dilbert [YYYY-MM-DD]
 Returns the latest Dilbert strip or that of the provided date.
 Dates before the first strip will return the first strip. Dates after the last trip will return the last strip.
 Source: dilbert.com
 ```]]
 
-local triggers = {
-	'^/dilbert[@'..bot.username..']*'
-}
+function dilbert:init()
+	dilbert.triggers = utilities.triggers(self.info.username):t('dilbert', true).table
+end
 
-local action = function(msg)
+function dilbert:action(msg)
 
-	sendChatAction(msg.chat.id, 'upload_photo')
+	bindings.sendChatAction(msg.chat.id, 'upload_photo')
 
 	local input = utilities.input(msg.text)
 	if not input then input = os.date('%F') end
@@ -23,24 +28,22 @@ local action = function(msg)
 	local url = 'http://dilbert.com/strip/' .. URL.escape(input)
 	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
-	if not dilbert[input] then
+	local strip_file = io.open('/tmp/' .. input .. '.gif')
+	if not strip_file then
 		local strip_url = str:match('<meta property="og:image" content="(.-)"/>')
-		dilbert[input] = download_file(strip_url, '/tmp/' .. input .. '.gif')
+		strip_file = utilities.download_file(strip_url, '/tmp/' .. input .. '.gif')
 	end
 
 	local strip_title = str:match('<meta property="article:publish_date" content="(.-)"/>')
 
-	sendPhoto(msg.chat.id, dilbert[input], strip_title)
+	bindings.sendPhoto(self, msg.chat.id, strip_file, strip_title)
+
+	strip_file:close()
 
 end
 
-return {
-	command = command,
-	doc = doc,
-	triggers = triggers,
-	action = action
-}
+return dilbert

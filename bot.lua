@@ -1,5 +1,7 @@
 local bot = {}
 
+local instance = {}
+
 local bindings = require('bindings') -- Load Telegram bindings.
 local utilities = require('utilities') -- Load miscellaneous and cross-plugin functions.
 
@@ -115,30 +117,30 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 
 end
 
-bot.init(bot) -- Actually start the script. Run the bot_init function.
+bot.init(instance) -- Actually start the script. Run the bot_init function.
 
-while bot.is_started do -- Start a loop while the bot should be running.
+while instance.is_started do -- Start a loop while the bot should be running.
 
 	do
-		local res = bindings.getUpdates(bot, bot.last_update+1) -- Get the latest updates!
+		local res = bindings.getUpdates(instance, instance.last_update+1) -- Get the latest updates!
 		if res then
 			for _,v in ipairs(res.result) do -- Go through every new message.
-				bot.last_update = v.update_id
-				bot.on_msg_receive(bot, v.message)
+				instance.last_update = v.update_id
+				bot.on_msg_receive(instance, v.message)
 			end
 		else
-			print(bot.config.errors.connection)
+			print(instance.config.errors.connection)
 		end
 	end
 
-	if bot.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
-		bot.last_cron = os.date('%M')
-		utilities.save_data(bot.info.username..'.db', bot.database) -- Save the database.
-		for i,v in ipairs(bot.plugins) do
+	if instance.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
+		instance.last_cron = os.date('%M')
+		utilities.save_data(instance.info.username..'.db', instance.database) -- Save the database.
+		for i,v in ipairs(instance.plugins) do
 			if v.cron then -- Call each plugin's cron function, if it has one.
 				local res, err = pcall(function() v.cron() end)
 				if not res then
-					utilities.handle_exception(bot, err, 'CRON: ' .. i)
+					utilities.handle_exception(instance, err, 'CRON: ' .. i)
 				end
 			end
 		end
@@ -147,5 +149,5 @@ while bot.is_started do -- Start a loop while the bot should be running.
 end
 
  -- Save the database before exiting.
-utilities.save_data(bot.info.username..'.db', bot.database)
+utilities.save_data(instance.info.username..'.db', instance.database)
 print('Halted.')

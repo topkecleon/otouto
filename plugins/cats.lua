@@ -14,7 +14,7 @@ end
 cats.command = 'cat'
 cats.doc = '`Returns a cat!`'
 
-cats.triggers = utilities.triggers():t('cat')
+cats.triggers = utilities.triggers():t('cat').table
 
 function cats:action(msg)
 

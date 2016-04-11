@@ -1,10 +1,15 @@
-local triggers = {
-	'^/run[@'..bot.username..']*'
-}
+local shell = {}
 
-local action = function(msg)
+local bindings = require('bindings')
+local utilities = require('utilities')
 
-	if msg.from.id ~= config.admin then
+function shell:init()
+	shell.triggers = utilities.bindings(self.info.username):t('run', true).table
+end
+
+function shell:action(msg)
+
+	if msg.from.id ~= self.config.admin then
 		return
 	end
 
@@ -12,7 +17,7 @@ local action = function(msg)
 	input = input:gsub('—', '--')
 	
 	if not input then
-		sendReply(msg, 'Please specify a command to run.')
+		bindings.sendReply(self, msg, 'Please specify a command to run.')
 		return
 	end
 
@@ -22,11 +27,8 @@ local action = function(msg)
 	else
 		output = '```\n' .. output .. '\n```'
 	end
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers
-}
+return shell

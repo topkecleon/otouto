@@ -287,9 +287,16 @@ function utilities.triggers_metatable:t(pattern, has_args)
 	return self
 end
 
-function utilities.triggers(username)
+function utilities.triggers(username, trigger_table)
 	local self = setmetatable({}, utilities.triggers_metatable)
 	self.username = username
-	self.table = {}
+	self.table = trigger_table or {}
 	return self
+end
+
+function utilities.with_http_timeout(timeout, fun)
+	local original = HTTP.TIMEOUT
+	HTTP.TIMEOUT = timeout
+	fun()
+	HTTP.TIMEOUT = original
 end

@@ -1,9 +1,21 @@
-if not database.librefm then
-	database.librefm = {}
+local librefm = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('cjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function librefm:init()
+	if not self.database.librefm then
+		self.database.librefm = {}
+	end
+
+	librefm.triggers = utilities.triggers(self.info.username):t('librefm', true):t('lnp', true):t('lfmset', true)
 end
 
-local command = 'librefm'
-local doc = [[```
+librefm.command = 'librefm'
+librefm.doc = [[```
 /lnp [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
@@ -11,28 +23,22 @@ Returns what you are or were last listening to. If you specify a username, info 
 Sets your libre.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
 ```]]
 
-local triggers = {
-	'^/librefm[@'..bot.username..']*',
-	'^/lnp[@'..bot.username..']*',
-	'^/lfmset[@'..bot.username..']*'
-}
-
-local action = function(msg)
+function librefm:action(msg)
 
 	local input = utilities.input(msg.text)
 
 	if string.match(msg.text, '^/librefm') then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, librefm.doc, true, msg.message_id, true)
 		return
 	elseif string.match(msg.text, '^/lfmset') then
 		if not input then
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, librefm.doc, true, msg.message_id, true)
 		elseif input == '-' then
-			database.lastfm[msg.from.id_str] = nil
-			sendReply(msg, 'Your libre.fm username has been forgotten.')
+			self.database.lastfm[msg.from.id_str] = nil
+			bindings.sendReply(self, msg, 'Your libre.fm username has been forgotten.')
 		else
-			database.lastfm[msg.from.id_str] = input
-			sendReply(msg, 'Your libre.fm username has been set to "' .. input .. '".')
+			self.database.lastfm[msg.from.id_str] = input
+			bindings.sendReply(self, msg, 'Your libre.fm username has been set to "' .. input .. '".')
 		end
 		return
 	end
@@ -43,34 +49,34 @@ local action = function(msg)
 	local output = ''
 	if input then
 		username = input
-	elseif database.lastfm[msg.from.id_str] then
-		username = database.lastfm[msg.from.id_str]
+	elseif self.database.lastfm[msg.from.id_str] then
+		username = self.database.lastfm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
 		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
-		database.lastfm[msg.from.id_str] = username
+		self.database.lastfm[msg.from.id_str] = username
 	else
-		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
+		bindings.sendReply(self, msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
 	url = url .. URL.escape(username)
 
-	jstr, res = HTTPS.request(url)
+	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
+		bindings.sendReply(self, msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
-	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
+	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.' .. output)
+		bindings.sendReply(self, msg, 'No history for this user.' .. output)
 		return
 	end
 
@@ -90,13 +96,8 @@ local action = function(msg)
 	end
 
 	message = message .. title .. ' - ' .. artist .. output
-	sendMessage(msg.chat.id, message)
+	bindings.sendMessage(self, msg.chat.id, message)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return librefm

@@ -1,28 +1,30 @@
-local triggers = {
-	'^/reload[@'..bot.username..']*',
-	'^/halt[@'..bot.username..']*'
-}
+local control = {}
 
-local action = function(msg)
+local bot = require('bot')
+local bindings = require('bindings')
+local utilities = require('utilities')
 
-	if msg.from.id ~= config.admin then
+function control:init()
+	control.triggers = utilities.triggers(self.info.username):t('reload'):t('halt').table
+end
+
+function control:action(msg)
+
+	if msg.from.id ~= self.config.admin then
 		return
 	end
 
 	if msg.date < os.time() then return end
 
-	if msg.text:match('^/reload') then
-		bot_init()
-		sendReply(msg, 'Bot reloaded!')
-	elseif msg.text:match('^/halt') then
-		is_started = false
-		sendReply(msg, 'Stopping bot!')
+	if msg.text:match('^'..utilities.INVOCATION_PATTERN..'reload') then
+		bot.init(self)
+		bindings.sendReply(self, msg, 'Bot reloaded!')
+	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'halt') then
+		self.is_started = false
+		bindings.sendReply(self, msg, 'Stopping bot!')
 	end
 
 end
 
-return {
-	action = action,
-	triggers = triggers
-}
+return control
 

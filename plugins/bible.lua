@@ -26,7 +26,7 @@ function bible:action(msg)
 
 	local input = utilities.input(msg.text)
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, self.doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, bible.doc, true, msg.message_id, true)
 		return
 	end
 

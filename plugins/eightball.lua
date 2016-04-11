@@ -1,10 +1,14 @@
-local command = '8ball'
-local doc = '`Returns an answer from a magic 8-ball!`'
+local eightball = {}
 
-local triggers = {
-	'^/8ball',
-	'y/n%p?$'
-}
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+eightball.command = '8ball'
+eightball.doc = '`Returns an answer from a magic 8-ball!`'
+
+function eightball:init()
+	eightball.triggers = utilities.triggers(self.info.username, {'[Yy]/[Nn]%p*$'}):t('8ball', true).table
+end
 
 local ball_answers = {
 	"It is certain.",
@@ -37,7 +41,7 @@ local yesno_answers = {
 	'No.'
 }
 
-local action = function(msg)
+function eightball:action(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
@@ -51,13 +55,8 @@ local action = function(msg)
 		message = ball_answers[math.random(#ball_answers)]
 	end
 
-	sendReply(msg, message)
+	bindings.sendReply(self, msg, message)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return eightball

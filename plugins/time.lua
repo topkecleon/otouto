@@ -1,28 +1,35 @@
-local command = 'time <location>'
-local doc = [[```
+local time = {}
+
+local HTTPS = require('ssl.https')
+local JSON = require('cjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+time.command = 'time <location>'
+time.doc = [[```
 /time <location>
 Returns the time, date, and timezone for the given location.
 ```]]
 
-local triggers = {
-	'^/time[@'..bot.username..']*'
-}
+function time:init()
+	time.triggers = utilities.triggers(self.info.username):t('time', true).table
+end
 
-local action = function(msg)
+function time:action(msg)
 
 	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, time.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
-	local coords = get_coords(input)
+	local coords = utilities.get_coords(self, input)
 	if type(coords) == 'string' then
-		sendReply(msg, coords)
+		bindings.sendReply(self, msg, coords)
 		return
 	end
 
@@ -30,26 +37,21 @@ local action = function(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
-	local timestamp = os.time() + jdat.rawOffset + jdat.dstOffset + config.time_offset
+	local timestamp = os.time() + jdat.rawOffset + jdat.dstOffset + self.config.time_offset
 	local utcoff = (jdat.rawOffset + jdat.dstOffset) / 3600
 	if utcoff == math.abs(utcoff) then
 		utcoff = '+' .. utcoff
 	end
 	local message = os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
 
-	sendReply(msg, message)
+	bindings.sendReply(self.msg, message)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return time

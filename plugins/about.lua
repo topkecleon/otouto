@@ -1,5 +1,6 @@
 local about = {}
 
+local bot = require('bot')
 local bindings = require('bindings')
 
 about.command = 'about'
@@ -15,7 +16,7 @@ function about:action(msg)
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local message = self.config.about_text .. '\nBased on @otouto v'..self.version..' by topkecleon.'
+	local message = self.config.about_text .. '\nBased on @otouto v'..bot.version..' by topkecleon.'
 
 	if msg.new_chat_participant and msg.new_chat_participant.id == self.info.id then
 		bindings.sendMessage(self, msg.chat.id, message, true)
