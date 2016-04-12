@@ -171,7 +171,7 @@ function utilities:user_from_message(msg)
 	if msg.reply_to_message then
 		target = msg.reply_to_message.from
 	elseif input and tonumber(input) then
-		target.id = input
+		target.id = tonumber(input)
 		if self.database.users[input] then
 			for k,v in pairs(self.database.users[input]) do
 				target[k] = v
@@ -299,4 +299,35 @@ function utilities.with_http_timeout(timeout, fun)
 	HTTP.TIMEOUT = timeout
 	fun()
 	HTTP.TIMEOUT = original
+end
+
+function utilities.enrich_user(user)
+	user.id_str = tostring(user.id)
+	user.name = utilities.build_name(user.first_name, user.last_name)
+	return user
+end
+
+function utilities.enrich_message(msg)
+	if not msg.text then msg.text = msg.caption or '' end
+	msg.text_lower = msg.text:lower()
+	msg.from = utilities.enrich_user(msg.from)
+	msg.chat.id_str = tostring(msg.chat.id)
+	if msg.reply_to_message then
+		if not msg.reply_to_message.text then
+			msg.reply_to_message.text = msg.reply_to_message.caption or ''
+		end
+		msg.reply_to_message.text_lower = msg.reply_to_message.text:lower()
+		msg.reply_to_message.from = utilities.enrich_user(msg.reply_to_message.from)
+		msg.reply_to_message.chat.id_str = tostring(msg.reply_to_message.chat.id)
+	end
+	if msg.forward_from then
+		msg.forward_from = utilities.enrich_user(msg.forward_from)
+	end
+	if msg.new_chat_participant then
+		msg.new_chat_participant = utilities.enrich_user(msg.new_chat_participant)
+	end
+	if msg.left_chat_participant then
+		msg.left_chat_participant = utilities.enrich_user(msg.left_chat_participant)
+	end
+	return msg
 end

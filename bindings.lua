@@ -12,10 +12,6 @@ function bindings.sendRequest(url)
 
 	local dat, res = HTTPS.request(url)
 
-	if res ~= 200 then
-		return false, res
-	end
-
 	local tab = JSON.decode(dat)
 
 	if not tab.ok then
@@ -112,6 +108,16 @@ function bindings:forwardMessage(chat_id, from_chat_id, message_id, disable_noti
 
 	return bindings.sendRequest(self, url)
 
+end
+
+function bindings:kickChatMember(chat_id, user_id)
+	local url = self.BASE_URL .. '/kickChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
+	return bindings.sendRequest(self, url)
+end
+
+function bindings:unbanChatMember(chat_id, user_id)
+	local url = self.BASE_URL .. '/unbanChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
+	return bindings.sendRequest(self, url)
 end
 
  -- TODO: More of this.

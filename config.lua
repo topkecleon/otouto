@@ -2,12 +2,12 @@ return {
 
 	-- Your authorization token from the botfather.
 	bot_api_key = '',
+	-- Your Telegram ID.
+	admin = 00000000,
 	-- Differences, in seconds, between your time and UTC.
 	time_offset = 0,
 	-- Two-letter language code.
 	lang = 'en',
-	-- Your Telegram ID.
-	admin = 00000000,
 	-- The channel, group, or user to send error reports to.
 	-- If this is not set, errors will be printed to the console.
 	log_chat = nil,

@@ -5,7 +5,7 @@ local instance = {}
 local bindings = require('bindings') -- Load Telegram bindings.
 local utilities = require('utilities') -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.5'
+bot.version = '3.6'
 
 function bot:init() -- The function run when the bot is started or reloaded.
 
@@ -44,22 +44,6 @@ function bot:init() -- The function run when the bot is started or reloaded.
 	self.database.users = self.database.users or {} -- Table to cache userdata.
 	self.database.users[tostring(self.info.id)] = self.info
 
-	-- Migration code. Remove in 3.6.
-	if self.database.lastfm then
-		for k,v in pairs(self.database.lastfm) do
-			if not self.database.users[k] then self.database.users[k] = {} end
-			self.database.users[k].lastfm = v
-		end
-	end
-
-	-- Migration code. Remove in 3.6.
-	if self.database.nicknames then
-		for k,v in pairs(self.database.nicknames) do
-			if not self.database.users[k] then self.database.users[k] = {} end
-			self.database.users[k].nickname = v
-		end
-	end
-
 end
 
 function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
@@ -77,25 +61,17 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 	end
 
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
-	if not msg.text then msg.text = msg.caption or '' end
 
-	if msg.reply_to_message and msg.reply_to_message.caption then
-		msg.reply_to_message.text = msg.reply_to_message.caption
-	end -- If the replied-to message has a caption, make that its text.
+	msg = utilities.enrich_message(msg)
 
 	if msg.text:match('^/start .+') then
 		msg.text = '/' .. utilities.input(msg.text)
+		msg.text_lower = msg.text:lower()
 	end
 
 	for _,v in ipairs(self.plugins) do
 		for _,w in pairs(v.triggers) do
 			if string.match(msg.text:lower(), w) then
-				-- a few shortcuts
-				msg.chat.id_str = tostring(msg.chat.id)
-				msg.from.id_str = tostring(msg.from.id)
-				msg.text_lower = msg.text:lower()
-				msg.from.name = utilities.build_name(msg.from.first_name, msg.from.last_name)
-
 				local success, result = pcall(function()
 					return v.action(self, msg)
 				end)

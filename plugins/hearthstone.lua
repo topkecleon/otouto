@@ -12,23 +12,26 @@ function hearthstone:init()
 
 		print('Downloading Hearthstone database...')
 
-		self.database.hearthstone = {
-			expiration = os.time() + 600000
-		}
+		-- This stuff doesn't play well with lua-sec. Disable it for now; hack in curl.
+		--local jstr, res = HTTPS.request('https://api.hearthstonejson.com/v1/latest/enUS/cards.json')
+		--if res ~= 200 then
+		--  print('Error connecting to hearthstonejson.com.')
+		--  print('hearthstone.lua will not be enabled.')
+		--  return
+		--end
+		--local jdat = JSON.decode(jstr)
 
-		local jstr, res = HTTPS.request('http://hearthstonejson.com/json/AllSets.json')
-		if res ~= 200 then
+		local s = io.popen('curl -s https://api.hearthstonejson.com/v1/latest/enUS/cards.json'):read('*all')
+		local d = JSON.decode(s)
+
+		if not d then
 			print('Error connecting to hearthstonejson.com.')
 			print('hearthstone.lua will not be enabled.')
 			return
 		end
-		local jdat = JSON.decode(jstr)
 
-		for _,v in pairs(jdat) do
-			for _,val in pairs(v) do
-				table.insert(self.database.hearthstone, val)
-			end
-		end
+		self.database.hearthstone = d
+		self.database.hearthstone.expiration = os.time() + 600000
 
 		print('Download complete! It will be stored for a week.')
 

@@ -47,15 +47,6 @@ function administration:init()
 		flood = {}
 	}
 
-	-- Migration code: Remove this in v1.8.
-	-- Most recent group activity is now cached for group listings.
-	if not self.database.administration.activity then
-		self.database.administration.activity = {}
-		for k,_ in pairs(self.database.administration.groups) do
-			table.insert(self.database.administration.activity, k)
-		end
-	end
-
 	-- Migration code: Remove this in v1.9.
 	-- Groups have single governors now.
 	for _,group in pairs(self.database.administration.groups) do
@@ -1011,6 +1002,7 @@ function administration.init_command(self_)
 					photo = drua.get_photo(msg.chat.id),
 					founded = os.time()
 				}
+				administration:update_desc(self, msg.chat.id)
 				for i,_ in ipairs(administration.flags) do
 					self.database.administration.groups[msg.chat.id_str].flags[i] = false
 				end
