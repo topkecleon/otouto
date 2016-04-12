@@ -3,7 +3,7 @@ HTTPS = require('ssl.https')
 URL = require('socket.url')
 JSON = require('cjson')
 
-version = '3.5'
+version = '3.6'
 
 bot_init = function() -- The function run when the bot is started or reloaded.
 
@@ -38,22 +38,6 @@ bot_init = function() -- The function run when the bot is started or reloaded.
 	database.users = database.users or {} -- Table to cache userdata.
 	database.users[tostring(bot.id)] = bot
 
-	-- Migration code. Remove in 3.6.
-	if database.lastfm then
-		for k,v in pairs(database.lastfm) do
-			if not database.users[k] then database.users[k] = {} end
-			database.users[k].lastfm = v
-		end
-	end
-
-	-- Migration code. Remove in 3.6.
-	if database.nicknames then
-		for k,v in pairs(database.nicknames) do
-			if not database.users[k] then database.users[k] = {} end
-			database.users[k].nickname = v
-		end
-	end
-
 end
 
 on_msg_receive = function(msg) -- The fn run whenever a message is received.
@@ -71,25 +55,17 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 	end
 
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
-	if not msg.text then msg.text = msg.caption or '' end
 
-	if msg.reply_to_message and msg.reply_to_message.caption then
-		msg.reply_to_message.text = msg.reply_to_message.caption
-	end -- If the replied-to message has a caption, make that its text.
+	msg = enrich_message(msg)
 
 	if msg.text:match('^/start .+') then
 		msg.text = '/' .. msg.text:input()
+		msg.text_lower = msg.text:lower()
 	end
 
 	for i,v in ipairs(plugins) do
 		for k,w in pairs(v.triggers) do
 			if string.match(msg.text:lower(), w) then
-				-- a few shortcuts
-				msg.chat.id_str = tostring(msg.chat.id)
-				msg.from.id_str = tostring(msg.from.id)
-				msg.text_lower = msg.text:lower()
-				msg.from.name = build_name(msg.from.first_name, msg.from.last_name)
-
 				local success, result = pcall(function()
 					return v.action(msg)
 				end)

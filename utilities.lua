@@ -1,7 +1,6 @@
 -- utilities.lua
 -- Functions shared among plugins.
 
- -- you're welcome, brayden :^)
 HTTP = HTTP or require('socket.http')
 HTTPS = HTTPS or require('ssl.https')
 JSON = JSON or require('cjson')
@@ -25,7 +24,7 @@ end
  -- Returns the actual index.
 function string:index()
 	local t = {}
-	for w in s:gmatch('%g+') do
+	for w in self:gmatch('%g+') do
 		table.insert(t, w)
 	end
 	return t
@@ -167,7 +166,7 @@ user_from_message = function(msg)
 	if msg.reply_to_message then
 		target = msg.reply_to_message.from
 	elseif input and tonumber(input) then
-		target.id = input
+		target.id = tonumber(input)
 		if database.users[input] then
 			for k,v in pairs(database.users[input]) do
 				target[k] = v
@@ -269,4 +268,35 @@ function string:md_escape()
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text
+end
+
+enrich_user = function(user)
+	user.id_str = tostring(user.id)
+	user.name = build_name(user.first_name, user.last_name)
+	return user
+end
+
+enrich_message = function(msg)
+	if not msg.text then msg.text = msg.caption or '' end
+	msg.text_lower = msg.text:lower()
+	msg.from = enrich_user(msg.from)
+	msg.chat.id_str = tostring(msg.chat.id)
+	if msg.reply_to_message then
+		if not msg.reply_to_message.text then
+			msg.reply_to_message.text = msg.reply_to_message.caption or ''
+		end
+		msg.reply_to_message.text_lower = msg.reply_to_message.text:lower()
+		msg.reply_to_message.from = enrich_user(msg.reply_to_message.from)
+		msg.reply_to_message.chat.id_str = tostring(msg.reply_to_message.chat.id)
+	end
+	if msg.forward_from then
+		msg.forward_from = enrich_user(msg.forward_from)
+	end
+	if msg.new_chat_participant then
+		msg.new_chat_participant = enrich_user(msg.new_chat_participant)
+	end
+	if msg.left_chat_participant then
+		msg.left_chat_participant = enrich_user(msg.left_chat_participant)
+	end
+	return msg
 end

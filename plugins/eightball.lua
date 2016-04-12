@@ -39,10 +39,6 @@ local yesno_answers = {
 
 local action = function(msg)
 
-	if msg.reply_to_message then
-		msg = msg.reply_to_message
-	end
-
 	local message
 
 	if msg.text_lower:match('y/n%p?$') then

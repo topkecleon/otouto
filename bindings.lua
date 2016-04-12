@@ -16,10 +16,6 @@ sendRequest = function(url)
 
 	local dat, res = HTTPS.request(url)
 
-	if res ~= 200 then
-		return false, res
-	end
-
 	local tab = JSON.decode(dat)
 
 	if not tab.ok then
@@ -116,6 +112,16 @@ forwardMessage = function(chat_id, from_chat_id, message_id, disable_notificatio
 
 	return sendRequest(url)
 
+end
+
+kickChatMember = function(chat_id, user_id)
+	local url = BASE_URL .. '/kickChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
+	return sendRequest(url)
+end
+
+unbanChatMember = function(chat_id, user_id)
+	local url = BASE_URL .. '/unbanChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
+	return sendRequest(url)
 end
 
  -- TODO: More of this.

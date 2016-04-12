@@ -1059,6 +1059,7 @@ local commands = {
 				photo = drua.get_photo(msg.chat.id),
 				founded = os.time()
 			}
+			update_desc(msg.chat.id)
 			for i = 1, #flags do
 				database.administration.groups[msg.chat.id_str].flags[i] = false
 			end
