@@ -10,7 +10,7 @@ Shouts something.
 ```]]
 
 function shout:init()
-	shout.triggers = utilities.triggers(self.info.username):t('shout', true)
+	shout.triggers = utilities.triggers(self.info.username):t('shout', true).table
 end
 
 function shout:action(msg)

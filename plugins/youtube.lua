@@ -14,6 +14,8 @@ function youtube:init()
 		print('youtube.lua will not be enabled.')
 		return
 	end
+
+	youtube.triggers = utilities.triggers(self.info.username):t('youtube', true):t('yt', true).table
 end
 
 youtube.command = 'youtube <query>'
@@ -22,10 +24,6 @@ youtube.doc = [[```
 Returns the top result from YouTube.
 Alias: /yt
 ```]]
-
-function youtube:init()
-	youtube.triggers = utilities.triggers(self.info.username):t('youtube', true):t('yt', true).table
-end
 
 function youtube:action(msg)
 

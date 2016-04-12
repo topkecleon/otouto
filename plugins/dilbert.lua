@@ -19,7 +19,7 @@ end
 
 function dilbert:action(msg)
 
-	bindings.sendChatAction(msg.chat.id, 'upload_photo')
+	bindings.sendChatAction(self, msg.chat.id, 'upload_photo')
 
 	local input = utilities.input(msg.text)
 	if not input then input = os.date('%F') end

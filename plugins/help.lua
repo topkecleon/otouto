@@ -15,7 +15,7 @@ function help:init()
 		end
 	end
 
-	help.triggers = utilities.triggers():t('help', true):t('h', true).table
+	help.triggers = utilities.triggers(self.info.username):t('help', true):t('h', true).table
 end
 
 help_text = help_text .. [[

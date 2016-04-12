@@ -1,5 +1,5 @@
  -- You need a Google API key and a Google Custom Search Engine set up to use this, in config.google_api_key and config.google_cse_key, respectively.
- -- You must also sign up for the CSE in the Google Developer Concsole, and enable image results.
+ -- You must also sign up for the CSE in the Google Developer Console, and enable image results.
 
 local gImages = {}
 
@@ -20,7 +20,7 @@ function gImages:init()
 		return
 	end
 
-	gImages.triggers = utilities.triggers():t('image', true):t('i', true):t('insfw', true).table
+	gImages.triggers = utilities.triggers(self.info.username):t('image', true):t('i', true):t('insfw', true).table
 end
 
 gImages.command = 'image <query>'

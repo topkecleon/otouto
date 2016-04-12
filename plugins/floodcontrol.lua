@@ -7,7 +7,7 @@ local JSON = require('cjson')
 local utilities = require('utilities')
 
 function floodcontrol:init()
-	self.floodcontrol = floodcontrol or {}
+	self.floodcontrol = self.floodcontrol or {}
 end
 
 floodcontrol.triggers = {

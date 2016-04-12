@@ -17,7 +17,7 @@ function dice:action(msg)
 
 	local input = utilities.input(msg.text_lower)
 	if not input then
-		bindings.sendMessage(msg.chat.id, dice.doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, dice.doc, true, msg.message_id, true)
 		return
 	end
 

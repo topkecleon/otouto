@@ -4,17 +4,17 @@ local HTTP = require('socket.http')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
-function bindings:init()
+function cats:init()
 	if not self.config.thecatapi_key then
 		print('Missing config value: thecatapi_key.')
 		print('cats.lua will be enabled, but there are more features with a key.')
 	end
+
+	cats.triggers = utilities.triggers(self.info.username):t('cat').table
 end
 
 cats.command = 'cat'
 cats.doc = '`Returns a cat!`'
-
-cats.triggers = utilities.triggers():t('cat').table
 
 function cats:action(msg)
 

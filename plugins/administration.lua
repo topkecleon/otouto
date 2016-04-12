@@ -1132,7 +1132,7 @@ function administration:action(msg)
 end
 
 function administration:cron()
-	self.temp.flood = {}
+	self.admin_temp.flood = {}
 end
 
 administration.command = 'groups'

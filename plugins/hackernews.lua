@@ -11,7 +11,9 @@ Returns four (if group) or eight (if private message) top stories from Hacker Ne
 Alias: /hn
 ```]]
 
-hackernews.triggers = utilities.triggers():t('hackernews', true):t('hn', true).table
+function hackernews:init()
+	hackernews.triggers = utilities.triggers(self.info.username):t('hackernews', true):t('hn', true).table
+end
 
 function hackernews:action(msg)
 
