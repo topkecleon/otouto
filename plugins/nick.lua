@@ -10,7 +10,7 @@ Set your nickname. Use "/nick --" to delete it.
 ```]]
 
 function nick:init()
-	nick.triggers = utilities.triggers(self.info.nick):t('nick', true).table
+	nick.triggers = utilities.triggers(self.info.username):t('nick', true).table
 end
 
 function nick:action(msg)
