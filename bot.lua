@@ -1,7 +1,5 @@
 local bot = {}
 
-local instance = {}
-
 local bindings = require('bindings') -- Load Telegram bindings.
 local utilities = require('utilities') -- Load miscellaneous and cross-plugin functions.
 
@@ -27,7 +25,7 @@ function bot:init() -- The function run when the bot is started or reloaded.
 
 	self.plugins = {} -- Load plugins.
 	for _,v in ipairs(self.config.plugins) do
-		local p = require('plugins/'..v)
+		local p = require('plugins.'..v)
 		table.insert(self.plugins, p)
 		if p.init then p.init(self) end
 	end
@@ -77,7 +75,7 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 				end)
 				if not success then
 					bindings.sendReply(self, msg, 'Sorry, an unexpected error occurred.')
-					bindings.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
+					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
 					return
 				end
 				-- If the action returns a table, make that table msg.
@@ -93,37 +91,41 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 
 end
 
-bot.init(instance) -- Actually start the script. Run the bot_init function.
+function bot:run()
+	bot.init(self) -- Actually start the script. Run the bot_init function.
 
-while instance.is_started do -- Start a loop while the bot should be running.
+	while self.is_started do -- Start a loop while the bot should be running.
 
-	do
-		local res = bindings.getUpdates(instance, instance.last_update+1) -- Get the latest updates!
-		if res then
-			for _,v in ipairs(res.result) do -- Go through every new message.
-				instance.last_update = v.update_id
-				bot.on_msg_receive(instance, v.message)
+		do
+			local res = bindings.getUpdates(self, self.last_update+1) -- Get the latest updates!
+			if res then
+				for _,v in ipairs(res.result) do -- Go through every new message.
+					self.last_update = v.update_id
+					bot.on_msg_receive(self, v.message)
+				end
+			else
+				print(self.config.errors.connection)
 			end
-		else
-			print(instance.config.errors.connection)
 		end
-	end
 
-	if instance.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
-		instance.last_cron = os.date('%M')
-		utilities.save_data(instance.info.username..'.db', instance.database) -- Save the database.
-		for i,v in ipairs(instance.plugins) do
-			if v.cron then -- Call each plugin's cron function, if it has one.
-				local res, err = pcall(function() v.cron(instance) end)
-				if not res then
-					utilities.handle_exception(instance, err, 'CRON: ' .. i)
+		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
+			self.last_cron = os.date('%M')
+			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
+			for i,v in ipairs(self.plugins) do
+				if v.cron then -- Call each plugin's cron function, if it has one.
+					local res, err = pcall(function() v.cron(self) end)
+					if not res then
+						utilities.handle_exception(self, err, 'CRON: ' .. i)
+					end
 				end
 			end
 		end
+
 	end
 
+	-- Save the database before exiting.
+	utilities.save_data(self.info.username..'.db', self.database)
+	print('Halted.')
 end
 
- -- Save the database before exiting.
-utilities.save_data(instance.info.username..'.db', instance.database)
-print('Halted.')
+return bot

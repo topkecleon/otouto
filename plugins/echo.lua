@@ -10,7 +10,7 @@ Repeats a string of text.
 ```]]
 
 function echo:init()
-	echo.triggers = utilities.triggers(self.info.username):t('echo').table
+	echo.triggers = utilities.triggers(self.info.username):t('echo', true).table
 end
 
 function echo:action(msg)

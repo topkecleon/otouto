@@ -4,7 +4,7 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 function shell:init()
-	shell.triggers = utilities.bindings(self.info.username):t('run', true).table
+	shell.triggers = utilities.triggers(self.info.username):t('run', true).table
 end
 
 function shell:action(msg)

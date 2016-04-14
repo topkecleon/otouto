@@ -75,7 +75,7 @@ function bindings:sendChatAction(chat_id, action)
  -- Support actions are typing, upload_photo, record_video, upload_video, record_audio, upload_audio, upload_document, find_location
 
 	local url = self.BASE_URL .. '/sendChatAction?chat_id=' .. chat_id .. '&action=' .. action
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 
 end
 
@@ -94,7 +94,7 @@ function bindings:sendLocation(chat_id, latitude, longitude, reply_to_message_id
 		url = url .. '&disable_notification=true'
 	end
 
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 
 end
 
@@ -106,18 +106,18 @@ function bindings:forwardMessage(chat_id, from_chat_id, message_id, disable_noti
 		url = url .. '&disable_notification=true'
 	end
 
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 
 end
 
 function bindings:kickChatMember(chat_id, user_id)
 	local url = self.BASE_URL .. '/kickChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 end
 
 function bindings:unbanChatMember(chat_id, user_id)
 	local url = self.BASE_URL .. '/unbanChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 end
 
  -- TODO: More of this.
@@ -138,7 +138,7 @@ function bindings:sendPhotoID(chat_id, file_id, caption, reply_to_message_id, di
 		url = url .. '&disable_notification=true'
 	end
 
-	return bindings.sendRequest(self, url)
+	return bindings.sendRequest(url)
 
 end
 

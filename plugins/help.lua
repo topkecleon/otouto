@@ -6,23 +6,26 @@ local help = {}
 local bindings = require('bindings')
 local utilities = require('utilities')
 
-local help_text = '*Available commands:*'
+local help_text
 
 function help:init()
+	help_text =  '*Available commands:*'
+
 	for _,plugin in ipairs(self.plugins) do
 		if plugin.command then
 			help_text = help_text .. '\n• /' .. plugin.command:gsub('%[', '\\[')
 		end
 	end
 
-	help.triggers = utilities.triggers(self.info.username):t('help', true):t('h', true).table
-end
-
-help_text = help_text .. [[
+	help_text = help_text .. [[
 
 • /help <command>
 Arguments: <required> \[optional]
 ]]
+
+	help.triggers = utilities.triggers(self.info.username):t('help', true):t('h', true).table
+
+end
 
 function help:action(msg)
 

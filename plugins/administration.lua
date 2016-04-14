@@ -324,7 +324,7 @@ function administration.init_command(self_)
 						if self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
 							drua.kick_user(msg.chat.id, msg.from.id)
 							local output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
-							bindings.sendMessage(msg.from.id, output)
+							bindings.sendMessage(self, msg.from.id, output)
 							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
 							return
 						end
@@ -372,7 +372,7 @@ function administration.init_command(self_)
 					else
 						group.name = msg.new_chat_title
 						if group.grouptype == 'supergroup' then
-							administration.update_desc(msg.chat.id)
+							administration.update_desc(self, msg.chat.id)
 						end
 					end
 					return
@@ -799,7 +799,7 @@ function administration.init_command(self_)
 						local status = group.flags[i] or false
 						output = output .. '`[' .. i .. ']` *' .. v.name .. '*` = ' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
 					end
-					bindings.sendMessage(msg.chat.id, output, true, nil, true)
+					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 					return
 				end
 				if group.flags[input] == true then
@@ -987,7 +987,7 @@ function administration.init_command(self_)
 
 			action = function(self, msg)
 				if self.database.administration.groups[msg.chat.id_str] then
-					bindings.sendReply(msg, 'I am already administrating this group.')
+					bindings.sendReply(self, msg, 'I am already administrating this group.')
 					return
 				end
 				self.database.administration.groups[msg.chat.id_str] = {

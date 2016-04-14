@@ -276,19 +276,20 @@ end
 
 utilities.INVOCATION_PATTERN = '/'
 
-utilities.triggers_metatable = {}
-function utilities.triggers_metatable:t(pattern, has_args)
-	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'$')
-	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'$')
+utilities.triggers_meta = {}
+utilities.triggers_meta.__index = utilities.triggers_meta
+function utilities.triggers_meta:t(pattern, has_args)
+	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'$')
+	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'$')
 	if has_args then
-		self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
-		self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'%s+[^%s]*')
+		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
+		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'%s+[^%s]*')
 	end
 	return self
 end
 
 function utilities.triggers(username, trigger_table)
-	local self = setmetatable({}, utilities.triggers_metatable)
+	local self = setmetatable({}, utilities.triggers_meta)
 	self.username = username
 	self.table = trigger_table or {}
 	return self
@@ -331,3 +332,5 @@ function utilities.enrich_message(msg)
 	end
 	return msg
 end
+
+return utilities

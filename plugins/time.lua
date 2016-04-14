@@ -43,7 +43,9 @@ function time:action(msg)
 
 	local jdat = JSON.decode(jstr)
 
-	local timestamp = os.time() + jdat.rawOffset + jdat.dstOffset + self.config.time_offset
+	local now = os.time()
+  local time_offset = os.difftime(now, os.time(os.date("!*t", now)))
+	local timestamp = now + jdat.rawOffset + jdat.dstOffset + time_offset
 	local utcoff = (jdat.rawOffset + jdat.dstOffset) / 3600
 	if utcoff == math.abs(utcoff) then
 		utcoff = '+' .. utcoff

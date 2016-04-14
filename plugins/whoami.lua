@@ -17,7 +17,7 @@ function whoami:action(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
-		msg.from.name = utilities.build_name(self, msg.from.first_name, msg.from.last_name)
+		msg.from.name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 	end
 
 	local chat_id = math.abs(msg.chat.id)
