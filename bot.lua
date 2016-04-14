@@ -75,7 +75,7 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 				end)
 				if not success then
 					bindings.sendReply(self, msg, 'Sorry, an unexpected error occurred.')
-					bindings.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
+					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
 					return
 				end
 				-- If the action returns a table, make that table msg.
