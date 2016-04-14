@@ -331,3 +331,5 @@ function utilities.enrich_message(msg)
 	end
 	return msg
 end
+
+return utilities
