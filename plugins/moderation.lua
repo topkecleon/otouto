@@ -268,12 +268,12 @@ function moderation:init()
 	moderation.triggers = {}
 	for trigger,_ in pairs(commands) do
 		if trigger[-1] == '$' then
-			moderation.triggers:insert(trigger:sub(1, -2)..'@'..self.info.username..'$')
+			tables.insert(moderation.triggers, trigger:sub(1, -2)..'@'..self.info.username..'$')
 		else
-			moderation.triggers:insert(trigger..'%s+[^%s]*')
-			moderation.triggers:insert(trigger..'@'..self.info.username..'%s+[^%s]*')
-			moderation.triggers:insert(trigger..'$')
-			moderation.triggers:insert(trigger..'@'..self.info.username..'$')
+			tables.insert(moderation.triggers, trigger..'%s+[^%s]*')
+			tables.insert(moderation.triggers, trigger..'@'..self.info.username..'%s+[^%s]*')
+			tables.insert(moderation.triggers, trigger..'$')
+			tables.insert(moderation.triggers, trigger..'@'..self.info.username..'$')
 		end
 	end
 end
