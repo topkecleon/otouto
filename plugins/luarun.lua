@@ -19,7 +19,7 @@ function luarun:action(msg)
 		return
 	end
 
-	local output = loadstring(input)()
+	local output = loadstring('function (instance) '..input..' end')()(self)
 	if output == nil then
 		output = 'Done!'
 	elseif type(output) == 'table' then
