@@ -276,8 +276,9 @@ end
 
 utilities.INVOCATION_PATTERN = '/'
 
-utilities.triggers_metatable = {}
-function utilities.triggers_metatable:t(pattern, has_args)
+utilities.triggers_meta = {}
+utilities.triggers_meta.__index = utilities.triggers_meta
+function utilities.triggers_meta:t(pattern, has_args)
 	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'$')
 	self.table:insert('^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'$')
 	if has_args then
@@ -288,7 +289,7 @@ function utilities.triggers_metatable:t(pattern, has_args)
 end
 
 function utilities.triggers(username, trigger_table)
-	local self = setmetatable({}, utilities.triggers_metatable)
+	local self = setmetatable({}, utilities.triggers_meta)
 	self.username = username
 	self.table = trigger_table or {}
 	return self
