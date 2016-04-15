@@ -16,6 +16,8 @@ sendRequest = function(url)
 
 	local dat, res = HTTPS.request(url)
 
+	if not dat then return false, res end
+
 	local tab = JSON.decode(dat)
 
 	if not tab.ok then
