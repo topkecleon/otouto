@@ -102,6 +102,26 @@ sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disab
 
 end
 
+sendContact = function(chat_id, phone_number, first_name, last_name, reply_to_message_id, disable_notification)
+
+	local url = BASE_URL .. '/sendContact?chat_id=' .. chat_id .. '&phone_number=' .. phone_number .. '&first_name=' .. first_name
+
+	if last_name then
+		url = url .. '&last_name=' .. last_name
+	end
+	
+	if reply_to_message_id then
+		url = url .. '&reply_to_message_id=' .. reply_to_message_id
+	end
+
+	if disable_notification then
+		url = url .. '&disable_notification=true'
+	end
+
+	return sendRequest(url)
+
+end
+
 forwardMessage = function(chat_id, from_chat_id, message_id, disable_notification)
 
 	local url = BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
