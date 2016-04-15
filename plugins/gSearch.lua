@@ -2,7 +2,7 @@ local gSearch = {}
 
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 

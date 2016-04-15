@@ -4,7 +4,7 @@ local chatter = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 
 function chatter:init()

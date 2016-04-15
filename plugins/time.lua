@@ -1,7 +1,7 @@
 local time = {}
 
 local HTTPS = require('ssl.https')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
@@ -33,7 +33,10 @@ function time:action(msg)
 		return
 	end
 
-	local url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' .. coords.lat ..','.. coords.lon .. '&timestamp='..os.time()
+	local now = os.time()
+	local utc = os.time(os.date("!*t", now))
+
+	local url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' .. coords.lat ..','.. coords.lon .. '&timestamp='..utc
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
@@ -43,16 +46,16 @@ function time:action(msg)
 
 	local jdat = JSON.decode(jstr)
 
-	local now = os.time()
-  local time_offset = os.difftime(now, os.time(os.date("!*t", now)))
-	local timestamp = now + jdat.rawOffset + jdat.dstOffset + time_offset
+	local timestamp = now + jdat.rawOffset + jdat.dstOffset
 	local utcoff = (jdat.rawOffset + jdat.dstOffset) / 3600
 	if utcoff == math.abs(utcoff) then
-		utcoff = '+' .. utcoff
+		utcoff = '+'.. utilities.pretty_float(utcoff)
+	else
+		utcoff = utilities.pretty_float(utcoff)
 	end
-	local message = os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
+	local message = os.date('!%I:%M %p\n', timestamp) .. os.date('!%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
 
-	bindings.sendReply(self.msg, message)
+	bindings.sendReply(self, msg, message)
 
 end
 

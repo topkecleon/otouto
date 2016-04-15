@@ -3,7 +3,7 @@
 
 local floodcontrol = {}
 
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local utilities = require('utilities')
 
 function floodcontrol:init()

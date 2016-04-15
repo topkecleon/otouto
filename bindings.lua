@@ -5,7 +5,7 @@
 local bindings = {}
 
 local HTTPS = require('ssl.https')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local URL = require('socket.url')
 
 function bindings.sendRequest(url)

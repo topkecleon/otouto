@@ -29,7 +29,7 @@ function reactions:init()
 	for trigger,reaction in pairs(mapping) do
 		help = help .. '• ' .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
 		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger)
-		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.username)
+		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.username:lower())
 	end
 end
 

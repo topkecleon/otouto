@@ -1,7 +1,7 @@
 local apod = {}
 
 local HTTPS = require('ssl.https')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local URL = require('socket.url')
 local bindings = require('bindings')
 local utilities = require('utilities')

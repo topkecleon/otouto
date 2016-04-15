@@ -32,8 +32,12 @@ function dilbert:action(msg)
 		return
 	end
 
-	local strip_file = io.open('/tmp/' .. input .. '.gif')
-	if not strip_file then
+	local strip_filename = '/tmp/' .. input .. '.gif'
+	local strip_file = io.open(strip_filename)
+	if strip_file then
+		strip_file:close()
+		strip_file = strip_filename
+	else
 		local strip_url = str:match('<meta property="og:image" content="(.-)"/>')
 		strip_file = utilities.download_file(strip_url, '/tmp/' .. input .. '.gif')
 	end
@@ -41,8 +45,6 @@ function dilbert:action(msg)
 	local strip_title = str:match('<meta property="article:publish_date" content="(.-)"/>')
 
 	bindings.sendPhoto(self, msg.chat.id, strip_file, strip_title)
-
-	strip_file:close()
 
 end
 

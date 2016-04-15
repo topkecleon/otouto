@@ -21,7 +21,7 @@ function shout:action(msg)
 		bindings.sendMessage(self, msg.chat.id, shout.doc, true, msg.message_id, true)
 		return
 	end
-	input = input:trim()
+	input = utilities.trim(input)
 
 	if input:len() > 20 then
 		input = input:sub(1,20)
@@ -42,7 +42,7 @@ function shout:action(msg)
 		inc = inc + 1
 		output = output .. match .. ' ' .. spacing .. match .. '\n'
 	end
-	output = '```\n' .. output:trim() .. '\n```'
+	output = '```\n' .. utilities.trim(output) .. '\n```'
 	bindings.sendMessage(self, msg.chat.id, output, true, false, true)
 
 end

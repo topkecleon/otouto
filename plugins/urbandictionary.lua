@@ -2,7 +2,7 @@ local urbandictionary = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
@@ -43,9 +43,9 @@ function urbandictionary:action(msg)
 		return
 	end
 
-	local output = '*' .. jdat.list[1].word .. '*\n\n' .. jdat.list[1].definition:trim()
+	local output = '*' .. jdat.list[1].word .. '*\n\n' .. utilities.trim(jdat.list[1].definition)
 	if string.len(jdat.list[1].example) > 0 then
-		output = output .. '_\n\n' .. jdat.list[1].example:trim() .. '_'
+		output = output .. '_\n\n' .. utilities.trim(jdat.list[1].example) .. '_'
 	end
 
 	output = output:gsub('%[', ''):gsub('%]', '')

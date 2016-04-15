@@ -19,7 +19,7 @@ function luarun:action(msg)
 		return
 	end
 
-	local output = loadstring('local utilities = require(\'utilities\'); return function (instance) '..input..' end')()(self)
+	local output = loadstring('local bindings = require(\'bindings\'); local utilities = require(\'utilities\'); return function (instance, msg) '..input..' end')()(self, msg)
 	if output == nil then
 		output = 'Done!'
 	elseif type(output) == 'table' then

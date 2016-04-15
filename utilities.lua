@@ -7,7 +7,7 @@ local HTTP = require('socket.http')
 local ltn12 = require('ltn12')
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 
  -- get the indexed word in a string
@@ -169,6 +169,7 @@ function utilities:user_from_message(msg)
 	local input = utilities.input(msg.text_lower)
 	local target = {}
 	if msg.reply_to_message then
+		print('reply')
 		target = msg.reply_to_message.from
 	elseif input and tonumber(input) then
 		target.id = tonumber(input)
@@ -279,11 +280,12 @@ utilities.INVOCATION_PATTERN = '/'
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
 function utilities.triggers_meta:t(pattern, has_args)
+	local username = self.username:lower()
 	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'$')
-	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'$')
+	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'$')
 	if has_args then
 		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
-		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..self.username..'%s+[^%s]*')
+		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'%s+[^%s]*')
 	end
 	return self
 end
@@ -331,6 +333,14 @@ function utilities.enrich_message(msg)
 		msg.left_chat_participant = utilities.enrich_user(msg.left_chat_participant)
 	end
 	return msg
+end
+
+function utilities.pretty_float(x)
+	if x % 1 == 0 then
+		return tostring(math.floor(x))
+	else
+		return tostring(x)
+	end
 end
 
 return utilities

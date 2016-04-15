@@ -3,7 +3,7 @@
 local hearthstone = {}
 
 local HTTPS = require('ssl.https')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
@@ -118,7 +118,7 @@ function hearthstone:action(msg)
 		end
 	end
 
-	output = output:trim()
+	output = utilities.trim(output)
 	if output:len() == 0 then
 		bindings.sendReply(self, msg, self.config.errors.results)
 		return

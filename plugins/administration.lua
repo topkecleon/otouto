@@ -25,7 +25,7 @@
 
 ]]--
 
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local drua = dofile('drua-tg/drua-tg.lua')
 local bindings = require('bindings')
 local utilities = require('utilities')
@@ -196,7 +196,7 @@ function administration:get_desc(chat_id)
 		for i,v in ipairs(group.rules) do
 			rulelist = rulelist .. '*' .. i .. '.* ' .. v .. '\n'
 		end
-		table.insert(t, rulelist:trim())
+		table.insert(t, utilities.trim(rulelist))
 	end
 	local flaglist = ''
 	for i = 1, #administration.flags do
@@ -205,7 +205,7 @@ function administration:get_desc(chat_id)
 		end
 	end
 	if flaglist ~= '' then
-		table.insert(t, '*Flags:*\n' .. flaglist:trim())
+		table.insert(t, '*Flags:*\n' .. utilities.trim(flaglist))
 	end
 	if group.governor then
 		local gov = self.database.users[tostring(group.governor)]
@@ -217,7 +217,7 @@ function administration:get_desc(chat_id)
 		modstring = modstring .. administration.mod_format(self, k)
 	end
 	if modstring ~= '' then
-		table.insert(t, '*Moderators:*\n' .. modstring:trim())
+		table.insert(t, '*Moderators:*\n' .. utilities.trim(modstring))
 	end
 	return table.concat(t, '\n\n')
 
@@ -491,7 +491,7 @@ function administration.init_command(self_)
 					local gov = self.database.users[tostring(group.governor)]
 					govstring = '*Governor:* ' .. utilities.md_escape(utilities.build_name(gov.first_name, gov.last_name)) .. ' `[' .. gov.id .. ']`'
 				end
-				local output = modstring:trim() ..'\n\n' .. govstring:trim()
+				local output = utilities.trim(modstring) ..'\n\n' .. utilities.trim(govstring)
 				if output == '\n\n' then
 					output = 'There are currently no moderators for this group.'
 				end
@@ -695,13 +695,13 @@ function administration.init_command(self_)
 					return
 				end
 				group.rules = {}
-				input = input:trim() .. '\n'
+				input = utilities.trim(input) .. '\n'
 				local output = '*Rules for* _' .. msg.chat.title .. '_ *:*\n'
 				local i = 1
 				for l in input:gmatch('(.-)\n') do
 					output = output .. '*' .. i .. '.* ' .. l .. '\n'
 					i = i + 1
-					table.insert(group.rules, l:trim())
+					table.insert(group.rules, utilities.trim(l))
 				end
 				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 			end
@@ -728,7 +728,7 @@ function administration.init_command(self_)
 					group.motd = nil
 					bindings.sendReply(self, msg, 'The MOTD has been cleared.')
 				else
-					input = input:trim()
+					input = utilities.trim(input)
 					group.motd = input
 					local output = '*MOTD for* _' .. msg.chat.title .. '_ *:*\n' .. input
 					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)

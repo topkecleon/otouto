@@ -3,7 +3,7 @@ local xkcd = {}
 local HTTP = require('socket.http')
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 

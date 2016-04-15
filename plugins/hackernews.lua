@@ -1,7 +1,7 @@
 local hackernews = {}
 
 local HTTPS = require('ssl.https')
-local JSON = require('cjson')
+local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
