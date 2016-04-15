@@ -102,6 +102,29 @@ sendLocation = function(chat_id, latitude, longitude, reply_to_message_id, disab
 
 end
 
+sendVenue = function(chat_id, latitude, longitude, title, address, foursquare_id, reply_to_message_id, disable_notification)
+
+	if latitude == 0 then latitude = 0.001 end
+	if longitude == 0 then longitude = 0.001 end
+
+	local url = BASE_URL .. '/sendVenue?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude .. '&title=' .. title .. '&address=' .. address
+
+	if foursquare_id then
+		url = url .. '&foursquare_id=' .. foursquare_id
+	end
+
+	if reply_to_message_id then
+		url = url .. '&reply_to_message_id=' .. reply_to_message_id
+	end
+
+	if disable_notification then
+		url = url .. '&disable_notification=true'
+	end
+
+	return sendRequest(url)
+
+end
+
 sendContact = function(chat_id, phone_number, first_name, last_name, reply_to_message_id, disable_notification)
 
 	local url = BASE_URL .. '/sendContact?chat_id=' .. chat_id .. '&phone_number=' .. phone_number .. '&first_name=' .. first_name
@@ -109,7 +132,7 @@ sendContact = function(chat_id, phone_number, first_name, last_name, reply_to_me
 	if last_name then
 		url = url .. '&last_name=' .. last_name
 	end
-	
+
 	if reply_to_message_id then
 		url = url .. '&reply_to_message_id=' .. reply_to_message_id
 	end
