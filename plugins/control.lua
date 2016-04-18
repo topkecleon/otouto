@@ -9,7 +9,7 @@ local action = function(msg)
 		return
 	end
 
-	if msg.date < os.time() then return end
+	if msg.date < os.time() - 1 then return end
 
 	if msg.text:match('^/reload') then
 		bot_init()

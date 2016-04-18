@@ -254,6 +254,9 @@ local commands = {
 				return true
 			end
 			drua.kick_user(msg.chat.id, msg.from.id)
+			if msg.chat.type == 'supergroup' then
+				unbanChatMember(msg.chat.id, msg.from.id)
+			end
 			local output = flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
 			sendMessage(msg.from.id, output)
 		end
@@ -282,6 +285,9 @@ local commands = {
 				if group.flags[3] == true then
 					if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
 						drua.kick_user(msg.chat.id, msg.from.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
 						return
@@ -320,6 +326,9 @@ local commands = {
 					end
 					if admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
 						drua.kick_user(msg.chat.id, msg.from.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.from.id, output)
 						admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
@@ -344,6 +353,9 @@ local commands = {
 				if group.flags[3] == true then
 					if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
 						drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
+						if msg.chat.type == 'supergroup' then
+							unbanChatMember(msg.chat.id, msg.from.id)
+						end
 						local output = flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 						sendMessage(msg.new_chat_participant.id, output)
 						return
@@ -617,6 +629,9 @@ local commands = {
 				return
 			end
 			drua.kick_user(msg.chat.id, target.id)
+			if msg.chat.type == 'supergroup' then
+				unbanChatMember(msg.chat.id, target.id)
+			end
 			sendMessage(msg.chat.id, target.name .. ' has been kicked.')
 		end
 	},
