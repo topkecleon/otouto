@@ -255,6 +255,7 @@ markdown_escape = function(text)
 
 	text = text:gsub('_', '\\_')
 	text = text:gsub('%[', '\\[')
+	text = text:gsub('%]', '\\]')
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text
@@ -265,6 +266,7 @@ function string:md_escape()
 	local text = self
 	text = text:gsub('_', '\\_')
 	text = text:gsub('%[', '\\[')
+	text = text:gsub('%]', '\\]')
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text

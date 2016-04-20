@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.8.1
+	Version 1.8.2
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -22,6 +22,9 @@
 	stuff. Removed /kickme.
 
 	1.8.1 - /rule <i> will return that numbered rule, if it exists.
+
+	1.8.2 - Will now attempt to unban users kicked from supergroups. Other small
+	changes.
 
 ]]--
 
@@ -415,10 +418,12 @@ local commands = {
 			end
 
 			-- Last active time for group listing.
-			for i,v in pairs(database.administration.activity) do
-				if v == msg.chat.id_str then
-					table.remove(database.administration.activity, i)
-					table.insert(database.administration.activity, 1, msg.chat.id_str)
+			if msg.text:len() > 0 then
+				for i,v in pairs(database.administration.activity) do
+					if v == msg.chat.id_str then
+						table.remove(database.administration.activity, i)
+						table.insert(database.administration.activity, 1, msg.chat.id_str)
+					end
 				end
 			end
 
@@ -443,7 +448,7 @@ local commands = {
 				local group = database.administration.groups[v]
 				if not group.flags[1] then -- no unlisted groups
 					if group.link then
-						output = output ..  '• [' .. group.name .. '](' .. group.link .. ')\n'
+						output = output ..  '• [' .. group.name:md_escape() .. '](' .. group.link .. ')\n'
 					else
 						output = output ..  '• ' .. group.name .. '\n'
 					end
@@ -1091,21 +1096,28 @@ local commands = {
 
 		command = 'gremove \\[chat]',
 		privilege = 5,
-		interior = true,
+		interior = false,
 
 		action = function(msg)
 			local input = msg.text:input() or msg.chat.id_str
+			local output
 			if database.administration.groups[input] then
+				local chat_name = database.administration.groups[input].name
 				database.administration.groups[input] = nil
 				for i,v in ipairs(database.administration.activity) do
 					if v == input then
 						table.remove(database.administration.activity, i)
 					end
 				end
-				sendReply(msg, 'I am no longer administrating that group.')
+				output = 'I am no longer administrating _' .. chat_name:md_escape() .. '_.'
 			else
-				sendReply(msg, 'I do not administrate that group.')
+				if input == msg.chat.id_str then
+					output = 'I do not administrate this group.'
+				else
+					output = 'I do not administrate that group.'
+				end
 			end
+			sendMessage(msg.chat.id, output, true, nil, true)
 		end
 	},
 
