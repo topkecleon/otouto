@@ -615,9 +615,35 @@ local commands = {
 		end
 	},
 
+	{ -- kickme
+		triggers = {
+			'^/leave$',
+			'^/leave@'..bot.username,
+			'^/kickme$',
+			'^/kickme@'..bot.username
+		},
+
+		command = 'kickme',
+		privilege = 1,
+		interior = true,
+
+		action = function(msg)
+			if get_rank(msg.from.id) == 5 then
+				sendReply(msg, 'I can\'t let you do that, '..msg.from.name..'.')
+				return
+			end
+			drua.kick_user(msg.chat.id, msg.from.id)
+			if msg.chat.type == 'supergroup' then
+				unbanChatMember(msg.chat.id, msg.from.id)
+			end
+		end
+	},
+
 	{ -- kick
 		triggers = {
-			'^/kick[@'..bot.username..']*'
+			'^/kick$',
+			'^/kick ',
+			'^/kick@'..bot.username
 		},
 
 		command = 'kick <user>',
@@ -663,6 +689,9 @@ local commands = {
 			end
 			if group.bans[target.id_str] then
 				group.bans[target.id_str] = nil
+				if msg.chat.type == 'supergroup' then
+					unbanChatMember(msg.chat.id, target.id)
+				end
 				sendReply(msg, target.name .. ' has been unbanned.')
 			else
 				group.bans[target.id_str] = true

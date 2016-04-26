@@ -1,19 +1,19 @@
  -- This plugin should go at the end of your plugin list in
  -- config.lua, but not after greetings.lua.
 
-local help_text = '*Available commands:*'
-
+local commandlist = {}
 for i,v in ipairs(plugins) do
 	if v.command then
-		help_text = help_text .. '\n• /' .. v.command:gsub('%[', '\\[')
+		table.insert(commandlist, v.command)
 	end
 end
 
-help_text = help_text .. [[
+table.insert(commandlist, 'help [command]')
+table.sort(commandlist)
 
-• /help <command>
-Arguments: <required> \[optional]
-]]
+local help_text = '*Available commands:*\n• /' .. table.concat(commandlist,'\n• /') .. '\nArguments: <required> [optional]'
+
+help_text = help_text:gsub('%[', '\\[')
 
 local triggers = {
 	'^/help[@'..bot.username..']*',
