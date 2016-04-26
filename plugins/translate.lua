@@ -38,7 +38,7 @@ local action = function(msg)
 	local output = jdat.text[1]
 	output = '*Translation:*\n"' .. output .. '"'
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

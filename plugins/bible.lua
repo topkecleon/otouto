@@ -42,7 +42,7 @@ local action = function(msg)
 		output = 'The text is too long to post here. Try being more specific.'
 	end
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

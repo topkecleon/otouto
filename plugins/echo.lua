@@ -17,7 +17,7 @@ local action = function(msg)
 	else
 		local output
 		if msg.chat.type == 'supergroup' then
-			output = 'Echo:\n`"' .. markdown_escape(input) .. '"`'
+			output = 'Echo:\n"' .. markdown_escape(input) .. '"'
 		else
 			output = latcyr(input)
 		end

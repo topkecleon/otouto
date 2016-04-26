@@ -64,7 +64,8 @@ local action = function(msg)
 
 
 	if msg.text:match('nsfw') then
-		sendReply(msg, result)
+		output = 'NSFW Image ' .. output
+		sendMessage(msg.chat.id, output, true, nil, true)
 	else
 		sendMessage(msg.chat.id, output, false, nil, true)
 	end
