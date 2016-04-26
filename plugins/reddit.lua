@@ -14,7 +14,7 @@ Aliases: /r, /r/[subreddit]
 ```]]
 
 function reddit:init()
-	reddit.triggers = utilities.triggers(self.info.username):t('reddit', true):t('r', true):t('r/', true).table
+	reddit.triggers = utilities.triggers(self.info.username, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
 end
 
 function reddit:action(msg)
