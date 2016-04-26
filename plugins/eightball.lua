@@ -39,15 +39,15 @@ local yesno_answers = {
 
 local action = function(msg)
 
-	local message
+	local output
 
 	if msg.text_lower:match('y/n%p?$') then
-		message = yesno_answers[math.random(#yesno_answers)]
+		output = yesno_answers[math.random(#yesno_answers)]
 	else
-		message = ball_answers[math.random(#ball_answers)]
+		output = ball_answers[math.random(#ball_answers)]
 	end
 
-	sendReply(msg, message)
+	sendReply(msg, output)
 
 end
 

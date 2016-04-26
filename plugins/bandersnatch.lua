@@ -20,18 +20,18 @@ local action = function(msg)
 	local message
 
 	if math.random(10) == 10 then
-		message = fullnames[math.random(#fullnames)]
+		output = fullnames[math.random(#fullnames)]
 	else
-		message = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
+		output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
 	end
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
 return {
 	action = action,
 	triggers = triggers,
-	command = command,
-	desc = desc
+	doc = doc,
+	command = command
 }
