@@ -41,9 +41,9 @@ local action = function(msg)
 	if utcoff == math.abs(utcoff) then
 		utcoff = '+' .. utcoff
 	end
-	local message = os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
+	local output = '`' .. os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')' .. '`'
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, nil, true)
 
 end
 
