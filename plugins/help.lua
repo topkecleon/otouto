@@ -11,7 +11,7 @@ end
 
 help_text = help_text .. [[
 
-• /help <command>
+• /help \[command]
 Arguments: <required> \[optional]
 ]]
 

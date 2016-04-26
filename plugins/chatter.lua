@@ -33,7 +33,7 @@ local action = function(msg)
 	local input = msg.text_lower
 	input = input:gsub(bot.first_name, 'simsimi')
 	input = input:gsub('@'..bot.username, 'simsimi')
-	
+
 	if config.simsimi_trial then
 		sandbox = 'sandbox.'
 	else
@@ -53,10 +53,10 @@ local action = function(msg)
 		sendMessage(msg.chat.id, config.errors.chatter_response)
 		return
 	end
-	local message = jdat.response
+	local output = jdat.response
 
-	if message:match('^I HAVE NO RESPONSE.') then
-		message = config.errors.chatter_response
+	if output:match('^I HAVE NO RESPONSE.') then
+		output = config.errors.chatter_response
 	end
 
 	-- Let's clean up the response a little. Capitalization & punctuation.
@@ -68,14 +68,14 @@ local action = function(msg)
 	}
 
 	for k,v in pairs(filter) do
-		message = string.gsub(message, k, v)
+		output = string.gsub(output, k, v)
 	end
 
-	if not string.match(message, '%p$') then
-		message = message .. '.'
+	if not string.match(output, '%p$') then
+		output = output .. '.'
 	end
 
-	sendMessage(msg.chat.id, message)
+	sendMessage(msg.chat.id, output)
 
 end
 

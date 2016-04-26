@@ -16,8 +16,8 @@ local triggers = {
 
 local action = function(msg)
 
-	local message = io.popen('fortune'):read('*all')
-	sendMessage(msg.chat.id, message)
+	local output = io.popen('fortune'):read('*all')
+	sendMessage(msg.chat.id, output)
 
 end
 
