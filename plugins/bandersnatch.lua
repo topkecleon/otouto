@@ -10,7 +10,7 @@ Alias: /bc
 ```]]
 
 function bandersnatch:init()
-	bandersnatch.triggers = utilities.triggers(self.info.username):trigger('bandersnatch'):trigger('bc').table
+	bandersnatch.triggers = utilities.triggers(self.info.username):t('bandersnatch'):t('bc').table
 end
 
 local fullnames = { "Wimbledon Tennismatch", "Rinkydink Curdlesnoot", "Butawhiteboy Cantbekhan", "Benadryl Claritin", "Bombadil Rivendell", "Wanda's Crotchfruit", "Biblical Concubine", "Syphilis Cankersore", "Buckminster Fullerene", "Bourgeoisie Capitalist" }

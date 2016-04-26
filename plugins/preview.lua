@@ -11,7 +11,7 @@ Returns a full-message, "unlinked" preview.
 ```]]
 
 function preview:init()
-	preview.triggers = utilities.triggers(self.info.username):t('preview').table
+	preview.triggers = utilities.triggers(self.info.username):t('preview', true).table
 end
 
 function preview:action(msg)

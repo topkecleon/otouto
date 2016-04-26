@@ -1002,7 +1002,7 @@ function administration.init_command(self_)
 					photo = drua.get_photo(msg.chat.id),
 					founded = os.time()
 				}
-				administration:update_desc(self, msg.chat.id)
+				administration.update_desc(self, msg.chat.id)
 				for i,_ in ipairs(administration.flags) do
 					self.database.administration.groups[msg.chat.id_str].flags[i] = false
 				end

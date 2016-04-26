@@ -38,7 +38,7 @@ function greetings:init()
 	end
 
 	greetings.triggers = {
-		self.info.first_name .. '%p*$'
+		self.info.first_name:lower() .. '%p*$'
 	}
 end
 
@@ -48,7 +48,7 @@ function greetings:action(msg)
 
 	for trigger,responses in pairs(self.config.greetings) do
 		for _,response in pairs(responses) do
-			if msg.text_lower:match(response..',? '..self.info.first_name) then
+			if msg.text_lower:match(response..',? '..self.info.first_name:lower()) then
 				bindings.sendMessage(self, msg.chat.id, utilities.latcyr(trigger:gsub('#NAME', nick)))
 				return
 			end
