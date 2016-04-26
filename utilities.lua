@@ -261,19 +261,14 @@ function utilities.markdown_escape(text)
 
 	text = text:gsub('_', '\\_')
 	text = text:gsub('%[', '\\[')
+	text = text:gsub('%]', '\\]')
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text
 
 end
 
-function utilities.md_escape(s)
-	s = s:gsub('_', '\\_')
-	s = s:gsub('%[', '\\[')
-	s = s:gsub('%*', '\\*')
-	s = s:gsub('`', '\\`')
-	return s
-end
+utilities.md_escape = utilities.markdown_escape
 
 utilities.INVOCATION_PATTERN = '/'
 

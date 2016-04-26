@@ -18,13 +18,10 @@ function about:action(msg)
 
 	local message = self.config.about_text .. '\nBased on @otouto v'..bot.version..' by topkecleon.'
 
-	if msg.new_chat_participant and msg.new_chat_participant.id == self.info.id then
-		bindings.sendMessage(self, msg.chat.id, message, true)
-		return
-	elseif msg.text_lower:match('^/about[@'..self.info.username..']*') then
-		bindings.sendMessage(self, msg.chat.id, message, true)
-		return
-	elseif msg.text_lower:match('^/start') then
+	if (msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
+		or msg.text_lower:match('^/about')
+		or msg.text_lower:match('^/about@'..self.info.username:lower())
+	or msg.text_lower:match('^/start') then
 		bindings.sendMessage(self, msg.chat.id, message, true)
 		return
 	end

@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.8.1
+	Version 1.8.2
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -22,6 +22,9 @@
 	stuff. Removed /kickme.
 
 	1.8.1 - /rule <i> will return that numbered rule, if it exists.
+
+	1.8.2 - Will now attempt to unban users kicked from supergroups. Other small
+	changes.
 
 ]]--
 
@@ -257,6 +260,9 @@ function administration.init_command(self_)
 					return true
 				end
 				drua.kick_user(msg.chat.id, msg.from.id)
+				if msg.chat.type == 'supergroup' then
+					bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+				end
 				local output = administration.flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
 				bindings.sendMessage(self, msg.from.id, output)
 			end
@@ -285,6 +291,9 @@ function administration.init_command(self_)
 					if group.flags[3] == true then
 						if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
 							drua.kick_user(msg.chat.id, msg.from.id)
+							if msg.chat.type == 'supergroup' then
+								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+							end
 							local output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 							bindings.sendMessage(self, msg.from.id, output)
 							return
@@ -323,6 +332,9 @@ function administration.init_command(self_)
 						end
 						if self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
 							drua.kick_user(msg.chat.id, msg.from.id)
+							if msg.chat.type == 'supergroup' then
+								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+							end
 							local output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
 							bindings.sendMessage(self, msg.from.id, output)
 							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
@@ -347,6 +359,9 @@ function administration.init_command(self_)
 					if group.flags[3] == true then
 						if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
 							drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
+							if msg.chat.type == 'supergroup' then
+								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+							end
 							local output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 							bindings.sendMessage(self, msg.new_chat_participant.id, output)
 							return
@@ -402,14 +417,15 @@ function administration.init_command(self_)
 						group.photo = nil
 					end
 					return
-
 				end
 
 				-- Last active time for group listing.
-				for i,v in pairs(self.database.administration.activity) do
-					if v == msg.chat.id_str then
-						table.remove(self.database.administration.activity, i)
-						table.insert(self.database.administration.activity, 1, msg.chat.id_str)
+				if msg.text:len() > 0 then
+					for i,v in pairs(self.database.administration.activity) do
+						if v == msg.chat.id_str then
+							table.remove(self.database.administration.activity, i)
+							table.insert(self.database.administration.activity, 1, msg.chat.id_str)
+						end
 					end
 				end
 
@@ -431,7 +447,7 @@ function administration.init_command(self_)
 					local group = self.database.administration.groups[v]
 					if not group.flags[1] then -- no unlisted groups
 						if group.link then
-							output = output ..  '• [' .. group.name .. '](' .. group.link .. ')\n'
+							output = output ..  '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
 						else
 							output = output ..  '• ' .. group.name .. '\n'
 						end
@@ -595,6 +611,9 @@ function administration.init_command(self_)
 					return
 				end
 				drua.kick_user(msg.chat.id, target.id)
+				if msg.chat.type == 'supergroup' then
+					bindings.unbanChatMember(self, msg.chat.id, target.id)
+				end
 				bindings.sendMessage(self, msg.chat.id, target.name .. ' has been kicked.')
 			end
 		},
@@ -1016,21 +1035,28 @@ function administration.init_command(self_)
 
 			command = 'gremove \\[chat]',
 			privilege = 5,
-			interior = true,
+			interior = false,
 
 			action = function(self, msg)
 				local input = utilities.input(msg.text) or msg.chat.id_str
+				local output
 				if self.database.administration.groups[input] then
+					local chat_name = self.administration.groups[input].name
 					self.database.administration.groups[input] = nil
 					for i,v in ipairs(self.database.administration.activity) do
 						if v == input then
 							table.remove(self.database.administration.activity, i)
 						end
 					end
-					bindings.sendReply(self, msg, 'I am no longer administrating that group.')
+					output = 'I am no longer administrating _' .. utilities.md_escape(chat_name) .. '_.'
 				else
-					bindings.sendReply(self, msg, 'I do not administrate that group.')
+					if input == msg.chat.id_str then
+						output = 'I do not administrate this group.'
+					else
+						output = 'I do not administrate that group.'
+					end
 				end
+				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
