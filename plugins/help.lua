@@ -9,19 +9,23 @@ local utilities = require('utilities')
 local help_text
 
 function help:init()
-	help_text =  '*Available commands:*'
+
+	local commandlist = {}
+	help_text = '*Available commands:*\n• /'
 
 	for _,plugin in ipairs(self.plugins) do
 		if plugin.command then
-			help_text = help_text .. '\n• /' .. plugin.command:gsub('%[', '\\[')
+			table.insert(commandlist, plugin.command)
+			--help_text = help_text .. '\n• /' .. plugin.command:gsub('%[', '\\[')
 		end
 	end
 
-	help_text = help_text .. [[
+	table.insert(commandlist, 'help [command]')
+	table.sort(commandlist)
 
-• /help <command>
-Arguments: <required> \[optional]
-]]
+	help_text = help_text .. table.concat(commandlist, '\n• /') .. '\nArguments: <required> [optional]'
+
+	help_text = help_text:gsub('%[', '\\[')
 
 	help.triggers = utilities.triggers(self.info.username):t('help', true):t('h', true).table
 

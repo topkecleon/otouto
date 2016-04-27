@@ -594,6 +594,25 @@ function administration.init_command(self_)
 			end
 		},
 
+		{ -- kickme
+			triggers = utilities.triggers(self_.info.username):t('leave'):t('kickme').table,
+
+			command = 'kickme',
+			privilege = 1,
+			interior = true,
+
+			action = function(self, msg)
+				if administration.get_rank(self, msg.from.id) == 5 then
+					bindings.sendReply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
+					return
+				end
+				drua.kick_user(msg.chat.id, msg.from.id)
+				if msg.chat.type == 'supergroup' then
+					bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+				end
+			end
+		},
+
 		{ -- kick
 			triggers = utilities.triggers(self_.info.username):t('kick', true).table,
 
@@ -637,6 +656,9 @@ function administration.init_command(self_)
 				end
 				if group.bans[target.id_str] then
 					group.bans[target.id_str] = nil
+					if msg.chat.type == 'supergroup' then
+						bindings.unbanChatMember(self, msg.chat.id, target.id)
+					end
 					bindings.sendReply(self, msg, target.name .. ' has been unbanned.')
 				else
 					group.bans[target.id_str] = true
