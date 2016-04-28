@@ -28,7 +28,7 @@ local action = function(msg)
 		return
 	end
 
-	output = '*Result:* `' .. output .. '`'
+	output = '`' .. output .. '`'
 
 	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 

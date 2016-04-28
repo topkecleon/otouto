@@ -39,7 +39,7 @@ local action = function(msg)
 		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
 	end
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	sendReply(msg, output)
 
 end
 

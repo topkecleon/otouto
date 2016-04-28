@@ -15,13 +15,14 @@ local action = function(msg)
 	if not input then
 		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 	else
+		input = markdown_escape(input)
 		local output
 		if msg.chat.type == 'supergroup' then
-			output = 'Echo:\n"' .. markdown_escape(input) .. '"'
+			output = '*Echo:*\n"' .. input .. '"'
 		else
 			output = latcyr(input)
 		end
-		sendMessage(msg.chat.id, output, true)
+		sendMessage(msg.chat.id, output, true, nil, true)
 	end
 
 

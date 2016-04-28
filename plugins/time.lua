@@ -43,7 +43,7 @@ local action = function(msg)
 	end
 	local output = '`' .. os.date('%I:%M %p\n', timestamp) .. os.date('%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')' .. '`'
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

@@ -25,6 +25,8 @@ local action = function(msg)
 		output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
 	end
 
+	output = '_' .. output .. '_'
+
 	sendMessage(msg.chat.id, output, true, nil, true)
 
 end

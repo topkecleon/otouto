@@ -36,7 +36,7 @@ local action = function(msg)
 	end
 
 	local output = jdat.text[1]
-	output = '*Translation:*\n"' .. output .. '"'
+	output = '*Translation:*\n"' .. markdown_escape(output) .. '"'
 
 	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 

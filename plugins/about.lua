@@ -8,7 +8,7 @@ local triggers = {
 local action = function(msg)
 
 	-- Filthy hack, but here is where we'll stop forwarded messages from hitting
-	-- Other plugins.
+	-- other plugins.
 	if msg.forward_from then return end
 
 	local output = config.about_text .. '\nBased on @otouto v'..version..' by topkecleon.'

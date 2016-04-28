@@ -35,10 +35,10 @@ local action = function(msg)
 		return
 	end
 
-	local output = '[' .. jdat.Title .. '](http://imdb.com/title/'
-	output = output .. jdat.imdbID .. ') ('.. jdat.Year ..')\n'
+	local output = '*' .. jdat.Title .. ' ('.. jdat.Year ..')*\n'
 	output = output .. jdat.imdbRating ..'/10 | '.. jdat.Runtime ..' | '.. jdat.Genre ..'\n'
-	output = output .. '`' .. jdat.Plot .. '`'
+	output = output .. '_' .. jdat.Plot .. '_\n'
+	output = output .. '[Read more.](http://imdb.com/title/' .. jdat.imdbID .. ')'
 
 	sendMessage(msg.chat.id, output, true, nil, true)
 

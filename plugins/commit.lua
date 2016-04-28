@@ -418,7 +418,7 @@ local commits = {
 
 local action = function(msg)
 
-	local output = '*Commit:* '..commits[math.random(#commits)]
+	local output = '`'..commits[math.random(#commits)]..'`'
 	sendMessage(msg.chat.id, output, true, nil, true)
 
 end

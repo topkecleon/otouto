@@ -6,7 +6,8 @@ local triggers = {
 }
 
 local action = function(msg)
-	sendMessage(msg.chat.id, msg.text_lower:match('^/ping') and '*Pong!*' or '*Annyong.*', true, nil, true)
+	local output = msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.'
+	sendMessage(msg.chat.id, output)
 end
 
 return {

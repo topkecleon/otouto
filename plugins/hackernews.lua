@@ -11,6 +11,8 @@ local triggers = {
 
 local action = function(msg)
 
+	sendChatAction(msg.chat.id, 'typing')
+
 	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
 	if res ~= 200 then
 		sendReply(msg, config.errors.connection)
