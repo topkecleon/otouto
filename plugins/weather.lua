@@ -48,9 +48,9 @@ local action = function(msg)
 
 	local celsius = string.format('%.2f', jdat.main.temp - 273.15)
 	local fahrenheit = string.format('%.2f', celsius * (9/5) + 32)
-	local message = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.'
+	local output = celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.'
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

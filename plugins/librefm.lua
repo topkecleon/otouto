@@ -28,10 +28,10 @@ local action = function(msg)
 		if not input then
 			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
 		elseif input == '-' then
-			database.lastfm[msg.from.id_str] = nil
+			database.librefm[msg.from.id_str] = nil
 			sendReply(msg, 'Your libre.fm username has been forgotten.')
 		else
-			database.lastfm[msg.from.id_str] = input
+			database.librefm[msg.from.id_str] = input
 			sendReply(msg, 'Your libre.fm username has been set to "' .. input .. '".')
 		end
 		return
@@ -40,15 +40,15 @@ local action = function(msg)
 	local url = 'http://alpha.libre.fm/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=0&user='
 
 	local username
-	local output = ''
+	local alert = ''
 	if input then
 		username = input
-	elseif database.lastfm[msg.from.id_str] then
-		username = database.lastfm[msg.from.id_str]
+	elseif database.librefm[msg.from.id_str] then
+		username = database.librefm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
-		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
-		database.lastfm[msg.from.id_str] = username
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
+		database.librefm[msg.from.id_str] = username
 	else
 		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
@@ -70,17 +70,17 @@ local action = function(msg)
 
 	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.' .. output)
+		sendReply(msg, 'No history for this user.' .. alert)
 		return
 	end
 
-	local message = input or msg.from.first_name
-	message = '🎵  ' .. message
+	local output = input or msg.from.first_name
+	output = '🎵  ' .. output
 
 	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = message .. ' is currently listening to:\n'
+		output = output .. ' is currently listening to:\n'
 	else
-		message = message .. ' last listened to:\n'
+		output = output .. ' last listened to:\n'
 	end
 
 	local title = jdat.name or 'Unknown'
@@ -89,8 +89,8 @@ local action = function(msg)
 		artist = jdat.artist['#text']
 	end
 
-	message = message .. title .. ' - ' .. artist .. output
-	sendMessage(msg.chat.id, message)
+	output = output .. title .. ' - ' .. artist .. alert
+	sendMessage(msg.chat.id, output)
 
 end
 

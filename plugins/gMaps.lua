@@ -13,6 +13,8 @@ local triggers = {
 
 local action = function(msg)
 
+	sendChatAction(msg.chat.id, "find_location")
+
 	local input = msg.text:input()
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then

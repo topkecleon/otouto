@@ -71,8 +71,8 @@ local cron = function()
 			-- If the reminder is past-due, send it and nullify it.
 			-- Otherwise, add it to the replacement table.
 			if time > reminder.time then
-				local output = 'Reminder:\n"' .. reminder.message .. '"'
-				local res = sendMessage(chat_id, output, true)
+				local output = '*Reminder:*\n"' .. markdown_escape(reminder.message) .. '"'
+				local res = sendMessage(chat_id, output, true, nil, true)
 				-- If the message fails to send, save it for later.
 				if res then
 					reminder = nil

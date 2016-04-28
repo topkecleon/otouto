@@ -12,8 +12,8 @@ local action = function(msg)
 	local m1, m2 = msg.text:match('^/?s/(.-)/(.-)/?$')
 	if not m2 then return true end
 	output = output:gsub(m1, m2)
-	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
-	sendReply(msg.reply_to_message, output)
+	output = '*Did you mean:*\n"' .. output:sub(1, 4000) .. '"'
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

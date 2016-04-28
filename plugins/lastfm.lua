@@ -45,14 +45,14 @@ local action = function(msg)
 	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
 	local username
-	local output = ''
+	local alert = ''
 	if input then
 		username = input
 	elseif database.users[msg.from.id_str].lastfm then
 		username = database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
-		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
 		database.users[msg.from.id_str].lastfm = username
 	else
 		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
@@ -75,17 +75,17 @@ local action = function(msg)
 
 	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.' .. output)
+		sendReply(msg, 'No history for this user.' .. alert)
 		return
 	end
 
-	local message = input or msg.from.first_name
-	message = '🎵  ' .. message
+	local output = input or msg.from.first_name
+	output = '🎵  ' .. output
 
 	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = message .. ' is currently listening to:\n'
+		output = output .. ' is currently listening to:\n'
 	else
-		message = message .. ' last listened to:\n'
+		output = output .. ' last listened to:\n'
 	end
 
 	local title = jdat.name or 'Unknown'
@@ -94,8 +94,8 @@ local action = function(msg)
 		artist = jdat.artist['#text']
 	end
 
-	message = message .. title .. ' - ' .. artist .. output
-	sendMessage(msg.chat.id, message)
+	output = output .. title .. ' - ' .. artist .. alert
+	sendMessage(msg.chat.id, output)
 
 end
 

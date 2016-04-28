@@ -45,9 +45,8 @@ local action = function(msg)
 
 	end
 
-	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n\n'
-	output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance'
-	output = '`' .. output .. '`'
+	local output = '*' .. amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '*\n\n'
+	output = output .. '`' .. os.date('!%F %T UTC') .. '\nSource: Google Finance`'
 
 	sendMessage(msg.chat.id, output, true, nil, true)
 

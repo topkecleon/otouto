@@ -27,22 +27,22 @@ local action = function(msg)
 
 	local url = 'http://api.biblia.com/v1/bible/content/ASV.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
 
-	local message, res = HTTP.request(url)
+	local output, res = HTTP.request(url)
 
-	if not message or res ~= 200 or message:len() == 0 then
+	if not output or res ~= 200 or output:len() == 0 then
 		url = 'http://api.biblia.com/v1/bible/content/KJVAPOC.txt?key=' .. config.biblia_api_key .. '&passage=' .. URL.escape(input)
-		message, res = HTTP.request(url)
+		output, res = HTTP.request(url)
 	end
 
-	if not message or res ~= 200  or message:len() == 0 then
-		message = config.errors.results
+	if not output or res ~= 200  or output:len() == 0 then
+		output = config.errors.results
 	end
 
-	if message:len() > 4000 then
-		message = 'The text is too long to post here. Try being more specific.'
+	if output:len() > 4000 then
+		output = 'The text is too long to post here. Try being more specific.'
 	end
 
-	sendReply(msg, message)
+	sendMessage(msg.chat.id, output, true, msg.message_id, true)
 
 end
 
