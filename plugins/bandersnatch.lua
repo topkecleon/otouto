@@ -29,7 +29,7 @@ function bandersnatch:action(msg)
 		output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
 	end
 
-	bindings.sendReply(self, msg, output)
+	bindings.sendReply(self, msg, '_'..output..'_', true)
 
 end
 

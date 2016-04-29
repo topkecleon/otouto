@@ -67,9 +67,9 @@ function bindings:sendMessage(chat_id, text, disable_web_page_preview, reply_to_
 
 end
 
-function bindings:sendReply(msg, text)
+function bindings:sendReply(msg, text, use_markdown, disable_notification)
 
-	return bindings.sendMessage(self, msg.chat.id, text, true, msg.message_id)
+	return bindings.sendMessage(self, msg.chat.id, text, true, msg.message_id, use_markdown, disable_notification)
 
 end
 

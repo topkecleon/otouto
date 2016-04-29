@@ -17,7 +17,7 @@ end
 
 function remind:action(msg)
 	-- Ensure there are arguments. If not, send doc.
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		bindings.sendMessage(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
@@ -36,7 +36,7 @@ function remind:action(msg)
 		duration = 526000
 	end
 	-- Ensure there is a second arg.
-	local message = input:input()
+	local message = utilities.input(input)
 	if not message then
 		bindings.sendMessage(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
