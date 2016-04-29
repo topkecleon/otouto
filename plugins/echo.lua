@@ -22,9 +22,9 @@ function echo:action(msg)
 	else
 		local output
 		if msg.chat.type == 'supergroup' then
-			output = 'Echo:\n"' .. input .. '"'
+			output = '*Echo:*\n"' .. utilities.md_escape(input) .. '"'
 		else
-			output = utilities.latcyr(input)
+			output = utilities.md_escape(utilities.latcyr(input))
 		end
 		bindings.sendMessage(self, msg.chat.id, output, true)
 	end

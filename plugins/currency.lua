@@ -52,8 +52,7 @@ function currency:action(msg)
 	end
 
 	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n\n'
-	output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance'
-	output = '`' .. output .. '`'
+	output = output .. '`' .. os.date('!%F %T UTC') .. '\nSource: Google Finance`'
 
 	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 

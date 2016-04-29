@@ -43,15 +43,15 @@ local yesno_answers = {
 
 function eightball:action(msg)
 
-	local message
+	local output
 
 	if msg.text_lower:match('y/n%p?$') then
-		message = yesno_answers[math.random(#yesno_answers)]
+		output = yesno_answers[math.random(#yesno_answers)]
 	else
-		message = ball_answers[math.random(#ball_answers)]
+		output = ball_answers[math.random(#ball_answers)]
 	end
 
-	bindings.sendReply(self, msg, message)
+	bindings.sendReply(self, msg, output)
 
 end
 

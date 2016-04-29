@@ -423,7 +423,8 @@ local commits = {
 
 function commit:action(msg)
 
-	bindings.sendMessage(self, msg.chat.id, '`'..commits[math.random(#commits)]..'`', true, nil, true)
+	local output = '`'..commits[math.random(#commits)]..'`'
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 

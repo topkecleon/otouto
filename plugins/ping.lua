@@ -10,7 +10,8 @@ function ping:init()
 end
 
 function ping:action(msg)
-	bindings.sendMessage(self, msg.chat.id, msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.')
+	local output = msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.'
+	bindings.sendMessage(self, msg.chat.id, output)
 end
 
 return ping

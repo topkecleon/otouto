@@ -21,8 +21,10 @@ fortune.doc = '`Returns a UNIX fortune.`'
 
 function fortune:action(msg)
 
-	local message = io.popen('fortune'):read('*all')
-	bindings.sendMessage(self, msg.chat.id, message)
+	local fortunef = io.popen('fortune')
+	local output = fortunef:read('*all')
+	bindings.sendMessage(self, msg.chat.id, output)
+	fortunef:close()
 
 end
 

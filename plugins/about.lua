@@ -16,13 +16,13 @@ function about:action(msg)
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local message = self.config.about_text .. '\nBased on @otouto v'..bot.version..' by topkecleon.'
+	local output = self.config.about_text .. '\nBased on @otouto v'..bot.version..' by topkecleon.'
 
 	if (msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
 		or msg.text_lower:match('^/about')
 		or msg.text_lower:match('^/about@'..self.info.username:lower())
 	or msg.text_lower:match('^/start') then
-		bindings.sendMessage(self, msg.chat.id, message, true)
+		bindings.sendMessage(self, msg.chat.id, output, true)
 		return
 	end
 

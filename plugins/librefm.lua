@@ -34,10 +34,10 @@ function librefm:action(msg)
 		if not input then
 			bindings.sendMessage(self, msg.chat.id, librefm.doc, true, msg.message_id, true)
 		elseif input == '-' then
-			self.database.lastfm[msg.from.id_str] = nil
+			self.database.librefm[msg.from.id_str] = nil
 			bindings.sendReply(self, msg, 'Your libre.fm username has been forgotten.')
 		else
-			self.database.lastfm[msg.from.id_str] = input
+			self.database.librefm[msg.from.id_str] = input
 			bindings.sendReply(self, msg, 'Your libre.fm username has been set to "' .. input .. '".')
 		end
 		return
@@ -46,15 +46,15 @@ function librefm:action(msg)
 	local url = 'http://alpha.libre.fm/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=0&user='
 
 	local username
-	local output = ''
+	local alert = ''
 	if input then
 		username = input
-	elseif self.database.lastfm[msg.from.id_str] then
-		username = self.database.lastfm[msg.from.id_str]
+	elseif self.database.librefm[msg.from.id_str] then
+		username = self.database.librefm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
-		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
-		self.database.lastfm[msg.from.id_str] = username
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
+		self.database.librefm[msg.from.id_str] = username
 	else
 		bindings.sendReply(self, msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
@@ -76,17 +76,17 @@ function librefm:action(msg)
 
 	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		bindings.sendReply(self, msg, 'No history for this user.' .. output)
+		bindings.sendReply(self, msg, 'No history for this user.' .. alert)
 		return
 	end
 
-	local message = input or msg.from.first_name
-	message = '🎵  ' .. message
+	local output = input or msg.from.first_name
+	output = '🎵  ' .. output
 
 	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = message .. ' is currently listening to:\n'
+		output = output .. ' is currently listening to:\n'
 	else
-		message = message .. ' last listened to:\n'
+		output = output .. ' last listened to:\n'
 	end
 
 	local title = jdat.name or 'Unknown'
@@ -95,8 +95,8 @@ function librefm:action(msg)
 		artist = jdat.artist['#text']
 	end
 
-	message = message .. title .. ' - ' .. artist .. output
-	bindings.sendMessage(self, msg.chat.id, message)
+	output = output .. title .. ' - ' .. artist .. alert
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 

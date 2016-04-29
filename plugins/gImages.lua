@@ -69,7 +69,7 @@ function gImages:action(msg)
 
 
 	if msg.text:match('nsfw') then
-		bindings.sendReply(self, msg, output)
+		bindings.sendReply(self, '*NSFW*\n'..msg, output)
 	else
 		bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
 	end

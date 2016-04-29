@@ -43,7 +43,7 @@ function translate:action(msg)
 	end
 
 	local output = jdat.text[1]
-	output = 'Translation:\n"' .. output .. '"'
+	output = '*Translation:*\n"' .. utilities.md_escape(output) .. '"'
 
 	bindings.sendReply(self, msg.reply_to_message or msg, output)
 

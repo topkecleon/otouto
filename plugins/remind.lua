@@ -76,8 +76,8 @@ function remind:cron()
 			-- If the reminder is past-due, send it and nullify it.
 			-- Otherwise, add it to the replacement table.
 			if time > reminder.time then
-				local output = 'Reminder:\n"' .. reminder.message .. '"'
-				local res = bindings.sendMessage(self, chat_id, output, true)
+				local output = '*Reminder:*\n"' .. utilities.md_escape(reminder.message) .. '"'
+				local res = bindings.sendMessage(self, chat_id, output, true, nil, true)
 				-- If the message fails to send, save it for later.
 				if not res then
 					table.insert(new_group, reminder)

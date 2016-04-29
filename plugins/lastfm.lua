@@ -48,14 +48,14 @@ function lastfm:action(msg)
 	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. self.config.lastfm_api_key .. '&user='
 
 	local username
-	local output = ''
+	local alert = ''
 	if input then
 		username = input
 	elseif self.database.users[msg.from.id_str].lastfm then
 		username = self.database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
-		output = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
 		self.database.users[msg.from.id_str].lastfm = username
 	else
 		bindings.sendReply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
@@ -82,17 +82,17 @@ function lastfm:action(msg)
 
 	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		bindings.sendReply(self, msg, 'No history for this user.' .. output)
+		bindings.sendReply(self, msg, 'No history for this user.' .. alert)
 		return
 	end
 
-	local message = input or msg.from.first_name
-	message = '🎵  ' .. message
+	local output = input or msg.from.first_name
+	output = '🎵  ' .. output
 
 	if jdat['@attr'] and jdat['@attr'].nowplaying then
-		message = message .. ' is currently listening to:\n'
+		output = output .. ' is currently listening to:\n'
 	else
-		message = message .. ' last listened to:\n'
+		output = output .. ' last listened to:\n'
 	end
 
 	local title = jdat.name or 'Unknown'
@@ -101,8 +101,8 @@ function lastfm:action(msg)
 		artist = jdat.artist['#text']
 	end
 
-	message = message .. title .. ' - ' .. artist .. output
-	bindings.sendMessage(self, msg.chat.id, message)
+	output = output .. title .. ' - ' .. artist .. alert
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 

@@ -63,10 +63,10 @@ function chatter:action(msg)
 		bindings.sendMessage(self, msg.chat.id, self.config.errors.chatter_response)
 		return
 	end
-	local message = jdat.response
+	local output = jdat.response
 
-	if message:match('^I HAVE NO RESPONSE.') then
-		message = self.config.errors.chatter_response
+	if output:match('^I HAVE NO RESPONSE.') then
+		output = self.config.errors.chatter_response
 	end
 
 	-- Let's clean up the response a little. Capitalization & punctuation.
@@ -78,14 +78,14 @@ function chatter:action(msg)
 	}
 
 	for k,v in pairs(filter) do
-		message = string.gsub(message, k, v)
+		output = string.gsub(output, k, v)
 	end
 
-	if not string.match(message, '%p$') then
-		message = message .. '.'
+	if not string.match(output, '%p$') then
+		output = output .. '.'
 	end
 
-	bindings.sendMessage(self, msg.chat.id, message)
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 

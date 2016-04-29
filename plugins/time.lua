@@ -53,9 +53,9 @@ function time:action(msg)
 	else
 		utcoff = utilities.pretty_float(utcoff)
 	end
-	local message = os.date('!%I:%M %p\n', timestamp) .. os.date('!%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
+	local output = '`' .. os.date('!%I:%M %p\n', timestamp) .. os.date('!%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')``'
 
-	bindings.sendReply(self, msg, message)
+	bindings.sendReply(self, msg, output)
 
 end
 
