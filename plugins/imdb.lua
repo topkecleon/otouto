@@ -46,7 +46,7 @@ function imdb:action(msg)
 	local output = '*' .. jdat.Title .. ' ('.. jdat.Year ..')*\n'
 	output = output .. jdat.imdbRating ..'/10 | '.. jdat.Runtime ..' | '.. jdat.Genre ..'\n'
 	output = output .. '_' .. jdat.Plot .. '_\n'
-	output = output .. '[*Read more*](http://imdb.com/title/' .. jdat.imdbID .. ')'
+	output = output .. '[Read more.](http://imdb.com/title/' .. jdat.imdbID .. ')'
 
 	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 

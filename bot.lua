@@ -1,11 +1,15 @@
 local bot = {}
 
-local bindings = require('bindings') -- Load Telegram bindings.
-local utilities = require('utilities') -- Load miscellaneous and cross-plugin functions.
+-- Requires are moved to init to allow for reloads.
+local bindings -- Load Telegram bindings.
+local utilities -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.6'
+bot.version = '3.7'
 
 function bot:init() -- The function run when the bot is started or reloaded.
+
+	bindings = require('bindings')
+	utilities = require('utilities')
 
 	self.config = require('config') -- Load configuration file.
 

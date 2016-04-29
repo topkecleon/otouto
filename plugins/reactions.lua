@@ -24,17 +24,17 @@ local help
 
 function reactions:init()
 	-- Generate a "help" message triggered by "/reactions".
-	local help = 'Reactions:\n'
+	help = 'Reactions:\n'
 	reactions.triggers = utilities.triggers(self.info.username):t('reactions').table
 	for trigger,reaction in pairs(mapping) do
-		help = help .. '• ' .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
+		help = help .. '• ' .. utilities.INVOCATION_PATTERN..trigger .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
 		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger)
-		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.username:lower())
+		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.info.username:lower())
 	end
 end
 
 function reactions:action(msg)
-	if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..'help') then
+	if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..'reactions') then
 		bindings.sendMessage(self, msg.chat.id, help)
 		return
 	end

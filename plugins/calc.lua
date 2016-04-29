@@ -22,7 +22,7 @@ function calc:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(msg.chat.id, calc.doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, calc.doc, true, msg.message_id, true)
 			return
 		end
 	end

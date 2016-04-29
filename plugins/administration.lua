@@ -1063,7 +1063,7 @@ function administration.init_command(self_)
 				local input = utilities.input(msg.text) or msg.chat.id_str
 				local output
 				if self.database.administration.groups[input] then
-					local chat_name = self.administration.groups[input].name
+					local chat_name = self.database.administration.groups[input].name
 					self.database.administration.groups[input] = nil
 					for i,v in ipairs(self.database.administration.activity) do
 						if v == input then
