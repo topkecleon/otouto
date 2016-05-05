@@ -75,7 +75,7 @@ local action = function(msg)
 		output = output .. '.'
 	end
 
-	sendMessage(msg.chat.id, output)
+	sendMessage(msg.chat.id, output, true,msg.message_id,false) --Reply to writing
 
 end
 
