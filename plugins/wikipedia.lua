@@ -1,25 +1,30 @@
-local command = 'wikipedia <query>'
-local doc = [[```
+local wikipedia = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+wikipedia.command = 'wikipedia <query>'
+wikipedia.doc = [[```
 /wikipedia <query>
 Returns an article from Wikipedia.
 Aliases: /w, /wiki
 ```]]
 
-local triggers = {
-	'^/wikipedia[@'..bot.username..']*',
-	'^/wiki[@'..bot.username..']*',
-	'^/w[@'..bot.username..']*$',
-	'^/w[@'..bot.username..']* '
-}
+function wikipedia:init()
+	wikipedia.triggers = utilities.triggers(self.info.username):t('wikipedia', true):t('wiki', true):t('w', true).table
+end
 
-local action = function(msg)
+function wikipedia:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -29,17 +34,17 @@ local action = function(msg)
 
 	local jstr, res = HTTPS.request(gurl .. URL.escape(input))
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.responseData then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 	if not jdat.responseData.results[1] then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -49,18 +54,18 @@ local action = function(msg)
 	-- 'https://en.wikipedia.org/wiki/':len() == 30
 	jstr, res = HTTPS.request(wurl .. url:sub(31))
 	if res ~= 200 then
-		sendReply(msg, config.error.connection)
+		bindings.sendReply(self, msg, self.config.error.connection)
 		return
 	end
 
+	local _
 	local text = JSON.decode(jstr).query.pages
-	for k,v in pairs(text) do
-		text = v.extract
-		break -- Seriously, there's probably a way more elegant solution.
-	end
+	_, text = next(text)
 	if not text then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
+	else
+		text = text.extract
 	end
 
 	text = text:gsub('</?.->', '')
@@ -78,13 +83,8 @@ local action = function(msg)
 		output = output .. '[Read more.](' .. url .. ')'
 	end
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return wikipedia

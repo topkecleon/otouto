@@ -1,5 +1,13 @@
-local command = 'apod [date]'
-local doc = [[```
+local apod = {}
+
+local HTTPS = require('ssl.https')
+local JSON = require('dkjson')
+local URL = require('socket.url')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+apod.command = 'apod [date]'
+apod.doc = [[```
 /apod [query]
 Returns the Astronomy Picture of the Day.
 If the query is a date, in the format YYYY-MM-DD, the APOD of that day is returned.
@@ -10,31 +18,29 @@ Returns the explanation of the APOD.
 Source: nasa.gov
 ```]]
 
-local triggers = {
-	'^/apod[@'..bot.username..']*',
-	'^/apodhd[@'..bot.username..']*',
-	'^/apodtext[@'..bot.username..']*'
-}
+function apod:init()
+	apod.triggers = utilities.triggers(self.info.username)
+		:t('apod', true):t('apodhd', true):t('apodtext', true).table
+end
 
-local action = function(msg)
+function apod:action(msg)
 
-	if not config.nasa_api_key then
-		config.nasa_api_key = 'DEMO_KEY'
+	if not self.config.nasa_api_key then
+		self.config.nasa_api_key = 'DEMO_KEY'
 	end
 
-	local input = msg.text:input()
-	local caption = ''
+	local input = utilities.input(msg.text)
 	local date = '*'
 	local disable_page_preview = false
 
-	local url = 'https://api.nasa.gov/planetary/apod?api_key=' .. config.nasa_api_key
+	local url = 'https://api.nasa.gov/planetary/apod?api_key=' .. self.config.nasa_api_key
 
 	if input then
 		if input:match('(%d+)%-(%d+)%-(%d+)$') then
 			url = url .. '&date=' .. URL.escape(input)
 			date = date .. input
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, apod.doc, true, msg.message_id, true)
 			return
 		end
 	else
@@ -45,14 +51,14 @@ local action = function(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.error then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(msg, self.config.errors.results)
 		return
 	end
 
@@ -62,7 +68,7 @@ local action = function(msg)
 		img_url = jdat.hdurl or jdat.url
 	end
 
-	output = date .. '[' .. jdat.title  .. '](' .. img_url .. ')'
+	local output = date .. '[' .. jdat.title  .. '](' .. img_url .. ')'
 
 	if string.match(msg.text, '^/apodtext*') then
 		output = output .. '\n' .. jdat.explanation
@@ -73,13 +79,8 @@ local action = function(msg)
 		output = output .. '\nCopyright: ' .. jdat.copyright
 	end
 
-	sendMessage(msg.chat.id, output, disable_page_preview, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, disable_page_preview, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return apod

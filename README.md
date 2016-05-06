@@ -17,7 +17,7 @@ otouto is an independently-developed Telegram API bot written in Lua. Originally
 | [Contributors](#contributors)                         |
 
 ## Setup
-You _must_ have Lua (5.2+), lua-socket, lua-sec, and lua-cjson installed. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
+You _must_ have Lua (5.2+), lua-socket, lua-sec, and dkjson installed. It is recommended you install these with LuaRocks. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
 Clone the repository and set the following values in `config.lua`:
 
@@ -26,7 +26,6 @@ Clone the repository and set the following values in `config.lua`:
 
 Optionally:
 
- - `time_offset` as the difference, in seconds, of your system clock to UTC.
  - `lang` as the two-letter code representing your language.
 
 Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` array.

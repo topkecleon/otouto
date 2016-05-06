@@ -1,18 +1,23 @@
-local command = 'whoami'
-local doc = [[```
+local whoami = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+whoami.command = 'whoami'
+whoami.doc = [[```
 Returns user and chat info for you or the replied-to message.
 Alias: /who
 ```]]
 
-local triggers = {
-	'^/who[ami]*[@'..bot.username..']*$'
-}
+function whoami:init()
+	whoami.triggers = utilities.triggers(self.info.username):t('who', true):t('whoami').table
+end
 
-local action = function(msg)
+function whoami:action(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
-		msg.from.name = build_name(msg.from.first_name, msg.from.last_name)
+		msg.from.name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 	end
 
 	local chat_id = math.abs(msg.chat.id)
@@ -22,7 +27,7 @@ local action = function(msg)
 
 	local user = 'You are @%s, also known as *%s* `[%s]`'
 	if msg.from.username then
-		user = user:format(markdown_escape(msg.from.username), msg.from.name, msg.from.id)
+		user = user:format(utilities.markdown_escape(msg.from.username), msg.from.name, msg.from.id)
 	else
 		user = 'You are *%s* `[%s]`,'
 		user = user:format(msg.from.name, msg.from.id)
@@ -30,9 +35,9 @@ local action = function(msg)
 
 	local group = '@%s, also known as *%s* `[%s]`.'
 	if msg.chat.type == 'private' then
-		group = group:format(markdown_escape(bot.username), bot.first_name, bot.id)
+		group = group:format(utilities.markdown_escape(self.info.username), self.info.first_name, self.info.id)
 	elseif msg.chat.username then
-		group = group:format(markdown_escape(msg.chat.username), msg.chat.title, chat_id)
+		group = group:format(utilities.markdown_escape(msg.chat.username), msg.chat.title, chat_id)
 	else
 		group = '*%s* `[%s]`.'
 		group = group:format(msg.chat.title, chat_id)
@@ -40,13 +45,8 @@ local action = function(msg)
 
 	local output = user .. ', and you are messaging ' .. group
 
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return whoami

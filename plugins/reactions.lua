@@ -3,38 +3,47 @@
  -- You must never restructure. You must never disable this plugin.
  -- ~ Drew, creator, a year later.
 
-local command = 'reactions'
-local doc = '`Returns a list of "reaction" emoticon commands.`'
+local reactions = {}
 
-local triggers = {
-	['¯\\_(ツ)_/¯'] = '/shrug',
-	['( ͡° ͜ʖ ͡°)'] = '/lenny',
-	['(╯°□°）╯︵ ┻━┻'] = '/flip',
-	['┌（┌　＾o＾）┐'] = '/homo',
-	['ಠ_ಠ'] = '/look',
-	['SHOTS FIRED'] = '/shots?'
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+reactions.command = 'reactions'
+reactions.doc = '`Returns a list of "reaction" emoticon commands.`'
+
+local mapping = {
+	['shrug'] = '¯\\_(ツ)_/¯',
+	['lenny'] = '( ͡° ͜ʖ ͡°)',
+	['flip'] = '(╯°□°）╯︵ ┻━┻',
+	['homo'] = '┌（┌　＾o＾）┐',
+	['look'] = 'ಠ_ಠ',
+	['shots?'] = 'SHOTS FIRED'
 }
 
- -- Generate a "help" message triggered by "/reactions".
-local help = 'Reactions:\n'
-for k,v in pairs(triggers) do
-	help = help .. '• ' .. v:gsub('%a%?', '') .. ': ' .. k .. '\n'
-	v = v .. '[@'..bot.username..']*'
-end
-triggers[help] = '^/reactions$'
+local help
 
-local action = function(msg)
-	for k,v in pairs(triggers) do
-		if string.match(msg.text_lower, v) then
-			sendMessage(msg.chat.id, k)
+function reactions:init()
+	-- Generate a "help" message triggered by "/reactions".
+	help = 'Reactions:\n'
+	reactions.triggers = utilities.triggers(self.info.username):t('reactions').table
+	for trigger,reaction in pairs(mapping) do
+		help = help .. '• ' .. utilities.INVOCATION_PATTERN..trigger .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
+		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger)
+		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.info.username:lower())
+	end
+end
+
+function reactions:action(msg)
+	if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..'reactions') then
+		bindings.sendMessage(self, msg.chat.id, help)
+		return
+	end
+	for trigger,reaction in pairs(mapping) do
+		if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..trigger) then
+			bindings.sendMessage(self, msg.chat.id, reaction)
 			return
 		end
 	end
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return reactions

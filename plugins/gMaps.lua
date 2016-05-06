@@ -1,41 +1,39 @@
-local command = 'location <query>'
-local doc = [[```
+local gMaps = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+gMaps.command = 'location <query>'
+gMaps.doc = [[```
 /location <query>
 Returns a location from Google Maps.
 Alias: /loc
 ```]]
 
-local triggers = {
-	'^/location[@'..bot.username..']*',
-	'^/loc[@'..bot.username..']* ',
-	'^/loc[@'..bot.username..']*$'
-}
+function gMaps:init()
+	gMaps.triggers = utilities.triggers(self.info.username):t('location', true):t('loc', true).table
+end
 
-local action = function(msg)
+function gMaps:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, gMaps.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
-	local coords = get_coords(input)
+	local coords = utilities.get_coords(self, input)
 	if type(coords) == 'string' then
-		sendReply(msg, coords)
+		bindings.sendReply(self, msg, coords)
 		return
 	end
 
-	sendLocation(msg.chat.id, coords.lat, coords.lon, msg.message_id)
+	bindings.sendLocation(self, msg.chat.id, coords.lat, coords.lon, msg.message_id)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return gMaps

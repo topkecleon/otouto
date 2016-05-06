@@ -1,20 +1,25 @@
-local triggers = {
-	'^/lua[@'..bot.username..']*'
-}
+local luarun = {}
 
-local action = function(msg)
+local bindings = require('bindings')
+local utilities = require('utilities')
 
-	if msg.from.id ~= config.admin then
+function luarun:init()
+	luarun.triggers = utilities.triggers(self.info.username):t('lua', true).table
+end
+
+function luarun:action(msg)
+
+	if msg.from.id ~= self.config.admin then
 		return
 	end
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
-		sendReply(msg, 'Please enter a string to load.')
+		bindings.sendReply(self, msg, 'Please enter a string to load.')
 		return
 	end
 
-	local output = loadstring(input)()
+	local output = loadstring('local bindings = require(\'bindings\'); local utilities = require(\'utilities\'); return function (self, msg) '..input..' end')()(self, msg)
 	if output == nil then
 		output = 'Done!'
 	elseif type(output) == 'table' then
@@ -22,12 +27,9 @@ local action = function(msg)
 	else
 		output = '```\n' .. tostring(output) .. '\n```'
 	end
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers
-}
+return luarun
 

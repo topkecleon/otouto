@@ -1,9 +1,14 @@
-local command = 'pun'
-local doc = '`Returns a pun.`'
+local pun = {}
 
-local triggers = {
-	'^/pun[@'..bot.username..']*'
-}
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+pun.command = 'pun'
+pun.doc = '`Returns a pun.`'
+
+function pun:init()
+	pun.triggers = utilities.triggers(self.info.username):t('pun').table
+end
 
 local puns = {
 	"The person who invented the door-knock won the No-bell prize.",
@@ -129,15 +134,10 @@ local puns = {
 	"In democracy, it's your vote that counts. In feudalism, it's your count that votes."
 }
 
-local action = function(msg)
+function pun:action(msg)
 
-	sendReply(msg, puns[math.random(#puns)])
+	bindings.sendReply(self, msg, puns[math.random(#puns)])
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return pun

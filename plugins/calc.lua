@@ -1,21 +1,28 @@
-local command = 'calc <expression>'
-local doc = [[```
+local calc = {}
+
+local URL = require('socket.url')
+local HTTPS = require('ssl.https')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+calc.command = 'calc <expression>'
+calc.doc = [[```
 /calc <expression>
 Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 ```]]
 
-local triggers = {
-	'^/calc[@'..bot.username..']*'
-}
+function calc:init()
+	calc.triggers = utilities.triggers(self.info.username):t('calc', true).table
+end
 
-local action = function(msg)
+function calc:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, calc.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -24,19 +31,14 @@ local action = function(msg)
 
 	local output = HTTPS.request(url)
 	if not output then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	output = '`' .. output .. '`'
 
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	command = command,
-	doc = doc
-}
+return calc

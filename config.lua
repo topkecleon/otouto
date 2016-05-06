@@ -4,8 +4,6 @@ return {
 	bot_api_key = '',
 	-- Your Telegram ID.
 	admin = 00000000,
-	-- Differences, in seconds, between your time and UTC.
-	time_offset = 0,
 	-- Two-letter language code.
 	lang = 'en',
 	-- The channel, group, or user to send error reports to.
@@ -51,35 +49,35 @@ Send /help to get started.
 	},
 
 	plugins = { -- To enable a plugin, add its name to the list.
-		'control.lua',
-		'blacklist.lua',
-		'about.lua',
-		'ping.lua',
-		'whoami.lua',
-		'nick.lua',
-		'echo.lua',
-		'gSearch.lua',
-		'gMaps.lua',
-		'wikipedia.lua',
-		'hackernews.lua',
-		'imdb.lua',
-		'calc.lua',
-		'urbandictionary.lua',
-		'time.lua',
-		'eightball.lua',
-		'dice.lua',
-		'reddit.lua',
-		'xkcd.lua',
-		'slap.lua',
-		'commit.lua',
-		'pun.lua',
-		'currency.lua',
-		'cats.lua',
-		'shout.lua',
-		'patterns.lua',
+		'control',
+		'blacklist',
+		'about',
+		'ping',
+		'whoami',
+		'nick',
+		'echo',
+		'gSearch',
+		'gMaps',
+		'wikipedia',
+		'hackernews',
+		'imdb',
+		'calc',
+		'urbandictionary',
+		'time',
+		'eightball',
+		'dice',
+		'reddit',
+		'xkcd',
+		'slap',
+		'commit',
+		'pun',
+		'currency',
+		'cats',
+		'shout',
+		'patterns',
 		-- Put new plugins above this line.
-		'help.lua',
-		'greetings.lua'
+		'help',
+		'greetings'
 	}
 
 }

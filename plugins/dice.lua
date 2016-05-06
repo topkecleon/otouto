@@ -1,18 +1,23 @@
-local command = 'roll <nDr>'
-local doc = [[```
+local dice = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+dice.command = 'roll <nDr>'
+dice.doc = [[```
 /roll <nDr>
 Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
 ```]]
 
-local triggers = {
-	'^/roll[@'..bot.username..']*'
-}
+function dice:init()
+	dice.triggers = utilities.triggers(self.info.username):t('roll', true).table
+end
 
-local action = function(msg)
+function dice:action(msg)
 
-	local input = msg.text_lower:input()
+	local input = utilities.input(msg.text_lower)
 	if not input then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, dice.doc, true, msg.message_id, true)
 		return
 	end
 
@@ -23,7 +28,7 @@ local action = function(msg)
 		count = 1
 		range = input:match('^d?([%d]+)$')
 	else
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, dice.doc, true, msg.message_id, true)
 		return
 	end
 
@@ -31,27 +36,22 @@ local action = function(msg)
 	range = tonumber(range)
 
 	if range < 2 then
-		sendReply(msg, 'The minimum range is 2.')
+		bindings.sendReply(self, msg, 'The minimum range is 2.')
 		return
 	end
 	if range > 1000 or count > 1000 then
-		sendReply(msg, 'The maximum range and count are 1000.')
+		bindings.sendReply(self, msg, 'The maximum range and count are 1000.')
 		return
 	end
 
 	local output = '*' .. count .. 'd' .. range .. '*\n`'
-	for i = 1, count do
+	for _ = 1, count do
 		output = output .. math.random(range) .. '\t'
 	end
 	output = output .. '`'
 
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return dice

@@ -1,36 +1,35 @@
-local command = 'echo <text>'
-local doc = [[```
+local echo = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+echo.command = 'echo <text>'
+echo.doc = [[```
 /echo <text>
 Repeats a string of text.
 ```]]
 
-local triggers = {
-	'^/echo[@'..bot.username..']*'
-}
+function echo:init()
+	echo.triggers = utilities.triggers(self.info.username):t('echo', true).table
+end
 
-local action = function(msg)
+function echo:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	if not input then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, echo.doc, true, msg.message_id, true)
 	else
-		input = markdown_escape(input)
 		local output
 		if msg.chat.type == 'supergroup' then
-			output = '*Echo:*\n"' .. input .. '"'
+			output = '*Echo:*\n"' .. utilities.md_escape(input) .. '"'
 		else
-			output = latcyr(input)
+			output = utilities.md_escape(utilities.latcyr(input))
 		end
-		sendMessage(msg.chat.id, output, true, nil, true)
+		bindings.sendMessage(self, msg.chat.id, output, true)
 	end
 
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return echo

@@ -1,16 +1,20 @@
-local triggers = {
-	'^/me',
-	'^/me@'..bot.username
-}
+local me = {}
 
-local action = function(msg)
+local bindings = require('bindings')
+local utilities = require('utilities')
 
-	local target = database.users[msg.from.id_str]
+function me:init()
+	me.triggers = utilities.triggers(self.info.username):t('me', true).table
+end
 
-	if msg.from.id == config.admin and (msg.reply_to_message or msg.text:input()) then
-		target = user_from_message(msg)
+function me:action(msg)
+
+	local target = self.database.users[msg.from.id_str]
+
+	if msg.from.id == self.config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
+		target = utilities.user_from_message(self, msg)
 		if target.err then
-			sendReply(msg, target.err)
+			bindings.sendReply(self, msg, target.err)
 			return
 		end
 	end
@@ -19,11 +23,8 @@ local action = function(msg)
 	for k,v in pairs(target) do
 		output = output .. '*' .. k .. ':* `' .. tostring(v) .. '`\n'
 	end
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	triggers = triggers,
-	action = action
-}
+return me

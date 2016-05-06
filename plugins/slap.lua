@@ -1,12 +1,17 @@
-local command = 'slap [target]'
-local doc = [[```
+local slap = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+slap.command = 'slap [target]'
+slap.doc = [[```
 /slap [target]
 Slap somebody.
 ```]]
 
-local triggers = {
-	'^/slap[@'..bot.username..']*'
-}
+function slap:init()
+	slap.triggers = utilities.triggers(self.info.username):t('slap', true).table
+end
 
 local slaps = {
 	'VICTIM was shot by VICTOR.',
@@ -92,40 +97,35 @@ local slaps = {
 	'Cowards die many times before their death. VICTIM never tasted death but once.'
 }
 
-local action = function(msg)
+function slap:action(msg)
 
-	local victim = msg.text:input()
+	local victim = utilities.input(msg.text)
 	if msg.reply_to_message then
-		if database.users[tostring(msg.reply_to_message.from.id)].nickname then
-			victim = database.users[tostring(msg.reply_to_message.from.id)].nickname
+		if self.database.users[tostring(msg.reply_to_message.from.id)].nickname then
+			victim = self.database.users[tostring(msg.reply_to_message.from.id)].nickname
 		else
 			victim = msg.reply_to_message.from.first_name
 		end
 	end
 
 	local victor = msg.from.first_name
-	if database.users[msg.from.id_str].nickname then
-		victor = database.users[msg.from.id_str].nickname
+	if self.database.users[msg.from.id_str].nickname then
+		victor = self.database.users[msg.from.id_str].nickname
 	end
 
 	if not victim then
 		victim = victor
-		victor = bot.first_name
+		victor = self.info.first_name
 	end
 
 	local message = slaps[math.random(#slaps)]
 	message = message:gsub('VICTIM', victim)
 	message = message:gsub('VICTOR', victor)
 
-	message = latcyr(message)
+	message = utilities.latcyr(message)
 
-	sendMessage(msg.chat.id, message)
+	bindings.sendMessage(self, msg.chat.id, message)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return slap

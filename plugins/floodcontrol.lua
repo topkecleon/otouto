@@ -1,22 +1,29 @@
  -- Liberbot-compliant floodcontrol.
  -- Put this after moderation.lua or blacklist.lua.
 
-floodcontrol = floodcontrol or {}
+local floodcontrol = {}
 
-local triggers = {
+local JSON = require('dkjson')
+local utilities = require('utilities')
+
+function floodcontrol:init()
+	self.floodcontrol = self.floodcontrol or {}
+end
+
+floodcontrol.triggers = {
 	''
 }
 
-local action = function(msg)
+function floodcontrol:action(msg)
 
-	if floodcontrol[-msg.chat.id] then
+	if self.floodcontrol[-msg.chat.id] then
 		return
 	end
 
-	local input = msg.text_lower:match('^/floodcontrol[@'..bot.username..']* (.+)')
+	local input = msg.text_lower:match('^/floodcontrol (.+)') or msg.text_lower:match('^/floodcontrol@'..self.info.username..' (.+)')
 	if not input then return true end
 
-	if msg.from.id ~= 100547061 and msg.from.id ~= config.admin then
+	if msg.from.id ~= 100547061 and msg.from.id ~= self.config.admin then
 		return -- Only run for Liberbot or the admin.
 	end
 
@@ -29,25 +36,21 @@ local action = function(msg)
 		input.duration = 600
 	end
 
-	floodcontrol[input.groupid] = os.time() + input.duration
+	self.floodcontrol[input.groupid] = os.time() + input.duration
 
 	local output = input.groupid .. ' silenced for ' .. input.duration .. ' seconds.'
-	handle_exception('floodcontrol.lua', output)
+	utilities.handle_exception(self, 'floodcontrol.lua', output)
 
 end
 
-local cron = function()
+function floodcontrol:cron()
 
-	for k,v in pairs(floodcontrol) do
+	for k,v in pairs(self.floodcontrol) do
 		if os.time() > v then
-			floodcontrol[k] = nil
+			self.floodcontrol[k] = nil
 		end
 	end
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	cron = cron
-}
+return floodcontrol

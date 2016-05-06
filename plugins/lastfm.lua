@@ -1,14 +1,23 @@
-if not config.lastfm_api_key then
-	print('Missing config value: lastfm_api_key.')
-	print('lastfm.lua will not be enabled.')
-	return
-end
+local lastfm = {}
 
 local HTTP = require('socket.http')
-HTTP.TIMEOUT = 1
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
 
-local command = 'lastfm'
-local doc = [[```
+function lastfm:init()
+	if not self.config.lastfm_api_key then
+		print('Missing config value: lastfm_api_key.')
+		print('lastfm.lua will not be enabled.')
+		return
+	end
+
+	lastfm.triggers = utilities.triggers(self.info.username):t('lastfm', true):t('np', true):t('fmset', true).table
+end
+
+bindings.command = 'lastfm'
+bindings.doc = [[```
 /np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
@@ -16,66 +25,64 @@ Returns what you are or were last listening to. If you specify a username, info 
 Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.
 ```]]
 
-local triggers = {
-	'^/lastfm[@'..bot.username..']*',
-	'^/np[@'..bot.username..']*',
-	'^/fmset[@'..bot.username..']*'
-}
+function lastfm:action(msg)
 
-local action = function(msg)
-
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	if string.match(msg.text, '^/lastfm') then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		return
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == '—' then
-			database.users[msg.from.id_str].lastfm = nil
-			sendReply(msg, 'Your last.fm username has been forgotten.')
+			self.database.users[msg.from.id_str].lastfm = nil
+			bindings.sendReply(self, msg, 'Your last.fm username has been forgotten.')
 		else
-			database.users[msg.from.id_str].lastfm = input
-			sendReply(msg, 'Your last.fm username has been set to "' .. input .. '".')
+			self.database.users[msg.from.id_str].lastfm = input
+			bindings.sendReply(self, msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
 		return
 	end
 
-	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
+	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. self.config.lastfm_api_key .. '&user='
 
 	local username
 	local alert = ''
 	if input then
 		username = input
-	elseif database.users[msg.from.id_str].lastfm then
-		username = database.users[msg.from.id_str].lastfm
+	elseif self.database.users[msg.from.id_str].lastfm then
+		username = self.database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
 		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
-		database.users[msg.from.id_str].lastfm = username
+		self.database.users[msg.from.id_str].lastfm = username
 	else
-		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
+		bindings.sendReply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
 	end
 
 	url = url .. URL.escape(username)
 
-	jstr, res = HTTP.request(url)
+	local jstr, res
+	utilities.with_http_timeout(
+		1, function ()
+			jstr, res = HTTP.request(url)
+	end)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, 'Please specify your last.fm username or set it with /fmset.')
+		bindings.sendReply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
 	end
 
-	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
+	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.' .. alert)
+		bindings.sendReply(self, msg, 'No history for this user.' .. alert)
 		return
 	end
 
@@ -95,13 +102,8 @@ local action = function(msg)
 	end
 
 	output = output .. title .. ' - ' .. artist .. alert
-	sendMessage(msg.chat.id, output)
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return lastfm

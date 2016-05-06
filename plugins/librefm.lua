@@ -1,9 +1,21 @@
-if not database.librefm then
-	database.librefm = {}
+local librefm = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function librefm:init()
+	if not self.database.librefm then
+		self.database.librefm = {}
+	end
+
+	librefm.triggers = utilities.triggers(self.info.username):t('librefm', true):t('lnp', true):t('lfmset', true)
 end
 
-local command = 'librefm'
-local doc = [[```
+librefm.command = 'librefm'
+librefm.doc = [[```
 /lnp [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
@@ -11,28 +23,22 @@ Returns what you are or were last listening to. If you specify a username, info 
 Sets your libre.fm username. Otherwise, /np will use your Telegram username. Use "/fmset -" to delete it.
 ```]]
 
-local triggers = {
-	'^/librefm[@'..bot.username..']*',
-	'^/lnp[@'..bot.username..']*',
-	'^/lfmset[@'..bot.username..']*'
-}
+function librefm:action(msg)
 
-local action = function(msg)
-
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 
 	if string.match(msg.text, '^/librefm') then
-		sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+		bindings.sendMessage(self, msg.chat.id, librefm.doc, true, msg.message_id, true)
 		return
 	elseif string.match(msg.text, '^/lfmset') then
 		if not input then
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, librefm.doc, true, msg.message_id, true)
 		elseif input == '-' then
-			database.librefm[msg.from.id_str] = nil
-			sendReply(msg, 'Your libre.fm username has been forgotten.')
+			self.database.librefm[msg.from.id_str] = nil
+			bindings.sendReply(self, msg, 'Your libre.fm username has been forgotten.')
 		else
-			database.librefm[msg.from.id_str] = input
-			sendReply(msg, 'Your libre.fm username has been set to "' .. input .. '".')
+			self.database.librefm[msg.from.id_str] = input
+			bindings.sendReply(self, msg, 'Your libre.fm username has been set to "' .. input .. '".')
 		end
 		return
 	end
@@ -43,34 +49,34 @@ local action = function(msg)
 	local alert = ''
 	if input then
 		username = input
-	elseif database.librefm[msg.from.id_str] then
-		username = database.librefm[msg.from.id_str]
+	elseif self.database.librefm[msg.from.id_str] then
+		username = self.database.librefm[msg.from.id_str]
 	elseif msg.from.username then
 		username = msg.from.username
 		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /lfmset <username>.'
-		database.librefm[msg.from.id_str] = username
+		self.database.librefm[msg.from.id_str] = username
 	else
-		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
+		bindings.sendReply(self, msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
 	url = url .. URL.escape(username)
 
-	jstr, res = HTTPS.request(url)
+	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		sendReply(msg, 'Please specify your libre.fm username or set it with /lfmset.')
+		bindings.sendReply(self, msg, 'Please specify your libre.fm username or set it with /lfmset.')
 		return
 	end
 
-	local jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
+	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		sendReply(msg, 'No history for this user.' .. alert)
+		bindings.sendReply(self, msg, 'No history for this user.' .. alert)
 		return
 	end
 
@@ -90,13 +96,8 @@ local action = function(msg)
 	end
 
 	output = output .. title .. ' - ' .. artist .. alert
-	sendMessage(msg.chat.id, output)
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return librefm

@@ -1,16 +1,17 @@
  -- Actually the simplest plugin ever!
 
-local triggers = {
-	'^/ping[@'..bot.username..']*',
-	'^/annyong[@'..bot.username..']*'
-}
+local ping = {}
 
-local action = function(msg)
-	local output = msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.'
-	sendMessage(msg.chat.id, output)
+local utilities = require('utilities')
+local bindings = require('bindings')
+
+function ping:init()
+	ping.triggers = utilities.triggers(self.info.username):t('ping'):t('annyong').table
 end
 
-return {
-	action = action,
-	triggers = triggers
-}
+function ping:action(msg)
+	local output = msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.'
+	bindings.sendMessage(self, msg.chat.id, output)
+end
+
+return ping

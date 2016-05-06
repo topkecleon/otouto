@@ -1,47 +1,53 @@
  -- Thanks to @TiagoDanin for writing the original plugin.
 
-if not config.google_api_key then
-	print('Missing config value: google_api_key.')
-	print('youtube.lua will not be enabled.')
-	return
+local youtube = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function youtube:init()
+	if not self.config.google_api_key then
+		print('Missing config value: google_api_key.')
+		print('youtube.lua will not be enabled.')
+		return
+	end
+
+	youtube.triggers = utilities.triggers(self.info.username):t('youtube', true):t('yt', true).table
 end
 
-local command = 'youtube <query>'
-local doc = [[```
+youtube.command = 'youtube <query>'
+youtube.doc = [[```
 /youtube <query>
 Returns the top result from YouTube.
 Alias: /yt
 ```]]
 
-local triggers = {
-	'^/youtube[@'..bot.username..']*',
-	'^/yt[@'..bot.username..']*$',
-	'^/yt[@'..bot.username..']* '
-}
+function youtube:action(msg)
 
-local action = function(msg)
-
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, youtube.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
-	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
+	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. self.config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.pageInfo.totalResults == 0 then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -50,13 +56,8 @@ local action = function(msg)
 	vid_title = vid_title:gsub('%(.+%)',''):gsub('%[.+%]','')
 	local output = '[' .. vid_title .. '](' .. vid_url .. ')'
 
-	sendMessage(msg.chat.id, output, false, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return youtube

@@ -1,48 +1,55 @@
-if not config.owm_api_key then
-	print('Missing config value: owm_api_key.')
-	print('weather.lua will not be enabled.')
-	return
+local weather = {}
+
+local HTTP = require('socket.http')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function weather:init()
+	if not self.config.owm_api_key then
+		print('Missing config value: owm_api_key.')
+		print('weather.lua will not be enabled.')
+		return
+	end
+
+	weather.triggers = utilities.triggers(self.info.username):t('weather', true).table
 end
 
-local command = 'weather <location>'
-local doc = [[```
+weather.command = 'weather <location>'
+weather.doc = [[```
 /weather <location>
 Returns the current weather conditions for a given location.
 ```]]
 
-local triggers = {
-	'^/weather[@'..bot.username..']*'
-}
+function weather:action(msg)
 
-local action = function(msg)
-
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, weather.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
-	local coords = get_coords(input)
+	local coords = utilities.get_coords(self, input)
 	if type(coords) == 'string' then
-		sendReply(msg, coords)
+		bindings.sendReply(self, msg, coords)
 		return
 	end
 
-	local url = 'http://api.openweathermap.org/data/2.5/weather?APPID=' .. config.owm_api_key .. '&lat=' .. coords.lat .. '&lon=' .. coords.lon
+	local url = 'http://api.openweathermap.org/data/2.5/weather?APPID=' .. self.config.owm_api_key .. '&lat=' .. coords.lat .. '&lon=' .. coords.lon
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.cod ~= 200 then
-		sendReply(msg, 'Error: City not found.')
+		bindings.sendReply(self, msg, 'Error: City not found.')
 		return
 	end
 
@@ -50,13 +57,8 @@ local action = function(msg)
 	local fahrenheit = string.format('%.2f', celsius * (9/5) + 32)
 	local output = '`' .. celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.`'
 
-	sendMessage(msg.chat.id, output, true, msg.message_id, true)
+	bindings.sendReply(self, msg, output, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return weather

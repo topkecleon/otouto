@@ -1,18 +1,23 @@
-local command = 'nick <nickname>'
-local doc = [[```
+local nick = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+nick.command = 'nick <nickname>'
+nick.doc = [[```
 /nick <nickname>
 Set your nickname. Use "/nick --" to delete it.
 ```]]
 
-local triggers = {
-	'^/nick[@'..bot.username..']*'
-}
+function nick:init()
+	nick.triggers = utilities.triggers(self.info.username):t('nick', true).table
+end
 
-local action = function(msg)
+function nick:action(msg)
 
 	local target = msg.from
 
-	if msg.from.id == config.admin and msg.reply_to_message then
+	if msg.from.id == self.config.admin and msg.reply_to_message then
 		target = msg.reply_to_message.from
 		target.id_str = tostring(target.id)
 		target.name = target.first_name
@@ -22,30 +27,25 @@ local action = function(msg)
 	end
 
 	local output
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
-		if database.users[target.id_str].nickname then
-			output = target.name .. '\'s nickname is "' .. database.users[target.id_str].nickname .. '".'
+		if self.database.users[target.id_str].nickname then
+			output = target.name .. '\'s nickname is "' .. self.database.users[target.id_str].nickname .. '".'
 		else
 			output = target.name .. ' currently has no nickname.'
 		end
 	elseif string.len(input) > 32 then
 		output = 'The character limit for nicknames is 32.'
 	elseif input == '--' or input == '—' then
-		database.users[target.id_str].nickname = nil
+		self.database.users[target.id_str].nickname = nil
 		output = target.name .. '\'s nickname has been deleted.'
 	else
-		database.users[target.id_str].nickname = input
+		self.database.users[target.id_str].nickname = input
 		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
 	end
 
-	sendReply(msg, output)
+	bindings.sendReply(self, msg, output)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return nick

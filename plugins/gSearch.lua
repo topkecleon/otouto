@@ -1,25 +1,30 @@
-local command = 'google <query>'
-local doc = [[```
+local gSearch = {}
+
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+gSearch.command = 'google <query>'
+gSearch.doc = [[```
 /google <query>
 Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
 Alias: /g
 ```]]
 
-local triggers = {
-	'^/g[@'..bot.username..']*$',
-	'^/g[@'..bot.username..']* ',
-	'^/google[@'..bot.username..']*',
-	'^/gnsfw[@'..bot.username..']*'
-}
+function gSearch:init()
+	gSearch.triggers = utilities.triggers(self.info.username):t('g', true):t('google', true):t('gnsfw', true).table
+end
 
-local action = function(msg)
+function gSearch:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, gSearch.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -40,22 +45,22 @@ local action = function(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.responseData then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 	if not jdat.responseData.results[1] then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
 	local output = '*Google results for* _' .. input .. '_ *:*\n'
-	for i,v in ipairs(jdat.responseData.results) do
+	for i,_ in ipairs(jdat.responseData.results) do
 		local title = jdat.responseData.results[i].titleNoFormatting:gsub('%[.+%]', ''):gsub('&amp;', '&')
 --[[
 		if title:len() > 48 then
@@ -70,13 +75,8 @@ local action = function(msg)
 		end
 	end
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return gSearch

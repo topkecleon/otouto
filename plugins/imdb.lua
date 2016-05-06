@@ -1,21 +1,29 @@
-local command = 'imdb <query>'
-local doc = [[```
+local imdb = {}
+
+local HTTP = require('socket.http')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+imdb.command = 'imdb <query>'
+imdb.doc = [[```
 /imdb <query>
 Returns an IMDb entry.
 ```]]
 
-local triggers = {
-	'^/imdb[@'..bot.username..']*'
-}
+function imdb:init()
+	imdb.triggers = utilities.triggers(self.info.username):t('imdb', true).table
+end
 
-local action = function(msg)
+function imdb:action(msg)
 
-	local input = msg.text:input()
+	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			sendMessage(msg.chat.id, doc, true, msg.message_id, true)
+			bindings.sendMessage(self, msg.chat.id, imdb.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -24,14 +32,14 @@ local action = function(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.Response ~= 'True' then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -40,13 +48,8 @@ local action = function(msg)
 	output = output .. '_' .. jdat.Plot .. '_\n'
 	output = output .. '[Read more.](http://imdb.com/title/' .. jdat.imdbID .. ')'
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return imdb

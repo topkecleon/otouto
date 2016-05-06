@@ -1,26 +1,31 @@
-local command = 'reddit [r/subreddit | query]'
-local doc = [[```
+local reddit = {}
+
+local HTTP = require('socket.http')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+reddit.command = 'reddit [r/subreddit | query]'
+reddit.doc = [[```
 /reddit [r/subreddit | query]
 Returns the four (if group) or eight (if private message) top posts for the given subreddit or query, or from the frontpage.
 Aliases: /r, /r/[subreddit]
 ```]]
 
-local triggers = {
-	'^/reddit[@'..bot.username..']*',
-	'^/r[@'..bot.username..']*$',
-	'^/r[@'..bot.username..']* ',
-	'^/r/'
-}
+function reddit:init()
+	reddit.triggers = utilities.triggers(self.info.username, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
+end
 
-local action = function(msg)
+function reddit:action(msg)
 
 	msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
-	local input = msg.text_lower:input()
+	local input
 	if msg.text_lower:match('^/r/') then
 		msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
-		input = get_word(msg.text_lower, 1)
+		input = utilities.get_word(msg.text_lower, 1)
 	else
-		input = msg.text_lower:input()
+		input = utilities.input(msg.text_lower)
 	end
 	local url
 
@@ -45,18 +50,18 @@ local action = function(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		sendReply(msg, config.errors.connection)
+		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if #jdat.data.children == 0 then
-		sendReply(msg, config.errors.results)
+		bindings.sendReply(self, msg, self.config.errors.results)
 		return
 	end
 
 	local output = ''
-	for i,v in ipairs(jdat.data.children) do
+	for _,v in ipairs(jdat.data.children) do
 		local title = v.data.title:gsub('%[', '('):gsub('%]', ')'):gsub('&amp;', '&')
 		if title:len() > 48 then
 			title = title:sub(1,45) .. '...'
@@ -73,13 +78,8 @@ local action = function(msg)
 
 	output = source .. output
 
-	sendMessage(msg.chat.id, output, true, nil, true)
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 
 end
 
-return {
-	action = action,
-	triggers = triggers,
-	doc = doc,
-	command = command
-}
+return reddit

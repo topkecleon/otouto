@@ -2,47 +2,54 @@
  -- If you want to configure your own greetings, copy the following table
  -- (without the "config.") to your config.lua file.
 
-if not config.greetings then
-	config.greetings = {
-		['Hello, #NAME.'] = {
-			'hello',
-			'hey',
-			'sup',
-			'hi',
-			'good morning',
-			'good day',
-			'good afternoon',
-			'good evening'
-		},
-		['Goodbye, #NAME.'] = {
-			'bye',
-			'later',
-			'see ya',
-			'good night'
-		},
-		['Welcome back, #NAME.'] = {
-			'i\'m home',
-			'i\'m back'
-		},
-		['You\'re welcome, #NAME.'] = {
-			'thanks',
-			'thank you'
+local greetings = {}
+
+local bindings = require('bindings')
+local utilities = require('utilities')
+
+function greetings:init()
+	if not self.config.greetings then
+		self.config.greetings = {
+			['Hello, #NAME.'] = {
+				'hello',
+				'hey',
+				'sup',
+				'hi',
+				'good morning',
+				'good day',
+				'good afternoon',
+				'good evening'
+			},
+			['Goodbye, #NAME.'] = {
+				'bye',
+				'later',
+				'see ya',
+				'good night'
+			},
+			['Welcome back, #NAME.'] = {
+				'i\'m home',
+				'i\'m back'
+			},
+			['You\'re welcome, #NAME.'] = {
+				'thanks',
+				'thank you'
+			}
 		}
+	end
+
+	greetings.triggers = {
+		self.info.first_name:lower() .. '%p*$'
 	}
 end
 
-local triggers = {
-	bot.first_name .. '%p*$'
-}
+function greetings:action(msg)
 
-local action = function(msg)
+	local nick = self.database.users[msg.from.id_str].nickname or msg.from.first_name
 
-	local nick = database.users[msg.from.id_str].nickname or msg.from.first_name
-
-	for k,v in pairs(config.greetings) do
-		for key,val in pairs(v) do
-			if msg.text_lower:match(val..',? '..bot.first_name) then
-				sendMessage(msg.chat.id, latcyr(k:gsub('#NAME', nick)))
+	for trigger,responses in pairs(self.config.greetings) do
+		for _,response in pairs(responses) do
+			if msg.text_lower:match(response..',? '..self.info.first_name:lower()) then
+				bindings.sendMessage(self, msg.chat.id, utilities.latcyr(trigger:gsub('#NAME', nick)))
 				return
 			end
 		end
@@ -52,7 +59,4 @@ local action = function(msg)
 
 end
 
-return {
-	action = action,
-	triggers = triggers
-}
+return greetings
