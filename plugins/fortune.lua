@@ -23,7 +23,8 @@ function fortune:action(msg)
 
 	local fortunef = io.popen('fortune')
 	local output = fortunef:read('*all')
-	bindings.sendMessage(self, msg.chat.id, output)
+	output = '```\n' .. output .. '\n```'
+	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 	fortunef:close()
 
 end

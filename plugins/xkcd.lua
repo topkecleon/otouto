@@ -7,10 +7,10 @@ local JSON = require('dkjson')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
-xkcd.command = 'xkcd [query]'
+xkcd.command = 'xkcd [i]'
 xkcd.doc = [[```
-/xkcd [query]
-Returns an xkcd strip and its alt text. If there is no query, it will be randomized.
+/xkcd [i]
+Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.
 ```]]
 
 function xkcd:init()
@@ -19,33 +19,28 @@ end
 
 function xkcd:action(msg)
 
-	local input = utilities.input(msg.text)
-
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
 		bindings.sendReply(self, msg, self.config.errors.connection)
 		return
 	end
-
 	local latest = JSON.decode(jstr).num
-	local res_url
+	local strip_num = latest
 
+	local input = utilities.input(msg.text)
 	if input then
-		local url = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.0&safe=active&q=site%3axkcd%2ecom%20' .. URL.escape(input)
-		jstr, res = HTTPS.request(url)
-		if res ~= 200 then
-			bindings.sendReply(self, msg, self.config.errors.connection)
-			return
+		if tonumber(input) then
+			if tonumber(input) > latest then
+				strip_num = latest
+			else
+				strip_num = input
+			end
+		elseif input == 'r' then
+			strip_num = math.random(latest)
 		end
-		local jdat = JSON.decode(jstr)
-		if #jdat.responseData.results == 0 then
-			bindings.sendReply(self, msg, self.config.errors.results)
-			return
-		end
-		res_url = jdat.responseData.results[1].url .. 'info.0.json'
-	else
-		res_url = 'http://xkcd.com/' .. math.random(latest) .. '/info.0.json'
 	end
+
+	local res_url = 'http://xkcd.com/' .. strip_num .. '/info.0.json'
 
 	jstr, res = HTTP.request(res_url)
 	if res ~= 200 then
