@@ -40,6 +40,7 @@ function nick:action(msg)
 		self.database.users[target.id_str].nickname = nil
 		output = target.name .. '\'s nickname has been deleted.'
 	else
+		input = input:gsub('\n', ' ')
 		self.database.users[target.id_str].nickname = input
 		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
 	end

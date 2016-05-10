@@ -88,7 +88,6 @@ end
 
  -- Loads a JSON file as a table.
 function utilities.load_data(filename)
-
 	local f = io.open(filename)
 	if not f then
 		return {}
@@ -96,19 +95,15 @@ function utilities.load_data(filename)
 	local s = f:read('*all')
 	f:close()
 	local data = JSON.decode(s)
-
 	return data
-
 end
 
  -- Saves a table to a JSON file.
 function utilities.save_data(filename, data)
-
 	local s = JSON.encode(data)
 	local f = io.open(filename, 'w')
 	f:write(s)
 	f:close()
-
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
@@ -169,7 +164,6 @@ function utilities:user_from_message(msg)
 	local input = utilities.input(msg.text_lower)
 	local target = {}
 	if msg.reply_to_message then
-		print('reply')
 		target = msg.reply_to_message.from
 	elseif input and tonumber(input) then
 		target.id = tonumber(input)

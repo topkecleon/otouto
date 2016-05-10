@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.8.2
+	Version 1.8.3
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -25,6 +25,8 @@
 
 	1.8.2 - Will now attempt to unban users kicked from supergroups. Other small
 	changes.
+
+	1.8.3 - Migrated to new plugin standard. Added /ahelp command to /desc.
 
 ]]--
 
@@ -222,6 +224,7 @@ function administration:get_desc(chat_id)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. utilities.trim(modstring))
 	end
+	table.insert(t, 'Run /ahelp@' .. self.info.username .. ' for a list of commands.')
 	return table.concat(t, '\n\n')
 
 end

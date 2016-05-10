@@ -1,7 +1,6 @@
 local xkcd = {}
 
 local HTTP = require('socket.http')
-local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('bindings')
@@ -29,7 +28,10 @@ function xkcd:action(msg)
 
 	local input = utilities.input(msg.text)
 	if input then
-		if tonumber(input) then
+		if input == '404' then
+			bindings.sendMessage(self, msg.chat.id, '*404*\nNot found.', false, nil, true)
+			return
+		elseif tonumber(input) then
 			if tonumber(input) > latest then
 				strip_num = latest
 			else
@@ -49,7 +51,7 @@ function xkcd:action(msg)
 	end
 	local jdat = JSON.decode(jstr)
 
-	local output = '[' .. jdat.num .. '](' .. jdat.img .. ')\n' .. jdat.alt
+	local output = '*' .. jdat.safe_title .. '* ([' .. jdat.num .. '](' .. jdat.img .. '))\n' .. jdat.alt
 
 	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
 

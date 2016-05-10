@@ -16,8 +16,8 @@ function lastfm:init()
 	lastfm.triggers = utilities.triggers(self.info.username):t('lastfm', true):t('np', true):t('fmset', true).table
 end
 
-bindings.command = 'lastfm'
-bindings.doc = [[```
+lastfm.command = 'lastfm'
+lastfm.doc = [[```
 /np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
