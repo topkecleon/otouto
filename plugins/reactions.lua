@@ -17,7 +17,8 @@ local mapping = {
 	['flip'] = '(╯°□°）╯︵ ┻━┻',
 	['homo'] = '┌（┌　＾o＾）┐',
 	['look'] = 'ಠ_ಠ',
-	['shots?'] = 'SHOTS FIRED'
+	['shots?'] = 'SHOTS FIRED',
+	['facepalm'] = '(－‸ლ)'
 }
 
 local help
@@ -27,7 +28,7 @@ function reactions:init()
 	help = 'Reactions:\n'
 	reactions.triggers = utilities.triggers(self.info.username):t('reactions').table
 	for trigger,reaction in pairs(mapping) do
-		help = help .. '• ' .. utilities.INVOCATION_PATTERN..trigger .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
+		help = help .. '• ' .. utilities.INVOCATION_PATTERN .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
 		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger)
 		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.info.username:lower())
 	end

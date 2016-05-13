@@ -1086,7 +1086,7 @@ function administration.init_command(self_)
 		},
 
 		{ -- glist
-			triggers = utilities.triggers(self_.info.username):t('list', false).table,
+			triggers = utilities.triggers(self_.info.username):t('glist', false).table,
 
 			command = 'glist',
 			privilege = 5,
