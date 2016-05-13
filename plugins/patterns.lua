@@ -1,6 +1,3 @@
- -- Shout-out to Kenny, as I didn't want to write this until
- -- he upset himself over the very thought of me doing so.
-
 local patterns = {}
 
 local bindings = require('bindings')
@@ -25,7 +22,6 @@ function patterns:action(msg)
 		bindings.sendReply(self, msg, output)
 		return
 	end
-	output = output:gsub(m1, m2)
 	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
 	bindings.sendReply(self, msg.reply_to_message, output)
 

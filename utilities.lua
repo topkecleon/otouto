@@ -12,17 +12,13 @@ local bindings = require('bindings')
 
  -- get the indexed word in a string
 function utilities.get_word(s, i)
-
 	s = s or ''
 	i = i or 1
-
 	local t = {}
 	for w in s:gmatch('%g+') do
 		table.insert(t, w)
 	end
-
 	return t[i] or false
-
 end
 
  -- Like get_word(), but better.
@@ -130,16 +126,15 @@ end
 
  -- Get the number of values in a key/value table.
 function utilities.table_size(tab)
-
 	local i = 0
 	for _,_ in pairs(tab) do
 		i = i + 1
 	end
 	return i
-
 end
 
  -- Just an easy way to get a user's full name.
+ -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
 	if last then
 		return first .. ' ' .. last
@@ -215,51 +210,37 @@ function utilities:handle_exception(err, message)
 
 end
 
- -- Okay, this one I actually did copy from yagop.
- -- https://github.com/yagop/telegram-bot/blob/master/bot/utils.lua
 function utilities.download_file(url, filename)
-
-	local respbody = {}
-	local options = {
-		url = url,
-		sink = ltn12.sink.table(respbody),
-		redirect = true
-	}
-
-	local response
-
-	if url:match('^https') then
-		options.redirect = false
-		response = { HTTPS.request(options) }
-	else
-		response = { HTTP.request(options) }
+	if not filename then
+		filename = url:match('.+/(.-)$') or os.time()
+		filename = '/tmp/' .. filename
 	end
-
-	local code = response[2]
-	local headers = response[3]
-	local status = response[4]
-
-	if code ~= 200 then return false end
-
-	filename = filename or '/tmp/' .. os.time()
-
+	local body = {}
+	local doer = HTTP
+	local do_redir = true
+	if url:match('^https') then
+		doer = HTTPS
+		do_redir = false
+	end
+	local _, res = doer.request{
+		url = url,
+		sink = ltn12.sink.table(body),
+		redirect = do_redir
+	}
+	if res ~= 200 then return false end
 	local file = io.open(filename, 'w+')
-	file:write(table.concat(respbody))
+	file:write(table.concat(body))
 	file:close()
-
 	return filename
-
 end
 
 function utilities.markdown_escape(text)
-
 	text = text:gsub('_', '\\_')
 	text = text:gsub('%[', '\\[')
 	text = text:gsub('%]', '\\]')
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text
-
 end
 
 utilities.md_escape = utilities.markdown_escape
