@@ -36,10 +36,6 @@ function bot:init() -- The function run when the bot is started or reloaded.
 
 	print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
 
-	-- Generate a random seed and "pop" the first random number. :)
-	math.randomseed(os.time())
-	math.random()
-
 	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,
 	self.last_cron = self.last_cron or os.date('%M') -- the time of the last cron job,
 	self.is_started = true -- and whether or not the bot should be running.
@@ -50,16 +46,12 @@ end
 
 function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 
-	-- Create a user entry if it does not exist.
-	if not self.database.users[tostring(msg.from.id)] then
-		self.database.users[tostring(msg.from.id)] = {}
-	end
-	-- Clear things that no longer exist.
-	self.database.users[tostring(msg.from.id)].username = nil
-	self.database.users[tostring(msg.from.id)].last_name = nil
-	-- Wee.
-	for k,v in pairs(msg.from) do
-		self.database.users[tostring(msg.from.id)][k] = v
+	-- Cache user info for those involved.
+	utilities.create_user_entry(self, msg.from)
+	if msg.forward_from and msg.forward_from.id ~= msg.from.id then
+		utilities.create_user_entry(self, msg.forward_from)
+	elseif msg.reply_to_message and msg.reply_to_message.from.id ~= msg.from.id then
+		utilities.create_user_entry(self, msg.reply_to_message.from)
 	end
 
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
@@ -82,10 +74,10 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
 					return
 				end
-				-- If the action returns a table, make that table msg.
+				-- If the action returns a table, make that table the new msg.
 				if type(result) == 'table' then
 					msg = result
-				-- If the action returns true, don't stop.
+				-- If the action returns true, continue.
 				elseif result ~= true then
 					return
 				end

@@ -12,7 +12,7 @@ function me:action(msg)
 	local target = self.database.users[msg.from.id_str]
 
 	if msg.from.id == self.config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
-		target = utilities.user_from_message(self, msg)
+		target = utilities.user_from_message(self, msg, true)
 		if target.err then
 			bindings.sendReply(self, msg, target.err)
 			return

@@ -154,12 +154,14 @@ function utilities:resolve_username(input)
 
 end
 
-function utilities:user_from_message(msg)
+function utilities:user_from_message(msg, no_extra)
 
 	local input = utilities.input(msg.text_lower)
 	local target = {}
 	if msg.reply_to_message then
-		target = msg.reply_to_message.from
+		for k,v in pairs(self.database.users[msg.reply_to_message.from.id_str]) do
+			target[k] = v
+		end
 	elseif input and tonumber(input) then
 		target.id = tonumber(input)
 		if self.database.users[input] then
@@ -183,13 +185,15 @@ function utilities:user_from_message(msg)
 		target.err = 'Please specify a user via reply, ID, or username.'
 	end
 
-	if target.id then
-		target.id_str = tostring(target.id)
+	if not no_extra then
+		if target.id then
+			target.id_str = tostring(target.id)
+		end
+		if not target.first_name then
+			target.first_name = 'User'
+		end
+		target.name = utilities.build_name(target.first_name, target.last_name)
 	end
-
-	if not target.first_name then target.first_name = 'User' end
-
-	target.name = utilities.build_name(target.first_name, target.last_name)
 
 	return target
 
@@ -310,6 +314,21 @@ function utilities.pretty_float(x)
 		return tostring(math.floor(x))
 	else
 		return tostring(x)
+	end
+end
+
+function utilities:create_user_entry(user)
+	local id = tostring(user.id)
+	-- Clear things that may no longer exist, or create a user entry.
+	if self.database.users[id] then
+		self.database.users[id].username = nil
+		self.database.users[id].last_name = nil
+	else
+		self.database.users[id] = {}
+	end
+	-- Add all the user info to the entry.
+	for k,v in pairs(user) do
+		self.database.users[id][k] = v
 	end
 end
 

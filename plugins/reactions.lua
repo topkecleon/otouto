@@ -1,7 +1,10 @@
  -- Never change this plugin. It was not meant to be changed.
  -- You may add reactions. You must never remove reactions.
  -- You must never restructure. You must never disable this plugin.
- -- ~ Drew, creator, a year later.
+ -- - Drew, creator, a year later.
+
+ -- Nevermind, Brayden changed it.
+ -- - Drew, just now.
 
 local reactions = {}
 

@@ -1,8 +1,6 @@
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-**This readme is outdated as of 3.7. Proceed with caution.**
-
 [Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
@@ -19,7 +17,7 @@ otouto is an independently-developed Telegram API bot written in Lua. Originally
 | [Contributors](#contributors)                         |
 
 ## Setup
-You _must_ have Lua (5.2+), lua-socket, lua-sec, and dkjson installed. It is recommended you install these with LuaRocks. To upload files, you must have curl installed. To use fortune.lua, you must have fortune installed.
+You _must_ have Lua (5.2+), luasocket, luasec, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks. To upload photos and other files, you must have curl installed. To use fortune.lua, you must have fortune installed.
 
 Clone the repository and set the following values in `config.lua`:
 
@@ -32,7 +30,7 @@ Optionally:
 
 Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` array.
 
-When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/halt" through Telegram. If you terminate the bot manually, you risk data loss. If you do you not want the bot to restart automatically, run it with `lua bot.lua`.
+When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/halt" through Telegram. If you terminate the bot manually, you risk data loss. If you do you not want the bot to restart automatically, run it with `lua main.lua`.
 
 Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
 
@@ -54,21 +52,22 @@ Most plugins are intended for public use, but a few are for other purposes, like
 
 A plugin can have five components, and two of them are required:
 
-| Component | Description                                  | Required? |
-|:----------|:---------------------------------------------|:----------|
-| action    | Main function. Expects `msg` table as an argument.   | Y |
-| triggers  | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| cron      | Optional function to be called every minute.         | N |
-| command   | Basic command and syntax. Listed in the help text.   | N |
-| doc       | Usage for the plugin. Returned by "/help $command".  | N |
+| Component       | Description                                  | Required? |
+|:----------------|:---------------------------------------------|:----------|
+| plugin:action   | Main function. Expects `msg` table as an argument.   | Y |
+| plugin.triggers | Table of triggers for the plugin. Uses Lua patterns. | Y |
+| plugin:init     | Optional function run when the plugin is loaded.     | N |
+| plugin:cron     | Optional function to be called every minute.         | N |
+| plugin.command  | Basic command and syntax. Listed in the help text.   | N |
+| plugin.doc      | Usage for the plugin. Returned by "/help $command".  | N |
 
-The `on_msg_receive()` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
+The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 
-Return values from `action()` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
+Return values from `plugin:action` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
 
-When an action or cron function fails, the exception is caught and passed to the `handle_exception()` utilty (in utilities.lua) and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
+When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
 
-Interactions with the bot API are straightforward. Every binding function shares the name of the API method (eg `sendMessage()`). An additional function, `sendReply()`, accepts the `msg` table and a string as an argument, and sends the string as a reply to that message.
+Interactions with the bot API are straightforward. Every binding function shares the name of the API method (eg `sendMessage`). An additional function, `sendReply`, accepts the `msg` table and a string as an argument, and sends the string as a reply to that message.
 
 Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
 
@@ -92,7 +91,7 @@ The administration plugin enables self-hosted, single-realm group administration
 
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
 
-Once the installation is finished, enable `administration.lua` in your config file. You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
+Once the installation is finished, enable `administration.lua` in your config file. **The administration plugin must be loaded before about.lua and blacklist.lua.** You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
 
 While tg is running, you may start/reload otouto with administration.lua enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
 
@@ -175,23 +174,6 @@ Some plugins are only useful when the bot is used in a Liberbot group, like floo
 `/floodcontrol {"groupid":987654321,"duration":600}`
 The bot will accept these commands from both Liberbot and the configured administrator.
 
-**moderation.lua** allows the owner to use the bot to moderate a Liberbot realm, or set of groups. This works by adding the bot to the realm's admin group and making it an administrator.
-You must configure the plugin in the "moderation" section of config.lua, in the following way:
-```lua
-moderation = {
-    admins = {
-        ['123456789'] = 'Adam',
-        ['246813579'] = 'Eve'
-    },
-    admin_group = -987654321,
-    realm_name = 'My Realm'
-}
-```
-
-Where Adam and Eve are realm administrators, and their IDs are set as their keys in the form of strings. admin_group is the group ID of the admin group, as a negative number. realm_name is the name of your Libebot realm.
-
-Once this is set up, put your bot in the admin group and run `/modadd` and `/modhelp` to get started.
-
 * * *
 
 ## List of plugins
@@ -254,9 +236,9 @@ Contributions are appreciated in any form. Monetary contributions will go toward
 
 | Contributors                                  |
 |:----------------------------------------------|
+| [bb010g](http://github.com/bb010g)            |
 | [Juan Potato](http://github.com/JuanPotato)   |
 | [Tiago Danin](http://github.com/TiagoDanin)   |
-| [bb010g](http://github.com/bb010g)            |
 | [Ender](http://github.com/luksireiku)         |
 | [Iman Daneshi](http://github.com/Imandaneshi) |
 | [HeitorPB](http://github.com/heitorPB)        |
