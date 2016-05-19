@@ -18,7 +18,12 @@
 	hammer group will also be banned locally. Bot will now also attempt to kick
 	via bot API before using tg. Added autobanning after (default) 3 autokicks.
 	Threshold onfigurable with antiflood. Autokick counters reset within twenty-
-	four hours. Merged antisquig action into generic.
+	four hours. Merged antisquig action into generic. There is no automatic
+	migration; simply add the following to database.administration:
+		autokick_timer = 0
+		groups[*].flags[6] = false
+		groups[*].autoban = 3
+		groups[*].autokicks = {}
 
 
 ]]--
@@ -175,7 +180,7 @@ function administration:mod_format(id)
 	local name = utilities.build_name(user.first_name, user.last_name)
 	name = utilities.markdown_escape(name)
 	local output = '• ' .. name .. ' `[' .. id .. ']`\n'
-	return outputbb
+	return output
 end
 
 function administration:get_desc(chat_id)
