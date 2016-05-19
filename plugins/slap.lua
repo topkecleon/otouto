@@ -94,7 +94,9 @@ local slaps = {
 	'VICTOR slaps VICTIM with a DMCA takedown request!',
 	'VICTIM became a corpse blanket for VICTOR.',
 	'Death is when the monsters get you. Death comes for VICTIM.',
-	'Cowards die many times before their death. VICTIM never tasted death but once.'
+	'Cowards die many times before their death. VICTIM never tasted death but once.',
+	'VICTIM died of hospital gangrene.',
+	'VICTIM got a house call from Doctor VICTOR.'
 }
 
 function slap:action(msg)

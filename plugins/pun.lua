@@ -131,7 +131,9 @@ local puns = {
 	"Horses are very stable animals.",
 	"Banks don't crash, they just lose their balance.",
 	"The career of a skier can go downhill very fast.",
-	"In democracy, it's your vote that counts. In feudalism, it's your count that votes."
+	"In democracy, it's your vote that counts. In feudalism, it's your count that votes.",
+	"A sea lion is nothing but an ionized seal.",
+	"The vegetables from my garden aren't that great. I guess you could say they're mediokra."
 }
 
 function pun:action(msg)

@@ -19,11 +19,17 @@ function luarun:action(msg)
 		return
 	end
 
-	local output = loadstring('local bindings = require(\'bindings\'); local utilities = require(\'utilities\'); return function (self, msg) '..input..' end')()(self, msg)
+	local output = loadstring( [[
+		local bindings = require('bindings')
+		local utilities = require('utilities')
+		local JSON = require('dkjson')
+		local URL = require('socket.url')
+		local HTTP = require('socket.http')
+		local HTTPS = require('ssl.https')
+		return function (self, msg) ]] .. input .. [[ end
+	]] )()(self, msg)
 	if output == nil then
 		output = 'Done!'
-	elseif type(output) == 'table' then
-		output = 'Done! Table returned.'
 	else
 		output = '```\n' .. tostring(output) .. '\n```'
 	end

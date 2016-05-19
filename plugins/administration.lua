@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.8.3
+	Version 1.9
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -13,20 +13,13 @@
 
 	Important notices about updates will be here!
 
-	1.7 - Added antiflood (flag 5). Fixed security flaw. Renamed flag 3
-	("antisquig Strict" -> "antisquig++"). Added /alist for governors to list
-	administrators. Back to single-governor groups as originally intended. Auto-
-	matic migration through 1.8.
+	1.9 - Added flag antihammer. Groups with antihammer enabled will not be
+	affected by global bans. However, users who are hammer'd from an anti-
+	hammer group will also be banned locally. Bot will now also attempt to kick
+	via bot API before using tg. Added autobanning after (default) 3 autokicks.
+	Threshold onfigurable with antiflood. Autokick counters reset within twenty-
+	four hours. Merged antisquig action into generic.
 
-	1.8 - Group descriptions will be updated automatically. Fixed markdown
-	stuff. Removed /kickme.
-
-	1.8.1 - /rule <i> will return that numbered rule, if it exists.
-
-	1.8.2 - Will now attempt to unban users kicked from supergroups. Other small
-	changes.
-
-	1.8.3 - Migrated to new plugin standard. Added /ahelp command to /desc.
 
 ]]--
 
@@ -43,7 +36,8 @@ function administration:init()
 		self.database.administration = {
 			admins = {},
 			groups = {},
-			activity = {}
+			activity = {},
+			autokick_timer = os.date('%d')
 		}
 	end
 
@@ -51,18 +45,6 @@ function administration:init()
 		help = {},
 		flood = {}
 	}
-
-	-- Migration code: Remove this in v1.9.
-	-- Groups have single governors now.
-	for _,group in pairs(self.database.administration.groups) do
-		if group.govs then
-			for gov, _ in pairs(group.govs) do
-				group.governor = gov
-				break
-			end
-		end
-		group.govs = nil
-	end
 
 	drua.PORT = self.config.cli_port or 4567
 
@@ -108,6 +90,13 @@ administration.flags = {
 		enabled = 'Users will now be removed automatically for excessive messages. Use /antiflood to configure limits.',
 		disabled = 'Users will no longer be removed automatically for excessive messages.',
 		kicked = 'You were automatically kicked from GROUPNAME for flooding.'
+	},
+	[6] = {
+		name = 'antihammer',
+		desc = 'Removes the ban on globally-banned users. Note that users hammered in this group will also be banned locally.',
+		short = 'This group does not acknowledge global bans.',
+		enabled = 'This group will no longer remove users for being globally banned.',
+		disabled = 'This group will now remove users for being globally banned.'
 	}
 }
 
@@ -135,9 +124,7 @@ administration.ranks = {
 function administration:get_rank(target, chat)
 
 	target = tostring(target)
-	if chat then
-		chat = tostring(chat)
-	end
+	chat = tostring(chat)
 
 	if tonumber(target) == self.config.admin or tonumber(target) == self.info.id then
 		return 5
@@ -157,8 +144,15 @@ function administration:get_rank(target, chat)
 		end
 	end
 
+	-- I wrote a more succint statement, but I want to be able to make sense of
+	-- it. Basically, blacklisted users get 0, except when the group has flag 6
+	-- enabled.
 	if self.database.blacklist[target] then
-		return 0
+		if chat and self.database.administration.groups[chat] and self.database.administration.groups[chat].flags[6] then
+			return 1
+		else
+			return 0
+		end
 	end
 
 	return 1
@@ -181,7 +175,7 @@ function administration:mod_format(id)
 	local name = utilities.build_name(user.first_name, user.last_name)
 	name = utilities.markdown_escape(name)
 	local output = '• ' .. name .. ' `[' .. id .. ']`\n'
-	return output
+	return outputbb
 end
 
 function administration:get_desc(chat_id)
@@ -242,36 +236,17 @@ function administration:update_desc(chat)
 	drua.channel_set_about(chat, desc)
 end
 
+function administration:kick_user(chat, target, reason)
+	if not bindings.kickChatMember(self, chat, target) then
+		drua.kick_user(chat, target)
+	end
+	utilities.handle_exception(self, target..' kicked from '..chat, reason)
+end
+
 function administration.init_command(self_)
 	administration.commands = {
 
-		{ -- antisquig
-			triggers = {
-				'[\216-\219][\128-\191]', -- arabic
-				'‮', -- rtl
-				'‏', -- other rtl
-			},
-
-			privilege = 0,
-			interior = true,
-
-			action = function(self, msg, group)
-				if administration.get_rank(self, msg.from.id, msg.chat.id) > 1 then
-					return true
-				end
-				if not group.flags[2] then
-					return true
-				end
-				drua.kick_user(msg.chat.id, msg.from.id)
-				if msg.chat.type == 'supergroup' then
-					bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
-				end
-				local output = administration.flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
-				bindings.sendMessage(self, msg.from.id, output)
-			end
-		},
-
-		{ -- generic
+		{ -- generic, mostly autokicks
 			triggers = { '' },
 
 			privilege = 0,
@@ -281,30 +256,44 @@ function administration.init_command(self_)
 
 				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
-				-- banned
-				if rank == 0 then
-					drua.kick_user(msg.chat.id, msg.from.id)
-					bindings.sendMessage(self, msg.from.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
-					return
-				end
+				local user = {
+					do_kick = false,
+					do_ban = false
+				}
 
 				if rank < 2 then
 
-					-- antisquig Strict
-					if group.flags[3] == true then
-						if msg.from.name:match('[\216-\219][\128-\191]') or msg.from.name:match('‮') or msg.from.name:match('‏') then
-							drua.kick_user(msg.chat.id, msg.from.id)
-							if msg.chat.type == 'supergroup' then
-								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
-							end
-							local output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
-							bindings.sendMessage(self, msg.from.id, output)
-							return
-						end
+					-- banned
+					if rank == 0 then
+						user.do_kick = true
+						user.reason = 'banned'
+						user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
+					end
+
+					-- antisquig
+					if group.flags[2] and (
+						msg.text:match('[\216-\219][\128-\191]')
+						or msg.text:match('‮')
+						or msg.text:match('‏')
+					) then
+						user.do_kick = true
+						user.reason = 'antisquig'
+						user.output = administration.flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
+					end
+
+					-- antisquig++
+					if group.flags[3] and (
+						msg.from.name:match('[\216-\219][\128-\191]')
+						or msg.from.name:match('‮')
+						or msg.from.name:match('‏')
+					) then
+						user.do_kick = true
+						user.reason = 'antisquig++'
+						user.output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
 					end
 
 					-- antiflood
-					if group.flags[5] == true then
+					if group.flags[5] then
 						if not group.antiflood then
 							group.antiflood = JSON.decode(JSON.encode(administration.antiflood))
 						end
@@ -314,73 +303,77 @@ function administration.init_command(self_)
 						if not self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] then
 							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = 0
 						end
+						local user_flood = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str]
 						if msg.sticker then -- Thanks Brazil for discarding switches.
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.sticker
+							user_flood = user_flood + group.antiflood.sticker
 						elseif msg.photo then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.photo
+							user_flood = user_flood + group.antiflood.photo
 						elseif msg.document then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.document
+							user_flood = user_flood + group.antiflood.document
 						elseif msg.audio then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.audio
+							user_flood = user_flood + group.antiflood.audio
 						elseif msg.contact then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.contact
+							user_flood = user_flood + group.antiflood.contact
 						elseif msg.video then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.video
+							user_flood = user_flood + group.antiflood.video
 						elseif msg.location then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.location
+							user_flood = user_flood + group.antiflood.location
 						elseif msg.voice then
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.voice
+							user_flood = user_flood + group.antiflood.voice
 						else
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.text
+							user_flood = user_flood + group.antiflood.text
 						end
-						if self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
-							drua.kick_user(msg.chat.id, msg.from.id)
-							if msg.chat.type == 'supergroup' then
-								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
-							end
-							local output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
-							bindings.sendMessage(self, msg.from.id, output)
-							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
-							return
+						if user_flood > 99 then
+							user.do_kick = true
+							user.reason = 'antiflood'
+							user.output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
+							user_flood = nil
 						end
 					end
 
 				end
 
+				local new_user = user
+
 				if msg.new_chat_participant then
 
-					msg.new_chat_participant.name = utilities.build_name(msg.new_chat_participant.first_name, msg.new_chat_participant.last_name)
-
-					-- banned
-					if administration.get_rank(self, msg.new_chat_participant.id, msg.chat.id) == 0 then
-						drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
-						bindings.sendMessage(self, msg.new_chat_participant.id, 'Sorry, you are banned from ' .. msg.chat.title .. '.')
-						return
+					-- We'll make a new table for the new guy, unless he's also
+					-- the original guy.
+					if msg.new_chat_participant.id ~= msg.from.id then
+						new_user = {
+							do_kick = false
+						}
 					end
 
-					-- antisquig Strict
-					if group.flags[3] == true then
-						if msg.new_chat_participant.name:match('[\216-\219][\128-\191]') or msg.new_chat_participant.name:match('‮') or msg.new_chat_participant.name:match('‏') then
-							drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
-							if msg.chat.type == 'supergroup' then
-								bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
-							end
-							local output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
-							bindings.sendMessage(self, msg.new_chat_participant.id, output)
-							return
-						end
-					end
+					-- I hate typing this out.
+					local newguy = msg.new_chat_participant
 
-					-- antibot
-					if msg.new_chat_participant.username and msg.new_chat_participant.username:match('bot$') then
-						if rank < 2 and group.flags[4] == true then
-							drua.kick_user(msg.chat.id, msg.new_chat_participant.id)
-							return
+					if administration.get_rank(self, msg.new_chat_participant.id, msg.chat.id) < 2 then
+
+						-- banned
+						if administration.get_rank(self, newguy.id, msg.chat.id) == 0 then
+							new_user.do_kick = true
+							new_user.reason = 'banned'
+							new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
 						end
-					else
-						local output = administration.get_desc(self, msg.chat.id)
-						bindings.sendMessage(self, msg.new_chat_participant.id, output, true, nil, true)
-						return
+
+						-- antisquig++
+						if group.flags[3] and (
+							newguy.name:match('[\216-\219][\128-\191]')
+							or newguy.name:match('‮')
+							or newguy.name:match('‏')
+						) then
+							new_user.do_kick = true
+							new_user.reason = 'antisquig++'
+							new_user.output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
+						end
+
+						-- antibot
+						if newguy.username and newguy.username:match('bot$') and group.flags[4] and rank < 2 then
+							new_user.do_kick = true
+							new_user.reason = 'antibot'
+						end
+
 					end
 
 				elseif msg.new_chat_title then
@@ -393,7 +386,6 @@ function administration.init_command(self_)
 							administration.update_desc(self, msg.chat.id)
 						end
 					end
-					return
 
 				elseif msg.new_chat_photo then
 
@@ -406,7 +398,6 @@ function administration.init_command(self_)
 					else
 						group.photo = drua.get_photo(msg.chat.id)
 					end
-					return
 
 				elseif msg.delete_chat_photo then
 
@@ -419,7 +410,60 @@ function administration.init_command(self_)
 					else
 						group.photo = nil
 					end
-					return
+
+				end
+
+				if new_user ~= user then
+					if new_user.do_ban then
+						administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
+						if new_user.output then
+							bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
+						end
+						group.bans[msg.new_chat_participant.id_str] = true
+					elseif new_user.do_kick then
+						administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
+						if new_user.output then
+							bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
+						end
+						if msg.chat.type == 'supergroup' then
+							bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+						end
+					end
+				end
+
+				if group.flags[5] and user.do_kick then
+					if group.autokicks[msg.from.id_str] then
+						group.autokicks[msg.from.id_str] = group.autokicks[msg.from.id_str] + 1
+					else
+						group.autokicks[msg.from.id_str] = 1
+					end
+					if group.autokicks[msg.from.id_str] >= group.autoban then
+						group.autokicks[msg.from.id_str] = 0
+						user.do_ban = true
+						user.reason = 'antiflood autoban'
+						user.output = 'You have been banned for being autokicked too many times.'
+					end
+				end
+
+				if user.do_ban then
+					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
+					if user.output then
+						bindings.sendMessage(self, msg.from.id, user.output)
+					end
+					group.bans[msg.from.id_str] = true
+				elseif user.do_kick then
+					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
+					if user.output then
+						bindings.sendMessage(self, msg.from.id, user.output)
+					end
+					if msg.chat.type == 'supergroup' then
+						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+					end
+				end
+
+				if msg.new_chat_participant and not (new_user.do_kick or new_user.do_ban) then
+					local output = administration.get_desc(self, msg.chat.id)
+					bindings.sendMessage(self, msg.new_chat_participant.id, output, true, nil, true)
 				end
 
 				-- Last active time for group listing.
@@ -437,7 +481,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- groups
+		{ -- /groups
 			triggers = utilities.triggers(self_.info.username):t('groups').table,
 
 			command = 'groups',
@@ -465,7 +509,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- ahelp
+		{ -- /ahelp
 			triggers = utilities.triggers(self_.info.username):t('ahelp').table,
 
 			command = 'ahelp',
@@ -490,7 +534,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- alist
+		{ -- /alist
 			triggers = utilities.triggers(self_.info.username):t('ops'):t('oplist').table,
 
 			command = 'ops',
@@ -519,7 +563,7 @@ function administration.init_command(self_)
 
 		},
 
-		{ -- desc
+		{ -- /desc
 			triggers = utilities.triggers(self_.info.username):t('desc'):t('description').table,
 
 			command = 'description',
@@ -538,7 +582,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- rules
+		{ -- /rules
 			triggers = utilities.triggers(self_.info.username):t('rules?', true).table,
 
 			command = 'rules',
@@ -565,7 +609,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- motd
+		{ -- /motd
 			triggers = utilities.triggers(self_.info.username):t('motd').table,
 
 			command = 'motd',
@@ -581,7 +625,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- link
+		{ -- /link
 			triggers = utilities.triggers(self_.info.username):t('link').table,
 
 			command = 'link',
@@ -597,7 +641,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- kickme
+		{ -- /kickme
 			triggers = utilities.triggers(self_.info.username):t('leave'):t('kickme').table,
 
 			command = 'kickme',
@@ -609,14 +653,14 @@ function administration.init_command(self_)
 					bindings.sendReply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
 					return
 				end
-				drua.kick_user(msg.chat.id, msg.from.id)
+				administration.kick_user(self, msg.chat.id, msg.from.id, 'kickme')
 				if msg.chat.type == 'supergroup' then
 					bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
 				end
 			end
 		},
 
-		{ -- kick
+		{ -- /kick
 			triggers = utilities.triggers(self_.info.username):t('kick', true).table,
 
 			command = 'kick <user>',
@@ -632,7 +676,7 @@ function administration.init_command(self_)
 					bindings.sendReply(self, msg, target.name .. ' is too privileged to be kicked.')
 					return
 				end
-				drua.kick_user(msg.chat.id, target.id)
+				administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.id)
 				if msg.chat.type == 'supergroup' then
 					bindings.unbanChatMember(self, msg.chat.id, target.id)
 				end
@@ -640,7 +684,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- ban
+		{ -- /ban
 			triggers = utilities.triggers(self_.info.username):t('ban', true):t('unban', true).table,
 
 			command = 'ban <user>',
@@ -665,13 +709,13 @@ function administration.init_command(self_)
 					bindings.sendReply(self, msg, target.name .. ' has been unbanned.')
 				else
 					group.bans[target.id_str] = true
-					drua.kick_user(msg.chat.id, target.id)
+					administration.kick_user(self, msg.chat.id, target.id, ' banned by '..msg.from.id)
 					bindings.sendReply(self, msg, target.name .. ' has been banned.')
 				end
 			end
 		},
 
-		{ -- changerule
+		{ -- /changerule
 			triggers = utilities.triggers(self_.info.username):t('changerule', true).table,
 
 			command = 'changerule <i> <rule>',
@@ -721,7 +765,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- setrules
+		{ -- /setrules
 			triggers = utilities.triggers(self_.info.username):t('setrules', true).table,
 
 			command = 'setrules <rules>',
@@ -751,7 +795,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- setmotd
+		{ -- /setmotd
 			triggers = utilities.triggers(self_.info.username):t('setmotd', true).table,
 
 			command = 'setmotd <motd>',
@@ -783,7 +827,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- setlink
+		{ -- /setlink
 			triggers = utilities.triggers(self_.info.username):t('setlink', true).table,
 
 			command = 'setlink <link>',
@@ -806,7 +850,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- alist
+		{ -- /alist
 			triggers = utilities.triggers(self_.info.username):t('alist').table,
 
 			command = 'alist',
@@ -823,7 +867,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- flags
+		{ -- /flags
 			triggers = utilities.triggers(self_.info.username):t('flags?', true).table,
 
 			command = 'flag <i>',
@@ -856,7 +900,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- antiflood
+		{ -- /antiflood
 			triggers = utilities.triggers(self_.info.username):t('antiflood', true).table,
 
 			command = 'antiflood <type> <i>',
@@ -875,10 +919,13 @@ function administration.init_command(self_)
 				local output
 				if input then
 					local key, val = input:match('(%a+) (%d+)')
-					if not group.antiflood[key] or not tonumber(val) then
+					if not key or not val or not tonumber(val) then
 						output = 'Not a valid message type or number.'
+					elseif key == 'autoban' then
+						group.autoban = tonumber(val)
+						output = 'Users will now be autobanned after *' .. val .. '* autokicks.'
 					else
-						group.antiflood[key] = val
+						group.antiflood[key] = tonumber(val)
 						output = '*' .. key:gsub('^%l', string.upper) .. '* messages are now worth *' .. val .. '* points.'
 					end
 				else
@@ -886,12 +933,13 @@ function administration.init_command(self_)
 					for k,v in pairs(group.antiflood) do
 						output = output .. '*'..k..':* `'..v..'`\n'
 					end
+					output = output .. '\nUsers will be banned automatically after *' .. group.autoban .. '* autokicks. Configure this with the *autoban* keyword.'
 				end
 				bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 			end
 		},
 
-		{ -- mod
+		{ -- /mod
 			triggers = utilities.triggers(self_.info.username):t('mod', true):t('demod', true).table,
 
 			command = 'mod <user>',
@@ -924,7 +972,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- gov
+		{ -- /gov
 			triggers = utilities.triggers(self_.info.username):t('gov', true):t('degov', true).table,
 
 			command = 'gov <user>',
@@ -962,14 +1010,14 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- hammer
+		{ -- /hammer
 			triggers = utilities.triggers(self_.info.username):t('hammer', true):t('unhammer', true).table,
 
 			command = 'hammer <user>',
 			privilege = 4,
 			interior = false,
 
-			action = function(self, msg)
+			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
 					bindings.sendReply(self, msg, target.err)
@@ -983,16 +1031,24 @@ function administration.init_command(self_)
 					self.database.blacklist[target.id_str] = nil
 					bindings.sendReply(self, msg, target.name .. ' has been globally unbanned.')
 				else
+					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.id)
 					self.database.blacklist[target.id_str] = true
-					for k,_ in pairs(self.database.administration.groups) do
-						drua.kick_user(k, target.id)
+					--for k,v in pairs(self.database.administration.groups) do
+						--if not v.flags[6] then
+							--administration.kick_user(self, k, target.id)
+						--end
+					--end
+					local output = target.name .. ' has been globally banned.'
+					if group.flags[6] == true then
+						group.bans[target.id_str] = true
+						output = target.name .. ' has been globally and locally banned.'
 					end
-					bindings.sendReply(self, msg, target.name .. ' has been globally banned.')
+					bindings.sendReply(self, msg, output)
 				end
 			end
 		},
 
-		{ -- admin
+		{ -- /admin
 			triggers = utilities.triggers(self_.info.username):t('admin', true):t('deadmin', true).table,
 
 			command = 'admin <user>',
@@ -1022,7 +1078,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- gadd
+		{ -- /gadd
 			triggers = utilities.triggers(self_.info.username):t('gadd').table,
 
 			command = 'gadd',
@@ -1044,10 +1100,12 @@ function administration.init_command(self_)
 					name = msg.chat.title,
 					link = drua.export_link(msg.chat.id),
 					photo = drua.get_photo(msg.chat.id),
-					founded = os.time()
+					founded = os.time(),
+					autokicks = {},
+					autoban = 3
 				}
 				administration.update_desc(self, msg.chat.id)
-				for i,_ in ipairs(administration.flags) do
+				for i = 1, #administration.flags do
 					self.database.administration.groups[msg.chat.id_str].flags[i] = false
 				end
 				table.insert(self.database.administration.activity, msg.chat.id_str)
@@ -1055,7 +1113,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- grem
+		{ -- /grem
 			triggers = utilities.triggers(self_.info.username):t('grem', true):t('gremove', true).table,
 
 			command = 'gremove \\[chat]',
@@ -1085,7 +1143,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- glist
+		{ -- /glist
 			triggers = utilities.triggers(self_.info.username):t('glist', false).table,
 
 			command = 'glist',
@@ -1113,7 +1171,7 @@ function administration.init_command(self_)
 			end
 		},
 
-		{ -- broadcast
+		{ -- /broadcast
 			triggers = utilities.triggers(self_.info.username):t('broadcast', true).table,
 
 			command = 'broadcast <message>',
@@ -1176,6 +1234,12 @@ end
 
 function administration:cron()
 	self.admin_temp.flood = {}
+	if os.date('%d') ~= self.database.administration.autokick_timer then
+		self.database.administration.autokick_timer = os.date('%d')
+		for _,v in pairs(self.database.administration.groups) do
+			v.autokicks = {}
+		end
+	end
 end
 
 administration.command = 'groups'
