@@ -106,15 +106,15 @@ administration.flags = {
 }
 
 administration.antiflood = {
-	text = 5,
-	voice = 5,
-	audio = 5,
-	contact = 5,
-	photo = 10,
-	video = 10,
-	location = 10,
-	document = 10,
-	sticker = 20
+	text = 10,
+	voice = 10,
+	audio = 10,
+	contact = 10,
+	photo = 20,
+	video = 20,
+	location = 20,
+	document = 20,
+	sticker = 40
 }
 
 administration.ranks = {
@@ -277,9 +277,9 @@ function administration.init_command(self_)
 
 					-- antisquig
 					if group.flags[2] and (
-						msg.text:match('[\216-\219][\128-\191]')
-						or msg.text:match('‮')
-						or msg.text:match('‏')
+						msg.text:match(utilities.char.arabic)
+						or msg.text:match(utilities.char.rtl)
+						or msg.text:match(utilities.char.flush_right)
 					) then
 						user.do_kick = true
 						user.reason = 'antisquig'
@@ -288,9 +288,9 @@ function administration.init_command(self_)
 
 					-- antisquig++
 					if group.flags[3] and (
-						msg.from.name:match('[\216-\219][\128-\191]')
-						or msg.from.name:match('‮')
-						or msg.from.name:match('‏')
+						msg.from.name:match(utilities.char.arabic)
+						or msg.from.name:match(utilities.char.rtl)
+						or msg.from.name:match(utilities.char.flush_right)
 					) then
 						user.do_kick = true
 						user.reason = 'antisquig++'
@@ -308,31 +308,30 @@ function administration.init_command(self_)
 						if not self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] then
 							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = 0
 						end
-						local user_flood = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str]
 						if msg.sticker then -- Thanks Brazil for discarding switches.
-							user_flood = user_flood + group.antiflood.sticker
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.sticker
 						elseif msg.photo then
-							user_flood = user_flood + group.antiflood.photo
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.photo
 						elseif msg.document then
-							user_flood = user_flood + group.antiflood.document
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.document
 						elseif msg.audio then
-							user_flood = user_flood + group.antiflood.audio
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.audio
 						elseif msg.contact then
-							user_flood = user_flood + group.antiflood.contact
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.contact
 						elseif msg.video then
-							user_flood = user_flood + group.antiflood.video
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.video
 						elseif msg.location then
-							user_flood = user_flood + group.antiflood.location
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.location
 						elseif msg.voice then
-							user_flood = user_flood + group.antiflood.voice
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.voice
 						else
-							user_flood = user_flood + group.antiflood.text
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] + group.antiflood.text
 						end
-						if user_flood > 99 then
+						if self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] > 99 then
 							user.do_kick = true
 							user.reason = 'antiflood'
 							user.output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
-							user_flood = nil
+							self.admin_temp.flood[msg.chat.id_str][msg.from.id_str] = nil
 						end
 					end
 
@@ -364,9 +363,9 @@ function administration.init_command(self_)
 
 						-- antisquig++
 						if group.flags[3] and (
-							newguy.name:match('[\216-\219][\128-\191]')
-							or newguy.name:match('‮')
-							or newguy.name:match('‏')
+							newguy.name:match(utilities.char.arabic)
+							or newguy.name:match(utilities.char.rtl)
+							or newguy.name:match(utilities.char.flush_right)
 						) then
 							new_user.do_kick = true
 							new_user.reason = 'antisquig++'
@@ -445,7 +444,7 @@ function administration.init_command(self_)
 					if group.autokicks[msg.from.id_str] >= group.autoban then
 						group.autokicks[msg.from.id_str] = 0
 						user.do_ban = true
-						user.reason = 'antiflood autoban'
+						user.reason = 'antiflood autoban: ' .. user.reason
 						user.output = 'You have been banned for being autokicked too many times.'
 					end
 				end
@@ -938,7 +937,7 @@ function administration.init_command(self_)
 					for k,v in pairs(group.antiflood) do
 						output = output .. '*'..k..':* `'..v..'`\n'
 					end
-					output = output .. '\nUsers will be banned automatically after *' .. group.autoban .. '* autokicks. Configure this with the *autoban* keyword.'
+					output = output .. 'Users will be banned automatically after *' .. group.autoban .. '* autokicks. Configure this with the *autoban* keyword.'
 				end
 				bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
 			end
