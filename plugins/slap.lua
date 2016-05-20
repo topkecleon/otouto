@@ -96,37 +96,35 @@ local slaps = {
 	'Death is when the monsters get you. Death comes for VICTIM.',
 	'Cowards die many times before their death. VICTIM never tasted death but once.',
 	'VICTIM died of hospital gangrene.',
-	'VICTIM got a house call from Doctor VICTOR.'
+	'VICTIM got a house call from Doctor VICTOR.',
+	'VICTOR beheaded VICTIM.',
+	'VICTIM got stoned...by an angry mob.',
+	'VICTOR sued the pants off VICTIM.',
+	'VICTIM was impeached.',
+	'VICTIM was one-hit KO\'d by VICTOR.',
+	'VICTOR sent VICTIM to /dev/null.',
+	'VICTOR sent VICTIM down the memory hole.'
 }
 
 function slap:action(msg)
 
-	local victim = utilities.input(msg.text)
-	if msg.reply_to_message then
-		if self.database.users[tostring(msg.reply_to_message.from.id)].nickname then
-			victim = self.database.users[tostring(msg.reply_to_message.from.id)].nickname
-		else
-			victim = msg.reply_to_message.from.first_name
-		end
+	local victor = self.database.users[msg.from.id_str]
+	local victim = utilities.user_from_message(self, msg, true)
+	local input = utilities.input(msg.text)
+
+	local victim_name = victim.nickname or victim.first_name or input
+	local victor_name = victor.nickname or victor.first_name
+	if not victim_name or victim_name == victor_name then
+		victim_name = victor_name
+		victor_name = self.info.first_name
 	end
 
-	local victor = msg.from.first_name
-	if self.database.users[msg.from.id_str].nickname then
-		victor = self.database.users[msg.from.id_str].nickname
-	end
+	local output = slaps[math.random(#slaps)]
+	output = output:gsub('VICTIM', victim_name)
+	output = output:gsub('VICTOR', victor_name)
+	output = utilities.char.zwnj .. output
 
-	if not victim then
-		victim = victor
-		victor = self.info.first_name
-	end
-
-	local message = slaps[math.random(#slaps)]
-	message = message:gsub('VICTIM', victim)
-	message = message:gsub('VICTOR', victor)
-
-	message = utilities.latcyr(message)
-
-	bindings.sendMessage(self, msg.chat.id, message)
+	bindings.sendMessage(self, msg.chat.id, output)
 
 end
 

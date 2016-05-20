@@ -332,4 +332,13 @@ function utilities:create_user_entry(user)
 	end
 end
 
+ -- This table will store unsavory characters that are not properly displayed,
+ -- or are just not fun to type.
+utilities.char = {
+	zwnj = '‌',
+	arabic = '[\216-\219][\128-\191]',
+	rtl = '‮',
+	flush_right = '‏'
+}
+
 return utilities
