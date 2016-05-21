@@ -187,11 +187,18 @@ function bindings:sendPhotoID(chat_id, file_id, caption, reply_to_message_id, di
 
 end
 
-function bindings.curlRequest(curl_command)
- -- Use at your own risk. Will not check for success.
-
-	io.popen(curl_command)
-
+function bindings.curlRequest(curl_command, give_output)
+	if give_output then
+		local s = io.popen(curl_command):read('*all')
+		local tab = JSON.encode(s)
+		if not tab then return false end
+		if not tab.ok then
+			return false, tab.description
+		end
+		return tab
+	else
+		io.popen(curl_command)
+	end
 end
 
 function bindings:sendPhoto(chat_id, photo, caption, reply_to_message_id, disable_notification)

@@ -19,7 +19,10 @@ function bot:init() -- The function run when the bot is started or reloaded.
 	end
 
 	-- Fetch bot information. Try until it succeeds.
-	repeat self.info = bindings.getMe(self) until self.info
+	repeat
+		print('Fetching bot information...')
+		self.info = bindings.getMe(self)
+	until self.info
 	self.info = self.info.result
 
 	-- Load the "database"! ;)

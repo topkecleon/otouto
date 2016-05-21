@@ -144,14 +144,12 @@ function utilities.build_name(first, last)
 end
 
 function utilities:resolve_username(input)
-
 	input = input:gsub('^@', '')
 	for _,v in pairs(self.database.users) do
 		if v.username and v.username:lower() == input:lower() then
 			return v
 		end
 	end
-
 end
 
 function utilities:user_from_message(msg, no_extra)

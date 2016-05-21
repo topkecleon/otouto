@@ -242,9 +242,7 @@ function administration:update_desc(chat)
 end
 
 function administration:kick_user(chat, target, reason)
-	if not bindings.kickChatMember(self, chat, target) then
-		drua.kick_user(chat, target)
-	end
+	drua.kick_user(chat, target)
 	utilities.handle_exception(self, target..' kicked from '..chat, reason)
 end
 
@@ -1037,11 +1035,11 @@ function administration.init_command(self_)
 				else
 					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.id)
 					self.database.blacklist[target.id_str] = true
-					--for k,v in pairs(self.database.administration.groups) do
-						--if not v.flags[6] then
-							--administration.kick_user(self, k, target.id)
-						--end
-					--end
+					for k,v in pairs(self.database.administration.groups) do
+						if not v.flags[6] then
+							drua.kick_user(k, target.id)
+						end
+					end
 					local output = target.name .. ' has been globally banned.'
 					if group.flags[6] == true then
 						group.bans[target.id_str] = true
@@ -1114,6 +1112,7 @@ function administration.init_command(self_)
 				end
 				table.insert(self.database.administration.activity, msg.chat.id_str)
 				bindings.sendReply(self, msg, 'I am now administrating this group.')
+				drua.channel_set_admin(msg.chat.id, self.info.id, 2)
 			end
 		},
 

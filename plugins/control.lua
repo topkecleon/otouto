@@ -6,6 +6,7 @@ local utilities = require('utilities')
 
 function control:init()
 	control.triggers = utilities.triggers(self.info.username):t('reload'):t('halt').table
+	table.insert(control.triggers, '^/script')
 end
 
 function control:action(msg)
@@ -30,6 +31,18 @@ function control:action(msg)
 	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'halt') then
 		self.is_started = false
 		bindings.sendReply(self, msg, 'Stopping bot!')
+	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'script') then
+		local input = msg.text:match('^'..utilities.INVOCATION_PATTERN..'script\n(.+)')
+		if not input then
+			bindings.sendReply(self, msg, 'usage: ```\n/script\n/command <arg>\n...\n```', true)
+			return
+		end
+		input = input .. '\n'
+		for command in input:gmatch('(.-)\n') do
+			command = utilities.trim(command)
+			msg.text = command
+			bot.on_msg_receive(self, msg)
+		end
 	end
 
 end
