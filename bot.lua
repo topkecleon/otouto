@@ -95,16 +95,16 @@ function bot:run()
 
 	while self.is_started do -- Start a loop while the bot should be running.
 
-		do
-			local res = bindings.getUpdates(self, self.last_update+1) -- Get the latest updates!
-			if res then
-				for _,v in ipairs(res.result) do -- Go through every new message.
-					self.last_update = v.update_id
+		local res = bindings.getUpdates(self, self.last_update+1) -- Get the latest updates!
+		if res then
+			for _,v in ipairs(res.result) do -- Go through every new message.
+				self.last_update = v.update_id
+				if v.message then
 					bot.on_msg_receive(self, v.message)
 				end
-			else
-				print(self.config.errors.connection)
 			end
+		else
+			print(self.config.errors.connection)
 		end
 
 		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
