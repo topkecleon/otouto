@@ -335,8 +335,8 @@ end
 utilities.char = {
 	zwnj = '‌',
 	arabic = '[\216-\219][\128-\191]',
-	rtl = '‮',
-	flush_right = '‏'
+	rtl_override = '‮',
+	rtl_mark = '‏'
 }
 
 return utilities

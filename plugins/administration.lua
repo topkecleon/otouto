@@ -15,11 +15,10 @@
 
 	1.9 - Added flag antihammer. Groups with antihammer enabled will not be
 	affected by global bans. However, users who are hammer'd from an anti-
-	hammer group will also be banned locally. Bot will now also attempt to kick
-	via bot API before using tg. Added autobanning after (default) 3 autokicks.
-	Threshold onfigurable with antiflood. Autokick counters reset within twenty-
-	four hours. Merged antisquig action into generic. There is no automatic
-	migration; simply add the following to database.administration:
+	hammer group will also be banned locally. Added autobanning after (default)
+	3 autokicks. Threshold onfigurable with antiflood. Autokick counters reset
+	within twenty-four hours. Merged antisquig action into generic. There is no
+	automatic migration; simply add the following to database.administration:
 		autokick_timer = 0
 		groups[*].flags[6] = false
 		groups[*].autoban = 3
@@ -29,7 +28,7 @@
 ]]--
 
 local JSON = require('dkjson')
-local drua = dofile('drua-tg/drua-tg.lua')
+local drua = dofile('drua-tg.lua')
 local bindings = require('bindings')
 local utilities = require('utilities')
 
@@ -114,7 +113,7 @@ administration.antiflood = {
 	video = 20,
 	location = 20,
 	document = 20,
-	sticker = 40
+	sticker = 30
 }
 
 administration.ranks = {
@@ -271,24 +270,18 @@ function administration.init_command(self_)
 						user.do_kick = true
 						user.reason = 'banned'
 						user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
-					end
-
-					-- antisquig
-					if group.flags[2] and (
+					elseif group.flags[2] and ( -- antisquig
 						msg.text:match(utilities.char.arabic)
-						or msg.text:match(utilities.char.rtl)
-						or msg.text:match(utilities.char.flush_right)
+						or msg.text:match(utilities.char.rtl_override)
+						or msg.text:match(utilities.char.rtl_mark)
 					) then
 						user.do_kick = true
 						user.reason = 'antisquig'
 						user.output = administration.flags[2].kicked:gsub('GROUPNAME', msg.chat.title)
-					end
-
-					-- antisquig++
-					if group.flags[3] and (
+					elseif group.flags[3] and ( -- antisquig++
 						msg.from.name:match(utilities.char.arabic)
-						or msg.from.name:match(utilities.char.rtl)
-						or msg.from.name:match(utilities.char.flush_right)
+						or msg.from.name:match(utilities.char.rtl_override)
+						or msg.from.name:match(utilities.char.rtl_mark)
 					) then
 						user.do_kick = true
 						user.reason = 'antisquig++'
@@ -357,21 +350,15 @@ function administration.init_command(self_)
 							new_user.do_kick = true
 							new_user.reason = 'banned'
 							new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
-						end
-
-						-- antisquig++
-						if group.flags[3] and (
+						elseif group.flags[3] and ( -- antisquig++
 							newguy.name:match(utilities.char.arabic)
-							or newguy.name:match(utilities.char.rtl)
-							or newguy.name:match(utilities.char.flush_right)
+							or newguy.name:match(utilities.char.rtl_override)
+							or newguy.name:match(utilities.char.rtl_mark)
 						) then
 							new_user.do_kick = true
 							new_user.reason = 'antisquig++'
 							new_user.output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
-						end
-
-						-- antibot
-						if newguy.username and newguy.username:match('bot$') and group.flags[4] and rank < 2 then
+						elseif group.flags[4] and newguy.username and newguy.username:match('bot') and rank < 2 then
 							new_user.do_kick = true
 							new_user.reason = 'antibot'
 						end
@@ -379,7 +366,6 @@ function administration.init_command(self_)
 					end
 
 				elseif msg.new_chat_title then
-
 					if rank < 3 then
 						drua.rename_chat(msg.chat.id, group.name)
 					else
@@ -388,9 +374,7 @@ function administration.init_command(self_)
 							administration.update_desc(self, msg.chat.id)
 						end
 					end
-
 				elseif msg.new_chat_photo then
-
 					if group.grouptype == 'group' then
 						if rank < 3 then
 							drua.set_photo(msg.chat.id, group.photo)
@@ -400,9 +384,7 @@ function administration.init_command(self_)
 					else
 						group.photo = drua.get_photo(msg.chat.id)
 					end
-
 				elseif msg.delete_chat_photo then
-
 					if group.grouptype == 'group' then
 						if rank < 3 then
 							drua.set_photo(msg.chat.id, group.photo)
@@ -412,24 +394,15 @@ function administration.init_command(self_)
 					else
 						group.photo = nil
 					end
-
 				end
 
-				if new_user ~= user then
-					if new_user.do_ban then
-						administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
-						if new_user.output then
-							bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
-						end
-						group.bans[msg.new_chat_participant.id_str] = true
-					elseif new_user.do_kick then
-						administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
-						if new_user.output then
-							bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
-						end
-						if msg.chat.type == 'supergroup' then
-							bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
-						end
+				if new_user ~= user and new_user.do_kick then
+					administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
+					if new_user.output then
+						bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
+					end
+					if msg.chat.type == 'supergroup' then
+						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
 					end
 				end
 
@@ -443,7 +416,7 @@ function administration.init_command(self_)
 						group.autokicks[msg.from.id_str] = 0
 						user.do_ban = true
 						user.reason = 'antiflood autoban: ' .. user.reason
-						user.output = 'You have been banned for being autokicked too many times.'
+						user.output = user.output .. '\nYou have been banned for being autokicked too many times.'
 					end
 				end
 
@@ -463,7 +436,7 @@ function administration.init_command(self_)
 					end
 				end
 
-				if msg.new_chat_participant and not (new_user.do_kick or new_user.do_ban) then
+				if msg.new_chat_participant and not new_user.do_kick then
 					local output = administration.get_desc(self, msg.chat.id)
 					bindings.sendMessage(self, msg.new_chat_participant.id, output, true, nil, true)
 				end
