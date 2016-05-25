@@ -89,6 +89,8 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 ## administration.lua
 The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups. This works by sending TCP commands to an instance of tg running on the owner's account.
 
+**For best results, make your bot an administrator of any group it administrates.**
+
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
 
 Once the installation is finished, enable `administration.lua` in your config file. **The administration plugin must be loaded before about.lua and blacklist.lua.** You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
@@ -223,6 +225,7 @@ The bot will accept these commands from both Liberbot and the configured adminis
 ## Style
 Bot output from every plugin should follow a consistent style. This style is easily observed interacting with the bot.
 Titles should be either **bold** (along with their colons) or a [link](http://otou.to) (with plaintext colons) to the content's source. Names should be _italic_. Numbered lists should use bold numbers followed by a bold period followed by a space. Unnumbered lists should use the • bullet point followed by a space. Descriptions and information should be in plaintext, although "flavor" text should be italic. Technical information should be `monospace`. Links should be named.
+The standard count for plugins which return multiple results is eight results in a private message, and four results elsewhere. This is a trivial number, but consistency is noticeable and desirable.
 
 ## Contributors
 Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.

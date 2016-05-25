@@ -36,7 +36,7 @@ function nick:action(msg)
 		end
 	elseif string.len(input) > 32 then
 		output = 'The character limit for nicknames is 32.'
-	elseif input == '--' or input == '—' then
+	elseif input == '--' or input == utilities.char.em_dash then
 		self.database.users[target.id_str].nickname = nil
 		output = target.name .. '\'s nickname has been deleted.'
 	else

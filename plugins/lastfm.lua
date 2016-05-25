@@ -35,7 +35,7 @@ function lastfm:action(msg)
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
 			bindings.sendMessage(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
-		elseif input == '--' or input == '—' then
+		elseif input == '--' or input == utilities.char.em_dash then
 			self.database.users[msg.from.id_str].lastfm = nil
 			bindings.sendReply(self, msg, 'Your last.fm username has been forgotten.')
 		else

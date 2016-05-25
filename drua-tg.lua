@@ -50,17 +50,16 @@ local drua = {
 }
 
 drua.send = function(command, do_receive)
-	command = command .. '\n'
-	local s = SOCKET.connect('localhost', 4567)
-	s:send(command)
+	local s = SOCKET.connect(drua.IP, drua.PORT)
+	assert(s, '\nUnable to connect to tg session.')
+	s:send(command..'\n')
+	local output
 	if do_receive then
-		-- Get the size of the output, and get the output.
-		-- Thanks Juan for making this so easy to read. :^)
-		local output = s:receive(tonumber(string.match(s:receive("*l"), "ANSWER (%d+)")))
-		s:close()
-		return output:gsub('\n$', '')
+		output = string.match(s:receive('*l'), 'ANSWER (%d+)')
+		output = s:receive(tonumber(n)):gsub('\n$', '')
 	end
 	s:close()
+	return output
 end
 
 drua.message = function(target, text)

@@ -9,77 +9,78 @@ local utilities = require('utilities')
 reddit.command = 'reddit [r/subreddit | query]'
 reddit.doc = [[```
 /reddit [r/subreddit | query]
-Returns the four (if group) or eight (if private message) top posts for the given subreddit or query, or from the frontpage.
-Aliases: /r, /r/[subreddit]
+Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
+Aliases: /r, /r/subreddit
 ```]]
 
 function reddit:init()
 	reddit.triggers = utilities.triggers(self.info.username, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
 end
 
-function reddit:action(msg)
-
-	msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
-	local input
-	if msg.text_lower:match('^/r/') then
-		msg.text_lower = msg.text_lower:gsub('/r/', '/r r/')
-		input = utilities.get_word(msg.text_lower, 1)
-	else
-		input = utilities.input(msg.text_lower)
+local format_results = function(posts)
+	local output = ''
+	for _,v in ipairs(posts) do
+		local post = v.data
+		local title = post.title:gsub('%[', '('):gsub('%]', ')'):gsub('&amp;', '&')
+		if title:len() > 256 then
+			title = title:sub(1, 253)
+			title = utilities.trim(title) .. '...'
+		end
+		local short_url = 'redd.it/' .. post.id
+		local s = '[' .. title .. '](' .. short_url .. ')'
+		if not post.is_self and not post.over_18 then
+			s = '`[`[' .. post.domain .. '](' .. post.url:gsub('%)', '\\)') .. ')`]` ' .. s
+		end
+		output = output .. '• ' .. s .. '\n'
 	end
-	local url
+	return output
+end
 
+reddit.subreddit_url = 'http://www.reddit.com/%s/.json?limit='
+reddit.search_url = 'http://www.reddit.com/search.json?q=%s&limit='
+reddit.rall_url = 'http://www.reddit.com/.json?limit='
+
+function reddit:action(msg)
+	-- Eight results in PM, four results elsewhere.
 	local limit = 4
-	if msg.chat.id == msg.from.id then
+	if msg.chat.type == 'private' then
 		limit = 8
 	end
-
-	local source
+	local text = msg.text_lower
+	if text:match('^/r/.') then
+		-- Normalize input so this hack works easily.
+		text = msg.text_lower:gsub('^/r/', '/r r/')
+	end
+	local input = utilities.input(text)
+	local source, url
 	if input then
 		if input:match('^r/.') then
-			url = 'http://www.reddit.com/' .. URL.escape(input) .. '/.json?limit=' .. limit
-			source = '*/r/' .. input:match('^r/(.+)') .. '*\n'
+			input = utilities.get_word(input, 1)
+			url = reddit.subreddit_url:format(input) .. limit
+			source = '*/' .. utilities.md_escape(input) .. '*\n'
 		else
-			url = 'http://www.reddit.com/search.json?q=' .. URL.escape(input) .. '&limit=' .. limit
-			source = '*reddit results for* _' .. input .. '_ *:*\n'
+			input = utilities.input(msg.text)
+			source = '*Results for* _' .. utilities.md_escape(input) .. '_ *:*\n'
+			input = URL.escape(input)
+			url = reddit.search_url:format(input) .. limit
 		end
 	else
-		url = 'http://www.reddit.com/.json?limit=' .. limit
+		url = reddit.rall_url .. limit
 		source = '*/r/all*\n'
 	end
-
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
 		bindings.sendReply(self, msg, self.config.errors.connection)
-		return
-	end
-
-	local jdat = JSON.decode(jstr)
-	if #jdat.data.children == 0 then
-		bindings.sendReply(self, msg, self.config.errors.results)
-		return
-	end
-
-	local output = ''
-	for _,v in ipairs(jdat.data.children) do
-		local title = v.data.title:gsub('%[', '('):gsub('%]', ')'):gsub('&amp;', '&')
-		if title:len() > 48 then
-			title = title:sub(1,45) .. '...'
-		end
-		if v.data.over_18 then
-			v.data.is_self = true
-		end
-		local short_url = 'redd.it/' .. v.data.id
-		output = output .. '• [' .. title .. '](' .. short_url .. ')\n'
-		if not v.data.is_self then
-			output = output .. v.data.url:gsub('_', '\\_') .. '\n'
+	else
+		local jdat = JSON.decode(jstr)
+		if #jdat.data.children == 0 then
+			bindings.sendReply(self, msg, self.config.errors.results)
+		else
+			local output = format_results(jdat.data.children)
+			output = source .. output
+			bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
 		end
 	end
-
-	output = source .. output
-
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
-
 end
 
 return reddit
