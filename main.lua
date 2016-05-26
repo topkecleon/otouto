@@ -1,4 +1,4 @@
-local bot = require('bot')
+local bot = require('otouto.bot')
 
 local instance = {}
 local config = require('config')
