@@ -28,7 +28,7 @@ local format_results = function(posts)
 		end
 		local short_url = 'redd.it/' .. post.id
 		local s = '[' .. title .. '](' .. short_url .. ')'
-		if not post.is_self and not post.over_18 then
+		if post.domain and not post.is_self and not post.over_18 then
 			s = '`[`[' .. post.domain .. '](' .. post.url:gsub('%)', '\\)') .. ')`]` ' .. s
 		end
 		output = output .. '• ' .. s .. '\n'

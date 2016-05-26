@@ -13,10 +13,10 @@ function bot:init() -- The function run when the bot is started or reloaded.
 
 	self.config = require('config') -- Load configuration file.
 
-	self.BASE_URL = 'https://api.telegram.org/bot' .. self.config.bot_api_key
 	if self.config.bot_api_key == '' then
 		error('You did not set your bot token in config.lua!')
 	end
+	self.BASE_URL = 'https://api.telegram.org/bot' .. self.config.bot_api_key
 
 	-- Fetch bot information. Try until it succeeds.
 	repeat

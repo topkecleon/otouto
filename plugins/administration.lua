@@ -30,6 +30,8 @@
 	 have been reworked to be more elegant. Style has been slightly changed (no
 	 more weak-looking, italic group names). Added some (but not many) comments.
 
+	1.10.1 - Bug fixes and minor improvements. :^)
+
 ]]--
 
 local JSON = require('dkjson')
@@ -74,7 +76,7 @@ administration.flags = {
 		desc = 'Automatically removes users who post Arabic script or RTL characters.',
 		short = 'This group does not allow Arabic script or RTL characters.',
 		enabled = 'Users will now be removed automatically for posting Arabic script and/or RTL characters.',
-		disabled = 'Users will no longer be removed automatically for posting Arabic script and/or RTL characters..',
+		disabled = 'Users will no longer be removed automatically for posting Arabic script and/or RTL characters.',
 		kicked = 'You were automatically kicked from GROUPNAME for posting Arabic script and/or RTL characters.'
 	},
 	[3] = {
@@ -248,7 +250,15 @@ end
 
 function administration:kick_user(chat, target, reason)
 	drua.kick_user(chat, target)
-	utilities.handle_exception(self, target..' kicked from '..chat, reason)
+	local victim = target
+	if self.database.users[tostring(target)] then
+		victim = utilities.build_name(
+			self.database.users[tostring(target)].first_name,
+			self.database.users[tostring(target)].last_name
+		)
+	end
+	local group = self.database.administration.groups[tostring(chat)].name
+	utilities.handle_exception(self, victim..' kicked from '..group, reason)
 end
 
 function administration.init_command(self_)
@@ -262,18 +272,16 @@ function administration.init_command(self_)
 
 			action = function(self, msg, group)
 
-				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
+local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
-				local user = {
-					do_kick = false,
-					do_ban = false
-				}
+				local user = {}
 
 				if rank < 2 then
 
 					-- banned
 					if rank == 0 then
 						user.do_kick = true
+						user.dont_unban = true
 						user.reason = 'banned'
 						user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
 					elseif group.flags[2] and ( -- antisquig
@@ -341,30 +349,29 @@ function administration.init_command(self_)
 					-- We'll make a new table for the new guy, unless he's also
 					-- the original guy.
 					if msg.new_chat_participant.id ~= msg.from.id then
-						new_user = {
-							do_kick = false
-						}
+						new_user = {}
 					end
 
 					-- I hate typing this out.
-					local newguy = msg.new_chat_participant
+					local noob = msg.new_chat_participant
 
 					if administration.get_rank(self, msg.new_chat_participant.id, msg.chat.id) < 2 then
 
 						-- banned
-						if administration.get_rank(self, newguy.id, msg.chat.id) == 0 then
+						if administration.get_rank(self, noob.id, msg.chat.id) == 0 then
 							new_user.do_kick = true
+							new_user.dont_unban = true
 							new_user.reason = 'banned'
 							new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
 						elseif group.flags[3] and ( -- antisquig++
-							newguy.name:match(utilities.char.arabic)
-							or newguy.name:match(utilities.char.rtl_override)
-							or newguy.name:match(utilities.char.rtl_mark)
+							noob.name:match(utilities.char.arabic)
+							or noob.name:match(utilities.char.rtl_override)
+							or noob.name:match(utilities.char.rtl_mark)
 						) then
 							new_user.do_kick = true
 							new_user.reason = 'antisquig++'
 							new_user.output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
-						elseif group.flags[4] and newguy.username and newguy.username:match('bot') and rank < 2 then
+						elseif group.flags[4] and noob.username and noob.username:match('bot') and rank < 2 then
 							new_user.do_kick = true
 							new_user.reason = 'antibot'
 						end
@@ -407,12 +414,12 @@ function administration.init_command(self_)
 					if new_user.output then
 						bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
 					end
-					if msg.chat.type == 'supergroup' then
+					if not new_user.dont_unban and msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
 					end
 				end
 
-				if group.flags[5] and user.do_kick then
+				if group.flags[5] and user.do_kick and not user.dont_unban then
 					if group.autokicks[msg.from.id_str] then
 						group.autokicks[msg.from.id_str] = group.autokicks[msg.from.id_str] + 1
 					else
@@ -420,24 +427,19 @@ function administration.init_command(self_)
 					end
 					if group.autokicks[msg.from.id_str] >= group.autoban then
 						group.autokicks[msg.from.id_str] = 0
-						user.do_ban = true
+						group.bans[msg.from.id_str] = true
+						user.dont_unban = true
 						user.reason = 'antiflood autoban: ' .. user.reason
 						user.output = user.output .. '\nYou have been banned for being autokicked too many times.'
 					end
 				end
 
-				if user.do_ban then
+				if user.do_kick then
 					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
 					if user.output then
 						bindings.sendMessage(self, msg.from.id, user.output)
 					end
-					group.bans[msg.from.id_str] = true
-				elseif user.do_kick then
-					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
-					if user.output then
-						bindings.sendMessage(self, msg.from.id, user.output)
-					end
-					if msg.chat.type == 'supergroup' then
+					if not user.dont_unban and msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
 					end
 				end
@@ -684,7 +686,7 @@ function administration.init_command(self_)
 				elseif target.rank > 1 then
 					bindings.sendReply(self, msg, target.name .. ' is too privileged to be kicked.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.id)
+					administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.name)
 					bindings.sendMessage(self, msg.chat.id, target.name .. ' has been kicked.')
 					if msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, msg.chat.id, target.id)
@@ -710,7 +712,7 @@ function administration.init_command(self_)
 				elseif group.bans[target.id_str] then
 					bindings.sendReply(self, msg, target.name .. ' is already banned.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, ' banned by '..msg.from.id)
+					administration.kick_user(self, msg.chat.id, target.id, ' banned by '..msg.from.name)
 					bindings.sendReply(self, msg, target.name .. ' has been banned.')
 					group.bans[target.id_str] = true
 				end
@@ -814,7 +816,7 @@ function administration.init_command(self_)
 			triggers = utilities.triggers(self_.info.username):t('setmotd', true).table,
 
 			command = 'setmotd <motd>',
-			privilege = 3,
+			privilege = 2,
 			interior = true,
 			doc = 'Sets the group\'s message of the day. Markdown is supported. Pass "--" to delete the message.',
 
@@ -852,7 +854,7 @@ function administration.init_command(self_)
 
 			action = function(self, msg, group)
 				local input = utilities.input(msg.text)
-				if input == '--' or input == utilities.chat.em_dash then
+				if input == '--' or input == utilities.char.em_dash then
 					group.link = drua.export_link(msg.chat.id)
 					bindings.sendReply(self, msg, 'The link has been regenerated.')
 				elseif input then
@@ -1081,7 +1083,7 @@ function administration.init_command(self_)
 				elseif self.database.blacklist[target.id_str] then
 					bindings.sendReply(self, msg, target.name .. ' is already globally banned.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.id)
+					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.name)
 					self.database.blacklist[target.id_str] = true
 					for k,v in pairs(self.database.administration.groups) do
 						if not v.flags[6] then
