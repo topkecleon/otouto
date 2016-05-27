@@ -6,14 +6,14 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 gSearch.command = 'google <query>'
-gSearch.doc = [[```
-]]..utilities.CMD_PAT..[[google <query>
-Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]]..utilities.CMD_PAT..[[gnsfw" to disable it.
-Alias: ]]..utilities.CMD_PAT..[[g
-```]]
 
-function gSearch:init()
-	gSearch.triggers = utilities.triggers(self.info.username):t('g', true):t('google', true):t('gnsfw', true).table
+function gSearch:init(config)
+	gSearch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('g', true):t('google', true):t('gnsfw', true).table
+	gSearch.doc = [[```
+]]..config.cmd_pat..[[google <query>
+Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]]..config.cmd_pat..[[gnsfw" to disable it.
+Alias: ]]..config.cmd_pat..[[g
+```]]
 end
 
 function gSearch:action(msg, config)
@@ -36,7 +36,7 @@ function gSearch:action(msg, config)
 		url = url .. '&rsz=4'
 	end
 
-	if not string.match(msg.text, '^'..utilities.CMD_PAT..'g[oogle]*nsfw') then
+	if not string.match(msg.text, '^'..config.cmd_pat..'g[oogle]*nsfw') then
 		url = url .. '&safe=active'
 	end
 

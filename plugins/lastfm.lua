@@ -15,26 +15,26 @@ function lastfm:init(config)
 		return
 	end
 
-	lastfm.triggers = utilities.triggers(self.info.username):t('lastfm', true):t('np', true):t('fmset', true).table
+	lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('fmset', true).table
+	lastfm.doc = [[```
+]]..config.cmd_pat..[[np [username]
+Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
+
+]]..config.cmd_pat..[[fmset <username>
+Sets your last.fm username. Otherwise, ]]..config.cmd_pat..[[np will use your Telegram username. Use "]]..config.cmd_pat..[[fmset --" to delete it.
+```]]
 end
 
 lastfm.command = 'lastfm'
-lastfm.doc = [[```
-]]..utilities.CMD_PAT..[[np [username]
-Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
-
-]]..utilities.CMD_PAT..[[fmset <username>
-Sets your last.fm username. Otherwise, ]]..utilities.CMD_PAT..[[np will use your Telegram username. Use "]]..utilities.CMD_PAT..[[fmset --" to delete it.
-```]]
 
 function lastfm:action(msg, config)
 
 	local input = utilities.input(msg.text)
 
-	if string.match(msg.text, '^'..utilities.CMD_PAT..'lastfm') then
+	if string.match(msg.text, '^'..config.cmd_pat..'lastfm') then
 		utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		return
-	elseif string.match(msg.text, '^'..utilities.CMD_PAT..'fmset') then
+	elseif string.match(msg.text, '^'..config.cmd_pat..'fmset') then
 		if not input then
 			utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == utilities.char.em_dash then
@@ -57,10 +57,10 @@ function lastfm:action(msg, config)
 		username = self.database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
-		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..utilities.CMD_PAT..'fmset <username>.'
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..config.cmd_pat..'fmset <username>.'
 		self.database.users[msg.from.id_str].lastfm = username
 	else
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..utilities.CMD_PAT..'fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
 		return
 	end
 
@@ -78,7 +78,7 @@ function lastfm:action(msg, config)
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..utilities.CMD_PAT..'fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
 		return
 	end
 

@@ -6,14 +6,14 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 wikipedia.command = 'wikipedia <query>'
-wikipedia.doc = [[```
-]]..utilities.CMD_PAT..[[wikipedia <query>
-Returns an article from Wikipedia.
-Aliases: ]]..utilities.CMD_PAT..[[w, ]]..utilities.CMD_PAT..[[wiki
-```]]
 
-function wikipedia:init()
-	wikipedia.triggers = utilities.triggers(self.info.username):t('wikipedia', true):t('wiki', true):t('w', true).table
+function wikipedia:init(config)
+	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true):t('w', true).table
+	wikipedia.doc = [[```
+]]..config.cmd_pat..[[wikipedia <query>
+Returns an article from Wikipedia.
+Aliases: ]]..config.cmd_pat..[[w, ]]..config.cmd_pat..[[wiki
+```]]
 end
 
 local get_title = function(search)

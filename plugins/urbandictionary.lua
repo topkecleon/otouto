@@ -6,14 +6,15 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 urbandictionary.command = 'urbandictionary <query>'
-urbandictionary.doc = [[```
-]]..utilities.CMD_PAT..[[urbandictionary <query>
-Returns a definition from Urban Dictionary.
-Aliases: ]]..utilities.CMD_PAT..[[ud, ]]..utilities.CMD_PAT..[[urban
-```]]
 
-function urbandictionary:init()
-	urbandictionary.triggers = utilities.triggers(self.info.username):t('urbandictionary', true):t('ud', true):t('urban', true).table
+function urbandictionary:init(config)
+	urbandictionary.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+		:t('urbandictionary', true):t('ud', true):t('urban', true).table
+	urbandictionary.doc = [[```
+]]..config.cmd_pat..[[urbandictionary <query>
+Returns a definition from Urban Dictionary.
+Aliases: ]]..config.cmd_pat..[[ud, ]]..config.cmd_pat..[[urban
+```]]
 end
 
 function urbandictionary:action(msg, config)

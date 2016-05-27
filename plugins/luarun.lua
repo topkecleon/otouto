@@ -4,8 +4,8 @@ local utilities = require('utilities')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 
-function luarun:init()
-	luarun.triggers = utilities.triggers(self.info.username):t('lua', true):t('return', true).table
+function luarun:init(config)
+	luarun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lua', true):t('return', true).table
 end
 
 function luarun:action(msg, config)
@@ -20,7 +20,7 @@ function luarun:action(msg, config)
 		return
 	end
 
-	if msg.text_lower:match('^'..utilities.CMD_PAT..'return') then
+	if msg.text_lower:match('^'..config.cmd_pat..'return') then
 		input = 'return ' .. input
 	end
 
@@ -32,8 +32,8 @@ function luarun:action(msg, config)
 		local URL = require('socket.url')
 		local HTTP = require('socket.http')
 		local HTTPS = require('ssl.https')
-		return function (self, msg) ]] .. input .. [[ end
-	]] )()(self, msg)
+		return function (self, msg, config) ]] .. input .. [[ end
+	]] )()(self, msg, config)
 	if output == nil then
 		output = 'Done!'
 	else

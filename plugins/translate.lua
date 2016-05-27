@@ -6,13 +6,13 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 translate.command = 'translate [text]'
-translate.doc = [[```
-]]..utilities.CMD_PAT..[[translate [text]
+
+function translate:init(config)
+	translate.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('translate', true):t('tl', true).table
+	translate.doc = [[```
+]]..config.cmd_pat..[[translate [text]
 Translates input or the replied-to message into the bot's language.
 ```]]
-
-function translate:init()
-	translate.triggers = utilities.triggers(self.info.username):t('translate', true):t('tl', true).table
 end
 
 function translate:action(msg, config)

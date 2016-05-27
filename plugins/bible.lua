@@ -11,15 +11,15 @@ function bible:init(config)
 		return
 	end
 
-	bible.triggers = utilities.triggers(self.info.username):t('bible', true):t('b', true).table
+	bible.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bible', true):t('b', true).table
+	bible.doc = [[```
+]]..config.cmd_pat..[[bible <reference>
+Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
+Alias: ]]..config.cmd_pat..[[b
+```]]
 end
 
 bible.command = 'bible <reference>'
-bible.doc = [[```
-]]..utilities.CMD_PAT..[[bible <reference>
-Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
-Alias: ]]..utilities.CMD_PAT..[[b
-```]]
 
 function bible:action(msg, config)
 

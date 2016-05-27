@@ -3,13 +3,13 @@ local echo = {}
 local utilities = require('utilities')
 
 echo.command = 'echo <text>'
-echo.doc = [[```
-]]..utilities.CMD_PAT..[[echo <text>
+
+function echo:init(config)
+	echo.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('echo', true).table
+	echo.doc = [[```
+]]..config.cmd_pat..[[echo <text>
 Repeats a string of text.
 ```]]
-
-function echo:init()
-	echo.triggers = utilities.triggers(self.info.username):t('echo', true).table
 end
 
 function echo:action(msg)

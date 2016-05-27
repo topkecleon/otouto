@@ -5,8 +5,8 @@ local utilities = require('utilities')
 pun.command = 'pun'
 pun.doc = '`Returns a pun.`'
 
-function pun:init()
-	pun.triggers = utilities.triggers(self.info.username):t('pun').table
+function pun:init(config)
+	pun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pun').table
 end
 
 local puns = {

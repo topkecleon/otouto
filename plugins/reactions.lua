@@ -25,24 +25,24 @@ local mapping = {
 
 local help
 
-function reactions:init()
+function reactions:init(config)
 	-- Generate a "help" message triggered by "/reactions".
 	help = 'Reactions:\n'
-	reactions.triggers = utilities.triggers(self.info.username):t('reactions').table
+	reactions.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('reactions').table
 	for trigger,reaction in pairs(mapping) do
-		help = help .. '• ' .. utilities.CMD_PAT .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
-		table.insert(reactions.triggers, utilities.CMD_PAT..trigger)
-		table.insert(reactions.triggers, utilities.CMD_PAT..trigger..'@'..self.info.username:lower())
+		help = help .. '• ' .. config.cmd_pat .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
+		table.insert(reactions.triggers, config.cmd_pat..trigger)
+		table.insert(reactions.triggers, config.cmd_pat..trigger..'@'..self.info.username:lower())
 	end
 end
 
-function reactions:action(msg)
-	if string.match(msg.text_lower, utilities.CMD_PAT..'reactions') then
+function reactions:action(msg, config)
+	if string.match(msg.text_lower, config.cmd_pat..'reactions') then
 		utilities.send_message(self, msg.chat.id, help)
 		return
 	end
 	for trigger,reaction in pairs(mapping) do
-		if string.match(msg.text_lower, utilities.CMD_PAT..trigger) then
+		if string.match(msg.text_lower, config.cmd_pat..trigger) then
 			utilities.send_message(self, msg.chat.id, reaction)
 			return
 		end

@@ -6,7 +6,6 @@ local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('bindings')
-local utilities = require('utilities')
 
 function chatter:init(config)
 	if not config.simsimi_key then
@@ -34,7 +33,7 @@ function chatter:action(msg, config)
 			--Uncomment the following line for Al Gore-like conversation.
 			--or (msg.reply_to_message and msg.reply_to_message.from.id == self.info.id)
 		)
-		or msg.text:match('^'..utilities.CMD_PAT)
+		or msg.text:match('^'..config.CMD_PAT)
 		or msg.text == ''
 	) then
 		return true

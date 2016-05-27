@@ -6,14 +6,14 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 pokedex.command = 'pokedex <query>'
-pokedex.doc = [[```
-]]..utilities.CMD_PAT..[[pokedex <query>
-Returns a Pokedex entry from pokeapi.co.
-Alias: ]]..utilities.CMD_PAT..[[dex
-```]]
 
-function pokedex:init()
-	pokedex.triggers = utilities.triggers(self.info.username):t('pokedex', true):t('dex', true).table
+function pokedex:init(config)
+	pokedex.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pokedex', true):t('dex', true).table
+	pokedex.doc = [[```
+]]..config.cmd_pat..[[pokedex <query>
+Returns a Pokedex entry from pokeapi.co.
+Alias: ]]..config.cmd_pat..[[dex
+```]]
 end
 
 function pokedex:action(msg, config)

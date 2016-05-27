@@ -7,8 +7,8 @@ local utilities = require('utilities')
 commit.command = 'commit'
 commit.doc = '`Returns a commit message from whatthecommit.com.`'
 
-function commit:init()
-	commit.triggers = utilities.triggers(self.info.username):t('commit').table
+function commit:init(config)
+	commit.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('commit').table
 end
 
 local commits = {

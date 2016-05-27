@@ -6,7 +6,7 @@ local hearthstone = {}
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function hearthstone:init()
+function hearthstone:init(config)
 	if not self.database.hearthstone or os.time() > self.database.hearthstone.expiration then
 
 		print('Downloading Hearthstone database...')
@@ -36,15 +36,15 @@ function hearthstone:init()
 
 	end
 
-	hearthstone.triggers = utilities.triggers(self.info.username):t('hearthstone', true):t('hs').table
+	hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
+	hearthstone.doc = [[```
+]]..config.cmd_pat..[[hearthstone <query>
+Returns Hearthstone card info.
+Alias: ]]..config.cmd_pat..[[hs
+```]]
 end
 
 hearthstone.command = 'hearthstone <query>'
-hearthstone.doc = [[```
-]]..utilities.CMD_PAT..[[hearthstone <query>
-Returns Hearthstone card info.
-Alias: ]]..utilities.CMD_PAT..[[hs
-```]]
 
 local function format_card(card)
 

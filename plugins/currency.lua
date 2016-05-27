@@ -4,15 +4,15 @@ local HTTPS = require('ssl.https')
 local utilities = require('utilities')
 
 currency.command = 'cash [amount] <from> to <to>'
-currency.doc = [[```
-]]..utilities.CMD_PAT..[[cash [amount] <from> to <to>
-Example: ]]..utilities.CMD_PAT..[[cash 5 USD to EUR
+
+function currency:init(config)
+	currency.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('cash', true).table
+	currency.doc = [[```
+]]..config.cmd_pat..[[cash [amount] <from> to <to>
+Example: ]]..config.cmd_pat..[[cash 5 USD to EUR
 Returns exchange rates for various currencies.
 Source: Google Finance.
 ```]]
-
-function currency:init()
-	currency.triggers = utilities.triggers(self.info.username):t('cash', true).table
 end
 
 function currency:action(msg, config)

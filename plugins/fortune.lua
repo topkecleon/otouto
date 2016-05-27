@@ -4,7 +4,7 @@ local fortune = {}
 
 local utilities = require('utilities')
 
-function fortune:init()
+function fortune:init(config)
 	local s = io.popen('fortune'):read('*all')
 	if s:match('not found$') then
 		print('fortune is not installed on this computer.')
@@ -12,7 +12,7 @@ function fortune:init()
 		return
 	end
 
-	fortune.triggers = utilities.triggers(self.info.username):t('fortune').table
+	fortune.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('fortune').table
 end
 
 fortune.command = 'fortune'

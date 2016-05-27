@@ -3,13 +3,13 @@ local whoami = {}
 local utilities = require('utilities')
 
 whoami.command = 'whoami'
-whoami.doc = [[```
-Returns user and chat info for you or the replied-to message.
-Alias: ]]..utilities.CMD_PAT..[[who
-```]]
 
-function whoami:init()
-	whoami.triggers = utilities.triggers(self.info.username):t('who', true):t('whoami').table
+function whoami:init(config)
+	whoami.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('who', true):t('whoami').table
+	whoami.doc = [[```
+Returns user and chat info for you or the replied-to message.
+Alias: ]]..config.cmd_pat..[[who
+```]]
 end
 
 function whoami:action(msg)

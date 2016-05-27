@@ -6,13 +6,13 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 hackernews.command = 'hackernews'
-hackernews.doc = [[```
-Returns four (if group) or eight (if private message) top stories from Hacker News.
-Alias: ]]..utilities.CMD_PAT..[[hn
-```]]
 
-function hackernews:init()
-	hackernews.triggers = utilities.triggers(self.info.username):t('hackernews', true):t('hn', true).table
+function hackernews:init(config)
+	hackernews.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hackernews', true):t('hn', true).table
+	hackernews.doc = [[```
+Returns four (if group) or eight (if private message) top stories from Hacker News.
+Alias: ]]..config.cmd_pat..[[hn
+```]]
 end
 
 function hackernews:action(msg, config)

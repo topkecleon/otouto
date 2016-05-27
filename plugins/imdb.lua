@@ -6,13 +6,13 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 imdb.command = 'imdb <query>'
-imdb.doc = [[```
-]]..utilities.CMD_PAT..[[imdb <query>
+
+function imdb:init(config)
+	imdb.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('imdb', true).table
+	imdb.doc = [[```
+]]..config.cmd_pat..[[imdb <query>
 Returns an IMDb entry.
 ```]]
-
-function imdb:init()
-	imdb.triggers = utilities.triggers(self.info.username):t('imdb', true).table
 end
 
 function imdb:action(msg, config)

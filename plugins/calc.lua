@@ -5,13 +5,13 @@ local HTTPS = require('ssl.https')
 local utilities = require('utilities')
 
 calc.command = 'calc <expression>'
-calc.doc = [[```
-]]..utilities.CMD_PAT..[[calc <expression>
+
+function calc:init(config)
+	calc.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('calc', true).table
+	calc.doc = [[```
+]]..config.cmd_pat..[[calc <expression>
 Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 ```]]
-
-function calc:init()
-	calc.triggers = utilities.triggers(self.info.username):t('calc', true).table
 end
 
 function calc:action(msg, config)

@@ -3,13 +3,13 @@ local dice = {}
 local utilities = require('utilities')
 
 dice.command = 'roll <nDr>'
-dice.doc = [[```
-]]..utilities.CMD_PAT..[[roll <nDr>
+
+function dice:init(config)
+	dice.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('roll', true).table
+	dice.doc = [[```
+]]..config.cmd_pat..[[roll <nDr>
 Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
 ```]]
-
-function dice:init()
-	dice.triggers = utilities.triggers(self.info.username):t('roll', true).table
 end
 
 function dice:action(msg)

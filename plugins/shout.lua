@@ -3,13 +3,13 @@ local shout = {}
 local utilities = require('utilities')
 
 shout.command = 'shout <text>'
-shout.doc = [[```
-]]..utilities.CMD_PAT..[[shout <text>
+
+function shout:init(config)
+	shout.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('shout', true).table
+	shout.doc = [[```
+]]..config.CMD_PAT..[[shout <text>
 Shouts something. Input may be the replied-to message.
 ```]]
-
-function shout:init()
-	shout.triggers = utilities.triggers(self.info.username):t('shout', true).table
 end
 
 function shout:action(msg)

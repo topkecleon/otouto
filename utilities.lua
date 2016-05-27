@@ -281,24 +281,23 @@ end
 
 utilities.md_escape = utilities.markdown_escape
 
-utilities.CMD_PAT = '/'
-
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
 function utilities.triggers_meta:t(pattern, has_args)
 	local username = self.username:lower()
-	table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'$')
-	table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'@'..username..'$')
+	table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
+	table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
 	if has_args then
-		table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'%s+[^%s]*')
-		table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'@'..username..'%s+[^%s]*')
+		table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
+		table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
 	end
 	return self
 end
 
-function utilities.triggers(username, trigger_table)
+function utilities.triggers(username, cmd_pat, trigger_table)
 	local self = setmetatable({}, utilities.triggers_meta)
 	self.username = username
+	self.cmd_pat = cmd_pat
 	self.table = trigger_table or {}
 	return self
 end

@@ -14,15 +14,15 @@ function youtube:init(config)
 		return
 	end
 
-	youtube.triggers = utilities.triggers(self.info.username):t('youtube', true):t('yt', true).table
+	youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
+	youtube.doc = [[```
+]]..config.cmd_pat..[[youtube <query>
+Returns the top result from YouTube.
+Alias: ]]..config.cmd_pat..[[yt
+```]]
 end
 
 youtube.command = 'youtube <query>'
-youtube.doc = [[```
-]]..utilities.CMD_PAT..[[youtube <query>
-Returns the top result from YouTube.
-Alias: ]]..utilities.CMD_PAT..[[yt
-```]]
 
 function youtube:action(msg, config)
 

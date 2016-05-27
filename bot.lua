@@ -61,14 +61,14 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 
 	msg = utilities.enrich_message(msg)
 
-	if msg.text:match('^'..utilities.CMD_PAT..'start .+') then
-		msg.text = utilities.CMD_PAT .. utilities.input(msg.text)
+	if msg.text:match('^'..config.cmd_pat..'start .+') then
+		msg.text = config.cmd_pat .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
 	end
 
 	for _,v in ipairs(self.plugins) do
 		for _,w in pairs(v.triggers) do
-			if string.match(msg.text:lower(), w) then
+			if string.match(msg.text_lower, w) then
 				local success, result = pcall(function()
 					return v.action(self, msg, config)
 				end)
@@ -90,8 +90,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 
 end
 
-function bot:run()
-	local config = require('config') -- Load configuration file.
+function bot:run(config)
 	bot.init(self, config) -- Actually start the script.
 
 	while self.is_started do -- Start a loop while the bot should be running.
@@ -113,7 +112,7 @@ function bot:run()
 			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
 			for i,v in ipairs(self.plugins) do
 				if v.cron then -- Call each plugin's cron function, if it has one.
-					local result, err = pcall(function() v.cron(self) end)
+					local result, err = pcall(function() v.cron(self, config) end)
 					if not result then
 						utilities.handle_exception(self, err, 'CRON: ' .. i, config)
 					end

@@ -2,26 +2,25 @@ local setandget = {}
 
 local utilities = require('utilities')
 
-function setandget:init()
+function setandget:init(config)
 	self.database.setandget = self.database.setandget or {}
-	setandget.triggers = utilities.triggers(self.info.username):t('set', true):t('get', true).table
+	setandget.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('set', true):t('get', true).table
+	setandget.doc = [[```
+]]..config.cmd_pat..[[set <name> <value>
+Stores a value with the given name. Use "]]..config.cmd_pat..[[set <name> --" to delete the stored value.
+]]..config.cmd_pat..[[get [name]
+Returns the stored value or a list of stored values.
+```]]
 end
 
 setandget.command = 'set <name> <value>'
-setandget.doc = [[```
-]]..utilities.CMD_PAT..[[set <name> <value>
-Stores a value with the given name. Use "]]..utilities.CMD_PAT..[[set <name> --" to delete the stored value.
-]]..utilities.CMD_PAT..[[get [name]
-Returns the stored value or a list of stored values.
-```]]
 
-
-function setandget:action(msg)
+function setandget:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	self.database.setandget[msg.chat.id_str] = self.database.setandget[msg.chat.id_str] or {}
 
-	if msg.text_lower:match('^'..utilities.CMD_PAT..'set') then
+	if msg.text_lower:match('^'..config.cmd_pat..'set') then
 
 		if not input then
 			utilities.send_message(self, msg.chat.id, setandget.doc, true, nil, true)
@@ -41,7 +40,7 @@ function setandget:action(msg)
 			utilities.send_message(self, msg.chat.id, '"' .. name .. '" has been set to "' .. value .. '".', true)
 		end
 
-	elseif msg.text_lower:match('^'..utilities.CMD_PAT..'get') then
+	elseif msg.text_lower:match('^'..config.cmd_pat..'get') then
 
 		if not input then
 			local output
