@@ -6,46 +6,44 @@ local greetings = {}
 
 local utilities = require('utilities')
 
-function greetings:init()
-	if not self.config.greetings then
-		self.config.greetings = {
-			['Hello, #NAME.'] = {
-				'hello',
-				'hey',
-				'sup',
-				'hi',
-				'good morning',
-				'good day',
-				'good afternoon',
-				'good evening'
-			},
-			['Goodbye, #NAME.'] = {
-				'bye',
-				'later',
-				'see ya',
-				'good night'
-			},
-			['Welcome back, #NAME.'] = {
-				'i\'m home',
-				'i\'m back'
-			},
-			['You\'re welcome, #NAME.'] = {
-				'thanks',
-				'thank you'
-			}
+function greetings:init(config)
+	config.greetings = config.greetings or {
+		['Hello, #NAME.'] = {
+			'hello',
+			'hey',
+			'sup',
+			'hi',
+			'good morning',
+			'good day',
+			'good afternoon',
+			'good evening'
+		},
+		['Goodbye, #NAME.'] = {
+			'bye',
+			'later',
+			'see ya',
+			'good night'
+		},
+		['Welcome back, #NAME.'] = {
+			'i\'m home',
+			'i\'m back'
+		},
+		['You\'re welcome, #NAME.'] = {
+			'thanks',
+			'thank you'
 		}
-	end
+	}
 
 	greetings.triggers = {
 		self.info.first_name:lower() .. '%p*$'
 	}
 end
 
-function greetings:action(msg)
+function greetings:action(msg, config)
 
 	local nick = self.database.users[msg.from.id_str].nickname or msg.from.first_name
 
-	for trigger,responses in pairs(self.config.greetings) do
+	for trigger,responses in pairs(config.greetings) do
 		for _,response in pairs(responses) do
 			if msg.text_lower:match(response..',? '..self.info.first_name:lower()) then
 				utilities.send_message(self, msg.chat.id, utilities.latcyr(trigger:gsub('#NAME', nick)))

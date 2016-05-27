@@ -39,7 +39,7 @@ reddit.subreddit_url = 'http://www.reddit.com/%s/.json?limit='
 reddit.search_url = 'http://www.reddit.com/search.json?q=%s&limit='
 reddit.rall_url = 'http://www.reddit.com/.json?limit='
 
-function reddit:action(msg)
+function reddit:action(msg, config)
 	-- Eight results in PM, four results elsewhere.
 	local limit = 4
 	if msg.chat.type == 'private' then
@@ -69,11 +69,11 @@ function reddit:action(msg)
 	end
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 	else
 		local jdat = JSON.decode(jstr)
 		if #jdat.data.children == 0 then
-			utilities.send_reply(self, msg, self.config.errors.results)
+			utilities.send_reply(self, msg, config.errors.results)
 		else
 			local output = format_results(jdat.data.children)
 			output = source .. output

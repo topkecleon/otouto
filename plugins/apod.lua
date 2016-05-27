@@ -24,17 +24,17 @@ function apod:init()
 		:t('apod', true):t('apodhd', true):t('apodtext', true).table
 end
 
-function apod:action(msg)
+function apod:action(msg, config)
 
-	if not self.config.nasa_api_key then
-		self.config.nasa_api_key = 'DEMO_KEY'
+	if not config.nasa_api_key then
+		config.nasa_api_key = 'DEMO_KEY'
 	end
 
 	local input = utilities.input(msg.text)
 	local date = '*'
 	local disable_page_preview = false
 
-	local url = 'https://api.nasa.gov/planetary/apod?api_key=' .. self.config.nasa_api_key
+	local url = 'https://api.nasa.gov/planetary/apod?api_key=' .. config.nasa_api_key
 
 	if input then
 		if input:match('(%d+)%-(%d+)%-(%d+)$') then
@@ -52,14 +52,14 @@ function apod:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.error then
-		utilities.send_reply(msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

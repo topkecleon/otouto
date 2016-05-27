@@ -15,7 +15,7 @@ function translate:init()
 	translate.triggers = utilities.triggers(self.info.username):t('translate', true):t('tl', true).table
 end
 
-function translate:action(msg)
+function translate:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -27,17 +27,17 @@ function translate:action(msg)
 		end
 	end
 
-	local url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=' .. self.config.yandex_key .. '&lang=' .. self.config.lang .. '&text=' .. URL.escape(input)
+	local url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=' .. config.yandex_key .. '&lang=' .. config.lang .. '&text=' .. URL.escape(input)
 
 	local str, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(str)
 	if jdat.code ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

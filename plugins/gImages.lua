@@ -8,12 +8,12 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function gImages:init()
-	if not self.config.google_api_key then
+function gImages:init(config)
+	if not config.google_api_key then
 		print('Missing config value: google_api_key.')
 		print('gImages.lua will not be enabled.')
 		return
-	elseif not self.config.google_cse_key then
+	elseif not config.google_cse_key then
 		print('Missing config value: google_cse_key.')
 		print('gImages.lua will not be enabled.')
 		return
@@ -29,7 +29,7 @@ Returns a randomized top result from Google Images. Safe search is enabled by de
 Alias: /i
 ```]]
 
-function gImages:action(msg)
+function gImages:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -41,7 +41,7 @@ function gImages:action(msg)
 		end
 	end
 
-	local url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. self.config.google_api_key .. '&cx=' .. self.config.google_cse_key
+	local url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. config.google_api_key .. '&cx=' .. config.google_cse_key
 
 	if not string.match(msg.text, '^/i[mage]*nsfw') then
 		url = url .. '&safe=high'
@@ -51,13 +51,13 @@ function gImages:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.searchInformation.totalResults == '0' then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

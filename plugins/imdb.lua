@@ -15,7 +15,7 @@ function imdb:init()
 	imdb.triggers = utilities.triggers(self.info.username):t('imdb', true).table
 end
 
-function imdb:action(msg)
+function imdb:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -31,14 +31,14 @@ function imdb:action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.Response ~= 'True' then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

@@ -16,7 +16,7 @@ function gSearch:init()
 	gSearch.triggers = utilities.triggers(self.info.username):t('g', true):t('google', true):t('gnsfw', true).table
 end
 
-function gSearch:action(msg)
+function gSearch:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -44,17 +44,17 @@ function gSearch:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.responseData then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	if not jdat.responseData.results[1] then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

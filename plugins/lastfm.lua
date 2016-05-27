@@ -8,8 +8,8 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function lastfm:init()
-	if not self.config.lastfm_api_key then
+function lastfm:init(config)
+	if not config.lastfm_api_key then
 		print('Missing config value: lastfm_api_key.')
 		print('lastfm.lua will not be enabled.')
 		return
@@ -27,7 +27,7 @@ Returns what you are or were last listening to. If you specify a username, info 
 Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.
 ```]]
 
-function lastfm:action(msg)
+function lastfm:action(msg, config)
 
 	local input = utilities.input(msg.text)
 
@@ -47,7 +47,7 @@ function lastfm:action(msg)
 		return
 	end
 
-	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. self.config.lastfm_api_key .. '&user='
+	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
 	local username
 	local alert = ''
@@ -72,7 +72,7 @@ function lastfm:action(msg)
 			jstr, res = HTTP.request(url)
 	end)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

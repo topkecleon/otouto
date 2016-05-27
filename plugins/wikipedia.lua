@@ -25,7 +25,7 @@ local get_title = function(search)
 	return false
 end
 
-function wikipedia:action(msg)
+function wikipedia:action(msg, config)
 
 	-- Get the query. If it's not in the message, check the replied-to message.
 	-- If those don't exist, send the help text.
@@ -50,19 +50,19 @@ function wikipedia:action(msg)
 
 	jstr, res = HTTPS.request(search_url .. URL.escape(input))
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	jdat = JSON.decode(jstr)
 	if jdat.query.searchinfo.totalhits == 0 then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 
 	local title = get_title(jdat.query.search)
 	if not title then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 
@@ -70,7 +70,7 @@ function wikipedia:action(msg)
 
 	jstr, res = HTTPS.request(res_url .. URL.escape(title))
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
@@ -78,7 +78,7 @@ function wikipedia:action(msg)
 	local text = JSON.decode(jstr).query.pages
 	_, text = next(text)
 	if not text then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	else
 		text = text.extract

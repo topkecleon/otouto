@@ -15,13 +15,13 @@ function hackernews:init()
 	hackernews.triggers = utilities.triggers(self.info.username):t('hackernews', true):t('hn', true).table
 end
 
-function hackernews:action(msg)
+function hackernews:action(msg, config)
 
 	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
 
 	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
@@ -37,7 +37,7 @@ function hackernews:action(msg)
 		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
 		jstr, res = HTTPS.request(res_url)
 		if res ~= 200 then
-			utilities.send_reply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, config.errors.connection)
 			return
 		end
 		local res_jdat = JSON.decode(jstr)
@@ -47,7 +47,7 @@ function hackernews:action(msg)
 		end
 		local url = res_jdat.url
 		if not url then
-			utilities.send_reply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, config.errors.connection)
 			return
 		end
 		if url:find('%(') then

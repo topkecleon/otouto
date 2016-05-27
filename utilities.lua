@@ -137,18 +137,18 @@ function utilities.save_data(filename, data)
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
-function utilities:get_coords(input)
+function utilities:get_coords(input, config)
 
 	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return self.config.errors.connection
+		return config.errors.connection
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.status == 'ZERO_RESULTS' then
-		return self.config.errors.results
+		return config.errors.results
 	end
 
 	return {
@@ -231,15 +231,15 @@ function utilities:user_from_message(msg, no_extra)
 
 end
 
-function utilities:handle_exception(err, message)
+function utilities:handle_exception(err, message, config)
 
 	if not err then err = '' end
 
 	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
 
-	if self.config.log_chat then
+	if config.log_chat then
 		output = '```' .. output .. '```'
-		utilities.send_message(self, self.config.log_chat, output, true, nil, true)
+		utilities.send_message(self, config.log_chat, output, true, nil, true)
 	else
 		print(output)
 	end

@@ -14,7 +14,7 @@ function calc:init()
 	calc.triggers = utilities.triggers(self.info.username):t('calc', true).table
 end
 
-function calc:action(msg)
+function calc:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -30,7 +30,7 @@ function calc:action(msg)
 
 	local output = HTTPS.request(url)
 	if not output then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

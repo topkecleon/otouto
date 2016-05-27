@@ -6,9 +6,9 @@ function shell:init()
 	shell.triggers = utilities.triggers(self.info.username):t('run', true).table
 end
 
-function shell:action(msg)
+function shell:action(msg, config)
 
-	if msg.from.id ~= self.config.admin then
+	if msg.from.id ~= config.admin then
 		return
 	end
 

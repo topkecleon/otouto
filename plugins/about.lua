@@ -10,13 +10,13 @@ about.triggers = {
 	''
 }
 
-function about:action(msg)
+function about:action(msg, config)
 
 	-- Filthy hack, but here is where we'll stop forwarded messages from hitting
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local output = self.config.about_text .. '\nBased on otouto v'..bot.version..' by topkecleon.'
+	local output = config.about_text .. '\nBased on otouto v'..bot.version..' by topkecleon.'
 
 	if (msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
 		or msg.text_lower:match('^/about')

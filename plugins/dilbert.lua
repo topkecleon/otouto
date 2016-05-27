@@ -17,7 +17,7 @@ function dilbert:init()
 	dilbert.triggers = utilities.triggers(self.info.username):t('dilbert', true).table
 end
 
-function dilbert:action(msg)
+function dilbert:action(msg, config)
 
 	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'upload_photo' } )
 
@@ -28,7 +28,7 @@ function dilbert:action(msg)
 	local url = 'http://dilbert.com/strip/' .. URL.escape(input)
 	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

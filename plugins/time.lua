@@ -14,7 +14,7 @@ function time:init()
 	time.triggers = utilities.triggers(self.info.username):t('time', true).table
 end
 
-function time:action(msg)
+function time:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -26,7 +26,7 @@ function time:action(msg)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input)
+	local coords = utilities.get_coords(self, input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return
@@ -39,7 +39,7 @@ function time:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

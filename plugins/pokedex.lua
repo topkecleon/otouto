@@ -16,7 +16,7 @@ function pokedex:init()
 	pokedex.triggers = utilities.triggers(self.info.username):t('pokedex', true):t('dex', true).table
 end
 
-function pokedex:action(msg)
+function pokedex:action(msg, config)
 
 	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
 
@@ -35,7 +35,7 @@ function pokedex:action(msg)
 	local dex_url = url .. '/api/v1/pokemon/' .. input
 	local dex_jstr, res = HTTP.request(dex_url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
@@ -44,7 +44,7 @@ function pokedex:action(msg)
 	local desc_url = url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
 	local desc_jstr, _ = HTTP.request(desc_url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

@@ -14,7 +14,7 @@ function gMaps:init()
 	gMaps.triggers = utilities.triggers(self.info.username):t('location', true):t('loc', true).table
 end
 
-function gMaps:action(msg)
+function gMaps:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -26,7 +26,7 @@ function gMaps:action(msg)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input)
+	local coords = utilities.get_coords(self, input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return

@@ -15,7 +15,7 @@ function currency:init()
 	currency.triggers = utilities.triggers(self.info.username):t('cash', true).table
 end
 
-function currency:action(msg)
+function currency:action(msg, config)
 
 	local input = msg.text:upper()
 	if not input:match('%a%a%a TO %a%a%a') then
@@ -36,13 +36,13 @@ function currency:action(msg)
 		url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
 		local str, res = HTTPS.request(url)
 		if res ~= 200 then
-			utilities.send_reply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, config.errors.connection)
 			return
 		end
 
 		str = str:match('<span class=bld>(.*) %u+</span>')
 		if not str then
-			utilities.send_reply(self, msg, self.config.errors.results)
+			utilities.send_reply(self, msg, config.errors.results)
 			return
 		end
 

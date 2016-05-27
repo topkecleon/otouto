@@ -14,11 +14,11 @@ function xkcd:init()
 	xkcd.triggers = utilities.triggers(self.info.username):t('xkcd', true).table
 end
 
-function xkcd:action(msg)
+function xkcd:action(msg, config)
 
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	local latest = JSON.decode(jstr).num
@@ -44,7 +44,7 @@ function xkcd:action(msg)
 
 	jstr, res = HTTP.request(res_url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	local jdat = JSON.decode(jstr)

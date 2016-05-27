@@ -8,9 +8,9 @@ function control:init()
 	table.insert(control.triggers, '^/script')
 end
 
-function control:action(msg)
+function control:action(msg, config)
 
-	if msg.from.id ~= self.config.admin then
+	if msg.from.id ~= config.admin then
 		return
 	end
 
@@ -21,11 +21,14 @@ function control:action(msg)
 			if pac:match('^plugins%.') then
 				package.loaded[pac] = nil
 			end
-			package.loaded['bindings'] = nil
-			package.loaded['utilities'] = nil
-			package.loaded['config'] = nil
 		end
-		bot.init(self)
+		package.loaded['bindings'] = nil
+		package.loaded['utilities'] = nil
+		package.loaded['config'] = nil
+		for k, v in pairs(require('config')) do
+			config[k] = v
+		end
+		bot.init(self, config)
 		utilities.send_reply(self, msg, 'Bot reloaded!')
 	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'halt') then
 		self.is_started = false

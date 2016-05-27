@@ -16,7 +16,7 @@ function urbandictionary:init()
 	urbandictionary.triggers = utilities.triggers(self.info.username):t('urbandictionary', true):t('ud', true):t('urban', true).table
 end
 
-function urbandictionary:action(msg)
+function urbandictionary:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -32,13 +32,13 @@ function urbandictionary:action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.result_type == "no_results" then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

@@ -102,7 +102,7 @@ local function format_card(card)
 
 end
 
-function hearthstone:action(msg)
+function hearthstone:action(msg, config)
 
 	local input = utilities.input(msg.text_lower)
 	if not input then
@@ -119,7 +119,7 @@ function hearthstone:action(msg)
 
 	output = utilities.trim(output)
 	if output:len() == 0 then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

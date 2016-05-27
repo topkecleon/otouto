@@ -8,9 +8,9 @@ function luarun:init()
 	luarun.triggers = utilities.triggers(self.info.username):t('lua', true):t('return', true).table
 end
 
-function luarun:action(msg)
+function luarun:action(msg, config)
 
-	if msg.from.id ~= self.config.admin then
+	if msg.from.id ~= config.admin then
 		return true
 	end
 
