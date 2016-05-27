@@ -39,6 +39,18 @@ function utilities.input(s)
 	return s:sub(s:find(' ')+1)
 end
 
+-- Calculates the length of the given string as UTF-8 characters
+function utilities.utf8_len(s)
+    local chars = 0
+    for i = 1, string.len(s) do
+        local b = string.byte(s, i)
+        if b < 128 or b >= 192 then
+            chars = chars + 1
+        end
+    end
+    return chars
+end
+
  -- I swear, I copied this from PIL, not yago! :)
 function utilities.trim(str) -- Trims whitespace from a string.
 	local s = str:gsub('^%s*(.-)%s*$', '%1')

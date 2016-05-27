@@ -34,7 +34,7 @@ function nick:action(msg)
 		else
 			output = target.name .. ' currently has no nickname.'
 		end
-	elseif string.len(input) > 32 then
+	elseif utilities.utf8_len(input) > 32 then
 		output = 'The character limit for nicknames is 32.'
 	elseif input == '--' or input == utilities.char.em_dash then
 		self.database.users[target.id_str].nickname = nil
