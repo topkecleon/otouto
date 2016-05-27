@@ -56,7 +56,7 @@ drua.send = function(command, do_receive)
 	local output
 	if do_receive then
 		output = string.match(s:receive('*l'), 'ANSWER (%d+)')
-		output = s:receive(tonumber(n)):gsub('\n$', '')
+		output = s:receive(tonumber(output)):gsub('\n$', '')
 	end
 	s:close()
 	return output
