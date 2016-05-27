@@ -5,9 +5,9 @@ local utilities = require('utilities')
 
 gMaps.command = 'location <query>'
 gMaps.doc = [[```
-/location <query>
+]]..utilities.CMD_PAT..[[location <query>
 Returns a location from Google Maps.
-Alias: /loc
+Alias: ]]..utilities.CMD_PAT..[[loc
 ```]]
 
 function gMaps:init()
@@ -26,7 +26,7 @@ function gMaps:action(msg, config)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input, config)
+	local coords = utilities.get_coords(input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return

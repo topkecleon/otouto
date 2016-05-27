@@ -5,7 +5,7 @@ local utilities = require('utilities')
 
 preview.command = 'preview <link>'
 preview.doc = [[```
-/preview <link>
+]]..utilities.CMD_PAT..[[preview <link>
 Returns a full-message, "unlinked" preview.
 ```]]
 

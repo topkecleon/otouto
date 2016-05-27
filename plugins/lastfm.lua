@@ -20,21 +20,21 @@ end
 
 lastfm.command = 'lastfm'
 lastfm.doc = [[```
-/np [username]
+]]..utilities.CMD_PAT..[[np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
-/fmset <username>
-Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.
+]]..utilities.CMD_PAT..[[fmset <username>
+Sets your last.fm username. Otherwise, ]]..utilities.CMD_PAT..[[np will use your Telegram username. Use "]]..utilities.CMD_PAT..[[fmset --" to delete it.
 ```]]
 
 function lastfm:action(msg, config)
 
 	local input = utilities.input(msg.text)
 
-	if string.match(msg.text, '^/lastfm') then
+	if string.match(msg.text, '^'..utilities.CMD_PAT..'lastfm') then
 		utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		return
-	elseif string.match(msg.text, '^/fmset') then
+	elseif string.match(msg.text, '^'..utilities.CMD_PAT..'fmset') then
 		if not input then
 			utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == utilities.char.em_dash then
@@ -57,10 +57,10 @@ function lastfm:action(msg, config)
 		username = self.database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
-		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..utilities.CMD_PAT..'fmset <username>.'
 		self.database.users[msg.from.id_str].lastfm = username
 	else
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..utilities.CMD_PAT..'fmset.')
 		return
 	end
 
@@ -78,7 +78,7 @@ function lastfm:action(msg, config)
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..utilities.CMD_PAT..'fmset.')
 		return
 	end
 

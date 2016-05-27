@@ -9,7 +9,7 @@ function ping:init()
 end
 
 function ping:action(msg)
-	local output = msg.text_lower:match('^/ping') and 'Pong!' or 'Annyong.'
+	local output = msg.text_lower:match('^'..utilities.CMD_PAT..'ping') and 'Pong!' or 'Annyong.'
 	utilities.send_message(self, msg.chat.id, output)
 end
 

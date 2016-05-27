@@ -41,9 +41,9 @@ end
 
 hearthstone.command = 'hearthstone <query>'
 hearthstone.doc = [[```
-/hearthstone <query>
+]]..utilities.CMD_PAT..[[hearthstone <query>
 Returns Hearthstone card info.
-Alias: /hs
+Alias: ]]..utilities.CMD_PAT..[[hs
 ```]]
 
 local function format_card(card)

@@ -5,7 +5,7 @@ local utilities = require('utilities')
 
 function control:init()
 	control.triggers = utilities.triggers(self.info.username):t('reload'):t('halt').table
-	table.insert(control.triggers, '^/script')
+	table.insert(control.triggers, '^'..utilities.CMD_PAT..'script')
 end
 
 function control:action(msg, config)
@@ -16,7 +16,7 @@ function control:action(msg, config)
 
 	if msg.date < os.time() - 1 then return end
 
-	if msg.text:match('^'..utilities.INVOCATION_PATTERN..'reload') then
+	if msg.text:match('^'..utilities.CMD_PAT..'reload') then
 		for pac, _ in pairs(package.loaded) do
 			if pac:match('^plugins%.') then
 				package.loaded[pac] = nil
@@ -30,13 +30,13 @@ function control:action(msg, config)
 		end
 		bot.init(self, config)
 		utilities.send_reply(self, msg, 'Bot reloaded!')
-	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'halt') then
+	elseif msg.text:match('^'..utilities.CMD_PAT..'halt') then
 		self.is_started = false
 		utilities.send_reply(self, msg, 'Stopping bot!')
-	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'script') then
-		local input = msg.text:match('^'..utilities.INVOCATION_PATTERN..'script\n(.+)')
+	elseif msg.text:match('^'..utilities.CMD_PAT..'script') then
+		local input = msg.text:match('^'..utilities.CMD_PAT..'script\n(.+)')
 		if not input then
-			utilities.send_reply(self, msg, 'usage: ```\n/script\n/command <arg>\n...\n```', true)
+			utilities.send_reply(self, msg, 'usage: ```\n'..utilities.CMD_PAT..'script\n'..utilities.CMD_PAT..'command <arg>\n...\n```', true)
 			return
 		end
 		input = input .. '\n'

@@ -30,19 +30,19 @@ function reactions:init()
 	help = 'Reactions:\n'
 	reactions.triggers = utilities.triggers(self.info.username):t('reactions').table
 	for trigger,reaction in pairs(mapping) do
-		help = help .. '• ' .. utilities.INVOCATION_PATTERN .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
-		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger)
-		table.insert(reactions.triggers, utilities.INVOCATION_PATTERN..trigger..'@'..self.info.username:lower())
+		help = help .. '• ' .. utilities.CMD_PAT .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
+		table.insert(reactions.triggers, utilities.CMD_PAT..trigger)
+		table.insert(reactions.triggers, utilities.CMD_PAT..trigger..'@'..self.info.username:lower())
 	end
 end
 
 function reactions:action(msg)
-	if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..'reactions') then
+	if string.match(msg.text_lower, utilities.CMD_PAT..'reactions') then
 		utilities.send_message(self, msg.chat.id, help)
 		return
 	end
 	for trigger,reaction in pairs(mapping) do
-		if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..trigger) then
+		if string.match(msg.text_lower, utilities.CMD_PAT..trigger) then
 			utilities.send_message(self, msg.chat.id, reaction)
 			return
 		end

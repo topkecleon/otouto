@@ -8,7 +8,7 @@ local utilities = require('utilities')
 hackernews.command = 'hackernews'
 hackernews.doc = [[```
 Returns four (if group) or eight (if private message) top stories from Hacker News.
-Alias: /hn
+Alias: ]]..utilities.CMD_PAT..[[hn
 ```]]
 
 function hackernews:init()

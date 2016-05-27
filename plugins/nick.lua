@@ -4,8 +4,8 @@ local utilities = require('utilities')
 
 nick.command = 'nick <nickname>'
 nick.doc = [[```
-/nick <nickname>
-Set your nickname. Use "/nick --" to delete it.
+]]..utilities.CMD_PAT..[[nick <nickname>
+Set your nickname. Use "]]..utilities.CMD_PAT..[[nick --" to delete it.
 ```]]
 
 function nick:init()

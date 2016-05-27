@@ -137,7 +137,7 @@ function utilities.save_data(filename, data)
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
-function utilities:get_coords(input, config)
+function utilities.get_coords(input, config)
 
 	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
@@ -281,17 +281,17 @@ end
 
 utilities.md_escape = utilities.markdown_escape
 
-utilities.INVOCATION_PATTERN = '/'
+utilities.CMD_PAT = '/'
 
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
 function utilities.triggers_meta:t(pattern, has_args)
 	local username = self.username:lower()
-	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'$')
-	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'$')
+	table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'$')
+	table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'@'..username..'$')
 	if has_args then
-		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
-		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'%s+[^%s]*')
+		table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'%s+[^%s]*')
+		table.insert(self.table, '^'..utilities.CMD_PAT..pattern..'@'..username..'%s+[^%s]*')
 	end
 	return self
 end

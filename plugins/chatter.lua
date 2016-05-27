@@ -34,7 +34,7 @@ function chatter:action(msg, config)
 			--Uncomment the following line for Al Gore-like conversation.
 			--or (msg.reply_to_message and msg.reply_to_message.from.id == self.info.id)
 		)
-		or msg.text:match('^/')
+		or msg.text:match('^'..utilities.CMD_PAT)
 		or msg.text == ''
 	) then
 		return true

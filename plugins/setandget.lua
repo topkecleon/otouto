@@ -9,9 +9,9 @@ end
 
 setandget.command = 'set <name> <value>'
 setandget.doc = [[```
-/set <name> <value>
-Stores a value with the given name. Use "/set <name> --" to delete the stored value.
-/get [name]
+]]..utilities.CMD_PAT..[[set <name> <value>
+Stores a value with the given name. Use "]]..utilities.CMD_PAT..[[set <name> --" to delete the stored value.
+]]..utilities.CMD_PAT..[[get [name]
 Returns the stored value or a list of stored values.
 ```]]
 
@@ -21,7 +21,7 @@ function setandget:action(msg)
 	local input = utilities.input(msg.text)
 	self.database.setandget[msg.chat.id_str] = self.database.setandget[msg.chat.id_str] or {}
 
-	if msg.text_lower:match('^/set') then
+	if msg.text_lower:match('^'..utilities.CMD_PAT..'set') then
 
 		if not input then
 			utilities.send_message(self, msg.chat.id, setandget.doc, true, nil, true)
@@ -41,7 +41,7 @@ function setandget:action(msg)
 			utilities.send_message(self, msg.chat.id, '"' .. name .. '" has been set to "' .. value .. '".', true)
 		end
 
-	elseif msg.text_lower:match('^/get') then
+	elseif msg.text_lower:match('^'..utilities.CMD_PAT..'get') then
 
 		if not input then
 			local output

@@ -6,7 +6,7 @@ local utilities = require('utilities')
 
 calc.command = 'calc <expression>'
 calc.doc = [[```
-/calc <expression>
+]]..utilities.CMD_PAT..[[calc <expression>
 Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 ```]]
 

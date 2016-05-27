@@ -7,9 +7,9 @@ local utilities = require('utilities')
 
 gSearch.command = 'google <query>'
 gSearch.doc = [[```
-/google <query>
-Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
-Alias: /g
+]]..utilities.CMD_PAT..[[google <query>
+Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]]..utilities.CMD_PAT..[[gnsfw" to disable it.
+Alias: ]]..utilities.CMD_PAT..[[g
 ```]]
 
 function gSearch:init()
@@ -36,7 +36,7 @@ function gSearch:action(msg, config)
 		url = url .. '&rsz=4'
 	end
 
-	if not string.match(msg.text, '^/g[oogle]*nsfw') then
+	if not string.match(msg.text, '^'..utilities.CMD_PAT..'g[oogle]*nsfw') then
 		url = url .. '&safe=active'
 	end
 

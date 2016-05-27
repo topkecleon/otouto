@@ -19,9 +19,9 @@ end
 
 youtube.command = 'youtube <query>'
 youtube.doc = [[```
-/youtube <query>
+]]..utilities.CMD_PAT..[[youtube <query>
 Returns the top result from YouTube.
-Alias: /yt
+Alias: ]]..utilities.CMD_PAT..[[yt
 ```]]
 
 function youtube:action(msg, config)

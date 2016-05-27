@@ -4,7 +4,7 @@ local utilities = require('utilities')
 
 remind.command = 'remind <duration> <message>'
 remind.doc = [[```
-	/remind <duration> <message>
+	]]..utilities.CMD_PAT..[[remind <duration> <message>
 	Repeats a message after a duration of time, in minutes.
 	```]]
 

@@ -4,7 +4,7 @@ local utilities = require('utilities')
 
 slap.command = 'slap [target]'
 slap.doc = [[```
-/slap [target]
+]]..utilities.CMD_PAT..[[slap [target]
 Slap somebody.
 ```]]
 

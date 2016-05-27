@@ -7,9 +7,9 @@ local utilities = require('utilities')
 
 urbandictionary.command = 'urbandictionary <query>'
 urbandictionary.doc = [[```
-/urbandictionary <query>
+]]..utilities.CMD_PAT..[[urbandictionary <query>
 Returns a definition from Urban Dictionary.
-Aliases: /ud, /urban
+Aliases: ]]..utilities.CMD_PAT..[[ud, ]]..utilities.CMD_PAT..[[urban
 ```]]
 
 function urbandictionary:init()

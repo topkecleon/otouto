@@ -10,19 +10,19 @@ local help_text
 function help:init()
 
 	local commandlist = {}
-	help_text = '*Available commands:*\n• /'
+	help_text = '*Available commands:*\n• '..utilities.CMD_PAT
 
 	for _,plugin in ipairs(self.plugins) do
 		if plugin.command then
 			table.insert(commandlist, plugin.command)
-			--help_text = help_text .. '\n• /' .. plugin.command:gsub('%[', '\\[')
+			--help_text = help_text .. '\n• '..utilities.CMD_PAT .. plugin.command:gsub('%[', '\\[')
 		end
 	end
 
 	table.insert(commandlist, 'help [command]')
 	table.sort(commandlist)
 
-	help_text = help_text .. table.concat(commandlist, '\n• /') .. '\nArguments: <required> [optional]'
+	help_text = help_text .. table.concat(commandlist, '\n• '..utilities.CMD_PAT) .. '\nArguments: <required> [optional]'
 
 	help_text = help_text:gsub('%[', '\\[')
 

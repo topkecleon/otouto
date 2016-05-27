@@ -7,7 +7,7 @@ local utilities = require('utilities')
 
 translate.command = 'translate [text]'
 translate.doc = [[```
-/translate [text]
+]]..utilities.CMD_PAT..[[translate [text]
 Translates input or the replied-to message into the bot's language.
 ```]]
 

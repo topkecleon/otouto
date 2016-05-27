@@ -9,12 +9,12 @@ local utilities = require('utilities')
 
 apod.command = 'apod [date]'
 apod.doc = [[```
-/apod [query]
+]]..utilities.CMD_PAT..[[apod [query]
 Returns the Astronomy Picture of the Day.
 If the query is a date, in the format YYYY-MM-DD, the APOD of that day is returned.
-/apodhd [query]
+]]..utilities.CMD_PAT..[[apodhd [query]
 Returns the image in HD, if available.
-/apodtext [query]
+]]..utilities.CMD_PAT..[[apodtext [query]
 Returns the explanation of the APOD.
 Source: nasa.gov
 ```]]
@@ -65,13 +65,13 @@ function apod:action(msg, config)
 
 	local img_url = jdat.url
 
-	if string.match(msg.text, '^/apodhd*') then
+	if string.match(msg.text, '^'..utilities.CMD_PAT..'apodhd*') then
 		img_url = jdat.hdurl or jdat.url
 	end
 
 	local output = date .. '[' .. jdat.title  .. '](' .. img_url .. ')'
 
-	if string.match(msg.text, '^/apodtext*') then
+	if string.match(msg.text, '^'..utilities.CMD_PAT..'apodtext*') then
 		output = output .. '\n' .. jdat.explanation
 		disable_page_preview = true
 	end

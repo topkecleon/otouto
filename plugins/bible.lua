@@ -16,9 +16,9 @@ end
 
 bible.command = 'bible <reference>'
 bible.doc = [[```
-/bible <reference>
+]]..utilities.CMD_PAT..[[bible <reference>
 Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
-Alias: /b
+Alias: ]]..utilities.CMD_PAT..[[b
 ```]]
 
 function bible:action(msg, config)

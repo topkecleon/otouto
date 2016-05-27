@@ -7,9 +7,9 @@ local utilities = require('utilities')
 
 reddit.command = 'reddit [r/subreddit | query]'
 reddit.doc = [[```
-/reddit [r/subreddit | query]
+]]..utilities.CMD_PAT..[[reddit [r/subreddit | query]
 Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
-Aliases: /r, /r/subreddit
+Aliases: ]]..utilities.CMD_PAT..[[r, /r/subreddit
 ```]]
 
 function reddit:init()
@@ -48,7 +48,7 @@ function reddit:action(msg, config)
 	local text = msg.text_lower
 	if text:match('^/r/.') then
 		-- Normalize input so this hack works easily.
-		text = msg.text_lower:gsub('^/r/', '/r r/')
+		text = msg.text_lower:gsub('^/r/', utilities.CMD_PAT..'r r/')
 	end
 	local input = utilities.input(text)
 	local source, url

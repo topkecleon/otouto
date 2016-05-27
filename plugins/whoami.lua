@@ -5,7 +5,7 @@ local utilities = require('utilities')
 whoami.command = 'whoami'
 whoami.doc = [[```
 Returns user and chat info for you or the replied-to message.
-Alias: /who
+Alias: ]]..utilities.CMD_PAT..[[who
 ```]]
 
 function whoami:init()

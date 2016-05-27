@@ -4,7 +4,7 @@ local utilities = require('utilities')
 
 echo.command = 'echo <text>'
 echo.doc = [[```
-/echo <text>
+]]..utilities.CMD_PAT..[[echo <text>
 Repeats a string of text.
 ```]]
 

@@ -7,7 +7,7 @@ local utilities = require('utilities')
 
 imdb.command = 'imdb <query>'
 imdb.doc = [[```
-/imdb <query>
+]]..utilities.CMD_PAT..[[imdb <query>
 Returns an IMDb entry.
 ```]]
 

@@ -4,7 +4,7 @@ local utilities = require('utilities')
 
 dice.command = 'roll <nDr>'
 dice.doc = [[```
-/roll <nDr>
+]]..utilities.CMD_PAT..[[roll <nDr>
 Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
 ```]]
 

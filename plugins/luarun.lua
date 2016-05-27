@@ -20,7 +20,7 @@ function luarun:action(msg, config)
 		return
 	end
 
-	if msg.text_lower:match('^/return') then
+	if msg.text_lower:match('^'..utilities.CMD_PAT..'return') then
 		input = 'return ' .. input
 	end
 

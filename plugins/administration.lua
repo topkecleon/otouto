@@ -75,8 +75,8 @@ administration.flags = {
 		name = 'unlisted',
 		desc = 'Removes this group from the group listing.',
 		short = 'This group is unlisted.',
-		enabled = 'This group is no longer listed in /groups.',
-		disabled = 'This group is now listed in /groups.'
+		enabled = 'This group is no longer listed in '..utilities.CMD_PAT..'groups.',
+		disabled = 'This group is now listed in '..utilities.CMD_PAT..'groups.'
 	},
 	[2] = {
 		name = 'antisquig',
@@ -105,7 +105,7 @@ administration.flags = {
 		name = 'antiflood',
 		desc = 'Prevents flooding by rate-limiting messages per user.',
 		short = 'This group automatically removes users who flood.',
-		enabled = 'Users will now be removed automatically for excessive messages. Use /antiflood to configure limits.',
+		enabled = 'Users will now be removed automatically for excessive messages. Use '..utilities.CMD_PAT..'antiflood to configure limits.',
 		disabled = 'Users will no longer be removed automatically for excessive messages.',
 		kicked = 'You were automatically kicked from GROUPNAME for flooding.'
 	},
@@ -237,7 +237,7 @@ function administration:get_desc(chat_id)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. utilities.trim(modstring))
 	end
-	table.insert(t, 'Run /ahelp@' .. self.info.username .. ' for a list of commands.')
+	table.insert(t, 'Run '..utilities.CMD_PAT..'ahelp@' .. self.info.username .. ' for a list of commands.')
 	return table.concat(t, '\n\n')
 
 end
@@ -250,7 +250,7 @@ function administration:update_desc(chat)
 		local gov = self.database.users[tostring(group.governor)]
 		desc = desc .. '\nGovernor: ' .. utilities.build_name(gov.first_name, gov.last_name) .. ' [' .. gov.id .. ']\n'
 	end
-	local s = '\n/desc@' .. self.info.username .. ' for more information.'
+	local s = '\n'..utilities.CMD_PAT..'desc@' .. self.info.username .. ' for more information.'
 	desc = desc:sub(1, 250-s:len()) .. s
 	drua.channel_set_about(chat, desc)
 end
@@ -521,11 +521,11 @@ function administration.init_command(self_, config)
 				local rank = administration.get_rank(self, msg.from.id, msg.chat.id, config)
 				local input = utilities.get_word(msg.text_lower, 2)
 				if input then
-					input = input:gsub('^/', '')
+					input = input:gsub('^'..utilities.CMD_PAT..'', '')
 					local doc
 					for _,action in ipairs(administration.commands) do
 						if action.keyword == input then
-							doc = '/' .. action.command:gsub('\\','') .. '\n' .. action.doc
+							doc = ''..utilities.CMD_PAT..'' .. action.command:gsub('\\','') .. '\n' .. action.doc
 							break
 						end
 					end
@@ -533,14 +533,14 @@ function administration.init_command(self_, config)
 						local output = '*Help for* _' .. input .. '_ :\n```\n' .. doc .. '\n```'
 						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					else
-						local output = 'Sorry, there is no help for that command.\n/ahelp@'..self.info.username
+						local output = 'Sorry, there is no help for that command.\n'..utilities.CMD_PAT..'ahelp@'..self.info.username
 						utilities.send_reply(self, msg, output)
 					end
 				else
 					local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
 					for i = 1, rank do
 						for _, val in ipairs(self.admin_temp.help[i]) do
-							output = output .. '• /' .. val .. '\n'
+							output = output .. '• ' .. utilities.CMD_PAT .. val .. '\n'
 						end
 					end
 					output = output .. 'Arguments: <required> \\[optional]'
@@ -771,7 +771,7 @@ function administration.init_command(self_, config)
 			doc = 'Sets the group\'s rules. Rules will be automatically numbered. Separate rules with a new line. Markdown is supported. Pass "--" to delete the rules.',
 
 			action = function(self, msg, group, config)
-				local input = msg.text:match('^/setrules[@'..self.info.username..']*(.+)')
+				local input = msg.text:match('^'..utilities.CMD_PAT..'setrules[@'..self.info.username..']*(.+)')
 				if input == ' --' or input == ' ' .. utilities.char.em_dash then
 					group.rules = {}
 					utilities.send_reply(self, msg, 'The rules have been cleared.')
@@ -802,7 +802,7 @@ function administration.init_command(self_, config)
 
 			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
-				local output = 'usage: `/changerule <i> <newrule>`'
+				local output = 'usage: `'..utilities.CMD_PAT..'changerule <i> <newrule>`'
 				if input then
 					local rule_num = tonumber(input:match('^%d+'))
 					local new_rule = utilities.input(input)
@@ -944,7 +944,7 @@ function administration.init_command(self_, config)
 
 			action = function(self, msg, group, config)
 				if not group.flags[5] then
-					utilities.send_message(self, msg.chat.id, 'antiflood is not enabled. Use `/flag 5` to enable it.', true, nil, true)
+					utilities.send_message(self, msg.chat.id, 'antiflood is not enabled. Use `'..utilities.CMD_PAT..'flag 5` to enable it.', true, nil, true)
 				else
 					if not group.antiflood then
 						group.antiflood = JSON.decode(JSON.encode(administration.antiflood))
@@ -963,7 +963,7 @@ function administration.init_command(self_, config)
 							output = '*' .. key:gsub('^%l', string.upper) .. '* messages are now worth *' .. val .. '* points.'
 						end
 					else
-						output = 'usage: `/antiflood <type> <i>`\nexample: `/antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
+						output = 'usage: `'..utilities.CMD_PAT..'antiflood <type> <i>`\nexample: `'..utilities.CMD_PAT..'antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
 						for k,v in pairs(group.antiflood) do
 							output = output .. '*'..k..':* `'..v..'`\n'
 						end
@@ -1389,6 +1389,6 @@ function administration:cron()
 end
 
 administration.command = 'groups'
-administration.doc = '`Returns a list of administrated groups.\nUse /ahelp for more administrative commands.`'
+administration.doc = '`Returns a list of administrated groups.\nUse '..utilities.CMD_PAT..'ahelp for more administrative commands.`'
 
 return administration

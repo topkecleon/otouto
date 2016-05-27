@@ -24,9 +24,9 @@ end
 
 gImages.command = 'image <query>'
 gImages.doc = [[```
-/image <query>
-Returns a randomized top result from Google Images. Safe search is enabled by default; use "/insfw" to disable it. NSFW results will not display an image preview.
-Alias: /i
+]]..utilities.CMD_PAT..[[image <query>
+Returns a randomized top result from Google Images. Safe search is enabled by default; use "]]..utilities.CMD_PAT..[[insfw" to disable it. NSFW results will not display an image preview.
+Alias: ]]..utilities.CMD_PAT..[[i
 ```]]
 
 function gImages:action(msg, config)
@@ -43,7 +43,7 @@ function gImages:action(msg, config)
 
 	local url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. config.google_api_key .. '&cx=' .. config.google_cse_key
 
-	if not string.match(msg.text, '^/i[mage]*nsfw') then
+	if not string.match(msg.text, '^'..utilities.CMD_PAT..'i[mage]*nsfw') then
 		url = url .. '&safe=high'
 	end
 

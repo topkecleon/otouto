@@ -5,7 +5,7 @@ local utilities = require('utilities')
 bandersnatch.command = 'bandersnatch'
 bandersnatch.doc = [[```
 Shun the frumious Bandersnatch.
-Alias: /bc
+Alias: ]]..utilities.CMD_PAT..[[bc
 ```]]
 
 function bandersnatch:init()

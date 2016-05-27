@@ -7,9 +7,9 @@ local utilities = require('utilities')
 
 wikipedia.command = 'wikipedia <query>'
 wikipedia.doc = [[```
-/wikipedia <query>
+]]..utilities.CMD_PAT..[[wikipedia <query>
 Returns an article from Wikipedia.
-Aliases: /w, /wiki
+Aliases: ]]..utilities.CMD_PAT..[[w, ]]..utilities.CMD_PAT..[[wiki
 ```]]
 
 function wikipedia:init()

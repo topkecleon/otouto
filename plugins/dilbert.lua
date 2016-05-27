@@ -7,7 +7,7 @@ local utilities = require('utilities')
 
 dilbert.command = 'dilbert [date]'
 dilbert.doc = [[```
-/dilbert [YYYY-MM-DD]
+]]..utilities.CMD_PAT..[[dilbert [YYYY-MM-DD]
 Returns the latest Dilbert strip or that of the provided date.
 Dates before the first strip will return the first strip. Dates after the last trip will return the last strip.
 Source: dilbert.com

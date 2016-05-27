@@ -6,7 +6,7 @@ local utilities = require('utilities')
 
 xkcd.command = 'xkcd [i]'
 xkcd.doc = [[```
-/xkcd [i]
+]]..utilities.CMD_PAT..[[xkcd [i]
 Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.
 ```]]
 

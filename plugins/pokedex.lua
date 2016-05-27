@@ -7,9 +7,9 @@ local utilities = require('utilities')
 
 pokedex.command = 'pokedex <query>'
 pokedex.doc = [[```
-/pokedex <query>
+]]..utilities.CMD_PAT..[[pokedex <query>
 Returns a Pokedex entry from pokeapi.co.
-Alias: /dex
+Alias: ]]..utilities.CMD_PAT..[[dex
 ```]]
 
 function pokedex:init()

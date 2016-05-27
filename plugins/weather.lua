@@ -16,7 +16,7 @@ end
 
 weather.command = 'weather <location>'
 weather.doc = [[```
-/weather <location>
+]]..utilities.CMD_PAT..[[weather <location>
 Returns the current weather conditions for a given location.
 ```]]
 
@@ -32,7 +32,7 @@ function weather:action(msg, config)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input, config)
+	local coords = utilities.get_coords(input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return

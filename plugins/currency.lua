@@ -5,8 +5,8 @@ local utilities = require('utilities')
 
 currency.command = 'cash [amount] <from> to <to>'
 currency.doc = [[```
-/cash [amount] <from> to <to>
-Example: /cash 5 USD to EUR
+]]..utilities.CMD_PAT..[[cash [amount] <from> to <to>
+Example: ]]..utilities.CMD_PAT..[[cash 5 USD to EUR
 Returns exchange rates for various currencies.
 Source: Google Finance.
 ```]]

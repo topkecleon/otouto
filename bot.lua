@@ -61,8 +61,8 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 
 	msg = utilities.enrich_message(msg)
 
-	if msg.text:match('^/start .+') then
-		msg.text = '/' .. utilities.input(msg.text)
+	if msg.text:match('^'..utilities.CMD_PAT..'start .+') then
+		msg.text = utilities.CMD_PAT .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
 	end
 

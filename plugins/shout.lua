@@ -4,7 +4,7 @@ local utilities = require('utilities')
 
 shout.command = 'shout <text>'
 shout.doc = [[```
-/shout <text>
+]]..utilities.CMD_PAT..[[shout <text>
 Shouts something. Input may be the replied-to message.
 ```]]
 

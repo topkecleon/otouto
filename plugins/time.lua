@@ -6,7 +6,7 @@ local utilities = require('utilities')
 
 time.command = 'time <location>'
 time.doc = [[```
-/time <location>
+]]..utilities.CMD_PAT..[[time <location>
 Returns the time, date, and timezone for the given location.
 ```]]
 
@@ -26,7 +26,7 @@ function time:action(msg, config)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input, config)
+	local coords = utilities.get_coords(input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return
