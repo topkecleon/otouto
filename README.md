@@ -5,7 +5,7 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See `LICENSE` for details.
+otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See LICENSE for details.
 
 | The Manual                               |
 |:-----------------------------------------|
@@ -36,6 +36,7 @@ When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/
 
 Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
 
+ - bing.lua: [Bing Search API](http://datamarket.azure.com/dataset/bing/search) key (`bing_api_key`)
  - gImages.lua & youtube.lua: Google [API](http://console.developers.google.com) and [CSE](https://cse.google.com/cse) keys (`google_api_key`, `google_cse_key`)
  - weather.lua: [OpenWeatherMap](http://openweathermap.org) API key (`owm_api_key`)
  - lastfm.lua: [last.fm](http://last.fm/api) API key (`lastfm_api_key`)
