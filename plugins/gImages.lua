@@ -6,7 +6,6 @@ local gImages = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function gImages:init()
@@ -37,7 +36,7 @@ function gImages:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -52,13 +51,13 @@ function gImages:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.searchInformation.totalResults == '0' then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -69,9 +68,9 @@ function gImages:action(msg)
 
 
 	if msg.text:match('nsfw') then
-		bindings.sendReply(self, '*NSFW*\n'..msg, output)
+		utilities.send_reply(self, '*NSFW*\n'..msg, output)
 	else
-		bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
+		utilities.send_message(self, msg.chat.id, output, false, nil, true)
 	end
 
 end

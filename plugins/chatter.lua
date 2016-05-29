@@ -6,6 +6,7 @@ local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('bindings')
+local utilities = require('utilities')
 
 function chatter:init()
 	if not self.config.simsimi_key then
@@ -37,7 +38,7 @@ function chatter:action(msg)
 		return true
 	end
 
-	bindings.sendChatAction(self, msg.chat.id, 'typing')
+	bindings.sendChatAction(self, { action = 'typing' } )
 
 	local input = msg.text_lower
 	input = input:gsub(self.info.first_name, 'simsimi')
@@ -54,13 +55,13 @@ function chatter:action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		bindings.sendMessage(self, msg.chat.id, self.config.errors.chatter_connection)
+		utilities.send_message(self, msg.chat.id, self.config.errors.chatter_connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.response then
-		bindings.sendMessage(self, msg.chat.id, self.config.errors.chatter_response)
+		utilities.send_message(self, msg.chat.id, self.config.errors.chatter_response)
 		return
 	end
 	local output = jdat.response
@@ -85,7 +86,7 @@ function chatter:action(msg)
 		output = output .. '.'
 	end
 
-	bindings.sendMessage(self, msg.chat.id, output)
+	utilities.send_message(self, msg.chat.id, output)
 
 end
 

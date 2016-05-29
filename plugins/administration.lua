@@ -22,7 +22,7 @@
 		autokick_timer = 0
 		groups[*].flags[6] = false
 		groups[*].autoban = 3
-		groups[*].autokicks = {}
+		groups[*].autokicks = {}b
 
 	1.9.1 - Returned to non-toggled promotions/bans (too many complaints!).
 
@@ -104,7 +104,7 @@ administration.flags = {
 	},
 	[6] = {
 		name = 'antihammer',
-		desc = 'Removes the ban on globally-banned users. Note that users hammered in this group will also be banned locally.',
+		desc = 'Allows globally banned users to enter this group. Note that users hammered in this group will also be banned locally.',
 		short = 'This group does not acknowledge global bans.',
 		enabled = 'This group will no longer remove users for being globally banned.',
 		disabled = 'This group will now remove users for being globally banned.'
@@ -412,10 +412,10 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if new_user ~= user and new_user.do_kick then
 					administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
 					if new_user.output then
-						bindings.sendMessage(self, msg.new_chat_participant.id, new_user.output)
+						utilities.send_message(self, msg.new_chat_participant.id, new_user.output)
 					end
 					if not new_user.dont_unban and msg.chat.type == 'supergroup' then
-						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = msg.from.id } )
 					end
 				end
 
@@ -437,16 +437,16 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if user.do_kick then
 					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
 					if user.output then
-						bindings.sendMessage(self, msg.from.id, user.output)
+						utilities.send_message(self, msg.from.id, user.output)
 					end
 					if not user.dont_unban and msg.chat.type == 'supergroup' then
-						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = msg.from.id } )
 					end
 				end
 
 				if msg.new_chat_participant and not new_user.do_kick then
 					local output = administration.get_desc(self, msg.chat.id)
-					bindings.sendMessage(self, msg.new_chat_participant.id, output, true, nil, true)
+					utilities.send_message(self, msg.new_chat_participant.id, output, true, nil, true)
 				end
 
 				-- Last active time for group listing.
@@ -489,7 +489,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				else
 					output = '*Groups:*\n' .. output
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -515,10 +515,10 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 					end
 					if doc then
 						local output = '*Help for* _' .. input .. '_ :\n```\n' .. doc .. '\n```'
-						bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					else
 						local output = 'Sorry, there is no help for that command.\n/ahelp@'..self.info.username
-						bindings.sendReply(self, msg, output)
+						utilities.send_reply(self, msg, output)
 					end
 				else
 					local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
@@ -528,12 +528,12 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						end
 					end
 					output = output .. 'Arguments: <required> \\[optional]'
-					if bindings.sendMessage(self, msg.from.id, output, true, nil, true) then
+					if utilities.send_message(self, msg.from.id, output, true, nil, true) then
 						if msg.from.id ~= msg.chat.id then
-							bindings.sendReply(self, msg, 'I have sent you the requested information in a private message.')
+							utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
 						end
 					else
-						bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					end
 				end
 			end
@@ -564,7 +564,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if output == '\n\n' then
 					output = 'There are currently no moderators for this group.'
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 
 		},
@@ -579,12 +579,12 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
 			action = function(self, msg)
 				local output = administration.get_desc(self, msg.chat.id)
-				if bindings.sendMessage(self, msg.from.id, output, true, nil, true) then
+				if utilities.send_message(self, msg.from.id, output, true, nil, true) then
 					if msg.from.id ~= msg.chat.id then
-						bindings.sendReply(self, msg, 'I have sent you the requested information in a private message.')
+						utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
 					end
 				else
-					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+					utilities.send_message(self, msg.chat.id, output, true, nil, true)
 				end
 			end
 		},
@@ -613,7 +613,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				else
 					output = 'No rules have been set for ' .. msg.chat.title .. '.'
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -630,7 +630,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if group.motd then
 					output = '*MOTD for ' .. msg.chat.title .. ':*\n' .. group.motd
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -647,7 +647,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if group.link then
 					output = '[' .. msg.chat.title .. '](' .. group.link .. ')'
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -661,11 +661,11 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
 			action = function(self, msg)
 				if administration.get_rank(self, msg.from.id) == 5 then
-					bindings.sendReply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
+					utilities.send_reply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
 				else
 					administration.kick_user(self, msg.chat.id, msg.from.id, 'kickme')
 					if msg.chat.type == 'supergroup' then
-						bindings.unbanChatMember(self, msg.chat.id, msg.from.id)
+						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = msg.from.id } )
 					end
 				end
 			end
@@ -682,14 +682,14 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 1 then
-					bindings.sendReply(self, msg, target.name .. ' is too privileged to be kicked.')
+					utilities.send_reply(self, msg, target.name .. ' is too privileged to be kicked.')
 				else
 					administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.name)
-					bindings.sendMessage(self, msg.chat.id, target.name .. ' has been kicked.')
+					utilities.send_message(self, msg.chat.id, target.name .. ' has been kicked.')
 					if msg.chat.type == 'supergroup' then
-						bindings.unbanChatMember(self, msg.chat.id, target.id)
+						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = target.id } )
 					end
 				end
 			end
@@ -706,14 +706,14 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 1 then
-					bindings.sendReply(self, msg, target.name .. ' is too privileged to be banned.')
+					utilities.send_reply(self, msg, target.name .. ' is too privileged to be banned.')
 				elseif group.bans[target.id_str] then
-					bindings.sendReply(self, msg, target.name .. ' is already banned.')
+					utilities.send_reply(self, msg, target.name .. ' is already banned.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, ' banned by '..msg.from.name)
-					bindings.sendReply(self, msg, target.name .. ' has been banned.')
+					administration.kick_user(self, msg.chat.id, target.id, 'banned by '..msg.from.name)
+					utilities.send_reply(self, msg, target.name .. ' has been banned.')
 					group.bans[target.id_str] = true
 				end
 			end
@@ -730,16 +730,16 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				else
 					if not group.bans[target.id_str] then
-						bindings.sendReply(self, msg, target.name .. ' is not banned.')
+						utilities.send_reply(self, msg, target.name .. ' is not banned.')
 					else
 						group.bans[target.id_str] = nil
-						bindings.sendReply(self, msg, target.name .. ' has been unbanned.')
+						utilities.send_reply(self, msg, target.name .. ' has been unbanned.')
 					end
 					if msg.chat.type == 'supergroup' then
-						bindings.unbanChatMember(self, msg.chat.id, target.id)
+						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = target.id } )
 					end
 				end
 			end
@@ -757,7 +757,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				local input = msg.text:match('^/setrules[@'..self.info.username..']*(.+)')
 				if input == ' --' or input == ' ' .. utilities.char.em_dash then
 					group.rules = {}
-					bindings.sendReply(self, msg, 'The rules have been cleared.')
+					utilities.send_reply(self, msg, 'The rules have been cleared.')
 				elseif input then
 					group.rules = {}
 					input = utilities.trim(input) .. '\n'
@@ -768,9 +768,9 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						i = i + 1
 						table.insert(group.rules, utilities.trim(l))
 					end
-					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+					utilities.send_message(self, msg.chat.id, output, true, nil, true)
 				else
-					bindings.sendReply(self, msg, 'Please specify the new rules.')
+					utilities.send_reply(self, msg, 'Please specify the new rules.')
 				end
 			end
 		},
@@ -808,7 +808,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						output = '*' .. rule_num .. '*. ' .. new_rule
 					end
 				end
-				bindings.sendReply(self, msg, output, true)
+				utilities.send_reply(self, msg, output, true)
 			end
 		},
 
@@ -828,18 +828,18 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				if input then
 					if input == '--' or input == utilities.char.em_dash then
 						group.motd = nil
-						bindings.sendReply(self, msg, 'The MOTD has been cleared.')
+						utilities.send_reply(self, msg, 'The MOTD has been cleared.')
 					else
 						input = utilities.trim(input)
 						group.motd = input
 						local output = '*MOTD for ' .. msg.chat.title .. ':*\n' .. input
-						bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					end
 					if group.grouptype == 'supergroup' then
 						administration.update_desc(self, msg.chat.id)
 					end
 				else
-					bindings.sendReply(self, msg, 'Please specify the new message of the day.')
+					utilities.send_reply(self, msg, 'Please specify the new message of the day.')
 				end
 			end
 		},
@@ -856,13 +856,13 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				local input = utilities.input(msg.text)
 				if input == '--' or input == utilities.char.em_dash then
 					group.link = drua.export_link(msg.chat.id)
-					bindings.sendReply(self, msg, 'The link has been regenerated.')
+					utilities.send_reply(self, msg, 'The link has been regenerated.')
 				elseif input then
 					group.link = input
 					local output = '[' .. msg.chat.title .. '](' .. input .. ')'
-					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+					utilities.send_message(self, msg.chat.id, output, true, nil, true)
 				else
-					bindings.sendReply(self, msg, 'Please specify the new link.')
+					utilities.send_reply(self, msg, 'Please specify the new link.')
 				end
 			end
 		},
@@ -881,7 +881,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				for id,_ in pairs(self.database.administration.admins) do
 					output = output .. administration.mod_format(self, id)
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -906,13 +906,13 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						local status = group.flags[i] or false
 						output = output .. '`[' .. i .. ']` *' .. v.name .. '*` = ' .. tostring(status) .. '`\n• ' .. v.desc .. '\n'
 					end
-					bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+					utilities.send_message(self, msg.chat.id, output, true, nil, true)
 				elseif group.flags[input] == true then
 					group.flags[input] = false
-					bindings.sendReply(self, msg, administration.flags[input].disabled)
+					utilities.send_reply(self, msg, administration.flags[input].disabled)
 				else
 					group.flags[input] = true
-					bindings.sendReply(self, msg, administration.flags[input].enabled)
+					utilities.send_reply(self, msg, administration.flags[input].enabled)
 				end
 			end
 		},
@@ -927,7 +927,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
 			action = function(self, msg, group)
 				if not group.flags[5] then
-					bindings.sendMessage(self, msg.chat.id, 'antiflood is not enabled. Use `/flag 5` to enable it.', true, nil, true)
+					utilities.send_message(self, msg.chat.id, 'antiflood is not enabled. Use `/flag 5` to enable it.', true, nil, true)
 				else
 					if not group.antiflood then
 						group.antiflood = JSON.decode(JSON.encode(administration.antiflood))
@@ -952,7 +952,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						end
 						output = output .. 'Users will be banned automatically after *' .. group.autoban .. '* autokicks. Configure this with the *autoban* keyword.'
 					end
-					bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+					utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 				end
 			end
 		},
@@ -968,14 +968,14 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				else
 					if target.rank > 1 then
-						bindings.sendReply(self, msg, target.name .. ' is already a moderator or greater.')
+						utilities.send_reply(self, msg, target.name .. ' is already a moderator or greater.')
 					else
 						group.bans[target.id_str] = nil
 						group.mods[target.id_str] = true
-						bindings.sendReply(self, msg, target.name .. ' is now a moderator.')
+						utilities.send_reply(self, msg, target.name .. ' is now a moderator.')
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 2)
@@ -995,13 +995,13 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				else
 					if not group.mods[target.id_str] then
-						bindings.sendReply(self, msg, target.name .. ' is not a moderator.')
+						utilities.send_reply(self, msg, target.name .. ' is not a moderator.')
 					else
 						group.mods[target.id_str] = nil
-						bindings.sendReply(self, msg, target.name .. ' is no longer a moderator.')
+						utilities.send_reply(self, msg, target.name .. ' is no longer a moderator.')
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 0)
@@ -1021,15 +1021,15 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				else
 					if group.governor == target.id then
-						bindings.sendReply(self, msg, target.name .. ' is already the governor.')
+						utilities.send_reply(self, msg, target.name .. ' is already the governor.')
 					else
 						group.bans[target.id_str] = nil
 						group.mods[target.id_str] = nil
 						group.governor = target.id
-						bindings.sendReply(self, msg, target.name .. ' is the new governor.')
+						utilities.send_reply(self, msg, target.name .. ' is the new governor.')
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 2)
@@ -1050,13 +1050,13 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				else
 					if group.governor ~= target.id then
-						bindings.sendReply(self, msg, target.name .. ' is not the governor.')
+						utilities.send_reply(self, msg, target.name .. ' is not the governor.')
 					else
 						group.governor = msg.from.id
-						bindings.sendReply(self, msg, target.name .. ' is no longer the governor.')
+						utilities.send_reply(self, msg, target.name .. ' is no longer the governor.')
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 0)
@@ -1077,11 +1077,11 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 3 then
-					bindings.sendReply(self, msg, target.name .. ' is too privileged to be globally banned.')
+					utilities.send_reply(self, msg, target.name .. ' is too privileged to be globally banned.')
 				elseif self.database.blacklist[target.id_str] then
-					bindings.sendReply(self, msg, target.name .. ' is already globally banned.')
+					utilities.send_reply(self, msg, target.name .. ' is already globally banned.')
 				else
 					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.name)
 					self.database.blacklist[target.id_str] = true
@@ -1097,7 +1097,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						group.bans[target.id_str] = true
 						output = target.name .. ' has been globally and locally banned.'
 					end
-					bindings.sendReply(self, msg, output)
+					utilities.send_reply(self, msg, output)
 				end
 			end
 		},
@@ -1110,15 +1110,18 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			interior = false,
 			doc = 'Removes a global ban. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
+			action = function(self, msg)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif not self.database.blacklist[target.id_str] then
-					bindings.sendReply(self, msg, target.name .. ' is not globally banned.')
+					utilities.send_reply(self, msg, target.name .. ' is not globally banned.')
 				else
 					self.database.blacklist[target.id_str] = nil
-					bindings.sendReply(self, msg, target.name .. ' has been globally unbanned.')
+					utilities.send_reply(self, msg, target.name .. ' has been globally unbanned.')
+				end
+				if msg.chat.type == 'supergroup' then
+					bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = target.id } )
 				end
 			end
 		},
@@ -1131,18 +1134,18 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			interior = false,
 			doc = 'Promotes a user to an administrator. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg)
+			action = function(self, msg, group)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif target.rank >= 4 then
-					bindings.sendReply(self, msg, target.name .. ' is already an administrator or greater.')
+					utilities.send_reply(self, msg, target.name .. ' is already an administrator or greater.')
 				else
-					for _,group in pairs(self.database.administration.groups) do
-						group.mods[target.id_str] = nil
+					for _,g in pairs(self.database.administration.groups) do
+						g.mods[target.id_str] = nil
 					end
 					self.database.administration.admins[target.id_str] = true
-					bindings.sendReply(self, msg, target.name .. ' is now an administrator.')
+					utilities.send_reply(self, msg, target.name .. ' is now an administrator.')
 				end
 				if group.grouptype == 'supergroup' then
 					drua.channel_set_admin(msg.chat.id, target.id, 2)
@@ -1161,12 +1164,12 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg)
 				local target = administration.get_target(self, msg)
 				if target.err then
-					bindings.sendReply(self, msg, target.err)
+					utilities.send_reply(self, msg, target.err)
 				elseif target.rank ~= 4 then
-					bindings.sendReply(self, msg, target.name .. ' is not an administrator.')
+					utilities.send_reply(self, msg, target.name .. ' is not an administrator.')
 				else
 					self.database.administration.admins[target.id_str] = nil
-					bindings.sendReply(self, msg, target.name .. ' is no longer an administrator.')
+					utilities.send_reply(self, msg, target.name .. ' is no longer an administrator.')
 				end
 			end
 		},
@@ -1181,7 +1184,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 
 			action = function(self, msg)
 				if self.database.administration.groups[msg.chat.id_str] then
-					bindings.sendReply(self, msg, 'I am already administrating this group.')
+					utilities.send_reply(self, msg, 'I am already administrating this group.')
 				else
 					self.database.administration.groups[msg.chat.id_str] = {
 						mods = {},
@@ -1202,7 +1205,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						self.database.administration.groups[msg.chat.id_str].flags[i] = false
 					end
 					table.insert(self.database.administration.activity, msg.chat.id_str)
-					bindings.sendReply(self, msg, 'I am now administrating this group.')
+					utilities.send_reply(self, msg, 'I am now administrating this group.')
 					drua.channel_set_admin(msg.chat.id, self.info.id, 2)
 				end
 			end
@@ -1235,7 +1238,7 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 						output = 'I do not administrate that group.'
 					end
 				end
-				bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
 		},
 
@@ -1260,9 +1263,9 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				else
 					output = 'There are no groups.'
 				end
-				if bindings.sendMessage(self, msg.from.id, output, true, nil, true) then
+				if utilities.send_message(self, msg.from.id, output, true, nil, true) then
 					if msg.from.id ~= msg.chat.id then
-						bindings.sendReply(self, msg, 'I have sent you the requested information in a private message.')
+						utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
 					end
 				end
 			end
@@ -1279,11 +1282,11 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 			action = function(self, msg)
 				local input = utilities.input(msg.text)
 				if not input then
-					bindings.sendReply(self, msg, 'Give me something to broadcast.')
+					utilities.send_reply(self, msg, 'Give me something to broadcast.')
 				else
 					input = '*Admin Broadcast:*\n' .. input
 					for id,_ in pairs(self.database.administration.groups) do
-						bindings.sendMessage(self, id, input, true, nil, true)
+						utilities.send_message(self, id, input, true, nil, true)
 					end
 				end
 			end

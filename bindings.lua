@@ -1,340 +1,78 @@
--- bindings.lua
--- Bindings for the Telegram bot API.
--- https://core.telegram.org/bots/api
+--[[
+	bindings.lua (rev. 2016/05/28)
+	otouto's bindings for the Telegram bot API.
+	https://core.telegram.org/bots/api
+	Copyright 2016 topkecleon. Published under the AGPLv3.
+
+	See the "Bindings" section of README.md for usage information.
+]]--
 
 local bindings = {}
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local URL = require('socket.url')
+local ltn12 = require('ltn12')
+local MP_ENCODE = require('multipart-post').encode
 
-function bindings.sendRequest(url)
-
-	local dat, res = HTTPS.request(url)
-
-	if not dat then return false, res end
-
-	local tab = JSON.decode(dat)
-
-	if not tab.ok then
-		return false, tab.description
+ -- Build and send a request to the API.
+ -- Expecting self, method, and parameters, where method is a string indicating
+ -- the API method and parameters is a key/value table of parameters with their
+ -- values.
+ -- Returns the table response with success. Returns false and the table
+ -- response with failure. Returns false and false with a connection error.
+ -- To mimic old/normal behavior, it errs if used with an invalid method.
+function bindings:request(method, parameters, file)
+	parameters = parameters or {}
+	for k,v in pairs(parameters) do
+		parameters[k] = tostring(v)
 	end
-
-	return tab
-
-end
-
-function bindings:getMe()
-
-	local url = self.BASE_URL .. '/getMe'
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:getUpdates(offset)
-
-	local url = self.BASE_URL .. '/getUpdates?timeout=20'
-
-	if offset then
-		url = url .. '&offset=' .. offset
+	if file and next(file) ~= nil then
+		local file_type, file_name = next(file)
+		local file_file = io.open(file_name, 'r')
+		local file_data = {
+			filename = file_name,
+			data = file_file:read('*a')
+		}
+		file_file:close()
+		parameters[file_type] = file_data
 	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:sendMessage(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, disable_notification)
-
-	local url = self.BASE_URL .. '/sendMessage?chat_id=' .. chat_id .. '&text=' .. URL.escape(text)
-
-	if disable_web_page_preview == true then
-		url = url .. '&disable_web_page_preview=true'
+	if next(parameters) == nil then
+		parameters = {''}
 	end
-
-	if reply_to_message_id then
-		url = url .. '&reply_to_message_id=' .. reply_to_message_id
-	end
-
-	if use_markdown then
-		url = url .. '&parse_mode=Markdown'
-	end
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:sendReply(msg, text, use_markdown, disable_notification)
-
-	return bindings.sendMessage(self, msg.chat.id, text, true, msg.message_id, use_markdown, disable_notification)
-
-end
-
-function bindings:sendChatAction(chat_id, action)
- -- Support actions are typing, upload_photo, record_video, upload_video, record_audio, upload_audio, upload_document, find_location
-
-	local url = self.BASE_URL .. '/sendChatAction?chat_id=' .. chat_id .. '&action=' .. action
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:sendLocation(chat_id, latitude, longitude, reply_to_message_id, disable_notification)
-
-	if latitude == 0 then latitude = 0.001 end
-	if longitude == 0 then longitude = 0.001 end
-
-	local url = self.BASE_URL .. '/sendLocation?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude
-
-	if reply_to_message_id then
-		url = url .. '&reply_to_message_id=' .. reply_to_message_id
-	end
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:sendVenue(chat_id, latitude, longitude, title, address, foursquare_id, reply_to_message_id, disable_notification)
-
-	if latitude == 0 then latitude = 0.001 end
-	if longitude == 0 then longitude = 0.001 end
-
-	local url = self.BASE_URL .. '/sendVenue?chat_id=' .. chat_id .. '&latitude=' .. latitude .. '&longitude=' .. longitude .. '&title=' .. title .. '&address=' .. address
-
-	if foursquare_id then
-		url = url .. '&foursquare_id=' .. foursquare_id
-	end
-
-	if reply_to_message_id then
-		url = url .. '&reply_to_message_id=' .. reply_to_message_id
-	end
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings.sendContact(chat_id, phone_number, first_name, last_name, reply_to_message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/sendContact?chat_id=' .. chat_id .. '&phone_number=' .. phone_number .. '&first_name=' .. first_name
-
-	if last_name then
-		url = url .. '&last_name=' .. last_name
-	end
-
-	if reply_to_message_id then
-		url = url .. '&reply_to_message_id=' .. reply_to_message_id
-	end
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:forwardMessage(chat_id, from_chat_id, message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/forwardMessage?chat_id=' .. chat_id .. '&from_chat_id=' .. from_chat_id .. '&message_id=' .. message_id
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings:kickChatMember(chat_id, user_id)
-	local url = self.BASE_URL .. '/kickChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
-	return bindings.sendRequest(url)
-end
-
-function bindings:unbanChatMember(chat_id, user_id)
-	local url = self.BASE_URL .. '/unbanChatMember?chat_id=' .. chat_id .. '&user_id=' .. user_id
-	return bindings.sendRequest(url)
-end
-
- -- TODO: More of this.
-
-function bindings:sendPhotoID(chat_id, file_id, caption, reply_to_message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/sendPhoto?chat_id=' .. chat_id .. '&photo=' .. file_id
-
-	if caption then
-		url = url .. '&caption=' .. URL.escape(caption)
-	end
-
-	if reply_to_message_id then
-		url = url .. '&reply_to_message_id=' .. reply_to_message_id
-	end
-
-	if disable_notification then
-		url = url .. '&disable_notification=true'
-	end
-
-	return bindings.sendRequest(url)
-
-end
-
-function bindings.curlRequest(curl_command, give_output)
-	if give_output then
-		local s = io.popen(curl_command):read('*all')
-		local tab = JSON.encode(s)
-		if not tab then return false end
-		if not tab.ok then
-			return false, tab.description
-		end
-		return tab
+	local response = {}
+	local body, boundary = MP_ENCODE(parameters)
+	local success = HTTPS.request{
+		url = self.BASE_URL .. method,
+		method = 'POST',
+		headers = {
+			["Content-Type"] =	"multipart/form-data; boundary=" .. boundary,
+			["Content-Length"] = #body,
+		},
+		source = ltn12.source.string(body),
+		sink = ltn12.sink.table(response)
+	}
+	local data = table.concat(response)
+	if not success then
+		print(method .. ': Connection error.')
+		return false, false
 	else
-		io.popen(curl_command)
+		local result = JSON.decode(data)
+		if not result then
+			return false, false
+		elseif result.ok then
+			return result
+		else
+			assert(result.description ~= 'Method not found', method .. ': Method not found.')
+			return false, result
+		end
 	end
 end
 
-function bindings:sendPhoto(chat_id, photo, caption, reply_to_message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/sendPhoto'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "photo=@' .. photo .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
+function bindings.gen(_, key)
+	return function(self, params, file)
+		return bindings.request(self, key, params, file)
 	end
-
-	if caption then
-		curl_command = curl_command .. ' -F "caption=' .. caption .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
 end
-
-function bindings:sendDocument(chat_id, document, reply_to_message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/sendDocument'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "document=@' .. document .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
-end
-
-function bindings:sendSticker(chat_id, sticker, reply_to_message_id, disable_notification)
-
-	local url = self.BASE_URL .. '/sendSticker'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "sticker=@' .. sticker .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
-end
-
-function bindings:sendAudio(chat_id, audio, reply_to_message_id, duration, performer, title, disable_notification)
-
-	local url = self.BASE_URL .. '/sendAudio'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "audio=@' .. audio .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
-	end
-
-	if duration then
-		curl_command = curl_command .. ' -F "duration=' .. duration .. '"'
-	end
-
-	if performer then
-		curl_command = curl_command .. ' -F "performer=' .. performer .. '"'
-	end
-
-	if title then
-		curl_command = curl_command .. ' -F "title=' .. title .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
-end
-
-function bindings:sendVideo(chat_id, video, reply_to_message_id, duration, caption, disable_notification)
-
-	local url = self.BASE_URL .. '/sendVideo'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "video=@' .. video .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
-	end
-
-	if caption then
-		curl_command = curl_command .. ' -F "caption=' .. caption .. '"'
-	end
-
-	if duration then
-		curl_command = curl_command .. ' -F "duration=' .. duration .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
-end
-
-function bindings:sendVoice(chat_id, voice, reply_to_message_id, duration, disable_notification)
-
-	local url = self.BASE_URL .. '/sendVoice'
-
-	local curl_command = 'curl -s "' .. url .. '" -F "chat_id=' .. chat_id .. '" -F "voice=@' .. voice .. '"'
-
-	if reply_to_message_id then
-		curl_command = curl_command .. ' -F "reply_to_message_id=' .. reply_to_message_id .. '"'
-	end
-
-	if duration then
-		curl_command = curl_command .. ' -F "duration=' .. duration .. '"'
-	end
-
-	if disable_notification then
-		curl_command = curl_command .. ' -F "disable_notification=true"'
-	end
-
-	return bindings.curlRequest(curl_command)
-
-end
+setmetatable(bindings, { __index = bindings.gen })
 
 return bindings

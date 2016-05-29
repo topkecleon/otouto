@@ -1,6 +1,5 @@
 local shell = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function shell:init()
@@ -15,9 +14,9 @@ function shell:action(msg)
 
 	local input = utilities.input(msg.text)
 	input = input:gsub('—', '--')
-	
+
 	if not input then
-		bindings.sendReply(self, msg, 'Please specify a command to run.')
+		utilities.send_reply(self, msg, 'Please specify a command to run.')
 		return
 	end
 
@@ -27,7 +26,7 @@ function shell:action(msg)
 	else
 		output = '```\n' .. output .. '\n```'
 	end
-	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 

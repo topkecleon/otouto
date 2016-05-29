@@ -4,7 +4,7 @@ local bot = {}
 local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.7'
+bot.version = '3.8'
 
 function bot:init() -- The function run when the bot is started or reloaded.
 
@@ -13,10 +13,11 @@ function bot:init() -- The function run when the bot is started or reloaded.
 
 	self.config = require('config') -- Load configuration file.
 
-	if self.config.bot_api_key == '' then
-		error('You did not set your bot token in config.lua!')
-	end
-	self.BASE_URL = 'https://api.telegram.org/bot' .. self.config.bot_api_key
+	assert(
+		self.config.bot_api_key and self.config.bot_api_key ~= '',
+		'You did not set your bot token in config.lua!'
+	)
+	self.BASE_URL = 'https://api.telegram.org/bot' .. self.config.bot_api_key .. '/'
 
 	-- Fetch bot information. Try until it succeeds.
 	repeat
@@ -73,7 +74,7 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 					return v.action(self, msg)
 				end)
 				if not success then
-					bindings.sendReply(self, msg, 'Sorry, an unexpected error occurred.')
+					utilities.send_reply(self, msg, 'Sorry, an unexpected error occurred.')
 					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
 					return
 				end
@@ -95,7 +96,7 @@ function bot:run()
 
 	while self.is_started do -- Start a loop while the bot should be running.
 
-		local res = bindings.getUpdates(self, self.last_update+1) -- Get the latest updates!
+		local res = bindings.getUpdates(self, { timeout=20, offset = self.last_update+1 } )
 		if res then
 			for _,v in ipairs(res.result) do -- Go through every new message.
 				self.last_update = v.update_id
@@ -104,7 +105,7 @@ function bot:run()
 				end
 			end
 		else
-			print(self.config.errors.connection)
+			print('Connection error fetching updates.')
 		end
 
 		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
@@ -112,8 +113,8 @@ function bot:run()
 			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
 			for i,v in ipairs(self.plugins) do
 				if v.cron then -- Call each plugin's cron function, if it has one.
-					local res, err = pcall(function() v.cron(self) end)
-					if not res then
+					local result, err = pcall(function() v.cron(self) end)
+					if not result then
 						utilities.handle_exception(self, err, 'CRON: ' .. i)
 					end
 				end

@@ -2,9 +2,8 @@
 
 local hearthstone = {}
 
-local HTTPS = require('ssl.https')
+--local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function hearthstone:init()
@@ -79,7 +78,7 @@ local function format_card(card)
 	end
 
 	-- unused?
-	local info = ''
+	local info
 	if card.text then
 		info = card.text:gsub('</?.->',''):gsub('%$','')
 		if card.flavor then
@@ -107,7 +106,7 @@ function hearthstone:action(msg)
 
 	local input = utilities.input(msg.text_lower)
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, hearthstone.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, hearthstone.doc, true, msg.message_id, true)
 		return
 	end
 
@@ -120,11 +119,11 @@ function hearthstone:action(msg)
 
 	output = utilities.trim(output)
 	if output:len() == 0 then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	end
 
-	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 

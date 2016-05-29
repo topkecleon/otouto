@@ -3,7 +3,6 @@ local wikipedia = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 wikipedia.command = 'wikipedia <query>'
@@ -18,7 +17,7 @@ function wikipedia:init()
 end
 
 local get_title = function(search)
-	for i,v in ipairs(search) do
+	for _,v in ipairs(search) do
 		if not v.snippet:match('may refer to:') then
 			return v.title
 		end
@@ -35,7 +34,7 @@ function wikipedia:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -51,19 +50,19 @@ function wikipedia:action(msg)
 
 	jstr, res = HTTPS.request(search_url .. URL.escape(input))
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	jdat = JSON.decode(jstr)
 	if jdat.query.searchinfo.totalhits == 0 then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	end
 
 	local title = get_title(jdat.query.search)
 	if not title then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -71,7 +70,7 @@ function wikipedia:action(msg)
 
 	jstr, res = HTTPS.request(res_url .. URL.escape(title))
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
@@ -79,7 +78,7 @@ function wikipedia:action(msg)
 	local text = JSON.decode(jstr).query.pages
 	_, text = next(text)
 	if not text then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	else
 		text = text.extract
@@ -108,7 +107,7 @@ function wikipedia:action(msg)
 	end
 	output = output .. '\n[Read more.](' .. url:gsub('%)', '\\)') .. ')'
 
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

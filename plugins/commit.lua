@@ -2,7 +2,6 @@
 
 local commit = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 commit.command = 'commit'
@@ -424,7 +423,7 @@ local commits = {
 function commit:action(msg)
 
 	local output = '`'..commits[math.random(#commits)]..'`'
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

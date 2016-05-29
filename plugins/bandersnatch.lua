@@ -1,6 +1,5 @@
 local bandersnatch = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 bandersnatch.command = 'bandersnatch'
@@ -29,7 +28,7 @@ function bandersnatch:action(msg)
 		output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
 	end
 
-	bindings.sendMessage(self, msg.chat.id, '_'..output..'_', true, nil, true)
+	utilities.send_message(self, msg.chat.id, '_'..output..'_', true, nil, true)
 
 end
 

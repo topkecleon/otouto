@@ -1,6 +1,5 @@
 local nick = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 nick.command = 'nick <nickname>'
@@ -45,7 +44,7 @@ function nick:action(msg)
 		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
 	end
 
-	bindings.sendReply(self, msg, output)
+	utilities.send_reply(self, msg, output)
 
 end
 

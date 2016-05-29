@@ -3,7 +3,6 @@ local gSearch = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 gSearch.command = 'google <query>'
@@ -24,7 +23,7 @@ function gSearch:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, gSearch.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, gSearch.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -45,17 +44,17 @@ function gSearch:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.responseData then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 	if not jdat.responseData.results[1] then
-		bindings.sendReply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, self.config.errors.results)
 		return
 	end
 
@@ -67,15 +66,15 @@ function gSearch:action(msg)
 			title = title:sub(1, 45) .. '...'
 		end
 ]]--
-		local url = jdat.responseData.results[i].unescapedUrl
-		if url:find('%)') then
-			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
+		local u = jdat.responseData.results[i].unescapedUrl
+		if u:find('%)') then
+			output = output .. '• ' .. title .. '\n' .. u:gsub('_', '\\_') .. '\n'
 		else
-			output = output .. '• [' .. title .. '](' .. url .. ')\n'
+			output = output .. '• [' .. title .. '](' .. u .. ')\n'
 		end
 	end
 
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

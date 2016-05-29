@@ -18,12 +18,14 @@ end
 
 function pokedex:action(msg)
 
+	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
+
 	local input = utilities.input(msg.text_lower)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, pokedex.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, pokedex.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -33,7 +35,7 @@ function pokedex:action(msg)
 	local dex_url = url .. '/api/v1/pokemon/' .. input
 	local dex_jstr, res = HTTP.request(dex_url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
@@ -42,7 +44,7 @@ function pokedex:action(msg)
 	local desc_url = url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
 	local desc_jstr, _ = HTTP.request(desc_url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
@@ -62,7 +64,7 @@ function pokedex:action(msg)
 	local output = '*' .. dex_jdat.name .. '*\n#' .. dex_jdat.national_id .. ' | ' .. poke_type .. '\n_' .. desc_jdat.description:gsub('POKMON', 'Pokémon'):gsub('Pokmon', 'Pokémon') .. '_'
 
 
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

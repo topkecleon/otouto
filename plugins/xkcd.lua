@@ -1,9 +1,7 @@
 local xkcd = {}
 
 local HTTP = require('socket.http')
-local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 xkcd.command = 'xkcd [i]'
@@ -20,7 +18,7 @@ function xkcd:action(msg)
 
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 	local latest = JSON.decode(jstr).num
@@ -29,7 +27,7 @@ function xkcd:action(msg)
 	local input = utilities.input(msg.text)
 	if input then
 		if input == '404' then
-			bindings.sendMessage(self, msg.chat.id, '*404*\nNot found.', false, nil, true)
+			utilities.send_message(self, msg.chat.id, '*404*\nNot found.', false, nil, true)
 			return
 		elseif tonumber(input) then
 			if tonumber(input) > latest then
@@ -46,14 +44,14 @@ function xkcd:action(msg)
 
 	jstr, res = HTTP.request(res_url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 	local jdat = JSON.decode(jstr)
 
 	local output = '*' .. jdat.safe_title .. '* ([' .. jdat.num .. '](' .. jdat.img .. '))\n' .. jdat.alt
 
-	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 
 end
 

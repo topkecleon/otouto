@@ -1,6 +1,5 @@
 local eightball = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 eightball.command = '8ball'
@@ -51,7 +50,7 @@ function eightball:action(msg)
 		output = ball_answers[math.random(#ball_answers)]
 	end
 
-	bindings.sendReply(self, msg, output)
+	utilities.send_reply(self, msg, output)
 
 end
 

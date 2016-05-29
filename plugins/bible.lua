@@ -2,7 +2,6 @@ local bible = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function bible:init()
@@ -26,7 +25,7 @@ function bible:action(msg)
 
 	local input = utilities.input(msg.text)
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, bible.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, bible.doc, true, msg.message_id, true)
 		return
 	end
 
@@ -47,7 +46,7 @@ function bible:action(msg)
 		output = 'The text is too long to post here. Try being more specific.'
 	end
 
-	bindings.sendReply(self, msg, output)
+	utilities.send_reply(self, msg, output)
 
 end
 

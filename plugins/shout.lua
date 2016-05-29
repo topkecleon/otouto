@@ -1,6 +1,5 @@
 local shout = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 shout.command = 'shout <text>'
@@ -18,7 +17,7 @@ function shout:action(msg)
 	local input = utilities.input(msg.text)
 
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, shout.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, shout.doc, true, msg.message_id, true)
 		return
 	end
 	input = utilities.trim(input)
@@ -43,7 +42,7 @@ function shout:action(msg)
 		output = output .. match .. ' ' .. spacing .. match .. '\n'
 	end
 	output = '```\n' .. utilities.trim(output) .. '\n```'
-	bindings.sendMessage(self, msg.chat.id, output, true, false, true)
+	utilities.send_message(self, msg.chat.id, output, true, false, true)
 
 end
 

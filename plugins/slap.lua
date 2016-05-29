@@ -1,6 +1,5 @@
 local slap = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 slap.command = 'slap [target]'
@@ -124,7 +123,7 @@ function slap:action(msg)
 	output = output:gsub('VICTOR', victor_name)
 	output = utilities.char.zwnj .. output
 
-	bindings.sendMessage(self, msg.chat.id, output)
+	utilities.send_message(self, msg.chat.id, output)
 
 end
 

@@ -1,6 +1,5 @@
 local echo = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 echo.command = 'echo <text>'
@@ -18,7 +17,7 @@ function echo:action(msg)
 	local input = utilities.input(msg.text)
 
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, echo.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, echo.doc, true, msg.message_id, true)
 	else
 		local output
 		if msg.chat.type == 'supergroup' then
@@ -26,7 +25,7 @@ function echo:action(msg)
 		else
 			output = utilities.md_escape(utilities.char.zwnj..input)
 		end
-		bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+		utilities.send_message(self, msg.chat.id, output, true, nil, true)
 	end
 
 

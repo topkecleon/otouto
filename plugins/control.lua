@@ -1,7 +1,6 @@
 local control = {}
 
 local bot = require('bot')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function control:init()
@@ -27,14 +26,14 @@ function control:action(msg)
 			package.loaded['config'] = nil
 		end
 		bot.init(self)
-		bindings.sendReply(self, msg, 'Bot reloaded!')
+		utilities.send_reply(self, msg, 'Bot reloaded!')
 	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'halt') then
 		self.is_started = false
-		bindings.sendReply(self, msg, 'Stopping bot!')
+		utilities.send_reply(self, msg, 'Stopping bot!')
 	elseif msg.text:match('^'..utilities.INVOCATION_PATTERN..'script') then
 		local input = msg.text:match('^'..utilities.INVOCATION_PATTERN..'script\n(.+)')
 		if not input then
-			bindings.sendReply(self, msg, 'usage: ```\n/script\n/command <arg>\n...\n```', true)
+			utilities.send_reply(self, msg, 'usage: ```\n/script\n/command <arg>\n...\n```', true)
 			return
 		end
 		input = input .. '\n'

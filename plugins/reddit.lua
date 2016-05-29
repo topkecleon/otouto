@@ -3,7 +3,6 @@ local reddit = {}
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 reddit.command = 'reddit [r/subreddit | query]'
@@ -70,15 +69,15 @@ function reddit:action(msg)
 	end
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 	else
 		local jdat = JSON.decode(jstr)
 		if #jdat.data.children == 0 then
-			bindings.sendReply(self, msg, self.config.errors.results)
+			utilities.send_reply(self, msg, self.config.errors.results)
 		else
 			local output = format_results(jdat.data.children)
 			output = source .. output
-			bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+			utilities.send_message(self, msg.chat.id, output, true, nil, true)
 		end
 	end
 end

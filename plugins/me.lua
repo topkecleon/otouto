@@ -1,6 +1,5 @@
 local me = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function me:init()
@@ -14,7 +13,7 @@ function me:action(msg)
 	if msg.from.id == self.config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
 		target = utilities.user_from_message(self, msg, true)
 		if target.err then
-			bindings.sendReply(self, msg, target.err)
+			utilities.send_reply(self, msg, target.err)
 			return
 		end
 	end
@@ -23,7 +22,7 @@ function me:action(msg)
 	for k,v in pairs(target) do
 		output = output .. '*' .. k .. ':* `' .. tostring(v) .. '`\n'
 	end
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

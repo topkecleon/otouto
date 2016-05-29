@@ -1,7 +1,6 @@
 local currency = {}
 
 local HTTPS = require('ssl.https')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 currency.command = 'cash [amount] <from> to <to>'
@@ -20,7 +19,7 @@ function currency:action(msg)
 
 	local input = msg.text:upper()
 	if not input:match('%a%a%a TO %a%a%a') then
-		bindings.sendMessage(self, msg.chat.id, currency.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, currency.doc, true, msg.message_id, true)
 		return
 	end
 
@@ -37,13 +36,13 @@ function currency:action(msg)
 		url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
 		local str, res = HTTPS.request(url)
 		if res ~= 200 then
-			bindings.sendReply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, self.config.errors.connection)
 			return
 		end
 
 		str = str:match('<span class=bld>(.*) %u+</span>')
 		if not str then
-			bindings.sendReply(self, msg, self.config.errors.results)
+			utilities.send_reply(self, msg, self.config.errors.results)
 			return
 		end
 
@@ -55,7 +54,7 @@ function currency:action(msg)
 	output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance`'
 	output = '```\n' .. output .. '\n```'
 
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

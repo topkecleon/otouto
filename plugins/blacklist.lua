@@ -3,7 +3,6 @@
 
 local blacklist = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function blacklist:init()
@@ -25,7 +24,7 @@ function blacklist:action(msg)
 
 	local target = utilities.user_from_message(self, msg)
 	if target.err then
-		bindings.sendReply(self, msg, target.err)
+		utilities.send_reply(self, msg, target.err)
 		return
 	end
 
@@ -35,10 +34,10 @@ function blacklist:action(msg)
 
 	if self.database.blacklist[tostring(target.id)] then
 		self.database.blacklist[tostring(target.id)] = nil
-		bindings.sendReply(self, msg, target.name .. ' has been removed from the blacklist.')
+		utilities.send_reply(self, msg, target.name .. ' has been removed from the blacklist.')
 	else
 		self.database.blacklist[tostring(target.id)] = true
-		bindings.sendReply(self, msg, target.name .. ' has been added to the blacklist.')
+		utilities.send_reply(self, msg, target.name .. ' has been added to the blacklist.')
 	end
 
  end

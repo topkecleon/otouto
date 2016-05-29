@@ -2,7 +2,6 @@ local time = {}
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 time.command = 'time <location>'
@@ -22,14 +21,14 @@ function time:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, time.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, time.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
 	local coords = utilities.get_coords(self, input)
 	if type(coords) == 'string' then
-		bindings.sendReply(self, msg, coords)
+		utilities.send_reply(self, msg, coords)
 		return
 	end
 
@@ -40,7 +39,7 @@ function time:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
@@ -56,7 +55,7 @@ function time:action(msg)
 	local output = os.date('!%I:%M %p\n', timestamp) .. os.date('!%A, %B %d, %Y\n', timestamp) .. jdat.timeZoneName .. ' (UTC' .. utcoff .. ')'
 	output = '```\n' .. output .. '\n```'
 
-	bindings.sendReply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, true)
 
 end
 

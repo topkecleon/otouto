@@ -1,6 +1,6 @@
 local patterns = {}
 
-local bindings = require('bindings')
+local utilities = require('utilities')
 
 patterns.triggers = {
 	'^/?s/.-/.-/?$'
@@ -19,11 +19,11 @@ function patterns:action(msg)
 	)
 	if res == false then
 		output = 'Malformed pattern!'
-		bindings.sendReply(self, msg, output)
+		utilities.send_reply(self, msg, output)
 		return
 	end
 	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
-	bindings.sendReply(self, msg.reply_to_message, output)
+	utilities.send_reply(self, msg.reply_to_message, output)
 
 end
 

@@ -21,18 +21,23 @@ function gMaps:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, gMaps.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, gMaps.doc, true, msg.message_id, true)
 			return
 		end
 	end
 
 	local coords = utilities.get_coords(self, input)
 	if type(coords) == 'string' then
-		bindings.sendReply(self, msg, coords)
+		utilities.send_reply(self, msg, coords)
 		return
 	end
 
-	bindings.sendLocation(self, msg.chat.id, coords.lat, coords.lon, msg.message_id)
+	bindings.sendLocation(self, {
+		chat_id = msg.chat.id,
+		latitude = coords.lat,
+		longitude = coords.lon,
+		reply_to_message_id = msg.message_id
+	} )
 
 end
 

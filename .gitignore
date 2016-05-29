@@ -1,9 +1,3 @@
 plugins/mokubot*
-plugins/qtbot*
-plugins/mjolnir*
-plugins/antisquigbot*
-profile-pictures
 *.db
-lua-tg
-drua-tg
 tg

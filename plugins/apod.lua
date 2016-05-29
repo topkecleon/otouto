@@ -1,9 +1,10 @@
+ -- Credit to Heitor (tg:Wololo666; gh:heitorPB) for this plugin.
+
 local apod = {}
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local URL = require('socket.url')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 apod.command = 'apod [date]'
@@ -40,7 +41,7 @@ function apod:action(msg)
 			url = url .. '&date=' .. URL.escape(input)
 			date = date .. input
 		else
-			bindings.sendMessage(self, msg.chat.id, apod.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, apod.doc, true, msg.message_id, true)
 			return
 		end
 	else
@@ -51,14 +52,14 @@ function apod:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 
 	if jdat.error then
-		bindings.sendReply(msg, self.config.errors.results)
+		utilities.send_reply(msg, self.config.errors.results)
 		return
 	end
 
@@ -79,7 +80,7 @@ function apod:action(msg)
 		output = output .. '\nCopyright: ' .. jdat.copyright
 	end
 
-	bindings.sendMessage(self, msg.chat.id, output, disable_page_preview, nil, true)
+	utilities.send_message(self, msg.chat.id, output, disable_page_preview, nil, true)
 
 end
 

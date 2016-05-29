@@ -1,6 +1,5 @@
 local whoami = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 whoami.command = 'whoami'
@@ -45,7 +44,7 @@ function whoami:action(msg)
 
 	local output = user .. ', and you are messaging ' .. group
 
-	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 

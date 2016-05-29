@@ -1,25 +1,31 @@
 local luarun = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
+local URL = require('socket.url')
+local JSON = require('dkjson')
 
 function luarun:init()
-	luarun.triggers = utilities.triggers(self.info.username):t('lua', true).table
+	luarun.triggers = utilities.triggers(self.info.username):t('lua', true):t('return', true).table
 end
 
 function luarun:action(msg)
 
 	if msg.from.id ~= self.config.admin then
-		return
+		return true
 	end
 
 	local input = utilities.input(msg.text)
 	if not input then
-		bindings.sendReply(self, msg, 'Please enter a string to load.')
+		utilities.send_reply(self, msg, 'Please enter a string to load.')
 		return
 	end
 
+	if msg.text_lower:match('^/return') then
+		input = 'return ' .. input
+	end
+
 	local output = loadstring( [[
+		local bot = require('bot')
 		local bindings = require('bindings')
 		local utilities = require('utilities')
 		local JSON = require('dkjson')
@@ -31,9 +37,15 @@ function luarun:action(msg)
 	if output == nil then
 		output = 'Done!'
 	else
+		if type(output) == 'table' then
+			local s = JSON.encode(output, {indent=true})
+			if URL.escape(s):len() < 4000 then
+				output = s
+			end
+		end
 		output = '```\n' .. tostring(output) .. '\n```'
 	end
-	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 

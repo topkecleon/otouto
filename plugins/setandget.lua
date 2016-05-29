@@ -1,6 +1,5 @@
 local setandget = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function setandget:init()
@@ -25,7 +24,7 @@ function setandget:action(msg)
 	if msg.text_lower:match('^/set') then
 
 		if not input then
-			bindings.sendMessage(self, msg.chat.id, setandget.doc, true, nil, true)
+			utilities.send_message(self, msg.chat.id, setandget.doc, true, nil, true)
 			return
 		end
 
@@ -33,13 +32,13 @@ function setandget:action(msg)
 		local value = utilities.input(input)
 
 		if not name or not value then
-			bindings.sendMessage(self, msg.chat.id, setandget.doc, true, nil, true)
+			utilities.send_message(self, msg.chat.id, setandget.doc, true, nil, true)
 		elseif value == '--' or value == '—' then
 			self.database.setandget[msg.chat.id_str][name] = nil
-			bindings.sendMessage(self, msg.chat.id, 'That value has been deleted.')
+			utilities.send_message(self, msg.chat.id, 'That value has been deleted.')
 		else
 			self.database.setandget[msg.chat.id_str][name] = value
-			bindings.sendMessage(self, msg.chat.id, '"' .. name .. '" has been set to "' .. value .. '".', true)
+			utilities.send_message(self, msg.chat.id, '"' .. name .. '" has been set to "' .. value .. '".', true)
 		end
 
 	elseif msg.text_lower:match('^/get') then
@@ -54,7 +53,7 @@ function setandget:action(msg)
 					output = output .. '• ' .. k .. ': `' .. v .. '`\n'
 				end
 			end
-			bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+			utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			return
 		end
 
@@ -65,7 +64,7 @@ function setandget:action(msg)
 			output = 'There is no value stored by that name.'
 		end
 
-		bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+		utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 	end
 

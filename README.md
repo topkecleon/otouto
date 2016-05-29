@@ -5,19 +5,21 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
 
-| The Manual                                            |
-|:------------------------------------------------------|
-| [Setup](#setup)                                       |
-| [Plugins](#plugins)                                   |
-| [Control plugins](#control-plugins)                   |
-| [administration.lua](#administrationlua)              |
-| [Liberbot-related plugins](#liberbot-related-plugins) |
-| [List of plugins](#list-of-plugins)                   |
-| [Style](#style)                                       |
-| [Contributors](#contributors)                         |
+otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See `LICENSE` for details.
+
+| The Manual                               |
+|:-----------------------------------------|
+| [Setup](#setup)                          |
+| [Bindings](#bindings)                    |
+| [Plugins](#plugins)                      |
+| [Control plugins](#control-plugins)      |
+| [administration.lua](#administrationlua) |
+| [List of plugins](#list-of-plugins)      |
+| [Style](#style)                          |
+| [Contributors](#contributors)            |
 
 ## Setup
-You _must_ have Lua (5.2+), luasocket, luasec, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks. To upload photos and other files, you must have curl installed. To use fortune.lua, you must have fortune installed.
+You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
 
 Clone the repository and set the following values in `config.lua`:
 
@@ -45,6 +47,60 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
 
 * * *
 
+## Bindings
+Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts four arguments: `self`, `method`, `parameters`, `file`. (At the very least, `self` should be a table containing `BASE_URL`, which is bot's API endpoint, ending with a slash, eg `https://api.telegram.org/bot123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ987654321/`.)
+
+`method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
+
+Additionally, any method can be called as a key in the `bindings` table (for example, `bindings.getMe`). The `bindings.gen` function (which is also the __index function in its metatable) will forward its arguments to `bindings.request` in their proper form. In this way, the following two function calls are equivalent:
+
+```
+bindings.request(
+	self,
+	'sendMessage',
+	{
+		chat_id = 987654321,
+		text = 'Quick brown fox.',
+		reply_to_message_id = 54321,
+		disable_web_page_preview = false,
+		parse_method = 'Markdown'
+	}
+)
+
+bindings.sendMessage(
+	self,
+	{
+		chat_id = 987654321,
+		text = 'Quick brown fox.',
+		reply_to_message_id = 54321,
+		disable_web_page_preview = false,
+		parse_method = 'Markdown'
+	}
+)
+```
+
+Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
+
+```
+utilities.send_message(self, 987654321, 'Quick brown fox.', false, 54321, true)
+```
+
+Uploading a file for the `sendPhoto` method would look like this:
+
+```
+bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'rarepepe.jpg' } )
+```
+
+and using `sendPhoto` with a file ID would look like this:
+
+```
+bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' } )
+```
+
+Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+
+* * *
+
 ## Plugins
 otouto uses a robust plugin system, similar to that of yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
 
@@ -67,7 +123,7 @@ Return values from `plugin:action` are optional, but they do effect the flow. If
 
 When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
 
-Interactions with the bot API are straightforward. Every binding function shares the name of the API method (eg `sendMessage`). An additional function, `sendReply`, accepts the `msg` table and a string as an argument, and sends the string as a reply to that message.
+Interactions with the bot API are straightforward. See the [Bindings section](#bindings) for details.
 
 Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
 
@@ -76,13 +132,14 @@ Several functions used in multiple plugins are defined in utilities.lua. Refer t
 ## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
 
-| Plugin        | Command    | Function                                        |
-|:--------------|:-----------|:------------------------------------------------|
-| control.lua   | /reload    | Reloads all plugins and configuration.          |
-| control.lua   | /halt      | Shuts down the bot after saving the database.   |
-| blacklist.lua | /blacklist | Blocks people from using the bot.               |
-| shell.lua     | /run       | Executes shell commands on the host system.     |
-| luarun.lua    | /lua       | Executes Lua commands in the bot's environment. |
+| Plugin        | Command    | Function                                           |
+|:--------------|:-----------|:---------------------------------------------------|
+| control.lua   | /reload    | Reloads all plugins and configuration.             |
+|               | /halt      | Shuts down the bot after saving the database.      |
+|               | /script    | Runs a list a bot commands, separated by newlines. |
+| blacklist.lua | /blacklist | Blocks people from using the bot.                  |
+| shell.lua     | /run       | Executes shell commands on the host system.        |
+| luarun.lua    | /lua       | Executes Lua commands in the bot's environment.    |
 
 * * *
 
@@ -93,7 +150,7 @@ The administration plugin enables self-hosted, single-realm group administration
 
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
 
-Once the installation is finished, enable `administration.lua` in your config file. **The administration plugin must be loaded before about.lua and blacklist.lua.** You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
+Once the installation is finished, enable the `administration` plugin in your config file. **The administration plugin must be loaded before the `about` and `blacklist` plugins.** You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
 
 While tg is running, you may start/reload otouto with administration.lua enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
 
@@ -107,18 +164,23 @@ While tg is running, you may start/reload otouto with administration.lua enabled
 | /motd       | Returns the message of the day of a group.                      | 1 | Y |
 | /link       | Returns the link for a group.                                   | 1 | Y |
 | /kick       | Removes the target from the group.                              | 2 | Y |
-| /(un)ban    | Bans the target from the group or vice-versa.                   | 2 | Y |
+| /ban        | Bans the target from the group.                                 | 2 | Y |
+| /unban      | Unbans the target from the group.                               | 2 | Y |
+| /setmotd    | Sets the message of the day for a group.                        | 2 | Y |
 | /changerule | Changes an individual group rule.                               | 3 | Y |
 | /setrules   | Sets the rules for a group.                                     | 3 | Y |
-| /setmotd    | Sets the message of the day for a group.                        | 3 | Y |
 | /setlink    | Sets the link for a group.                                      | 3 | Y |
 | /alist      | Returns a list of administrators.                               | 3 | Y |
 | /flags      | Returns a list of flags and their states, or toggles one.       | 3 | Y |
 | /antiflood  | Configures antiflood (flag 5) settings.                         | 3 | Y |
-| /(de)mod    | Promotes a user to a moderator or vice-versa.                   | 3 | Y |
-| /(de)gov    | Promotes a user to the governor or vice-versa.                  | 4 | Y |
-| /(un)hammer | Bans a user globally and blacklists him or vice-versa.          | 4 | N |
-| /(de)admin  | Promotes a user to an administrator or vice-versa.              | 5 | N |
+| /mod        | Promotes a user to a moderator.                                 | 3 | Y |
+| /demod      | Demotes a moderator to a user.                                  | 3 | Y |
+| /gov        | Promotes a user to the governor.                                | 4 | Y |
+| /degov      | Demotes the governor to a user.                                 | 4 | Y |
+| /hammer     | Blacklists and globally bans a user.                            | 4 | N |
+| /unhammer   | Unblacklists and globally bans a user.                          | 4 | N |
+| /admin      | Promotes a user to an administrator.                            | 5 | N |
+| /deadmin    | Demotes an administrator to a user.                             | 5 | N |
 | /gadd       | Adds a group to the administrative system.                      | 5 | N |
 | /grem       | Removes a group from the administrative system.                 | 5 | Y |
 | /glist      | Returns a list of all administrated groups and their governors. | 5 | N |
@@ -132,8 +194,8 @@ Internal commands can only be run within an administrated group.
 |:-:|:--------------|:------------------------------------------------------------------|:-------|
 | 0 | Banned        | Cannot enter the group(s).                                        | Either |
 | 1 | User          | Default rank.                                                     | Local  |
-| 2 | Moderator     | Can kick/ban/unban users.                                         | Local  |
-| 3 | Governor      | Can set rules/motd/link, promote/demote moderators, modify flags. | Local  |
+| 2 | Moderator     | Can kick/ban/unban users. Can set MOTD.                           | Local  |
+| 3 | Governor      | Can set rules/link, promote/demote moderators, modify flags.      | Local  |
 | 4 | Administrator | Can globally ban/unban users, promote/demote governors.           | Global |
 | 5 | Owner         | Can add/remove groups, broadcast, promote/demote administrators.  | Global |
 
@@ -148,6 +210,7 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 | 3 | antisquig++ | Automatically removes users whose names contain Arabic script or RTL characters. |
 | 4 | antibot     | Prevents bots from being added by non-moderators.                                |
 | 5 | antiflood   | Prevents flooding by rate-limiting messages per user.                            |
+| 6 | antihammer  | Allows globally-banned users to enter a group.                                   |
 
 #### antiflood
 antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
@@ -166,15 +229,7 @@ antiflood (flag 5) provides a system of automatic flood protection by removing u
 | video    | 10 |
 | sticker  | 20 |
 
-* * *
-
-# Liberbot-related plugins
-**Note:** This section may be out of date. The Liberbot-related plugins have not changed in very long time.
-Some plugins are only useful when the bot is used in a Liberbot group, like floodcontrol.lua and moderation.lua.
-
-**floodcontrol.lua** makes the bot compliant with Liberbot's floodcontrol function. When the bot has posted too many messages to a single group in a given period of time, Liberbot will send it a message telling it to cease posting in that group. Here is an example floodcontrol command:
-`/floodcontrol {"groupid":987654321,"duration":600}`
-The bot will accept these commands from both Liberbot and the configured administrator.
+Additionally, antiflood can be configured to automatically ban a user after he has been automatically kicked from a single group a certain number of times in one day. This is configurable as the antiflood value `autoban` and is set to three by default.
 
 * * *
 
@@ -186,7 +241,7 @@ The bot will accept these commands from both Liberbot and the configured adminis
 | about.lua           | /about                        | Returns the about text as configured in config.lua.               |
 | ping.lua            | /ping                         | The simplest plugin ever!                                         |
 | echo.lua            | /echo ‹text›                  | Repeats a string of text.                                         |
-| gSearch.lua         | /google ‹query›               | Returns Google web results.                                | /g   |
+| bing.lua            | /bing ‹query›                 | Returns Bing web results.                                  | /g   |
 | gImages.lua         | /images ‹query›               | Returns a Google image result.                             | /i   |
 | gMaps.lua           | /location ‹query›             | Returns location data from Google Maps.                    | /loc |
 | youtube.lua         | /youtube ‹query›              | Returns the top video result from YouTube.                 | /yt  |
@@ -219,6 +274,7 @@ The bot will accept these commands from both Liberbot and the configured adminis
 | dilbert.lua         | /dilbert [date]               | Returns a Dilbert strip.                                          |
 | patterns.lua        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                            |
 | me.lua              | /me                           | Returns user-specific data stored by the bot.                     |
+| remind.lua          | /remind <duration> <message>  | Reminds a user of something after a duration of minutes.          |
 
 * * *
 

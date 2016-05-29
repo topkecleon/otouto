@@ -1,7 +1,6 @@
 local preview = {}
 
 local HTTP = require('socket.http')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 preview.command = 'preview <link>'
@@ -19,7 +18,7 @@ function preview:action(msg)
 	local input = utilities.input(msg.text)
 
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, preview.doc, true, nil, true)
+		utilities.send_message(self, msg.chat.id, preview.doc, true, nil, true)
 		return
 	end
 
@@ -30,18 +29,18 @@ function preview:action(msg)
 
 	local res = HTTP.request(input)
 	if not res then
-		bindings.sendReply(self, msg, 'Please provide a valid link.')
+		utilities.send_reply(self, msg, 'Please provide a valid link.')
 		return
 	end
 
 	if res:len() == 0 then
-		bindings.sendReply(self, msg, 'Sorry, the link you provided is not letting us make a preview.')
+		utilities.send_reply(self, msg, 'Sorry, the link you provided is not letting us make a preview.')
 		return
 	end
 
 	-- Invisible zero-width, non-joiner.
 	local output = '[​](' .. input .. ')'
-	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 
 end
 

@@ -1,9 +1,11 @@
+ -- TODO: Add support for librefm API.
+ -- Just kidding, nobody actually uses that.
+
 local lastfm = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function lastfm:init()
@@ -30,17 +32,17 @@ function lastfm:action(msg)
 	local input = utilities.input(msg.text)
 
 	if string.match(msg.text, '^/lastfm') then
-		bindings.sendMessage(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		return
 	elseif string.match(msg.text, '^/fmset') then
 		if not input then
-			bindings.sendMessage(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == utilities.char.em_dash then
 			self.database.users[msg.from.id_str].lastfm = nil
-			bindings.sendReply(self, msg, 'Your last.fm username has been forgotten.')
+			utilities.send_reply(self, msg, 'Your last.fm username has been forgotten.')
 		else
 			self.database.users[msg.from.id_str].lastfm = input
-			bindings.sendReply(self, msg, 'Your last.fm username has been set to "' .. input .. '".')
+			utilities.send_reply(self, msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
 		return
 	end
@@ -58,7 +60,7 @@ function lastfm:action(msg)
 		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
 		self.database.users[msg.from.id_str].lastfm = username
 	else
-		bindings.sendReply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
 	end
 
@@ -70,19 +72,19 @@ function lastfm:action(msg)
 			jstr, res = HTTP.request(url)
 	end)
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		bindings.sendReply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
 		return
 	end
 
 	jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
 	if not jdat then
-		bindings.sendReply(self, msg, 'No history for this user.' .. alert)
+		utilities.send_reply(self, msg, 'No history for this user.' .. alert)
 		return
 	end
 
@@ -102,7 +104,7 @@ function lastfm:action(msg)
 	end
 
 	output = output .. title .. ' - ' .. artist .. alert
-	bindings.sendMessage(self, msg.chat.id, output)
+	utilities.send_message(self, msg.chat.id, output)
 
 end
 

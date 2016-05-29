@@ -19,6 +19,8 @@ I am otouto, the plugin-wielding, multipurpose Telegram bot.
 Send /help to get started.
 	]],
 
+	-- https://datamarket.azure.com/dataset/bing/search
+	bing_api_key = '',
 	-- http://console.developers.google.com
 	google_api_key = '',
 	-- https://cse.google.com/cse
@@ -56,7 +58,6 @@ Send /help to get started.
 		'whoami',
 		'nick',
 		'echo',
-		'gSearch',
 		'gMaps',
 		'wikipedia',
 		'hackernews',
@@ -74,7 +75,6 @@ Send /help to get started.
 		'currency',
 		'cats',
 		'shout',
-		'patterns',
 		-- Put new plugins above this line.
 		'help',
 		'greetings'

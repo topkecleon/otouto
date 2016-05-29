@@ -1,6 +1,5 @@
 local pun = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 pun.command = 'pun'
@@ -138,7 +137,7 @@ local puns = {
 
 function pun:action(msg)
 
-	bindings.sendReply(self, msg, puns[math.random(#puns)])
+	utilities.send_reply(self, msg, puns[math.random(#puns)])
 
 end
 

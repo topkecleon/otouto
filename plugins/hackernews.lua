@@ -17,11 +17,11 @@ end
 
 function hackernews:action(msg)
 
-	bindings.sendChatAction(self, msg.chat.id, 'typing')
+	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
 
 	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
 	if res ~= 200 then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
@@ -37,7 +37,7 @@ function hackernews:action(msg)
 		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
 		jstr, res = HTTPS.request(res_url)
 		if res ~= 200 then
-			bindings.sendReply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, self.config.errors.connection)
 			return
 		end
 		local res_jdat = JSON.decode(jstr)
@@ -47,7 +47,7 @@ function hackernews:action(msg)
 		end
 		local url = res_jdat.url
 		if not url then
-			bindings.sendReply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, self.config.errors.connection)
 			return
 		end
 		if url:find('%(') then
@@ -58,7 +58,7 @@ function hackernews:action(msg)
 
 	end
 
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
 end
 

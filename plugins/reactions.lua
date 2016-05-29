@@ -8,7 +8,6 @@
 
 local reactions = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 reactions.command = 'reactions'
@@ -39,12 +38,12 @@ end
 
 function reactions:action(msg)
 	if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..'reactions') then
-		bindings.sendMessage(self, msg.chat.id, help)
+		utilities.send_message(self, msg.chat.id, help)
 		return
 	end
 	for trigger,reaction in pairs(mapping) do
 		if string.match(msg.text_lower, utilities.INVOCATION_PATTERN..trigger) then
-			bindings.sendMessage(self, msg.chat.id, reaction)
+			utilities.send_message(self, msg.chat.id, reaction)
 			return
 		end
 	end

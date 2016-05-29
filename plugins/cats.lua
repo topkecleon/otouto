@@ -1,7 +1,6 @@
 local cats = {}
 
 local HTTP = require('socket.http')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function cats:init()
@@ -25,14 +24,14 @@ function cats:action(msg)
 
 	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		bindings.sendReply(msg, self.config.errors.connection)
+		utilities.send_reply(msg, self.config.errors.connection)
 		return
 	end
 
 	str = str:match('<img src="(.-)">')
 	local output = '[Cat!]('..str..')'
 
-	bindings.sendMessage(self, msg.chat.id, output, false, nil, true)
+	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 
 end
 

@@ -1,6 +1,5 @@
 local remind = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 remind.command = 'remind <duration> <message>'
@@ -19,13 +18,13 @@ function remind:action(msg)
 	-- Ensure there are arguments. If not, send doc.
 	local input = utilities.input(msg.text)
 	if not input then
-		bindings.sendMessage(self, msg.chat.id, remind.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
 	end
 	-- Ensure first arg is a number. If not, send doc.
 	local duration = utilities.get_word(input, 1)
 	if not tonumber(duration) then
-		bindings.sendMessage(self, msg.chat.id, remind.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
 	end
 	-- Duration must be between one minute and one year (approximately).
@@ -38,17 +37,17 @@ function remind:action(msg)
 	-- Ensure there is a second arg.
 	local message = utilities.input(input)
 	if not message then
-		bindings.sendMessage(self, msg.chat.id, remind.doc, true, msg.message_id, true)
+		utilities.send_message(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
 	end
 	-- Make a database entry for the group/user if one does not exist.
 	self.database.reminders[msg.chat.id_str] = self.database.reminders[msg.chat.id_str] or {}
 	-- Limit group reminders to 10 and private reminders to 50.
 	if msg.chat.type ~= 'private' and utilities.table_size(self.database.reminders[msg.chat.id_str]) > 9 then
-		bindings.sendReply(self, msg, 'Sorry, this group already has ten reminders.')
+		utilities.send_reply(self, msg, 'Sorry, this group already has ten reminders.')
 		return
 	elseif msg.chat.type == 'private' and utilities.table_size(self.database.reminders[msg.chat.id_str]) > 49 then
-		bindings.sendReply(msg, 'Sorry, you already have fifty reminders.')
+		utilities.send_reply(msg, 'Sorry, you already have fifty reminders.')
 		return
 	end
 	-- Put together the reminder with the expiration, message, and message to reply to.
@@ -63,7 +62,7 @@ function remind:action(msg)
 	else
 		output = output .. ' minutes!'
 	end
-	bindings.sendReply(self, msg, output)
+	utilities.send_reply(self, msg, output)
 end
 
 function remind:cron()
@@ -77,7 +76,7 @@ function remind:cron()
 			-- Otherwise, add it to the replacement table.
 			if time > reminder.time then
 				local output = '*Reminder:*\n"' .. utilities.md_escape(reminder.message) .. '"'
-				local res = bindings.sendMessage(self, chat_id, output, true, nil, true)
+				local res = utilities.send_message(self, chat_id, output, true, nil, true)
 				-- If the message fails to send, save it for later.
 				if not res then
 					table.insert(new_group, reminder)

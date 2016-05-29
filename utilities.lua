@@ -10,6 +10,28 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('bindings')
 
+ -- For the sake of ease to new contributors and familiarity to old contributors,
+ -- we'll provide a couple of aliases to real bindings here.
+function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
+	return bindings.request(self, 'sendMessage', {
+		chat_id = chat_id,
+		text = text,
+		disable_web_page_preview = disable_web_page_preview,
+		reply_to_message_id = reply_to_message_id,
+		parse_mode = use_markdown and 'Markdown' or nil
+	} )
+end
+
+function utilities:send_reply(old_msg, text, use_markdown)
+	return bindings.request(self, 'sendMessage', {
+		chat_id = old_msg.chat.id,
+		text = text,
+		disable_web_page_preview = true,
+		reply_to_message_id = old_msg.message_id,
+		parse_mode = use_markdown and 'Markdown' or nil
+	} )
+end
+
  -- get the indexed word in a string
 function utilities.get_word(s, i)
 	s = s or ''
@@ -205,7 +227,7 @@ function utilities:handle_exception(err, message)
 
 	if self.config.log_chat then
 		output = '```' .. output .. '```'
-		bindings.sendMessage(self, self.config.log_chat, output, true, nil, true)
+		utilities.send_message(self, self.config.log_chat, output, true, nil, true)
 	else
 		print(output)
 	end

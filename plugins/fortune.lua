@@ -2,7 +2,6 @@
 
 local fortune = {}
 
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 function fortune:init()
@@ -24,7 +23,7 @@ function fortune:action(msg)
 	local fortunef = io.popen('fortune')
 	local output = fortunef:read('*all')
 	output = '```\n' .. output .. '\n```'
-	bindings.sendMessage(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 	fortunef:close()
 
 end

@@ -2,7 +2,6 @@ local calc = {}
 
 local URL = require('socket.url')
 local HTTPS = require('ssl.https')
-local bindings = require('bindings')
 local utilities = require('utilities')
 
 calc.command = 'calc <expression>'
@@ -22,7 +21,7 @@ function calc:action(msg)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			bindings.sendMessage(self, msg.chat.id, calc.doc, true, msg.message_id, true)
+			utilities.send_message(self, msg.chat.id, calc.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -31,13 +30,13 @@ function calc:action(msg)
 
 	local output = HTTPS.request(url)
 	if not output then
-		bindings.sendReply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, self.config.errors.connection)
 		return
 	end
 
 	output = '`' .. output .. '`'
 
-	bindings.sendMessage(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
 
 end
 
