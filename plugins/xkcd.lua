@@ -49,7 +49,7 @@ function xkcd:action(msg)
 	end
 	local jdat = JSON.decode(jstr)
 
-	local output = '*' .. jdat.safe_title .. '* ([' .. jdat.num .. '](' .. jdat.img .. '))\n' .. jdat.alt
+	local output = '*' .. jdat.safe_title .. ' (*[' .. jdat.num .. '](' .. jdat.img .. ')*)*\n_' .. jdat.alt:gsub('_', '\\_') .. '_'
 
 	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 

@@ -3,25 +3,24 @@ The plugin-wielding, multipurpose Telegram bot.
 
 [Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
 
-otouto is an independently-developed Telegram API bot written in Lua. Originally conceived as a CLI script in February of 2015, otouto has since been open-sourced and migrated to the API, and is being developed to this day.
+otouto is a plugin-based, IRC-style bot written for the [Telegram Bot API](http://core.telegram.org/bots/api). Originally written in February of 2015 as a set of Lua scripts to run on [telegram-cli](http://github.com/vysheng/tg), otouto was open-sourced and migrated to the bot API later in June that year.
 
-otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See LICENSE for details.
+otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
 
-| The Manual                               |
-|:-----------------------------------------|
-| [Setup](#setup)                          |
-| [Bindings](#bindings)                    |
-| [Plugins](#plugins)                      |
-| [Control plugins](#control-plugins)      |
-| [administration.lua](#administrationlua) |
-| [List of plugins](#list-of-plugins)      |
-| [Style](#style)                          |
-| [Contributors](#contributors)            |
+**The Manual**
+
+| For Users                                     | For Coders                    |
+|:----------------------------------------------|:------------------------------|
+| [Setup](#setup)                               | [Introduction](#introduction) |
+| [Control plugins](#control-plugins)           | [Plugins](#plugins)           |
+| [Group Administration](#group-administration) | [Bindings](#bindings)         |
+| [List of plugins](#list-of-plugins)           | [Output style](#output-style) |
+|                                               | [Contributors](#contributors) |
 
 ## Setup
 You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
 
-Clone the repository and set the following values in `config.lua`:
+To get started, clone the repository and set the following values in `config.lua`:
 
  - `bot_api_key` as your bot authorization token from the BotFather.
  - `admin` as your Telegram ID.
@@ -48,88 +47,6 @@ Note that certain plugins, such as translate.lua and greetings.lua, will require
 
 * * *
 
-## Bindings
-Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts four arguments: `self`, `method`, `parameters`, `file`. (At the very least, `self` should be a table containing `BASE_URL`, which is bot's API endpoint, ending with a slash, eg `https://api.telegram.org/bot123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ987654321/`.)
-
-`method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
-
-Additionally, any method can be called as a key in the `bindings` table (for example, `bindings.getMe`). The `bindings.gen` function (which is also the __index function in its metatable) will forward its arguments to `bindings.request` in their proper form. In this way, the following two function calls are equivalent:
-
-```
-bindings.request(
-	self,
-	'sendMessage',
-	{
-		chat_id = 987654321,
-		text = 'Quick brown fox.',
-		reply_to_message_id = 54321,
-		disable_web_page_preview = false,
-		parse_method = 'Markdown'
-	}
-)
-
-bindings.sendMessage(
-	self,
-	{
-		chat_id = 987654321,
-		text = 'Quick brown fox.',
-		reply_to_message_id = 54321,
-		disable_web_page_preview = false,
-		parse_method = 'Markdown'
-	}
-)
-```
-
-Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
-
-```
-utilities.send_message(self, 987654321, 'Quick brown fox.', false, 54321, true)
-```
-
-Uploading a file for the `sendPhoto` method would look like this:
-
-```
-bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'rarepepe.jpg' } )
-```
-
-and using `sendPhoto` with a file ID would look like this:
-
-```
-bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' } )
-```
-
-Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
-
-* * *
-
-## Plugins
-otouto uses a robust plugin system, similar to that of yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
-
-Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#liberbot-related-plugins), or for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
-
-A plugin can have five components, and two of them are required:
-
-| Component       | Description                                  | Required? |
-|:----------------|:---------------------------------------------|:----------|
-| plugin:action   | Main function. Expects `msg` table as an argument.   | Y |
-| plugin.triggers | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| plugin:init     | Optional function run when the plugin is loaded.     | N |
-| plugin:cron     | Optional function to be called every minute.         | N |
-| plugin.command  | Basic command and syntax. Listed in the help text.   | N |
-| plugin.doc      | Usage for the plugin. Returned by "/help $command".  | N |
-
-The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
-
-Return values from `plugin:action` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
-
-When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
-
-Interactions with the bot API are straightforward. See the [Bindings section](#bindings) for details.
-
-Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
-
-* * *
-
 ## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
 
@@ -144,10 +61,8 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 
 * * *
 
-## administration.lua
-The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups. This works by sending TCP commands to an instance of tg running on the owner's account.
-
-**For best results, make your bot an administrator of any group it administrates.**
+## Group Administration
+The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups whch are owned by the bot owner. This works by sending TCP commands to an instance of tg running on the owner's account.
 
 To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
 
@@ -279,35 +194,138 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 
 * * *
 
-## Style
-Bot output from every plugin should follow a consistent style. This style is easily observed interacting with the bot.
-Titles should be either **bold** (along with their colons) or a [link](http://otou.to) (with plaintext colons) to the content's source. Names should be _italic_. Numbered lists should use bold numbers followed by a bold period followed by a space. Unnumbered lists should use the • bullet point followed by a space. Descriptions and information should be in plaintext, although "flavor" text should be italic. Technical information should be `monospace`. Links should be named.
-The standard count for plugins which return multiple results is eight results in a private message, and four results elsewhere. This is a trivial number, but consistency is noticeable and desirable.
+## Introduction
+#todo
+
+## Plugins
+otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
+
+Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#liberbot-related-plugins), or for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
+
+A plugin can have five components, and two of them are required:
+
+| Component       | Description                                  | Required? |
+|:----------------|:---------------------------------------------|:----------|
+| plugin:action   | Main function. Expects `msg` table as an argument.   | Y |
+| plugin.triggers | Table of triggers for the plugin. Uses Lua patterns. | Y |
+| plugin:init     | Optional function run when the plugin is loaded.     | N |
+| plugin:cron     | Optional function to be called every minute.         | N |
+| plugin.command  | Basic command and syntax. Listed in the help text.   | N |
+| plugin.doc      | Usage for the plugin. Returned by "/help $command".  | N |
+
+The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
+
+Return values from `plugin:action` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
+
+When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
+
+Interactions with the bot API are straightforward. See the [Bindings section](#bindings) for details.
+
+Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
+
+* * *
+
+## Bindings
+Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts four arguments: `self`, `method`, `parameters`, `file`. (At the very least, `self` should be a table containing `BASE_URL`, which is bot's API endpoint, ending with a slash, eg `https://api.telegram.org/bot123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ987654321/`.)
+
+`method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
+
+Additionally, any method can be called as a key in the `bindings` table (for example, `bindings.getMe`). The `bindings.gen` function (which is also the __index function in its metatable) will forward its arguments to `bindings.request` in their proper form. In this way, the following two function calls are equivalent:
+
+```
+bindings.request(
+	self,
+	'sendMessage',
+	{
+		chat_id = 987654321,
+		text = 'Quick brown fox.',
+		reply_to_message_id = 54321,
+		disable_web_page_preview = false,
+		parse_method = 'Markdown'
+	}
+)
+
+bindings.sendMessage(
+	self,
+	{
+		chat_id = 987654321,
+		text = 'Quick brown fox.',
+		reply_to_message_id = 54321,
+		disable_web_page_preview = false,
+		parse_method = 'Markdown'
+	}
+)
+```
+
+Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
+
+```
+utilities.send_message(self, 987654321, 'Quick brown fox.', false, 54321, true)
+```
+
+Uploading a file for the `sendPhoto` method would look like this:
+
+```
+bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'rarepepe.jpg' } )
+```
+
+and using `sendPhoto` with a file ID would look like this:
+
+```
+bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' } )
+```
+
+Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+
+* * *
+
+## Output style
+otouto plugins should maintain a consistent visual style in their output. This provides a recognizable and comfortable user experience.
+
+### Titles
+Title lines should be **bold**, including any names and trailing punctuation (such as colons). The exception to this rule is if the title line includes a query, which should be _italic_. It is also acceptable to have a link somewhere inside a title, usually within parentheses. eg:
+
+> **Star Wars: Episode IV - A New Hope (1977)**
+>
+> **Search results for** _star wars_**:**
+>
+> **Changelog for otouto (**[Github](http://github.com/topkecleon/otouto)**):**
+
+### Lists
+Numerated lists should be done with the number and its following punctuation bolded. Unnumbered lists should use the bullet character ( • ). eg:
+
+> **1.** Life as a quick brown fox.
+>
+> **2.** The art of jumping over lazy dogs.
+
+and
+
+> • Life as a quick brown fox.
+>
+> • The art of jumping over lazy dogs.
+
+### Links
+Always name your links. Even then, use them with discretion. Excessive links make a post look messy. Links are reasonable when a user may want to learn more about something, but should be avoided when all desirable information is provided. One appropriate use of linking is to provide a preview of an image, as xkcd.lua and apod.lua do.
+
+### Other Stuff
+User IDs should appear within brackets, monospaced (`[123456789]`). Descriptions and information should be in plain text, but "flavor" text should be italic. The standard size for arbitrary lists (such as search results) is eight within a private conversation and four elsewhere. This is a trivial pair of numbers (leftover from the deprecated Google search API), but consistency is noticeable and desirable.
+
+* * *
 
 ## Contributors
-Everybody is free to contribute to otouto. If you are interested, you are invited to fork the [repo](http://github.com/topkecleon/otouto) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the Bot Development group.
+Everybody is free to contribute to otouto. If you are interested, you are invited to [fork the repo](http://github.com/topkecleon/otouto/fork) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the [Bot Development group](http://telegram.me/BotDevelopment).
 
 The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
+
+[List of contributors.](https://github.com/topkecleon/otouto/graphs/contributors)
 
 There are a a few ways to contribute if you are not a programmer. For one, your feedback is always appreciated. Drop me a line on Telegram or on Twitter. Secondly, we are always looking for new ideas for plugins. Most new plugins start with community input. Feel free to suggest them on Github or in the Bot Dev group. You can also donate Bitcoin to the following address:
 `1BxegZJ73hPu218UrtiY8druC7LwLr82gS`
 
-Contributions are appreciated in any form. Monetary contributions will go toward server costs. Both programmers and donators will be eternally honored (at their discretion) on this page.
+Contributions are appreciated in all forms. Monetary contributions will go toward server costs. Donators will be eternally honored (at their discretion) on this page.
 
-| Contributors                                  |
+| Donators (in chronological order)             |
 |:----------------------------------------------|
-| [bb010g](http://github.com/bb010g)            |
-| [Juan Potato](http://github.com/JuanPotato)   |
-| [Tiago Danin](http://github.com/TiagoDanin)   |
-| [Ender](http://github.com/luksireiku)         |
-| [Iman Daneshi](http://github.com/Imandaneshi) |
-| [HeitorPB](http://github.com/heitorPB)        |
-| [Akronix](http://github.com/Akronix)          |
-| [Ville](http://github.com/cwxda)              |
-| [dogtopus](http://github.com/dogtopus)        |
-
-| Donators                                      |
-|:----------------------------------------------|
-| [n8](http://telegram.me/n8_c00)               |
+| [n8 c00](http://telegram.me/n8_c00)           |
 | [Alex](http://telegram.me/sandu)              |
-| [Brayden Banks](http://telegram.me/bb010g)    |
+| [Brayden](http://telegram.me/bb010g)          |

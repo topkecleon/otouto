@@ -272,8 +272,7 @@ function administration.init_command(self_)
 
 			action = function(self, msg, group)
 
-local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
-
+				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				local user = {}
 
 				if rank < 2 then
@@ -343,27 +342,27 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				end
 
 				local new_user = user
+				local new_rank = rank
 
 				if msg.new_chat_participant then
+
+					-- I hate typing this out.
+					local noob = msg.new_chat_participant
 
 					-- We'll make a new table for the new guy, unless he's also
 					-- the original guy.
 					if msg.new_chat_participant.id ~= msg.from.id then
 						new_user = {}
+						new_rank = administration.get_rank(self,noob.id, msg.chat.id)
 					end
 
-					-- I hate typing this out.
-					local noob = msg.new_chat_participant
-
-					if administration.get_rank(self, msg.new_chat_participant.id, msg.chat.id) < 2 then
-
-						-- banned
-						if administration.get_rank(self, noob.id, msg.chat.id) == 0 then
-							new_user.do_kick = true
-							new_user.dont_unban = true
-							new_user.reason = 'banned'
-							new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
-						elseif group.flags[3] and ( -- antisquig++
+					if new_rank == 0 then
+						new_user.do_kick = true
+						new_user.dont_unban = true
+						new_user.reason = 'banned'
+						new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
+					elseif new_rank == 1 then
+						if group.flags[3] and ( -- antisquig++
 							noob.name:match(utilities.char.arabic)
 							or noob.name:match(utilities.char.rtl_override)
 							or noob.name:match(utilities.char.rtl_mark)
@@ -371,11 +370,20 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 							new_user.do_kick = true
 							new_user.reason = 'antisquig++'
 							new_user.output = administration.flags[3].kicked:gsub('GROUPNAME', msg.chat.title)
-						elseif group.flags[4] and noob.username and noob.username:match('bot') and rank < 2 then
+						elseif ( -- antibot
+							group.flags[4]
+							and noob.username
+							and noob.username:match('bot')
+							and rank < 2
+						) then
 							new_user.do_kick = true
 							new_user.reason = 'antibot'
 						end
-
+					else
+						-- Make the new user a group admin if he's a mod or higher.
+						if msg.chat.type == 'supergroup' then
+							drua.channel_set_admin(msg.chat.id, msg.new_chat_participant.id, 2)
+						end
 					end
 
 				elseif msg.new_chat_title then
@@ -1165,11 +1173,18 @@ local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				local target = administration.get_target(self, msg)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
-				elseif target.rank ~= 4 then
-					utilities.send_reply(self, msg, target.name .. ' is not an administrator.')
 				else
-					self.database.administration.admins[target.id_str] = nil
-					utilities.send_reply(self, msg, target.name .. ' is no longer an administrator.')
+					for chat_id, group in pairs(self.database.administration.groups) do
+						if group.grouptype == 'supergroup' then
+							drua.channel_set_admin(chat_id, target.id, 0)
+						end
+					end
+					if target.rank ~= 4 then
+						utilities.send_reply(self, msg, target.name .. ' is not an administrator.')
+					else
+						self.database.administration.admins[target.id_str] = nil
+						utilities.send_reply(self, msg, target.name .. ' is no longer an administrator.')
+					end
 				end
 			end
 		},

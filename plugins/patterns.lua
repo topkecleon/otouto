@@ -12,7 +12,8 @@ function patterns:action(msg)
 	local output = msg.reply_to_message.text or ''
 	local m1, m2 = msg.text:match('^/?s/(.-)/(.-)/?$')
 	if not m2 then return true end
-	local res, output = pcall(
+	local res
+	res, output = pcall(
 		function()
 			return output:gsub(m1, m2)
 		end
