@@ -29,7 +29,7 @@ function cats:action(msg)
 	end
 
 	str = str:match('<img src="(.-)">')
-	local output = '[Cat!]('..str..')'
+	local output = '[Meow!]('..str..')'
 
 	utilities.send_message(self, msg.chat.id, output, false, nil, true)
 
