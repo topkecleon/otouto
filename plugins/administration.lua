@@ -373,7 +373,7 @@ function administration.init_command(self_)
 						elseif ( -- antibot
 							group.flags[4]
 							and noob.username
-							and noob.username:match('bot')
+							and noob.username:match('bot$')
 							and rank < 2
 						) then
 							new_user.do_kick = true
