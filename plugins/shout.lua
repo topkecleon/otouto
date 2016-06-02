@@ -5,7 +5,7 @@ local utilities = require('utilities')
 shout.command = 'shout <text>'
 shout.doc = [[```
 /shout <text>
-Shouts something.
+Shouts something. Input may be the replied-to message.
 ```]]
 
 function shout:init()
@@ -15,10 +15,13 @@ end
 function shout:action(msg)
 
 	local input = utilities.input(msg.text)
-
 	if not input then
-		utilities.send_message(self, msg.chat.id, shout.doc, true, msg.message_id, true)
-		return
+		if msg.reply_to_message and #msg.reply_to_message.text > 0 then
+			input = msg.reply_to_message.text
+		else
+			utilities.send_message(self, msg.chat.id, shout.doc, true, msg.message_id, true)
+			return
+		end
 	end
 	input = utilities.trim(input)
 
