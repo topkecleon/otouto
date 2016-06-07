@@ -24,7 +24,7 @@ function cats:action(msg, config)
 
 	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, onfig.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

@@ -6,6 +6,7 @@ local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 function chatter:init(config)
 	if not config.simsimi_key then
