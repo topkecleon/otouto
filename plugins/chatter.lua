@@ -33,7 +33,7 @@ function chatter:action(msg, config)
 			--Uncomment the following line for Al Gore-like conversation.
 			--or (msg.reply_to_message and msg.reply_to_message.from.id == self.info.id)
 		)
-		or msg.text:match('^'..config.CMD_PAT)
+		or msg.text:match('^'..config.cmd_pat)
 		or msg.text == ''
 	) then
 		return true
