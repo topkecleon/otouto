@@ -44,9 +44,9 @@ function chatter:action(msg, config)
 	local input = msg.text_lower:gsub(self.info.first_name, 'simsimi')
 	input = input:gsub('@'..self.info.username, 'simsimi')
 
-	local sandbox = self.config.simsimi_trial and 'sandbox.' or ''
+	local sandbox = config.simsimi_trial and 'sandbox.' or ''
 
-	local url = chatter.base_url:format(sandbox, config.simsimi_key, self.config.lang, URL.escape(input))
+	local url = chatter.base_url:format(sandbox, config.simsimi_key, config.lang, URL.escape(input))
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then

@@ -21,7 +21,7 @@ function control:action(msg, config)
 
 	if msg.text_lower:match('^'..cmd_pat..'reload') then
 		for pac, _ in pairs(package.loaded) do
-			if pac:match('^plugins%.') then
+			if pac:match('^otouto%.plugins%.') then
 				package.loaded[pac] = nil
 			end
 		end

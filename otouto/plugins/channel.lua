@@ -24,7 +24,7 @@ function channel:init(config)
 	channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
 end
 
-function channel:action(msg)
+function channel:action(msg, config)
 	-- An exercise in using zero early returns. :)
 	local input = utilities.input(msg.text)
 	local output

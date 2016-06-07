@@ -28,7 +28,7 @@ function bing:init(config)
 	bing.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bing', true):t('g', true):t('google', true).table
 end
 
-function bing:action(msg)
+function bing:action(msg, config)
 	local input = utilities.input(msg.text)
 	if not input then
 		if msg.reply_to_message and msg.reply_to_message.text ~= '' then
@@ -42,11 +42,11 @@ function bing:action(msg)
 	local resbody = {}
 	local _,b,_ = https.request{
 	    url = url,
-	    headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. self.config.bing_api_key) },
+	    headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) },
 	    sink = ltn12.sink.table(resbody),
 	}
 	if b ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 	local dat = JSON.decode(table.concat(resbody))
