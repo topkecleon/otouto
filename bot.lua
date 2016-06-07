@@ -31,6 +31,9 @@ function bot:init() -- The function run when the bot is started or reloaded.
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
 
+	self.database.users = self.database.users or {} -- Table to cache userdata.
+	self.database.users[tostring(self.info.id)] = self.info
+
 	self.plugins = {} -- Load plugins.
 	for _,v in ipairs(self.config.plugins) do
 		local p = require('plugins.'..v)
@@ -43,8 +46,6 @@ function bot:init() -- The function run when the bot is started or reloaded.
 	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,
 	self.last_cron = self.last_cron or os.date('%M') -- the time of the last cron job,
 	self.is_started = true -- and whether or not the bot should be running.
-	self.database.users = self.database.users or {} -- Table to cache userdata.
-	self.database.users[tostring(self.info.id)] = self.info
 
 end
 
@@ -105,7 +106,7 @@ function bot:run()
 				end
 			end
 		else
-			print('Connection error fetching updates.')
+			print('Connection error while fetching updates.')
 		end
 
 		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.

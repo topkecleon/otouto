@@ -3,13 +3,16 @@ local patterns = {}
 local utilities = require('utilities')
 
 patterns.triggers = {
-	'^/?s/.-/.-/?$'
+	'^/?s/.-/.-$'
 }
 
 function patterns:action(msg)
-
 	if not msg.reply_to_message then return end
-	local output = msg.reply_to_message.text or ''
+	local output = msg.reply_to_message.text
+	if msg.reply_to_message.from.id == self.info.id then
+		output = output:gsub('Did you mean:\n"', '')
+		output = output:gsub('"$', '')
+	end
 	local m1, m2 = msg.text:match('^/?s/(.-)/(.-)/?$')
 	if not m2 then return true end
 	local res
@@ -21,11 +24,11 @@ function patterns:action(msg)
 	if res == false then
 		output = 'Malformed pattern!'
 		utilities.send_reply(self, msg, output)
-		return
+	else
+		output = output:sub(1, 4000)
+		output = 'Did you mean:\n"' .. output .. '"'
+		utilities.send_reply(self, msg.reply_to_message, output)
 	end
-	output = 'Did you mean:\n"' .. output:sub(1, 4000) .. '"'
-	utilities.send_reply(self, msg.reply_to_message, output)
-
 end
 
 return patterns

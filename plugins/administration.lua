@@ -32,6 +32,13 @@
 
 	1.10.1 - Bug fixes and minor improvements. :^)
 
+	1.10.2 - Fixed bug in antibot. Further, ranks 2+ will be automatically made
+	 group admins when they join a group.
+
+	1.10.3 - /gadd now supports arguments to enable flags immediately, eg:
+	 "/gadd 1 4 5" will add a grouo with the unlisted, antibot, and antiflood
+	 flags.
+
 ]]--
 
 local JSON = require('dkjson')
@@ -672,6 +679,7 @@ function administration.init_command(self_)
 					utilities.send_reply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
 				else
 					administration.kick_user(self, msg.chat.id, msg.from.id, 'kickme')
+					utilities.send_message(self, msg.chat.id, 'Goodbye, ' .. msg.from.name .. '!', true)
 					if msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = msg.from.id } )
 					end
@@ -789,7 +797,7 @@ function administration.init_command(self_)
 			command = 'changerule <i> <rule>',
 			privilege = 3,
 			interior = true,
-			doc = 'Changes a single rule. Pass "--" to delete the rule.',
+			doc = 'Changes a single rule. Pass "--" to delete the rule. If i is a number for which there is no rule, adds a rule by the next incremented number.',
 
 			action = function(self, msg, group)
 				local input = utilities.input(msg.text)
@@ -1190,22 +1198,36 @@ function administration.init_command(self_)
 		},
 
 		{ -- /gadd
-			triggers = utilities.triggers(self_.info.username):t('gadd').table,
+			triggers = utilities.triggers(self_.info.username):t('gadd', true).table,
 
-			command = 'gadd',
+			command = 'gadd [i] ...',
 			privilege = 5,
 			interior = false,
-			doc = 'Adds a group to the administration system.',
+			doc = 'Adds a group to the administration system. Pass numbers as arguments to enable those flags immediately. For example, this would add the group and enable the unlisted flag, antibot, and antiflood:\n/gadd 1 4 5',
 
 			action = function(self, msg)
 				if self.database.administration.groups[msg.chat.id_str] then
 					utilities.send_reply(self, msg, 'I am already administrating this group.')
 				else
+					local flags = {}
+					for i = 1, #administration.flags do
+						flags[i] = false
+					end
+					local input = utilities.input(msg.text)
+					if input then
+						local index = utilities.index(input)
+						for _, i in ipairs(index) do
+							i = tonumber(i)
+							if i and i < #administration.flags and i > 0 then
+								flags[i] = true
+							end
+						end
+					end
 					self.database.administration.groups[msg.chat.id_str] = {
 						mods = {},
 						governor = msg.from.id,
 						bans = {},
-						flags = {},
+						flags = flags,
 						rules = {},
 						grouptype = msg.chat.type,
 						name = msg.chat.title,
@@ -1216,9 +1238,6 @@ function administration.init_command(self_)
 						autoban = 3
 					}
 					administration.update_desc(self, msg.chat.id)
-					for i = 1, #administration.flags do
-						self.database.administration.groups[msg.chat.id_str].flags[i] = false
-					end
 					table.insert(self.database.administration.activity, msg.chat.id_str)
 					utilities.send_reply(self, msg, 'I am now administrating this group.')
 					drua.channel_set_admin(msg.chat.id, self.info.id, 2)

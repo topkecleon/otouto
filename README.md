@@ -195,12 +195,12 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 * * *
 
 ## Introduction
-#todo
+####todo
 
 ## Plugins
-otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot). The aim of the otouto project is to contain any desirable bot feature within one universal bot framework.
+otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot).
 
-Most plugins are intended for public use, but a few are for other purposes, like those used alongside [Liberbot](#liberbot-related-plugins), or for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
+Most plugins are intended for public use, but a few are for other purposes, like those for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
 
 A plugin can have five components, and two of them are required:
 
