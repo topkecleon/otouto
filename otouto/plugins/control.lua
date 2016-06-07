@@ -25,8 +25,8 @@ function control:action(msg, config)
 				package.loaded[pac] = nil
 			end
 		end
-		package.loaded['bindings'] = nil
-		package.loaded['utilities'] = nil
+		package.loaded['otouto.bindings'] = nil
+		package.loaded['otouto.utilities'] = nil
 		package.loaded['config'] = nil
 		if msg.text_lower:match('%+config') then for k, v in pairs(require('config')) do
 			config[k] = v
