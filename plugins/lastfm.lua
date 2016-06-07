@@ -8,33 +8,33 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function lastfm:init()
-	if not self.config.lastfm_api_key then
+function lastfm:init(config)
+	if not config.lastfm_api_key then
 		print('Missing config value: lastfm_api_key.')
 		print('lastfm.lua will not be enabled.')
 		return
 	end
 
-	lastfm.triggers = utilities.triggers(self.info.username):t('lastfm', true):t('np', true):t('fmset', true).table
+	lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('fmset', true).table
+	lastfm.doc = [[```
+]]..config.cmd_pat..[[np [username]
+Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
+
+]]..config.cmd_pat..[[fmset <username>
+Sets your last.fm username. Otherwise, ]]..config.cmd_pat..[[np will use your Telegram username. Use "]]..config.cmd_pat..[[fmset --" to delete it.
+```]]
 end
 
 lastfm.command = 'lastfm'
-lastfm.doc = [[```
-/np [username]
-Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
-/fmset <username>
-Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.
-```]]
-
-function lastfm:action(msg)
+function lastfm:action(msg, config)
 
 	local input = utilities.input(msg.text)
 
-	if string.match(msg.text, '^/lastfm') then
+	if string.match(msg.text, '^'..config.cmd_pat..'lastfm') then
 		utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		return
-	elseif string.match(msg.text, '^/fmset') then
+	elseif string.match(msg.text, '^'..config.cmd_pat..'fmset') then
 		if not input then
 			utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == utilities.char.em_dash then
@@ -47,7 +47,7 @@ function lastfm:action(msg)
 		return
 	end
 
-	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. self.config.lastfm_api_key .. '&user='
+	local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
 	local username
 	local alert = ''
@@ -57,10 +57,10 @@ function lastfm:action(msg)
 		username = self.database.users[msg.from.id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
-		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use /fmset <username>.'
+		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..config.cmd_pat..'fmset <username>.'
 		self.database.users[msg.from.id_str].lastfm = username
 	else
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
 		return
 	end
 
@@ -72,13 +72,13 @@ function lastfm:action(msg)
 			jstr, res = HTTP.request(url)
 	end)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.error then
-		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with /fmset.')
+		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
 		return
 	end
 

@@ -7,26 +7,26 @@ local utilities = require('utilities')
 
 local help_text
 
-function help:init()
+function help:init(config)
 
 	local commandlist = {}
-	help_text = '*Available commands:*\n• /'
+	help_text = '*Available commands:*\n• '..config.cmd_pat
 
 	for _,plugin in ipairs(self.plugins) do
 		if plugin.command then
 			table.insert(commandlist, plugin.command)
-			--help_text = help_text .. '\n• /' .. plugin.command:gsub('%[', '\\[')
+			--help_text = help_text .. '\n• '..config.cmd_pat .. plugin.command:gsub('%[', '\\[')
 		end
 	end
 
 	table.insert(commandlist, 'help [command]')
 	table.sort(commandlist)
 
-	help_text = help_text .. table.concat(commandlist, '\n• /') .. '\nArguments: <required> [optional]'
+	help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nArguments: <required> [optional]'
 
 	help_text = help_text:gsub('%[', '\\[')
 
-	help.triggers = utilities.triggers(self.info.username):t('help', true):t('h', true).table
+	help.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('help', true):t('h', true).table
 
 end
 

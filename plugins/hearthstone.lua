@@ -6,7 +6,7 @@ local hearthstone = {}
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function hearthstone:init()
+function hearthstone:init(config)
 	if not self.database.hearthstone or os.time() > self.database.hearthstone.expiration then
 
 		print('Downloading Hearthstone database...')
@@ -36,15 +36,15 @@ function hearthstone:init()
 
 	end
 
-	hearthstone.triggers = utilities.triggers(self.info.username):t('hearthstone', true):t('hs').table
+	hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
+	hearthstone.doc = [[```
+]]..config.cmd_pat..[[hearthstone <query>
+Returns Hearthstone card info.
+Alias: ]]..config.cmd_pat..[[hs
+```]]
 end
 
 hearthstone.command = 'hearthstone <query>'
-hearthstone.doc = [[```
-/hearthstone <query>
-Returns Hearthstone card info.
-Alias: /hs
-```]]
 
 local function format_card(card)
 
@@ -102,7 +102,7 @@ local function format_card(card)
 
 end
 
-function hearthstone:action(msg)
+function hearthstone:action(msg, config)
 
 	local input = utilities.input(msg.text_lower)
 	if not input then
@@ -119,7 +119,7 @@ function hearthstone:action(msg)
 
 	output = utilities.trim(output)
 	if output:len() == 0 then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

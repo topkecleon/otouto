@@ -7,24 +7,24 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('utilities')
 
-function youtube:init()
-	if not self.config.google_api_key then
+function youtube:init(config)
+	if not config.google_api_key then
 		print('Missing config value: google_api_key.')
 		print('youtube.lua will not be enabled.')
 		return
 	end
 
-	youtube.triggers = utilities.triggers(self.info.username):t('youtube', true):t('yt', true).table
+	youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
+	youtube.doc = [[```
+]]..config.cmd_pat..[[youtube <query>
+Returns the top result from YouTube.
+Alias: ]]..config.cmd_pat..[[yt
+```]]
 end
 
 youtube.command = 'youtube <query>'
-youtube.doc = [[```
-/youtube <query>
-Returns the top result from YouTube.
-Alias: /yt
-```]]
 
-function youtube:action(msg)
+function youtube:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -36,17 +36,17 @@ function youtube:action(msg)
 		end
 	end
 
-	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. self.config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
+	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.pageInfo.totalResults == 0 then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

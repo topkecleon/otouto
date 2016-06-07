@@ -3,13 +3,13 @@ local slap = {}
 local utilities = require('utilities')
 
 slap.command = 'slap [target]'
-slap.doc = [[```
-/slap [target]
+
+function slap:init(config)
+	slap.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('slap', true).table
+	slap.doc = [[```
+]]..config.cmd_pat..[[slap [target]
 Slap somebody.
 ```]]
-
-function slap:init()
-	slap.triggers = utilities.triggers(self.info.username):t('slap', true).table
 end
 
 local slaps = {

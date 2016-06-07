@@ -5,8 +5,9 @@ local utilities = require('utilities')
 eightball.command = '8ball'
 eightball.doc = '`Returns an answer from a magic 8-ball!`'
 
-function eightball:init()
-	eightball.triggers = utilities.triggers(self.info.username, {'[Yy]/[Nn]%p*$'}):t('8ball', true).table
+function eightball:init(config)
+	eightball.triggers = utilities.triggers(self.info.username, config.cmd_pat,
+		{'[Yy]/[Nn]%p*$'}):t('8ball', true).table
 end
 
 local ball_answers = {

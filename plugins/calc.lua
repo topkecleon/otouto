@@ -5,16 +5,16 @@ local HTTPS = require('ssl.https')
 local utilities = require('utilities')
 
 calc.command = 'calc <expression>'
-calc.doc = [[```
-/calc <expression>
+
+function calc:init(config)
+	calc.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('calc', true).table
+	calc.doc = [[```
+]]..config.cmd_pat..[[calc <expression>
 Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
 ```]]
-
-function calc:init()
-	calc.triggers = utilities.triggers(self.info.username):t('calc', true).table
 end
 
-function calc:action(msg)
+function calc:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -30,7 +30,7 @@ function calc:action(msg)
 
 	local output = HTTPS.request(url)
 	if not output then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

@@ -5,20 +5,20 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 xkcd.command = 'xkcd [i]'
-xkcd.doc = [[```
-/xkcd [i]
+
+function xkcd:init(config)
+	xkcd.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('xkcd', true).table
+	xkcd.doc = [[```
+]]..config.cmd_pat..[[xkcd [i]
 Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.
 ```]]
-
-function xkcd:init()
-	xkcd.triggers = utilities.triggers(self.info.username):t('xkcd', true).table
 end
 
-function xkcd:action(msg)
+function xkcd:action(msg, config)
 
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	local latest = JSON.decode(jstr).num
@@ -44,7 +44,7 @@ function xkcd:action(msg)
 
 	jstr, res = HTTP.request(res_url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	local jdat = JSON.decode(jstr)

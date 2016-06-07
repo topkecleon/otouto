@@ -6,18 +6,18 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 dilbert.command = 'dilbert [date]'
-dilbert.doc = [[```
-/dilbert [YYYY-MM-DD]
+
+function dilbert:init(config)
+	dilbert.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('dilbert', true).table
+	dilbert.doc = [[```
+]]..config.cmd_pat..[[dilbert [YYYY-MM-DD]
 Returns the latest Dilbert strip or that of the provided date.
 Dates before the first strip will return the first strip. Dates after the last trip will return the last strip.
 Source: dilbert.com
 ```]]
-
-function dilbert:init()
-	dilbert.triggers = utilities.triggers(self.info.username):t('dilbert', true).table
 end
 
-function dilbert:action(msg)
+function dilbert:action(msg, config)
 
 	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'upload_photo' } )
 
@@ -28,7 +28,7 @@ function dilbert:action(msg)
 	local url = 'http://dilbert.com/strip/' .. URL.escape(input)
 	local str, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 

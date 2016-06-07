@@ -15,12 +15,12 @@ blacklist.triggers = {
 	''
 }
 
-function blacklist:action(msg)
+function blacklist:action(msg, config)
 
 	if self.database.blacklist[msg.from.id_str] then return end
 	if self.database.blacklist[msg.chat.id_str] then return end
-	if not msg.text:match('^/blacklist') then return true end
-	if msg.from.id ~= self.config.admin then return end
+	if not msg.text:match('^'..config.cmd_pat..'blacklist') then return true end
+	if msg.from.id ~= config.admin then return end
 
 	local target = utilities.user_from_message(self, msg)
 	if target.err then

@@ -6,18 +6,16 @@ local utilities -- Load miscellaneous and cross-plugin functions.
 
 bot.version = '3.8'
 
-function bot:init() -- The function run when the bot is started or reloaded.
+function bot:init(config) -- The function run when the bot is started or reloaded.
 
 	bindings = require('bindings')
 	utilities = require('utilities')
 
-	self.config = require('config') -- Load configuration file.
-
 	assert(
-		self.config.bot_api_key and self.config.bot_api_key ~= '',
-		'You did not set your bot token in config.lua!'
+		config.bot_api_key and config.bot_api_key ~= '',
+		'You did not set your bot token in the config!'
 	)
-	self.BASE_URL = 'https://api.telegram.org/bot' .. self.config.bot_api_key .. '/'
+	self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
 
 	-- Fetch bot information. Try until it succeeds.
 	repeat
@@ -35,10 +33,10 @@ function bot:init() -- The function run when the bot is started or reloaded.
 	self.database.users[tostring(self.info.id)] = self.info
 
 	self.plugins = {} -- Load plugins.
-	for _,v in ipairs(self.config.plugins) do
+	for _,v in ipairs(config.plugins) do
 		local p = require('plugins.'..v)
 		table.insert(self.plugins, p)
-		if p.init then p.init(self) end
+		if p.init then p.init(self, config) end
 	end
 
 	print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
@@ -49,7 +47,7 @@ function bot:init() -- The function run when the bot is started or reloaded.
 
 end
 
-function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
+function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
 
 	-- Cache user info for those involved.
 	utilities.create_user_entry(self, msg.from)
@@ -63,20 +61,20 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 
 	msg = utilities.enrich_message(msg)
 
-	if msg.text:match('^/start .+') then
-		msg.text = '/' .. utilities.input(msg.text)
+	if msg.text:match('^'..config.cmd_pat..'start .+') then
+		msg.text = config.cmd_pat .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
 	end
 
 	for _,v in ipairs(self.plugins) do
 		for _,w in pairs(v.triggers) do
-			if string.match(msg.text:lower(), w) then
+			if string.match(msg.text_lower, w) then
 				local success, result = pcall(function()
-					return v.action(self, msg)
+					return v.action(self, msg, config)
 				end)
 				if not success then
 					utilities.send_reply(self, msg, 'Sorry, an unexpected error occurred.')
-					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text)
+					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 					return
 				end
 				-- If the action returns a table, make that table the new msg.
@@ -92,8 +90,8 @@ function bot:on_msg_receive(msg) -- The fn run whenever a message is received.
 
 end
 
-function bot:run()
-	bot.init(self) -- Actually start the script. Run the bot_init function.
+function bot:run(config)
+	bot.init(self, config) -- Actually start the script.
 
 	while self.is_started do -- Start a loop while the bot should be running.
 
@@ -102,7 +100,7 @@ function bot:run()
 			for _,v in ipairs(res.result) do -- Go through every new message.
 				self.last_update = v.update_id
 				if v.message then
-					bot.on_msg_receive(self, v.message)
+					bot.on_msg_receive(self, v.message, config)
 				end
 			end
 		else
@@ -114,9 +112,9 @@ function bot:run()
 			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
 			for i,v in ipairs(self.plugins) do
 				if v.cron then -- Call each plugin's cron function, if it has one.
-					local result, err = pcall(function() v.cron(self) end)
+					local result, err = pcall(function() v.cron(self, config) end)
 					if not result then
-						utilities.handle_exception(self, err, 'CRON: ' .. i)
+						utilities.handle_exception(self, err, 'CRON: ' .. i, config)
 					end
 				end
 			end

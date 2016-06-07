@@ -6,14 +6,14 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 reddit.command = 'reddit [r/subreddit | query]'
-reddit.doc = [[```
-/reddit [r/subreddit | query]
-Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
-Aliases: /r, /r/subreddit
-```]]
 
-function reddit:init()
-	reddit.triggers = utilities.triggers(self.info.username, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
+function reddit:init(config)
+	reddit.triggers = utilities.triggers(self.info.username, config.cmd_pat, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
+	reddit.doc = [[```
+]]..config.cmd_pat..[[reddit [r/subreddit | query]
+Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
+Aliases: ]]..config.cmd_pat..[[r, /r/subreddit
+```]]
 end
 
 local format_results = function(posts)
@@ -39,7 +39,7 @@ reddit.subreddit_url = 'http://www.reddit.com/%s/.json?limit='
 reddit.search_url = 'http://www.reddit.com/search.json?q=%s&limit='
 reddit.rall_url = 'http://www.reddit.com/.json?limit='
 
-function reddit:action(msg)
+function reddit:action(msg, config)
 	-- Eight results in PM, four results elsewhere.
 	local limit = 4
 	if msg.chat.type == 'private' then
@@ -48,7 +48,7 @@ function reddit:action(msg)
 	local text = msg.text_lower
 	if text:match('^/r/.') then
 		-- Normalize input so this hack works easily.
-		text = msg.text_lower:gsub('^/r/', '/r r/')
+		text = msg.text_lower:gsub('^/r/', config.cmd_pat..'r r/')
 	end
 	local input = utilities.input(text)
 	local source, url
@@ -69,11 +69,11 @@ function reddit:action(msg)
 	end
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 	else
 		local jdat = JSON.decode(jstr)
 		if #jdat.data.children == 0 then
-			utilities.send_reply(self, msg, self.config.errors.results)
+			utilities.send_reply(self, msg, config.errors.results)
 		else
 			local output = format_results(jdat.data.children)
 			output = source .. output

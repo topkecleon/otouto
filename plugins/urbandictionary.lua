@@ -6,17 +6,18 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 urbandictionary.command = 'urbandictionary <query>'
-urbandictionary.doc = [[```
-/urbandictionary <query>
-Returns a definition from Urban Dictionary.
-Aliases: /ud, /urban
-```]]
 
-function urbandictionary:init()
-	urbandictionary.triggers = utilities.triggers(self.info.username):t('urbandictionary', true):t('ud', true):t('urban', true).table
+function urbandictionary:init(config)
+	urbandictionary.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+		:t('urbandictionary', true):t('ud', true):t('urban', true).table
+	urbandictionary.doc = [[```
+]]..config.cmd_pat..[[urbandictionary <query>
+Returns a definition from Urban Dictionary.
+Aliases: ]]..config.cmd_pat..[[ud, ]]..config.cmd_pat..[[urban
+```]]
 end
 
-function urbandictionary:action(msg)
+function urbandictionary:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -32,13 +33,13 @@ function urbandictionary:action(msg)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.result_type == "no_results" then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

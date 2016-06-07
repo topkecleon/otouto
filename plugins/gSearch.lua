@@ -6,17 +6,17 @@ local JSON = require('dkjson')
 local utilities = require('utilities')
 
 gSearch.command = 'google <query>'
-gSearch.doc = [[```
-/google <query>
-Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "/gnsfw" to disable it.
-Alias: /g
-```]]
 
-function gSearch:init()
-	gSearch.triggers = utilities.triggers(self.info.username):t('g', true):t('google', true):t('gnsfw', true).table
+function gSearch:init(config)
+	gSearch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('g', true):t('google', true):t('gnsfw', true).table
+	gSearch.doc = [[```
+]]..config.cmd_pat..[[google <query>
+Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]]..config.cmd_pat..[[gnsfw" to disable it.
+Alias: ]]..config.cmd_pat..[[g
+```]]
 end
 
-function gSearch:action(msg)
+function gSearch:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -36,7 +36,7 @@ function gSearch:action(msg)
 		url = url .. '&rsz=4'
 	end
 
-	if not string.match(msg.text, '^/g[oogle]*nsfw') then
+	if not string.match(msg.text, '^'..config.cmd_pat..'g[oogle]*nsfw') then
 		url = url .. '&safe=active'
 	end
 
@@ -44,17 +44,17 @@ function gSearch:action(msg)
 
 	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
 	local jdat = JSON.decode(jstr)
 	if not jdat.responseData then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 	if not jdat.responseData.results[1] then
-		utilities.send_reply(self, msg, self.config.errors.results)
+		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 

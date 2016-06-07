@@ -4,13 +4,13 @@ local HTTP = require('socket.http')
 local utilities = require('utilities')
 
 preview.command = 'preview <link>'
-preview.doc = [[```
-/preview <link>
+
+function preview:init(config)
+	preview.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('preview', true).table
+	preview.doc = [[```
+]]..config.cmd_pat..[[preview <link>
 Returns a full-message, "unlinked" preview.
 ```]]
-
-function preview:init()
-	preview.triggers = utilities.triggers(self.info.username):t('preview', true).table
 end
 
 function preview:action(msg)

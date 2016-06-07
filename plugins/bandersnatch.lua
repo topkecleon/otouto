@@ -3,13 +3,13 @@ local bandersnatch = {}
 local utilities = require('utilities')
 
 bandersnatch.command = 'bandersnatch'
-bandersnatch.doc = [[```
-Shun the frumious Bandersnatch.
-Alias: /bc
-```]]
 
-function bandersnatch:init()
-	bandersnatch.triggers = utilities.triggers(self.info.username):t('bandersnatch'):t('bc').table
+function bandersnatch:init(config)
+	bandersnatch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bandersnatch'):t('bc').table
+	bandersnatch.doc = [[```
+Shun the frumious Bandersnatch.
+Alias: ]]..config.cmd_pat..[[bc
+```]]
 end
 
 local fullnames = { "Wimbledon Tennismatch", "Rinkydink Curdlesnoot", "Butawhiteboy Cantbekhan", "Benadryl Claritin", "Bombadil Rivendell", "Wanda's Crotchfruit", "Biblical Concubine", "Syphilis Cankersore", "Buckminster Fullerene", "Bourgeoisie Capitalist" }

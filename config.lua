@@ -18,6 +18,8 @@ I am otouto, the plugin-wielding, multipurpose Telegram bot.
 
 Send /help to get started.
 	]],
+	-- The symbol that starts a command. Usually noted as '/' in documentation.
+	cmd_pat = '/',
 
 	-- https://datamarket.azure.com/dataset/bing/search
 	bing_api_key = '',

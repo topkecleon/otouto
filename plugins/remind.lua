@@ -3,15 +3,15 @@ local remind = {}
 local utilities = require('utilities')
 
 remind.command = 'remind <duration> <message>'
-remind.doc = [[```
-	/remind <duration> <message>
-	Repeats a message after a duration of time, in minutes.
-	```]]
 
-function remind:init()
+function remind:init(config)
 	self.database.reminders = self.database.reminders or {}
 
-	remind.triggers = utilities.triggers(self.info.username):t('remind', true).table
+	remind.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('remind', true).table
+	remind.doc = [[```
+	]]..config.cmd_pat..[[remind <duration> <message>
+	Repeats a message after a duration of time, in minutes.
+	```]]
 end
 
 function remind:action(msg)

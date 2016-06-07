@@ -48,7 +48,7 @@ local utilities = require('utilities')
 
 local administration = {}
 
-function administration:init()
+function administration:init(config)
 	-- Build the administration db if nonexistent.
 	if not self.database.administration then
 		self.database.administration = {
@@ -64,19 +64,22 @@ function administration:init()
 		flood = {}
 	}
 
-	drua.PORT = self.config.cli_port or 4567
+	drua.PORT = config.cli_port or 4567
 
-	administration.init_command(self)
+	administration.init_flags(config.cmd_pat)
+	administration.init_command(self, config)
+
+	administration.doc = '`Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.`'
 
 end
 
-administration.flags = {
+function administration.init_flags(cmd_pat) return {
 	[1] = {
 		name = 'unlisted',
 		desc = 'Removes this group from the group listing.',
 		short = 'This group is unlisted.',
-		enabled = 'This group is no longer listed in /groups.',
-		disabled = 'This group is now listed in /groups.'
+		enabled = 'This group is no longer listed in '..cmd_pat..'groups.',
+		disabled = 'This group is now listed in '..cmd_pat..'groups.'
 	},
 	[2] = {
 		name = 'antisquig',
@@ -105,7 +108,7 @@ administration.flags = {
 		name = 'antiflood',
 		desc = 'Prevents flooding by rate-limiting messages per user.',
 		short = 'This group automatically removes users who flood.',
-		enabled = 'Users will now be removed automatically for excessive messages. Use /antiflood to configure limits.',
+		enabled = 'Users will now be removed automatically for excessive messages. Use '..cmd_pat..'antiflood to configure limits.',
 		disabled = 'Users will no longer be removed automatically for excessive messages.',
 		kicked = 'You were automatically kicked from GROUPNAME for flooding.'
 	},
@@ -116,7 +119,7 @@ administration.flags = {
 		enabled = 'This group will no longer remove users for being globally banned.',
 		disabled = 'This group will now remove users for being globally banned.'
 	}
-}
+} end
 
 administration.antiflood = {
 	text = 10,
@@ -139,13 +142,13 @@ administration.ranks = {
 	[5] = 'Owner'
 }
 
-function administration:get_rank(target, chat)
+function administration:get_rank(target, chat, config)
 
 	target = tostring(target)
 	chat = tostring(chat)
 
 	-- Return 5 if the target is the bot or its owner.
-	if tonumber(target) == self.config.admin or tonumber(target) == self.info.id then
+	if tonumber(target) == config.admin or tonumber(target) == self.info.id then
 		return 5
 	end
 
@@ -180,10 +183,10 @@ function administration:get_rank(target, chat)
 
 end
 
-function administration:get_target(msg)
+function administration:get_target(msg, config)
 	local target = utilities.user_from_message(self, msg)
 	if target.id then
-		target.rank = administration.get_rank(self, target.id_str, msg.chat.id)
+		target.rank = administration.get_rank(self, target.id_str, msg.chat.id, config)
 	end
 	return target
 end
@@ -197,7 +200,7 @@ function administration:mod_format(id)
 	return output
 end
 
-function administration:get_desc(chat_id)
+function administration:get_desc(chat_id, config)
 
 	local group = self.database.administration.groups[tostring(chat_id)]
 	local t = {}
@@ -237,12 +240,12 @@ function administration:get_desc(chat_id)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. utilities.trim(modstring))
 	end
-	table.insert(t, 'Run /ahelp@' .. self.info.username .. ' for a list of commands.')
+	table.insert(t, 'Run '..config..'ahelp@' .. self.info.username .. ' for a list of commands.')
 	return table.concat(t, '\n\n')
 
 end
 
-function administration:update_desc(chat)
+function administration:update_desc(chat, config)
 	local group = self.database.administration.groups[tostring(chat)]
 	local desc = 'Welcome to ' .. group.name .. '!\n'
 	if group.motd then desc = desc .. group.motd .. '\n' end
@@ -250,12 +253,12 @@ function administration:update_desc(chat)
 		local gov = self.database.users[tostring(group.governor)]
 		desc = desc .. '\nGovernor: ' .. utilities.build_name(gov.first_name, gov.last_name) .. ' [' .. gov.id .. ']\n'
 	end
-	local s = '\n/desc@' .. self.info.username .. ' for more information.'
+	local s = '\n'..config.cmd_pat..'desc@' .. self.info.username .. ' for more information.'
 	desc = desc:sub(1, 250-s:len()) .. s
 	drua.channel_set_about(chat, desc)
 end
 
-function administration:kick_user(chat, target, reason)
+function administration:kick_user(chat, target, reason, config)
 	drua.kick_user(chat, target)
 	local victim = target
 	if self.database.users[tostring(target)] then
@@ -265,10 +268,10 @@ function administration:kick_user(chat, target, reason)
 		)
 	end
 	local group = self.database.administration.groups[tostring(chat)].name
-	utilities.handle_exception(self, victim..' kicked from '..group, reason)
+	utilities.handle_exception(self, victim..' kicked from '..group, reason, config)
 end
 
-function administration.init_command(self_)
+function administration.init_command(self_, config)
 	administration.commands = {
 
 		{ -- generic, mostly autokicks
@@ -277,9 +280,10 @@ function administration.init_command(self_)
 			privilege = 0,
 			interior = true,
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 
 				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
+				local rank = administration.get_rank(self, msg.from.id, msg.chat.id, config)
 				local user = {}
 
 				if rank < 2 then
@@ -360,7 +364,7 @@ function administration.init_command(self_)
 					-- the original guy.
 					if msg.new_chat_participant.id ~= msg.from.id then
 						new_user = {}
-						new_rank = administration.get_rank(self,noob.id, msg.chat.id)
+						new_rank = administration.get_rank(self,noob.id, msg.chat.id, config)
 					end
 
 					if new_rank == 0 then
@@ -399,7 +403,7 @@ function administration.init_command(self_)
 					else
 						group.name = msg.new_chat_title
 						if group.grouptype == 'supergroup' then
-							administration.update_desc(self, msg.chat.id)
+							administration.update_desc(self, msg.chat.id, config)
 						end
 					end
 				elseif msg.new_chat_photo then
@@ -425,7 +429,7 @@ function administration.init_command(self_)
 				end
 
 				if new_user ~= user and new_user.do_kick then
-					administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason)
+					administration.kick_user(self, msg.chat.id, msg.new_chat_participant.id, new_user.reason, config)
 					if new_user.output then
 						utilities.send_message(self, msg.new_chat_participant.id, new_user.output)
 					end
@@ -450,7 +454,7 @@ function administration.init_command(self_)
 				end
 
 				if user.do_kick then
-					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
+					administration.kick_user(self, msg.chat.id, msg.from.id, user.reason, config)
 					if user.output then
 						utilities.send_message(self, msg.from.id, user.output)
 					end
@@ -460,7 +464,7 @@ function administration.init_command(self_)
 				end
 
 				if msg.new_chat_participant and not new_user.do_kick then
-					local output = administration.get_desc(self, msg.chat.id)
+					local output = administration.get_desc(self, msg.chat.id, config)
 					utilities.send_message(self, msg.new_chat_participant.id, output, true, nil, true)
 				end
 
@@ -480,14 +484,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /groups
-			triggers = utilities.triggers(self_.info.username):t('groups').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('groups').table,
 
 			command = 'groups',
 			privilege = 1,
 			interior = false,
 			doc = 'Returns a list of administrated groups.',
 
-			action = function(self, msg)
+			action = function(self, msg, group, config)
 				local output = ''
 				for _,v in ipairs(self.database.administration.activity) do
 					local group = self.database.administration.groups[v]
@@ -509,22 +513,22 @@ function administration.init_command(self_)
 		},
 
 		{ -- /ahelp
-			triggers = utilities.triggers(self_.info.username):t('ahelp', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('ahelp', true).table,
 
 			command = 'ahelp \\[command]',
 			privilege = 1,
 			interior = false,
 			doc = 'Returns a list of realm-related commands for your rank (in a private message), or command-specific help.',
 
-			action = function(self, msg)
-				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
+			action = function(self, msg, group, config)
+				local rank = administration.get_rank(self, msg.from.id, msg.chat.id, config)
 				local input = utilities.get_word(msg.text_lower, 2)
 				if input then
-					input = input:gsub('^/', '')
+					input = input:gsub('^'..config.cmd_pat..'', '')
 					local doc
 					for _,action in ipairs(administration.commands) do
 						if action.keyword == input then
-							doc = '/' .. action.command:gsub('\\','') .. '\n' .. action.doc
+							doc = ''..config.cmd_pat..'' .. action.command:gsub('\\','') .. '\n' .. action.doc
 							break
 						end
 					end
@@ -532,14 +536,14 @@ function administration.init_command(self_)
 						local output = '*Help for* _' .. input .. '_ :\n```\n' .. doc .. '\n```'
 						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					else
-						local output = 'Sorry, there is no help for that command.\n/ahelp@'..self.info.username
+						local output = 'Sorry, there is no help for that command.\n'..config.cmd_pat..'ahelp@'..self.info.username
 						utilities.send_reply(self, msg, output)
 					end
 				else
 					local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
 					for i = 1, rank do
 						for _, val in ipairs(self.admin_temp.help[i]) do
-							output = output .. '• /' .. val .. '\n'
+							output = output .. '• ' .. config.cmd_pat .. val .. '\n'
 						end
 					end
 					output = output .. 'Arguments: <required> \\[optional]'
@@ -555,14 +559,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /ops
-			triggers = utilities.triggers(self_.info.username):t('ops'):t('oplist').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('ops'):t('oplist').table,
 
 			command = 'ops',
 			privilege = 1,
 			interior = true,
 			doc = 'Returns a list of moderators and the governor for the group.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local modstring = ''
 				for k,_ in pairs(group.mods) do
 					modstring = modstring .. administration.mod_format(self, k)
@@ -585,15 +589,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /desc
-			triggers = utilities.triggers(self_.info.username):t('desc'):t('description').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('desc'):t('description').table,
 
 			command = 'description',
 			privilege = 1,
 			interior = true,
 			doc = 'Returns a description of the group (in a private message), including its motd, rules, flags, governor, and moderators.',
 
-			action = function(self, msg)
-				local output = administration.get_desc(self, msg.chat.id)
+			action = function(self, msg, group, config)
+				local output = administration.get_desc(self, msg.chat.id, config)
 				if utilities.send_message(self, msg.from.id, output, true, nil, true) then
 					if msg.from.id ~= msg.chat.id then
 						utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
@@ -605,14 +609,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /rules
-			triggers = utilities.triggers(self_.info.username):t('rules?', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('rules?', true).table,
 
 			command = 'rules \\[i]',
 			privilege = 1,
 			interior = true,
 			doc = 'Returns the group\'s list of rules, or a specific rule.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local output
 				local input = utilities.get_word(msg.text_lower, 2)
 				input = tonumber(input)
@@ -633,14 +637,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /motd
-			triggers = utilities.triggers(self_.info.username):t('motd').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('motd').table,
 
 			command = 'motd',
 			privilege = 1,
 			interior = true,
 			doc = 'Returns the group\'s message of the day.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local output = 'No MOTD has been set for ' .. msg.chat.title .. '.'
 				if group.motd then
 					output = '*MOTD for ' .. msg.chat.title .. ':*\n' .. group.motd
@@ -650,14 +654,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /link
-			triggers = utilities.triggers(self_.info.username):t('link').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('link').table,
 
 			command = 'link',
 			privilege = 1,
 			interior = true,
 			doc = 'Returns the group\'s link.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local output = 'No link has been set for ' .. msg.chat.title .. '.'
 				if group.link then
 					output = '[' .. msg.chat.title .. '](' .. group.link .. ')'
@@ -667,18 +671,18 @@ function administration.init_command(self_)
 		},
 
 		{ -- /kickme
-			triggers = utilities.triggers(self_.info.username):t('leave'):t('kickme').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('leave'):t('kickme').table,
 
 			command = 'kickme',
 			privilege = 1,
 			interior = true,
 			doc = 'Removes the user from the group.',
 
-			action = function(self, msg)
-				if administration.get_rank(self, msg.from.id) == 5 then
+			action = function(self, msg, group, config)
+				if administration.get_rank(self, msg.from.id, nil, config) == 5 then
 					utilities.send_reply(self, msg, 'I can\'t let you do that, '..msg.from.name..'.')
 				else
-					administration.kick_user(self, msg.chat.id, msg.from.id, 'kickme')
+					administration.kick_user(self, msg.chat.id, msg.from.id, 'kickme', config)
 					utilities.send_message(self, msg.chat.id, 'Goodbye, ' .. msg.from.name .. '!', true)
 					if msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = msg.from.id } )
@@ -688,21 +692,21 @@ function administration.init_command(self_)
 		},
 
 		{ -- /kick
-			triggers = utilities.triggers(self_.info.username):t('kick', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('kick', true).table,
 
 			command = 'kick <user>',
 			privilege = 2,
 			interior = true,
 			doc = 'Removes a user from the group. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 1 then
 					utilities.send_reply(self, msg, target.name .. ' is too privileged to be kicked.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.name)
+					administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. msg.from.name, config)
 					utilities.send_message(self, msg.chat.id, target.name .. ' has been kicked.')
 					if msg.chat.type == 'supergroup' then
 						bindings.unbanChatMember(self, { chat_id = msg.chat.id, user_id = target.id } )
@@ -712,15 +716,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /ban
-			triggers = utilities.triggers(self_.info.username):t('ban', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('ban', true).table,
 
 			command = 'ban <user>',
 			privilege = 2,
 			interior = true,
 			doc = 'Bans a user from the group. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 1 then
@@ -728,7 +732,7 @@ function administration.init_command(self_)
 				elseif group.bans[target.id_str] then
 					utilities.send_reply(self, msg, target.name .. ' is already banned.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, 'banned by '..msg.from.name)
+					administration.kick_user(self, msg.chat.id, target.id, 'banned by '..msg.from.name, config)
 					utilities.send_reply(self, msg, target.name .. ' has been banned.')
 					group.bans[target.id_str] = true
 				end
@@ -736,15 +740,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /unban
-			triggers = utilities.triggers(self_.info.username):t('unban', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('unban', true).table,
 
 			command = 'unban <user>',
 			privilege = 2,
 			interior = true,
 			doc = 'Unbans a user from the group. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -762,15 +766,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /setrules
-			triggers = utilities.triggers(self_.info.username):t('setrules', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('setrules', true).table,
 
 			command = 'setrules <rules>',
 			privilege = 3,
 			interior = true,
 			doc = 'Sets the group\'s rules. Rules will be automatically numbered. Separate rules with a new line. Markdown is supported. Pass "--" to delete the rules.',
 
-			action = function(self, msg, group)
-				local input = msg.text:match('^/setrules[@'..self.info.username..']*(.+)')
+			action = function(self, msg, group, config)
+				local input = msg.text:match('^'..config.cmd_pat..'setrules[@'..self.info.username..']*(.+)')
 				if input == ' --' or input == ' ' .. utilities.char.em_dash then
 					group.rules = {}
 					utilities.send_reply(self, msg, 'The rules have been cleared.')
@@ -792,16 +796,16 @@ function administration.init_command(self_)
 		},
 
 		{ -- /changerule
-			triggers = utilities.triggers(self_.info.username):t('changerule', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('changerule', true).table,
 
 			command = 'changerule <i> <rule>',
 			privilege = 3,
 			interior = true,
 			doc = 'Changes a single rule. Pass "--" to delete the rule. If i is a number for which there is no rule, adds a rule by the next incremented number.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
-				local output = 'usage: `/changerule <i> <newrule>`'
+				local output = 'usage: `'..config.cmd_pat..'changerule <i> <newrule>`'
 				if input then
 					local rule_num = tonumber(input:match('^%d+'))
 					local new_rule = utilities.input(input)
@@ -829,14 +833,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /setmotd
-			triggers = utilities.triggers(self_.info.username):t('setmotd', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('setmotd', true).table,
 
 			command = 'setmotd <motd>',
 			privilege = 2,
 			interior = true,
 			doc = 'Sets the group\'s message of the day. Markdown is supported. Pass "--" to delete the message.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
 				if not input and msg.reply_to_message and msg.reply_to_message.text:len() > 0 then
 					input = msg.reply_to_message.text
@@ -852,7 +856,7 @@ function administration.init_command(self_)
 						utilities.send_message(self, msg.chat.id, output, true, nil, true)
 					end
 					if group.grouptype == 'supergroup' then
-						administration.update_desc(self, msg.chat.id)
+						administration.update_desc(self, msg.chat.id, config)
 					end
 				else
 					utilities.send_reply(self, msg, 'Please specify the new message of the day.')
@@ -861,14 +865,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /setlink
-			triggers = utilities.triggers(self_.info.username):t('setlink', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('setlink', true).table,
 
 			command = 'setlink <link>',
 			privilege = 3,
 			interior = true,
 			doc = 'Sets the group\'s join link. Pass "--" to regenerate the link.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
 				if input == '--' or input == utilities.char.em_dash then
 					group.link = drua.export_link(msg.chat.id)
@@ -884,16 +888,16 @@ function administration.init_command(self_)
 		},
 
 		{ -- /alist
-			triggers = utilities.triggers(self_.info.username):t('alist').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('alist').table,
 
 			command = 'alist',
 			privilege = 3,
 			interior = true,
 			doc = 'Returns a list of administrators. Owner is denoted with a star character.',
 
-			action = function(self, msg)
+			action = function(self, msg, config)
 				local output = '*Administrators:*\n'
-				output = output .. administration.mod_format(self, self.config.admin):gsub('\n', ' ★\n')
+				output = output .. administration.mod_format(self, config.admin):gsub('\n', ' ★\n')
 				for id,_ in pairs(self.database.administration.admins) do
 					output = output .. administration.mod_format(self, id)
 				end
@@ -902,14 +906,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /flags
-			triggers = utilities.triggers(self_.info.username):t('flags?', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('flags?', true).table,
 
 			command = 'flag \\[i]',
 			privilege = 3,
 			interior = true,
 			doc = 'Returns a list of flags or toggles the specified flag.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
 				if input then
 					input = utilities.get_word(input, 1)
@@ -934,16 +938,16 @@ function administration.init_command(self_)
 		},
 
 		{ -- /antiflood
-			triggers = utilities.triggers(self_.info.username):t('antiflood', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('antiflood', true).table,
 
 			command = 'antiflood \\[<type> <i>]',
 			privilege = 3,
 			interior = true,
 			doc = 'Returns a list of antiflood values or sets one.',
 
-			action = function(self, msg, group)
+			action = function(self, msg, group, config)
 				if not group.flags[5] then
-					utilities.send_message(self, msg.chat.id, 'antiflood is not enabled. Use `/flag 5` to enable it.', true, nil, true)
+					utilities.send_message(self, msg.chat.id, 'antiflood is not enabled. Use `'..config.cmd_pat..'flag 5` to enable it.', true, nil, true)
 				else
 					if not group.antiflood then
 						group.antiflood = JSON.decode(JSON.encode(administration.antiflood))
@@ -962,7 +966,7 @@ function administration.init_command(self_)
 							output = '*' .. key:gsub('^%l', string.upper) .. '* messages are now worth *' .. val .. '* points.'
 						end
 					else
-						output = 'usage: `/antiflood <type> <i>`\nexample: `/antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
+						output = 'usage: `'..config.cmd_pat..'antiflood <type> <i>`\nexample: `'..config.cmd_pat..'antiflood text 5`\nUse this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:\n'
 						for k,v in pairs(group.antiflood) do
 							output = output .. '*'..k..':* `'..v..'`\n'
 						end
@@ -974,15 +978,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /mod
-			triggers = utilities.triggers(self_.info.username):t('mod', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('mod', true).table,
 
 			command = 'mod <user>',
 			privilege = 3,
 			interior = true,
 			doc = 'Promotes a user to a moderator. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -1001,15 +1005,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /demod
-			triggers = utilities.triggers(self_.info.username):t('demod', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('demod', true).table,
 
 			command = 'demod <user>',
 			privilege = 3,
 			interior = true,
 			doc = 'Demotes a moderator to a user. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -1027,15 +1031,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /gov
-			triggers = utilities.triggers(self_.info.username):t('gov', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('gov', true).table,
 
 			command = 'gov <user>',
 			privilege = 4,
 			interior = true,
 			doc = 'Promotes a user to the governor. The current governor will be replaced. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -1049,22 +1053,22 @@ function administration.init_command(self_)
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 2)
-						administration.update_desc(self, msg.chat.id)
+						administration.update_desc(self, msg.chat.id, config)
 					end
 				end
 			end
 		},
 
 		{ -- /degov
-			triggers = utilities.triggers(self_.info.username):t('degov', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('degov', true).table,
 
 			command = 'degov <user>',
 			privilege = 4,
 			interior = true,
 			doc = 'Demotes the governor to a user. The administrator will become the new governor. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -1076,22 +1080,22 @@ function administration.init_command(self_)
 					end
 					if group.grouptype == 'supergroup' then
 						drua.channel_set_admin(msg.chat.id, target.id, 0)
-						administration.update_desc(self, msg.chat.id)
+						administration.update_desc(self, msg.chat.id, config)
 					end
 				end
 			end
 		},
 
 		{ -- /hammer
-			triggers = utilities.triggers(self_.info.username):t('hammer', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('hammer', true).table,
 
 			command = 'hammer <user>',
 			privilege = 4,
 			interior = false,
 			doc = 'Bans a user from all groups. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				elseif target.rank > 3 then
@@ -1099,7 +1103,7 @@ function administration.init_command(self_)
 				elseif self.database.blacklist[target.id_str] then
 					utilities.send_reply(self, msg, target.name .. ' is already globally banned.')
 				else
-					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.name)
+					administration.kick_user(self, msg.chat.id, target.id, 'hammered by '..msg.from.name, config)
 					self.database.blacklist[target.id_str] = true
 					for k,v in pairs(self.database.administration.groups) do
 						if not v.flags[6] then
@@ -1119,15 +1123,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /unhammer
-			triggers = utilities.triggers(self_.info.username):t('unhammer', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('unhammer', true).table,
 
 			command = 'unhammer <user>',
 			privilege = 4,
 			interior = false,
 			doc = 'Removes a global ban. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				elseif not self.database.blacklist[target.id_str] then
@@ -1143,15 +1147,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /admin
-			triggers = utilities.triggers(self_.info.username):t('admin', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('admin', true).table,
 
 			command = 'admin <user>',
 			privilege = 5,
 			interior = false,
 			doc = 'Promotes a user to an administrator. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg, group)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				elseif target.rank >= 4 then
@@ -1170,15 +1174,15 @@ function administration.init_command(self_)
 		},
 
 		{ -- /deadmin
-			triggers = utilities.triggers(self_.info.username):t('deadmin', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('deadmin', true).table,
 
 			command = 'deadmin <user>',
 			privilege = 5,
 			interior = false,
 			doc = 'Demotes an administrator to a user. The target may be specified via reply, username, or ID.',
 
-			action = function(self, msg)
-				local target = administration.get_target(self, msg)
+			action = function(self, msg, group, config)
+				local target = administration.get_target(self, msg, config)
 				if target.err then
 					utilities.send_reply(self, msg, target.err)
 				else
@@ -1198,14 +1202,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /gadd
-			triggers = utilities.triggers(self_.info.username):t('gadd', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('gadd', true).table,
 
 			command = 'gadd [i] ...',
 			privilege = 5,
 			interior = false,
 			doc = 'Adds a group to the administration system. Pass numbers as arguments to enable those flags immediately. For example, this would add the group and enable the unlisted flag, antibot, and antiflood:\n/gadd 1 4 5',
 
-			action = function(self, msg)
+			action = function(self, msg, group, config)
 				if self.database.administration.groups[msg.chat.id_str] then
 					utilities.send_reply(self, msg, 'I am already administrating this group.')
 				else
@@ -1237,7 +1241,7 @@ function administration.init_command(self_)
 						autokicks = {},
 						autoban = 3
 					}
-					administration.update_desc(self, msg.chat.id)
+					administration.update_desc(self, msg.chat.id, config)
 					table.insert(self.database.administration.activity, msg.chat.id_str)
 					utilities.send_reply(self, msg, 'I am now administrating this group.')
 					drua.channel_set_admin(msg.chat.id, self.info.id, 2)
@@ -1246,14 +1250,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /grem
-			triggers = utilities.triggers(self_.info.username):t('grem', true):t('gremove', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('grem', true):t('gremove', true).table,
 
 			command = 'gremove \\[chat]',
 			privilege = 5,
 			interior = false,
 			doc = 'Removes a group from the administration system.',
 
-			action = function(self, msg)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text) or msg.chat.id_str
 				local output
 				if self.database.administration.groups[input] then
@@ -1277,14 +1281,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /glist
-			triggers = utilities.triggers(self_.info.username):t('glist', false).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('glist', false).table,
 
 			command = 'glist',
 			privilege = 5,
 			interior = false,
 			doc = 'Returns a list (in a private message) of all administrated groups with their governors and links.',
 
-			action = function(self, msg)
+			action = function(self, msg, group, config)
 				local output = ''
 				if utilities.table_size(self.database.administration.groups) > 0 then
 					for k,v in pairs(self.database.administration.groups) do
@@ -1306,14 +1310,14 @@ function administration.init_command(self_)
 		},
 
 		{ -- /broadcast
-			triggers = utilities.triggers(self_.info.username):t('broadcast', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('broadcast', true).table,
 
 			command = 'broadcast <message>',
 			privilege = 5,
 			interior = false,
 			doc = 'Broadcasts a message to all administrated groups.',
 
-			action = function(self, msg)
+			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
 				if not input then
 					utilities.send_reply(self, msg, 'Give me something to broadcast.')
@@ -1357,17 +1361,17 @@ function administration.init_command(self_)
 	end
 end
 
-function administration:action(msg)
+function administration:action(msg, config)
 	for _,command in ipairs(administration.commands) do
 		for _,trigger in pairs(command.triggers) do
 			if msg.text_lower:match(trigger) then
 				if command.interior and not self.database.administration.groups[msg.chat.id_str] then
 					break
 				end
-				if administration.get_rank(self, msg.from.id, msg.chat.id) < command.privilege then
+				if administration.get_rank(self, msg.from.id, msg.chat.id, config) < command.privilege then
 					break
 				end
-				local res = command.action(self, msg, self.database.administration.groups[msg.chat.id_str])
+				local res = command.action(self, msg, self.database.administration.groups[msg.chat.id_str], config)
 				if res ~= true then
 					return res
 				end
@@ -1388,6 +1392,5 @@ function administration:cron()
 end
 
 administration.command = 'groups'
-administration.doc = '`Returns a list of administrated groups.\nUse /ahelp for more administrative commands.`'
 
 return administration

@@ -137,18 +137,18 @@ function utilities.save_data(filename, data)
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
-function utilities:get_coords(input)
+function utilities.get_coords(input, config)
 
 	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
 	local jstr, res = HTTP.request(url)
 	if res ~= 200 then
-		return self.config.errors.connection
+		return config.errors.connection
 	end
 
 	local jdat = JSON.decode(jstr)
 	if jdat.status == 'ZERO_RESULTS' then
-		return self.config.errors.results
+		return config.errors.results
 	end
 
 	return {
@@ -231,15 +231,15 @@ function utilities:user_from_message(msg, no_extra)
 
 end
 
-function utilities:handle_exception(err, message)
+function utilities:handle_exception(err, message, config)
 
 	if not err then err = '' end
 
 	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
 
-	if self.config.log_chat then
+	if config.log_chat then
 		output = '```' .. output .. '```'
-		utilities.send_message(self, self.config.log_chat, output, true, nil, true)
+		utilities.send_message(self, config.log_chat, output, true, nil, true)
 	else
 		print(output)
 	end
@@ -281,24 +281,23 @@ end
 
 utilities.md_escape = utilities.markdown_escape
 
-utilities.INVOCATION_PATTERN = '/'
-
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
 function utilities.triggers_meta:t(pattern, has_args)
 	local username = self.username:lower()
-	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'$')
-	table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'$')
+	table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
+	table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
 	if has_args then
-		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'%s+[^%s]*')
-		table.insert(self.table, '^'..utilities.INVOCATION_PATTERN..pattern..'@'..username..'%s+[^%s]*')
+		table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
+		table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
 	end
 	return self
 end
 
-function utilities.triggers(username, trigger_table)
+function utilities.triggers(username, cmd_pat, trigger_table)
 	local self = setmetatable({}, utilities.triggers_meta)
 	self.username = username
+	self.cmd_pat = cmd_pat
 	self.table = trigger_table or {}
 	return self
 end

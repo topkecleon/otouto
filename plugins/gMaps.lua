@@ -4,17 +4,17 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 gMaps.command = 'location <query>'
-gMaps.doc = [[```
-/location <query>
-Returns a location from Google Maps.
-Alias: /loc
-```]]
 
-function gMaps:init()
-	gMaps.triggers = utilities.triggers(self.info.username):t('location', true):t('loc', true).table
+function gMaps:init(config)
+	gMaps.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('location', true):t('loc', true).table
+	gMaps.doc = [[```
+]]..config.cmd_pat..[[location <query>
+Returns a location from Google Maps.
+Alias: ]]..config.cmd_pat..[[loc
+```]]
 end
 
-function gMaps:action(msg)
+function gMaps:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
@@ -26,7 +26,7 @@ function gMaps:action(msg)
 		end
 	end
 
-	local coords = utilities.get_coords(self, input)
+	local coords = utilities.get_coords(input, config)
 	if type(coords) == 'string' then
 		utilities.send_reply(self, msg, coords)
 		return

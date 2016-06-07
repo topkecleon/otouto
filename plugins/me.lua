@@ -2,15 +2,15 @@ local me = {}
 
 local utilities = require('utilities')
 
-function me:init()
-	me.triggers = utilities.triggers(self.info.username):t('me', true).table
+function me:init(config)
+	me.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('me', true).table
 end
 
-function me:action(msg)
+function me:action(msg, config)
 
 	local target = self.database.users[msg.from.id_str]
 
-	if msg.from.id == self.config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
+	if msg.from.id == config.admin and (msg.reply_to_message or utilities.input(msg.text)) then
 		target = utilities.user_from_message(self, msg, true)
 		if target.err then
 			utilities.send_reply(self, msg, target.err)

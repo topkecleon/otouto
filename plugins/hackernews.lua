@@ -6,22 +6,22 @@ local bindings = require('bindings')
 local utilities = require('utilities')
 
 hackernews.command = 'hackernews'
-hackernews.doc = [[```
-Returns four (if group) or eight (if private message) top stories from Hacker News.
-Alias: /hn
-```]]
 
-function hackernews:init()
-	hackernews.triggers = utilities.triggers(self.info.username):t('hackernews', true):t('hn', true).table
+function hackernews:init(config)
+	hackernews.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hackernews', true):t('hn', true).table
+	hackernews.doc = [[```
+Returns four (if group) or eight (if private message) top stories from Hacker News.
+Alias: ]]..config.cmd_pat..[[hn
+```]]
 end
 
-function hackernews:action(msg)
+function hackernews:action(msg, config)
 
 	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
 
 	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
 	if res ~= 200 then
-		utilities.send_reply(self, msg, self.config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
@@ -37,7 +37,7 @@ function hackernews:action(msg)
 		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
 		jstr, res = HTTPS.request(res_url)
 		if res ~= 200 then
-			utilities.send_reply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, config.errors.connection)
 			return
 		end
 		local res_jdat = JSON.decode(jstr)
@@ -47,7 +47,7 @@ function hackernews:action(msg)
 		end
 		local url = res_jdat.url
 		if not url then
-			utilities.send_reply(self, msg, self.config.errors.connection)
+			utilities.send_reply(self, msg, config.errors.connection)
 			return
 		end
 		if url:find('%(') then
