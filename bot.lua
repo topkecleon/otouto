@@ -4,7 +4,7 @@ local bot = {}
 local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.8'
+bot.version = '3.9'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
