@@ -1,6 +1,6 @@
 local eightball = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 eightball.command = '8ball'
 eightball.doc = '`Returns an answer from a magic 8-ball!`'

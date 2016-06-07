@@ -3,7 +3,7 @@ local urbandictionary = {}
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 urbandictionary.command = 'urbandictionary <query>'
 

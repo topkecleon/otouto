@@ -1,6 +1,6 @@
 local shout = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 shout.command = 'shout <text>'
 

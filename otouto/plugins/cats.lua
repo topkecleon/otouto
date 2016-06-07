@@ -1,7 +1,7 @@
 local cats = {}
 
 local HTTP = require('socket.http')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function cats:init(config)
 	if not config.thecatapi_key then

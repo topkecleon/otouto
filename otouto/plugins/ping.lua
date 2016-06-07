@@ -2,7 +2,7 @@
 
 local ping = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function ping:init(config)
 	ping.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ping'):t('annyong').table

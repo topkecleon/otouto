@@ -1,7 +1,7 @@
 local gMaps = {}
 
-local bindings = require('bindings')
-local utilities = require('utilities')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 gMaps.command = 'location <query>'
 

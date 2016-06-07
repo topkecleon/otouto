@@ -2,7 +2,7 @@ local bible = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function bible:init(config)
 	if not config.biblia_api_key then

@@ -1,6 +1,6 @@
 local dice = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 dice.command = 'roll <nDr>'
 

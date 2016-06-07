@@ -1,6 +1,6 @@
 local patterns = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 patterns.triggers = {
 	'^/?s/.-/.-$'

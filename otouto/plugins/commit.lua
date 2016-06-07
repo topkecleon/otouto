@@ -2,7 +2,7 @@
 
 local commit = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 commit.command = 'commit'
 commit.doc = '`Returns a commit message from whatthecommit.com.`'

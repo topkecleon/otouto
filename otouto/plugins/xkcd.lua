@@ -2,7 +2,7 @@ local xkcd = {}
 
 local HTTP = require('socket.http')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 xkcd.command = 'xkcd [i]'
 

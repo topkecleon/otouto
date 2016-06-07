@@ -2,8 +2,8 @@ local hackernews = {}
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local bindings = require('bindings')
-local utilities = require('utilities')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 hackernews.command = 'hackernews'
 

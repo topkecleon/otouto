@@ -43,8 +43,8 @@
 
 local JSON = require('dkjson')
 local drua = dofile('drua-tg.lua')
-local bindings = require('bindings')
-local utilities = require('utilities')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 local administration = {}
 

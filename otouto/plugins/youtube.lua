@@ -5,7 +5,7 @@ local youtube = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function youtube:init(config)
 	if not config.google_api_key then

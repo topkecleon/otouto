@@ -1,6 +1,6 @@
 local echo = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 echo.command = 'echo <text>'
 

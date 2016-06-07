@@ -2,7 +2,7 @@ local weather = {}
 
 local HTTP = require('socket.http')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function weather:init(config)
 	if not config.owm_api_key then

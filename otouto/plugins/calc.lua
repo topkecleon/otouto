@@ -2,7 +2,7 @@ local calc = {}
 
 local URL = require('socket.url')
 local HTTPS = require('ssl.https')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 calc.command = 'calc <expression>'
 

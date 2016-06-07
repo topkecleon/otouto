@@ -8,8 +8,8 @@ bot.version = '3.9'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
-	bindings = require('bindings')
-	utilities = require('utilities')
+	bindings = require('otouto.bindings')
+	utilities = require('otouto.utilities')
 
 	assert(
 		config.bot_api_key and config.bot_api_key ~= '',
@@ -34,7 +34,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 	self.plugins = {} -- Load plugins.
 	for _,v in ipairs(config.plugins) do
-		local p = require('plugins.'..v)
+		local p = require('otouto.plugins.'..v)
 		table.insert(self.plugins, p)
 		if p.init then p.init(self, config) end
 	end

@@ -3,7 +3,7 @@
 
 local blacklist = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function blacklist:init()
 	if not self.database.blacklist then

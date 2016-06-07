@@ -3,7 +3,7 @@
 
 local help = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 local help_text
 

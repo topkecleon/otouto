@@ -4,7 +4,7 @@ local hearthstone = {}
 
 --local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function hearthstone:init(config)
 	if not self.database.hearthstone or os.time() > self.database.hearthstone.expiration then

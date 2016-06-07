@@ -1,6 +1,6 @@
 local slap = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 slap.command = 'slap [target]'
 

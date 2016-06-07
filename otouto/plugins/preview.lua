@@ -1,7 +1,7 @@
 local preview = {}
 
 local HTTP = require('socket.http')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 preview.command = 'preview <link>'
 

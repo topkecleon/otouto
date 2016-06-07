@@ -1,7 +1,7 @@
 local channel = {}
 
-local bindings = require('bindings')
-local utilities = require('utilities')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 --channel.command = 'ch <channel> \\n <message>'
 channel.doc = [[```

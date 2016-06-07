@@ -3,7 +3,7 @@ local wikipedia = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 wikipedia.command = 'wikipedia <query>'
 

@@ -1,6 +1,6 @@
 local nick = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 nick.command = 'nick <nickname>'
 

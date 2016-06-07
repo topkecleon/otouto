@@ -8,7 +8,7 @@ local ltn12 = require('ltn12')
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local bindings = require('bindings')
+local bindings = require('otouto.bindings')
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.

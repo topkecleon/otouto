@@ -6,7 +6,7 @@ local lastfm = {}
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function lastfm:init(config)
 	if not config.lastfm_api_key then

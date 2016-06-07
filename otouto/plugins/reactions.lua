@@ -8,7 +8,7 @@
 
 local reactions = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 reactions.command = 'reactions'
 reactions.doc = '`Returns a list of "reaction" emoticon commands.`'

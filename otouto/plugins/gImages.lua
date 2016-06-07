@@ -6,7 +6,7 @@ local gImages = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function gImages:init(config)
 	if not config.google_api_key then

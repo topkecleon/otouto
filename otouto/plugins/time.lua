@@ -2,7 +2,7 @@ local time = {}
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 time.command = 'time <location>'
 

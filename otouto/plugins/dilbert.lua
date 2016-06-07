@@ -2,8 +2,8 @@ local dilbert = {}
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
-local bindings = require('bindings')
-local utilities = require('utilities')
+local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 
 dilbert.command = 'dilbert [date]'
 

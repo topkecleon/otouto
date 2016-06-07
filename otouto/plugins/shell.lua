@@ -1,6 +1,6 @@
 local shell = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function shell:init(config)
 	shell.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('run', true).table

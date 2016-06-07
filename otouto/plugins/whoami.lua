@@ -1,6 +1,6 @@
 local whoami = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 whoami.command = 'whoami'
 

@@ -1,7 +1,7 @@
 local currency = {}
 
 local HTTPS = require('ssl.https')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 currency.command = 'cash [amount] <from> to <to>'
 

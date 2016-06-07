@@ -2,7 +2,7 @@
 
 local fortune = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function fortune:init(config)
 	local s = io.popen('fortune'):read('*all')

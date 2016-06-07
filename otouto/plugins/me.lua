@@ -1,6 +1,6 @@
 local me = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function me:init(config)
 	me.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('me', true).table

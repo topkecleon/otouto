@@ -1,6 +1,6 @@
 local remind = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 remind.command = 'remind <duration> <message>'
 

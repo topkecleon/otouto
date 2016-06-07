@@ -1,6 +1,6 @@
 local bandersnatch = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 bandersnatch.command = 'bandersnatch'
 

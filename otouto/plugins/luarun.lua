@@ -1,6 +1,6 @@
 local luarun = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 
@@ -25,9 +25,9 @@ function luarun:action(msg, config)
 	end
 
 	local output = loadstring( [[
-		local bot = require('bot')
-		local bindings = require('bindings')
-		local utilities = require('utilities')
+		local bot = require('otouto.bot')
+		local bindings = require('otouto.bindings')
+		local utilities = require('otouto.utilities')
 		local JSON = require('dkjson')
 		local URL = require('socket.url')
 		local HTTP = require('socket.http')

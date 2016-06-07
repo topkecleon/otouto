@@ -3,7 +3,7 @@ local reddit = {}
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 reddit.command = 'reddit [r/subreddit | query]'
 

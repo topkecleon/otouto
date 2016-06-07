@@ -1,6 +1,6 @@
 local setandget = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function setandget:init(config)
 	self.database.setandget = self.database.setandget or {}

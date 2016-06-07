@@ -1,7 +1,7 @@
 local control = {}
 
-local bot = require('bot')
-local utilities = require('utilities')
+local bot = require('otouto.bot')
+local utilities = require('otouto.utilities')
 
 local cmd_pat -- Prevents the command from being uncallable.
 

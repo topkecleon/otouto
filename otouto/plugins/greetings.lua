@@ -4,7 +4,7 @@
 
 local greetings = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 function greetings:init(config)
 	config.greetings = config.greetings or {

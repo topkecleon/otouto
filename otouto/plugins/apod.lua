@@ -5,7 +5,7 @@ local apod = {}
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local URL = require('socket.url')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 apod.command = 'apod [date]'
 

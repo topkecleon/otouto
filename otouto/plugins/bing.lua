@@ -8,7 +8,7 @@ local JSON = require('dkjson')
 local mime = require('mime')
 local https = require('ssl.https')
 local ltn12 = require('ltn12')
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 bing.command = 'bing <query>'
 bing.doc = [[```

@@ -1,6 +1,6 @@
 local pun = {}
 
-local utilities = require('utilities')
+local utilities = require('otouto.utilities')
 
 pun.command = 'pun'
 pun.doc = '`Returns a pun.`'
