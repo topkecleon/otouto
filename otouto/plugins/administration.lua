@@ -66,7 +66,7 @@ function administration:init(config)
 
 	drua.PORT = config.cli_port or 4567
 
-	administration.init_flags(config.cmd_pat)
+	administration.flags = administration.init_flags(config.cmd_pat)
 	administration.init_command(self, config)
 
 	administration.doc = '`Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.`'
@@ -240,7 +240,7 @@ function administration:get_desc(chat_id, config)
 	if modstring ~= '' then
 		table.insert(t, '*Moderators:*\n' .. utilities.trim(modstring))
 	end
-	table.insert(t, 'Run '..config..'ahelp@' .. self.info.username .. ' for a list of commands.')
+	table.insert(t, 'Run '..config.cmd_pat..'ahelp@' .. self.info.username .. ' for a list of commands.')
 	return table.concat(t, '\n\n')
 
 end
@@ -282,7 +282,6 @@ function administration.init_command(self_, config)
 
 			action = function(self, msg, group, config)
 
-				local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
 				local rank = administration.get_rank(self, msg.from.id, msg.chat.id, config)
 				local user = {}
 

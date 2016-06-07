@@ -19,13 +19,13 @@ Aliases: /g, /google
 
 bing.search_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/Web?Query=\'%s\'&$format=json'
 
-function bing:init()
-	if not self.config.bing_api_key then
+function bing:init(config)
+	if not config.bing_api_key then
 		print('Missing config value: bing_api_key.')
 		print('bing.lua will not be enabled.')
 		return
 	end
-	bing.triggers = utilities.triggers(self.info.username):t('bing', true):t('g', true):t('google', true).table
+	bing.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bing', true):t('g', true):t('google', true).table
 end
 
 function bing:action(msg)

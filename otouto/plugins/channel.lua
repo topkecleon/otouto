@@ -20,8 +20,8 @@ The following markdown syntax is supported:
 Due to the frequent dysfunction and incompletion of the API method used to determine the administrators of a channel, this command may not work for the owners of some channels.
 ```]]
 
-function channel:init()
-	channel.triggers = utilities.triggers(self.info.username):t('ch', true).table
+function channel:init(config)
+	channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
 end
 
 function channel:action(msg)
