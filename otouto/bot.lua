@@ -4,7 +4,7 @@ local bot = {}
 local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.9'
+bot.version = '3.10'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -66,14 +66,21 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 		msg.text_lower = msg.text:lower()
 	end
 
-	for _,v in ipairs(self.plugins) do
-		for _,w in pairs(v.triggers) do
-			if string.match(msg.text_lower, w) then
+	for _, plugin in ipairs(self.plugins) do
+		for _, trigger in pairs(plugin.triggers) do
+			if string.match(msg.text_lower, trigger) then
 				local success, result = pcall(function()
-					return v.action(self, msg, config)
+					return plugin.action(self, msg, config)
 				end)
 				if not success then
-					utilities.send_reply(self, msg, 'Sorry, an unexpected error occurred.')
+					-- If the plugin has an error message, send it. If it does
+					-- not, use the generic one specified in config. If it's set
+					-- to false, do nothing.
+					if plugin.error then
+						utilities.send_reply(self, msg, plugin.error)
+					elseif plugin.error == nil then
+						utilities.send_reply(self, msg, config.errors.generic)
+					end
 					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 					return
 				end

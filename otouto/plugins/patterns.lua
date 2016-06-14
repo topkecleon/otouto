@@ -7,7 +7,7 @@ patterns.triggers = {
 }
 
 function patterns:action(msg)
-	if not msg.reply_to_message then return end
+	if not msg.reply_to_message then return true end
 	local output = msg.reply_to_message.text
 	if msg.reply_to_message.from.id == self.info.id then
 		output = output:gsub('Did you mean:\n"', '')
@@ -22,8 +22,7 @@ function patterns:action(msg)
 		end
 	)
 	if res == false then
-		output = 'Malformed pattern!'
-		utilities.send_reply(self, msg, output)
+		utilities.send_reply(self, msg, 'Malformed pattern!')
 	else
 		output = output:sub(1, 4000)
 		output = 'Did you mean:\n"' .. output .. '"'

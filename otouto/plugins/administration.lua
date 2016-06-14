@@ -71,6 +71,9 @@ function administration:init(config)
 
 	administration.doc = '`Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.`'
 
+	-- In the worst case, don't send errors in reply to random messages.
+	administration.error = false
+
 end
 
 function administration.init_flags(cmd_pat) return {
@@ -263,9 +266,9 @@ function administration:kick_user(chat, target, reason, config)
 	local victim = target
 	if self.database.users[tostring(target)] then
 		victim = utilities.build_name(
-			self.database.users[tostring(target)].first_name,
-			self.database.users[tostring(target)].last_name
-		)
+				self.database.users[tostring(target)].first_name,
+				self.database.users[tostring(target)].last_name
+			) .. ' [' .. victim .. ']'
 	end
 	local group = self.database.administration.groups[tostring(chat)].name
 	utilities.handle_exception(self, victim..' kicked from '..group, reason, config)
@@ -917,7 +920,9 @@ function administration.init_command(self_, config)
 				if input then
 					input = utilities.get_word(input, 1)
 					input = tonumber(input)
-					if not input or not administration.flags[input] then input = false end
+					if not input or not administration.flags[input] then
+						input = false
+					end
 				end
 				if not input then
 					local output = '*Flags for ' .. msg.chat.title .. ':*\n'
@@ -1209,7 +1214,9 @@ function administration.init_command(self_, config)
 			doc = 'Adds a group to the administration system. Pass numbers as arguments to enable those flags immediately. For example, this would add the group and enable the unlisted flag, antibot, and antiflood:\n/gadd 1 4 5',
 
 			action = function(self, msg, group, config)
-				if self.database.administration.groups[msg.chat.id_str] then
+				if msg.chat.id == msg.from.id then
+					utilities.send_message(self, msg.chat.id, 'No.')
+				elseif self.database.administration.groups[msg.chat.id_str] then
 					utilities.send_reply(self, msg, 'I am already administrating this group.')
 				else
 					local flags = {}
@@ -1326,6 +1333,18 @@ function administration.init_command(self_, config)
 						utilities.send_message(self, id, input, true, nil, true)
 					end
 				end
+			end
+		},
+
+		{ -- /buildwall :^)
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('buildwall').table,
+			privilege = 3,
+			interior = true,
+			action = function(self, msg, group, config)
+				for i = 2, 5 do
+					group.flags[i] = true
+				end
+				utilities.send_message(self, msg.chat.id, 'antisquig, antisquig++, antibot, and antiflood have been enabled.')
 			end
 		}
 

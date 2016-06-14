@@ -43,7 +43,8 @@ Send /help to get started.
 	simsimi_key = '',
 	simsimi_trial = true,
 
-	errors = { -- Generic error messages used in various plugins.
+	errors = { -- Generic error messages.
+		generic = 'An unexpected error occurred.',
 		connection = 'Connection error.',
 		results = 'No results found.',
 		argument = 'Invalid argument.',
