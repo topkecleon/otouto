@@ -30,7 +30,7 @@ function shout:action(msg)
 	local inc = 0
 	local ilen = 0
 	for match in input:gmatch(utilities.char.utf_8) do
-		if ilen < 18 then
+		if ilen < 20 then
 			ilen = ilen + 1
 			output = output .. match .. ' '
 		end
@@ -38,7 +38,7 @@ function shout:action(msg)
 	ilen = 0
 	output = output .. '\n'
 	for match in input:sub(2):gmatch(utilities.char.utf_8) do
-		if ilen < 18 then
+		if ilen < 19 then
 			local spacing = ''
 			for _ = 1, inc do
 				spacing = spacing .. '  '
