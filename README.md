@@ -11,11 +11,10 @@ otouto is free software; you are free to redistribute it and/or modify it under 
 
 | For Users                                     | For Coders                    |
 |:----------------------------------------------|:------------------------------|
-| [Setup](#setup)                               | [Introduction](#introduction) |
-| [Control plugins](#control-plugins)           | [Plugins](#plugins)           |
-| [Group Administration](#group-administration) | [Bindings](#bindings)         |
-| [List of plugins](#list-of-plugins)           | [Output style](#output-style) |
-|                                               | [Contributors](#contributors) |
+| [Setup](#setup)                               | [Plugins](#plugins)           |
+| [Control plugins](#control-plugins)           | [Bindings](#bindings)         |
+| [Group Administration](#group-administration) | [Output style](#output-style) |
+| [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
 
 ## Setup
 You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
@@ -194,9 +193,6 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 
 * * *
 
-## Introduction
-####todo
-
 ## Plugins
 otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot).
 
@@ -204,14 +200,15 @@ Most plugins are intended for public use, but a few are for other purposes, like
 
 A plugin can have five components, and two of them are required:
 
-| Component       | Description                                  | Required? |
-|:----------------|:---------------------------------------------|:----------|
-| plugin:action   | Main function. Expects `msg` table as an argument.   | Y |
-| plugin.triggers | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| plugin:init     | Optional function run when the plugin is loaded.     | N |
-| plugin:cron     | Optional function to be called every minute.         | N |
-| plugin.command  | Basic command and syntax. Listed in the help text.   | N |
-| plugin.doc      | Usage for the plugin. Returned by "/help $command".  | N |
+| Component         | Description                                  | Required? |
+|:------------------|:---------------------------------------------|:----------|
+| `plugin:action`   | Main function. Expects `msg` table as an argument.   | Y |
+| `plugin.triggers` | Table of triggers for the plugin. Uses Lua patterns. | Y |
+| `plugin:init`     | Optional function run when the plugin is loaded.     | N |
+| `plugin:cron`     | Optional function to be called every minute.         | N |
+| `plugin.command`  | Basic command and syntax. Listed in the help text.   | N |
+| `plugin.doc`      | Usage for the plugin. Returned by "/help $command".  | N |
+| `plugin.error`    | Plugin-specific error message; false for no message. | N |
 
 The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 

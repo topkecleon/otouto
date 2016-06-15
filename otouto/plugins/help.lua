@@ -39,7 +39,7 @@ function help:action(msg)
 	if not input then
 		local res = utilities.send_message(self, msg.from.id, help_text, true, nil, true)
 		if not res then
-			utilities.send_reply(self, msg, 'Please message me privately or [click here](http://telegram.me/' .. self.info.username .. '?start=help) for a list of commands.', true)
+			utilities.send_reply(self, msg, 'Please [message me privately](http://telegram.me/' .. self.info.username .. '?start=help) for a list of commands.', true)
 		elseif msg.chat.type ~= 'private' then
 			utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
 		end
