@@ -46,7 +46,7 @@ function control:action(msg, config)
 		for command in input:gmatch('(.-)\n') do
 			command = utilities.trim(command)
 			msg.text = command
-			bot.on_msg_receive(self, msg)
+			bot.on_msg_receive(self, msg, config)
 		end
 	end
 

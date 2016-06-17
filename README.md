@@ -16,6 +16,8 @@ otouto is free software; you are free to redistribute it and/or modify it under 
 | [Group Administration](#group-administration) | [Output style](#output-style) |
 | [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
 
+* * *
+
 ## Setup
 You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
 
@@ -190,6 +192,7 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 | `patterns.lua`        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                            |
 | `me.lua`              | /me                           | Returns user-specific data stored by the bot.                     |
 | `remind.lua`          | /remind <duration> <message>  | Reminds a user of something after a duration of minutes.          |
+| `channel.lua`         | /ch <channel> \n <message>    | Sends a markdown-enabled message to a channel.                    |
 
 * * *
 
@@ -284,7 +287,7 @@ Title lines should be **bold**, including any names and trailing punctuation (su
 
 > **Star Wars: Episode IV - A New Hope (1977)**
 >
-> **Search results for** _star wars_**:**
+> **Search results for** _star wars_ **:**
 >
 > **Changelog for otouto (**[Github](http://github.com/topkecleon/otouto)**):**
 
