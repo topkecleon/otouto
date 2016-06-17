@@ -24,25 +24,29 @@ function shout:action(msg)
 		end
 	end
 	input = utilities.trim(input)
-
-	if input:len() > 20 then
-		input = input:sub(1,20)
-	end
-
 	input = input:upper()
+
 	local output = ''
 	local inc = 0
-	for match in input:gmatch('([%z\1-\127\194-\244][\128-\191]*)') do
-		output = output .. match .. ' '
-	end
-	output = output .. '\n'
-	for match in input:sub(2):gmatch('([%z\1-\127\194-\244][\128-\191]*)') do
-		local spacing = ''
-		for _ = 1, inc do
-			spacing = spacing .. '  '
+	local ilen = 0
+	for match in input:gmatch(utilities.char.utf_8) do
+		if ilen < 20 then
+			ilen = ilen + 1
+			output = output .. match .. ' '
 		end
-		inc = inc + 1
-		output = output .. match .. ' ' .. spacing .. match .. '\n'
+	end
+	ilen = 0
+	output = output .. '\n'
+	for match in input:sub(2):gmatch(utilities.char.utf_8) do
+		if ilen < 19 then
+			local spacing = ''
+			for _ = 1, inc do
+				spacing = spacing .. '  '
+			end
+			inc = inc + 1
+			ilen = ilen + 1
+			output = output .. match .. ' ' .. spacing .. match .. '\n'
+		end
 	end
 	output = '```\n' .. utilities.trim(output) .. '\n```'
 	utilities.send_message(self, msg.chat.id, output, true, false, true)

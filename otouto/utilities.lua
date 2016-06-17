@@ -370,7 +370,8 @@ utilities.char = {
 	arabic = '[\216-\219][\128-\191]',
 	rtl_override = '‮',
 	rtl_mark = '‏',
-	em_dash = '—'
+	em_dash = '—',
+	utf_8 = '([%z\1-\127\194-\244][\128-\191]*)',
 }
 
 return utilities
