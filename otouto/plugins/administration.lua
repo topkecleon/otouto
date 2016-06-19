@@ -898,7 +898,7 @@ function administration.init_command(self_, config)
 			interior = true,
 			doc = 'Returns a list of administrators. Owner is denoted with a star character.',
 
-			action = function(self, msg, config)
+			action = function(self, msg, _, config)
 				local output = '*Administrators:*\n'
 				output = output .. administration.mod_format(self, config.admin):gsub('\n', ' ★\n')
 				for id,_ in pairs(self.database.administration.admins) do
