@@ -1,6 +1,6 @@
 --[[
 	administration.lua
-	Version 1.10
+	Version 1.10.5
 	Part of the otouto project.
 	© 2016 topkecleon <drew@otou.to>
 	GNU General Public License, version 2
@@ -12,19 +12,6 @@
 	Remember to load this before blacklist.lua.
 
 	Important notices about updates will be here!
-
-	1.9 - Added flag antihammer. Groups with antihammer enabled will not be
-	 affected by global bans. However, users who are hammer'd from an anti-
-	 hammer group will also be banned locally. Added autobanning after (default)
-	 3 autokicks. Threshold onfigurable with antiflood. Autokick counters reset
-	 within twenty-four hours. Merged antisquig action into generic. There is no
-	 automatic migration; simply add the following to database.administration:
-		autokick_timer = 0
-		groups[*].flags[6] = false
-		groups[*].autoban = 3
-		groups[*].autokicks = {}b
-
-	1.9.1 - Returned to non-toggled promotions/bans (too many complaints!).
 
 	1.10 - Added /ahelp $command support. No migration required. All actions
 	 have been reworked to be more elegant. Style has been slightly changed (no
@@ -41,6 +28,9 @@
 
 	1.10.4 - Kick notifications now include user IDs. Errors are silenced.
 	 /flags can now be used with multiple arguments, similar to /gadd.
+
+	1.10.5 - /groups now supports searching for groups. /setqotd can set a
+	 quoted MOTD.
 
 ]]--
 
@@ -489,29 +479,33 @@ function administration.init_command(self_, config)
 		},
 
 		{ -- /groups
-			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('groups').table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('groups', true).table,
 
-			command = 'groups',
+			command = 'groups \\[query]',
 			privilege = 1,
 			interior = false,
-			doc = 'Returns a list of administrated groups.',
+			doc = 'Returns a list of groups matching the query, or a list of all administrated groups.',
 
-			action = function(self, msg, group, config)
-				local output = ''
-				for _,v in ipairs(self.database.administration.activity) do
+			action = function(self, msg, _, config)
+				local input = utilities.input(msg.text)
+				local search_res = ''
+				local grouplist = ''
+				for i,v in ipairs(self.database.administration.activity) do
 					local group = self.database.administration.groups[v]
-					if not group.flags[1] then -- no unlisted groups
-						if group.link then
-							output = output ..  '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
-						else
-							output = output ..  '• ' .. group.name .. '\n'
+					if (not group.flags[1]) and group.link then -- no unlisted or unlinked groups
+						grouplist = grouplist .. '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
+						if input and string.match(group.name:lower(), input:lower()) then
+							search_res = search_res .. '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
 						end
 					end
 				end
-				if output == '' then
-					output = 'There are currently no listed groups.'
+				local output
+				if search_res ~= '' then
+					output = '*Groups matching* _' .. input .. '_ *:*\n' .. search_res
+				elseif grouplist ~= '' then
+					output = '*Groups:*\n' .. grouplist
 				else
-					output = '*Groups:*\n' .. output
+					output = 'There are currently no listed groups.'
 				end
 				utilities.send_message(self, msg.chat.id, output, true, nil, true)
 			end
@@ -771,7 +765,7 @@ function administration.init_command(self_, config)
 		},
 
 		{ -- /setmotd
-			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('setmotd', true).table,
+			triggers = utilities.triggers(self_.info.username, config.cmd_pat):t('setmotd', true):t('setqotd', true).table,
 
 			command = 'setmotd <motd>',
 			privilege = 2,
@@ -780,15 +774,19 @@ function administration.init_command(self_, config)
 
 			action = function(self, msg, group, config)
 				local input = utilities.input(msg.text)
-				if not input and msg.reply_to_message and msg.reply_to_message.text:len() > 0 then
+				local quoted = msg.from.name
+				if msg.reply_to_message and #msg.reply_to_message.text > 0 then
 					input = msg.reply_to_message.text
+					quoted = msg.reply_to_message.from.name
 				end
 				if input then
 					if input == '--' or input == utilities.char.em_dash then
 						group.motd = nil
 						utilities.send_reply(self, msg, 'The MOTD has been cleared.')
 					else
-						input = utilities.trim(input)
+						if msg.text:match('^/setqotd') then
+							input = '_' .. utilities.md_escape(input) .. '_\n - ' .. utilities.md_escape(quoted)
+						end
 						group.motd = input
 						local output = '*MOTD for ' .. msg.chat.title .. ':*\n' .. input
 						utilities.send_message(self, msg.chat.id, output, true, nil, true)

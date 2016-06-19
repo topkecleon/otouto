@@ -16,13 +16,15 @@ function about:action(msg, config)
 	-- other plugins.
 	if msg.forward_from then return end
 
-	local output = config.about_text .. '\nBased on otouto v'..bot.version..' by topkecleon.'
+	local output = config.about_text .. '\nBased on [otouto](http://github.com/topkecleon/otouto) v'..bot.version..' by topkecleon.'
 
-	if (msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
+	if
+		(msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
 		or msg.text_lower:match('^'..config.cmd_pat..'about')
 		or msg.text_lower:match('^'..config.cmd_pat..'about@'..self.info.username:lower())
-	or msg.text_lower:match('^'..config.cmd_pat..'start') then
-		utilities.send_message(self, msg.chat.id, output, true)
+		or msg.text_lower:match('^'..config.cmd_pat..'start')
+	then
+		utilities.send_message(self, msg.chat.id, output, true, nil, true)
 		return
 	end
 
