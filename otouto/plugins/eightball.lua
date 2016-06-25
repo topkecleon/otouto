@@ -41,12 +41,26 @@ local yesno_answers = {
 	'No.'
 }
 
+local yes_answers = {
+	'Absolutely.',
+	'Yes.'
+}
+
+local no_answers = {
+	'In your dreams.',
+	'No.'
+}
+
 function eightball:action(msg)
 
 	local output
 
-	if msg.text_lower:match('y/n%p?$') then
+	if msg.text:match('y/n%p?$') or msg.text:match('Y/N%p?$') then
 		output = yesno_answers[math.random(#yesno_answers)]
+	elseif msg.text:match('Y/n%p?$') then
+		output = yes_answers[math.random(#yes_answers)]
+	elseif msg.text:match('y/N%p?$') then
+		output = no_answers[math.random(#no_answers)]
 	else
 		output = ball_answers[math.random(#ball_answers)]
 	end
