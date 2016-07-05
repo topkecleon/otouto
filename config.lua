@@ -20,6 +20,8 @@ Send /help to get started.
 	]],
 	-- The symbol that starts a command. Usually noted as '/' in documentation.
 	cmd_pat = '/',
+	-- If drua is used, should a user be blocked when he's blacklisted? (and vice-versa)
+	drua_block_on_blacklist = false,
 
 	-- https://datamarket.azure.com/dataset/bing/search
 	bing_api_key = '',

@@ -1,6 +1,7 @@
 local weather = {}
 
 local HTTP = require('socket.http')
+HTTP.TIMEOUT = 2
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 

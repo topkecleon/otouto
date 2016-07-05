@@ -30,6 +30,8 @@ lastfm.command = 'lastfm'
 function lastfm:action(msg, config)
 
 	local input = utilities.input(msg.text)
+	local from_id_str = tostring(msg.from.id)
+	self.database.userdata[from_id_str] = self.database.userdata[from_id_str] or {}
 
 	if string.match(msg.text, '^'..config.cmd_pat..'lastfm') then
 		utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
@@ -38,10 +40,10 @@ function lastfm:action(msg, config)
 		if not input then
 			utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
 		elseif input == '--' or input == utilities.char.em_dash then
-			self.database.users[msg.from.id_str].lastfm = nil
+			self.database.userdata[from_id_str].lastfm = nil
 			utilities.send_reply(self, msg, 'Your last.fm username has been forgotten.')
 		else
-			self.database.users[msg.from.id_str].lastfm = input
+			self.database.userdata[from_id_str].lastfm = input
 			utilities.send_reply(self, msg, 'Your last.fm username has been set to "' .. input .. '".')
 		end
 		return
@@ -53,12 +55,12 @@ function lastfm:action(msg, config)
 	local alert = ''
 	if input then
 		username = input
-	elseif self.database.users[msg.from.id_str].lastfm then
-		username = self.database.users[msg.from.id_str].lastfm
+	elseif self.database.userdata[from_id_str].lastfm then
+		username = self.database.userdata[from_id_str].lastfm
 	elseif msg.from.username then
 		username = msg.from.username
 		alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..config.cmd_pat..'fmset <username>.'
-		self.database.users[msg.from.id_str].lastfm = username
+		self.database.userdata[from_id_str].lastfm = username
 	else
 		utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
 		return

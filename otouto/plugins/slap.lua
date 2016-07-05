@@ -61,7 +61,7 @@ local slaps = {
 	'VICTIM died. I blame VICTOR.',
 	'VICTIM was axe-murdered by VICTOR.',
 	'VICTIM\'s melon was split by VICTOR.',
-	'VICTIM was slice and diced by VICTOR.',
+	'VICTIM was sliced and diced by VICTOR.',
 	'VICTIM was split from crotch to sternum by VICTOR.',
 	'VICTIM\'s death put another notch in VICTOR\'s axe.',
 	'VICTIM died impossibly!',
@@ -102,29 +102,52 @@ local slaps = {
 	'VICTIM was impeached.',
 	'VICTIM was one-hit KO\'d by VICTOR.',
 	'VICTOR sent VICTIM to /dev/null.',
-	'VICTOR sent VICTIM down the memory hole.'
+	'VICTOR sent VICTIM down the memory hole.',
+	'VICTIM was a mistake.',
+	'"VICTIM was a mistake." - VICTOR',
+	'VICTOR checkmated VICTIM in two moves.'
 }
 
+ -- optimize later
 function slap:action(msg)
-
-	local victor = self.database.users[msg.from.id_str]
-	local victim = utilities.user_from_message(self, msg, true)
 	local input = utilities.input(msg.text)
-
-	local victim_name = victim.nickname or victim.first_name or input
-	local victor_name = victor.nickname or victor.first_name
-	if not victim_name or victim_name == victor_name then
-		victim_name = victor_name
+	local victor_id = msg.from.id
+	local victim_id = utilities.id_from_message(self, msg)
+	-- IDs
+	if victim_id then
+		if victim_id == victor_id then
+			victor_id = self.info.id
+		end
+	else
+		if not input then
+			victor_id = self.info.id
+			victim_id = msg.from.id
+		end
+	end
+	-- Names
+	local victor_name, victim_name
+	if input and not victim_id then
+		victim_name = input
+	else
+		local victim_id_str = tostring(victim_id)
+		if self.database.userdata[victim_id_str] and self.database.userdata[victim_id_str].nickname then
+			victim_name = self.database.userdata[victim_id_str].nickname
+		elseif self.database.users[victim_id_str] then
+			victim_name = utilities.build_name(self.database.users[victim_id_str].first_name, self.database.users[victim_id_str].last_name)
+		else
+			victim_name = victim_id_str
+		end
+	end
+	local victor_id_str = tostring(victor_id)
+	if self.database.userdata[victor_id_str] and self.database.userdata[victor_id_str].nickname then
+		victor_name = self.database.userdata[victor_id_str].nickname
+	elseif self.database.users[victor_id_str] then
+		victor_name = utilities.build_name(self.database.users[victor_id_str].first_name, self.database.users[victor_id_str].last_name)
+	else
 		victor_name = self.info.first_name
 	end
-
-	local output = slaps[math.random(#slaps)]
-	output = output:gsub('VICTIM', victim_name)
-	output = output:gsub('VICTOR', victor_name)
-	output = utilities.char.zwnj .. output
-
+	local output = utilities.char.zwnj .. slaps[math.random(#slaps)]:gsub('VICTIM', victim_name):gsub('VICTOR', victor_name)
 	utilities.send_message(self, msg.chat.id, output)
-
 end
 
 return slap

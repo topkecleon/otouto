@@ -41,12 +41,16 @@ end
 
 function greetings:action(msg, config)
 
-	local nick = self.database.users[msg.from.id_str].nickname or msg.from.first_name
+	local nick = utilities.build_name(msg.from.first_name, msg.from.last_name)
+	if self.database.userdata[tostring(msg.from.id)] then
+		nick = self.database.userdata[tostring(msg.from.id)].nickname or nick
+	end
 
 	for trigger,responses in pairs(config.greetings) do
 		for _,response in pairs(responses) do
 			if msg.text_lower:match(response..',? '..self.info.first_name:lower()) then
-				utilities.send_message(self, msg.chat.id, utilities.latcyr(trigger:gsub('#NAME', nick)))
+				local output = utilities.char.zwnj .. trigger:gsub('#NAME', nick)
+				utilities.send_message(self, msg.chat.id, output)
 				return
 			end
 		end

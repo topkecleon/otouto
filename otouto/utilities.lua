@@ -73,47 +73,10 @@ function utilities.utf8_len(s)
     return chars
 end
 
- -- I swear, I copied this from PIL, not yago! :)
-function utilities.trim(str) -- Trims whitespace from a string.
+ -- Trims whitespace from a string.
+function utilities.trim(str)
 	local s = str:gsub('^%s*(.-)%s*$', '%1')
 	return s
-end
-
-local lc_list = {
--- Latin = 'Cyrillic'
-	['A'] = 'А',
-	['B'] = 'В',
-	['C'] = 'С',
-	['E'] = 'Е',
-	['I'] = 'І',
-	['J'] = 'Ј',
-	['K'] = 'К',
-	['M'] = 'М',
-	['H'] = 'Н',
-	['O'] = 'О',
-	['P'] = 'Р',
-	['S'] = 'Ѕ',
-	['T'] = 'Т',
-	['X'] = 'Х',
-	['Y'] = 'Ү',
-	['a'] = 'а',
-	['c'] = 'с',
-	['e'] = 'е',
-	['i'] = 'і',
-	['j'] = 'ј',
-	['o'] = 'о',
-	['s'] = 'ѕ',
-	['x'] = 'х',
-	['y'] = 'у',
-	['!'] = 'ǃ'
-}
-
- -- Replaces letters with corresponding Cyrillic characters.
-function utilities.latcyr(str)
-	for k,v in pairs(lc_list) do
-		str = str:gsub(k, v)
-	end
-	return str
 end
 
  -- Loads a JSON file as a table.
@@ -179,9 +142,41 @@ end
 
 function utilities:resolve_username(input)
 	input = input:gsub('^@', '')
-	for _,v in pairs(self.database.users) do
-		if v.username and v.username:lower() == input:lower() then
-			return v
+	for _, user in pairs(self.database.users) do
+		if user.username and user.username:lower() == input:lower() then
+			local t = {}
+			for key, val in pairs(user) do
+				t[key] = val
+			end
+			return t
+		end
+	end
+end
+
+ -- Simpler than above function; only returns an ID.
+ -- Returns nil if no ID is available.
+function utilities:id_from_username(input)
+	input = input:gsub('^@', '')
+	for _, user in pairs(self.database.users) do
+		if user.username and user.username:lower() == input:lower() then
+			return user.id
+		end
+	end
+end
+
+ -- Simpler than below function; only returns an ID.
+ -- Returns nil if no ID is available.
+function utilities:id_from_message(msg)
+	if msg.reply_to_message then
+		return msg.reply_to_message.from.id
+	else
+		local input = utilities.input(msg.text)
+		if input then
+			if tonumber(input) then
+				return tonumber(input)
+			elseif input:match('^@') then
+				return utilities.id_from_username(self, input)
+			end
 		end
 	end
 end
@@ -309,57 +304,11 @@ function utilities.with_http_timeout(timeout, fun)
 	HTTP.TIMEOUT = original
 end
 
-function utilities.enrich_user(user)
-	user.id_str = tostring(user.id)
-	user.name = utilities.build_name(user.first_name, user.last_name)
-	return user
-end
-
-function utilities.enrich_message(msg)
-	if not msg.text then msg.text = msg.caption or '' end
-	msg.text_lower = msg.text:lower()
-	msg.from = utilities.enrich_user(msg.from)
-	msg.chat.id_str = tostring(msg.chat.id)
-	if msg.reply_to_message then
-		if not msg.reply_to_message.text then
-			msg.reply_to_message.text = msg.reply_to_message.caption or ''
-		end
-		msg.reply_to_message.text_lower = msg.reply_to_message.text:lower()
-		msg.reply_to_message.from = utilities.enrich_user(msg.reply_to_message.from)
-		msg.reply_to_message.chat.id_str = tostring(msg.reply_to_message.chat.id)
-	end
-	if msg.forward_from then
-		msg.forward_from = utilities.enrich_user(msg.forward_from)
-	end
-	if msg.new_chat_participant then
-		msg.new_chat_participant = utilities.enrich_user(msg.new_chat_participant)
-	end
-	if msg.left_chat_participant then
-		msg.left_chat_participant = utilities.enrich_user(msg.left_chat_participant)
-	end
-	return msg
-end
-
 function utilities.pretty_float(x)
 	if x % 1 == 0 then
 		return tostring(math.floor(x))
 	else
 		return tostring(x)
-	end
-end
-
-function utilities:create_user_entry(user)
-	local id = tostring(user.id)
-	-- Clear things that may no longer exist, or create a user entry.
-	if self.database.users[id] then
-		self.database.users[id].username = nil
-		self.database.users[id].last_name = nil
-	else
-		self.database.users[id] = {}
-	end
-	-- Add all the user info to the entry.
-	for k,v in pairs(user) do
-		self.database.users[id][k] = v
 	end
 end
 

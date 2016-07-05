@@ -151,4 +151,12 @@ drua.channel_set_about = function(chat, text)
 	return drua.send(command)
 end
 
+drua.block = function(user)
+	return drua.send('block_user user#' .. user)
+end
+
+drua.unblock = function(user)
+	return drua.send('unblock_user user#' .. user)
+end
+
 return drua

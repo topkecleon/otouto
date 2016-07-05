@@ -17,8 +17,8 @@ blacklist.triggers = {
 
 function blacklist:action(msg, config)
 
-	if self.database.blacklist[msg.from.id_str] then return end
-	if self.database.blacklist[msg.chat.id_str] then return end
+	if self.database.blacklist[tostring(msg.from.id)] then return end
+	if self.database.blacklist[tostring(msg.chat.id)] then return end
 	if not msg.text:match('^'..config.cmd_pat..'blacklist') then return true end
 	if msg.from.id ~= config.admin then return end
 
@@ -35,9 +35,15 @@ function blacklist:action(msg, config)
 	if self.database.blacklist[tostring(target.id)] then
 		self.database.blacklist[tostring(target.id)] = nil
 		utilities.send_reply(self, msg, target.name .. ' has been removed from the blacklist.')
+		if config.drua_block_on_blacklist then
+			require('drua-tg').unblock(target.id)
+		end
 	else
 		self.database.blacklist[tostring(target.id)] = true
 		utilities.send_reply(self, msg, target.name .. ' has been added to the blacklist.')
+		if config.drua_block_on_blacklist then
+			require('drua-tg').block(target.id)
+		end
 	end
 
  end

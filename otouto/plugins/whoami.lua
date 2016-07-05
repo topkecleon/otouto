@@ -16,8 +16,9 @@ function whoami:action(msg)
 
 	if msg.reply_to_message then
 		msg = msg.reply_to_message
-		msg.from.name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 	end
+
+	local from_name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 
 	local chat_id = math.abs(msg.chat.id)
 	if chat_id > 1000000000000 then
@@ -26,10 +27,10 @@ function whoami:action(msg)
 
 	local user = 'You are @%s, also known as *%s* `[%s]`'
 	if msg.from.username then
-		user = user:format(utilities.markdown_escape(msg.from.username), msg.from.name, msg.from.id)
+		user = user:format(utilities.markdown_escape(msg.from.username), from_name, msg.from.id)
 	else
 		user = 'You are *%s* `[%s]`,'
-		user = user:format(msg.from.name, msg.from.id)
+		user = user:format(from_name, msg.from.id)
 	end
 
 	local group = '@%s, also known as *%s* `[%s]`.'

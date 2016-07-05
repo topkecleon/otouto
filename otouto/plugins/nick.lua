@@ -14,34 +14,35 @@ end
 
 function nick:action(msg, config)
 
-	local target = msg.from
+	local id_str, name
 
 	if msg.from.id == config.admin and msg.reply_to_message then
-		target = msg.reply_to_message.from
-		target.id_str = tostring(target.id)
-		target.name = target.first_name
-		if target.last_name then
-			target.name = target.first_name .. ' ' .. target.last_name
-		end
+		id_str = tostring(msg.reply_to_message.from.id)
+		name = utilities.build_name(msg.reply_to_message.from.first_name, msg.reply_to_message.from.last_name)
+	else
+		id_str = tostring(msg.from.id)
+		name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 	end
+
+	self.database.userdata[id_str] = self.database.userdata[id_str] or {}
 
 	local output
 	local input = utilities.input(msg.text)
 	if not input then
-		if self.database.users[target.id_str].nickname then
-			output = target.name .. '\'s nickname is "' .. self.database.users[target.id_str].nickname .. '".'
+		if self.database.userdata[id_str].nickname then
+			output = name .. '\'s nickname is "' .. self.database.userdata[id_str].nickname .. '".'
 		else
-			output = target.name .. ' currently has no nickname.'
+			output = name .. ' currently has no nickname.'
 		end
 	elseif utilities.utf8_len(input) > 32 then
 		output = 'The character limit for nicknames is 32.'
 	elseif input == '--' or input == utilities.char.em_dash then
-		self.database.users[target.id_str].nickname = nil
-		output = target.name .. '\'s nickname has been deleted.'
+		self.database.userdata[id_str].nickname = nil
+		output = name .. '\'s nickname has been deleted.'
 	else
 		input = input:gsub('\n', ' ')
-		self.database.users[target.id_str].nickname = input
-		output = target.name .. '\'s nickname has been set to "' .. input .. '".'
+		self.database.userdata[id_str].nickname = input
+		output = name .. '\'s nickname has been set to "' .. input .. '".'
 	end
 
 	utilities.send_reply(self, msg, output)

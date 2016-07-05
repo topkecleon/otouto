@@ -17,7 +17,7 @@ function control:action(msg, config)
 		return
 	end
 
-	if msg.date < os.time() - 1 then return end
+	if msg.date < os.time() - 2 then return end
 
 	if msg.text_lower:match('^'..cmd_pat..'reload') then
 		for pac, _ in pairs(package.loaded) do

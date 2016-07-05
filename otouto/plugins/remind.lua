@@ -40,13 +40,14 @@ function remind:action(msg)
 		utilities.send_message(self, msg.chat.id, remind.doc, true, msg.message_id, true)
 		return
 	end
+	local chat_id_str = tostring(msg.chat.id)
 	-- Make a database entry for the group/user if one does not exist.
-	self.database.reminders[msg.chat.id_str] = self.database.reminders[msg.chat.id_str] or {}
+	self.database.reminders[chat_id_str] = self.database.reminders[chat_id_str] or {}
 	-- Limit group reminders to 10 and private reminders to 50.
-	if msg.chat.type ~= 'private' and utilities.table_size(self.database.reminders[msg.chat.id_str]) > 9 then
+	if msg.chat.type ~= 'private' and utilities.table_size(self.database.reminders[chat_id_str]) > 9 then
 		utilities.send_reply(self, msg, 'Sorry, this group already has ten reminders.')
 		return
-	elseif msg.chat.type == 'private' and utilities.table_size(self.database.reminders[msg.chat.id_str]) > 49 then
+	elseif msg.chat.type == 'private' and utilities.table_size(self.database.reminders[chat_id_str]) > 49 then
 		utilities.send_reply(msg, 'Sorry, you already have fifty reminders.')
 		return
 	end
@@ -55,7 +56,7 @@ function remind:action(msg)
 		time = os.time() + duration * 60,
 		message = message
 	}
-	table.insert(self.database.reminders[msg.chat.id_str], reminder)
+	table.insert(self.database.reminders[chat_id_str], reminder)
 	local output = 'I will remind you in ' .. duration
 	if duration == 1 then
 		output = output .. ' minute!'

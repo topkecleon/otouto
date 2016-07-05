@@ -13,8 +13,9 @@ otouto is free software; you are free to redistribute it and/or modify it under 
 |:----------------------------------------------|:------------------------------|
 | [Setup](#setup)                               | [Plugins](#plugins)           |
 | [Control plugins](#control-plugins)           | [Bindings](#bindings)         |
-| [Group Administration](#group-administration) | [Output style](#output-style) |
-| [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
+| [Group administration](#group-administration) | [Database](#database)         |
+| [List of plugins](#list-of-plugins)           | [Output style](#output-style) |
+|                                               | [Contributors](#contributors) |
 
 * * *
 
@@ -201,21 +202,22 @@ otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://git
 
 Most plugins are intended for public use, but a few are for other purposes, like those for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
 
-A plugin can have five components, and two of them are required:
+There are five standard plugin components.
 
-| Component         | Description                                  | Required? |
-|:------------------|:---------------------------------------------|:----------|
-| `plugin:action`   | Main function. Expects `msg` table as an argument.   | Y |
-| `plugin.triggers` | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| `plugin:init`     | Optional function run when the plugin is loaded.     | N |
-| `plugin:cron`     | Optional function to be called every minute.         | N |
-| `plugin.command`  | Basic command and syntax. Listed in the help text.   | N |
-| `plugin.doc`      | Usage for the plugin. Returned by "/help $command".  | N |
-| `plugin.error`    | Plugin-specific error message; false for no message. | N |
+| Component  | Description                                          |
+|:-----------|:-----------------------------------------------------|
+| `action`   | Main function. Expects `msg` table as an argument.   |
+| `triggers` | Table of triggers for the plugin. Uses Lua patterns. |
+| `init`     | Optional function run when the plugin is loaded.     |
+| `cron`     | Optional function to be called every minute.         |
+| `command`  | Basic command and syntax. Listed in the help text.   |
+| `doc`      | Usage for the plugin. Returned by "/help $command".  |
+| `error`    | Plugin-specific error message; false for no message. |
 
-The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 
-Return values from `plugin:action` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
+No component is required, but some depend on others. For example, `action` will never be run if there's no `triggers`, and `doc` will never be seen if there's no `command`.
+
+Return values from `action` are optional, but they do affect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
 
 When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
 
@@ -266,7 +268,7 @@ utilities.send_message(self, 987654321, 'Quick brown fox.', false, 54321, true)
 Uploading a file for the `sendPhoto` method would look like this:
 
 ```
-bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'rarepepe.jpg' } )
+bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'dankmeme.jpg' } )
 ```
 
 and using `sendPhoto` with a file ID would look like this:
@@ -276,6 +278,40 @@ bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVW
 ```
 
 Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+
+* * *
+
+## Database
+otouto doesn't use one. This isn't because of dedication to lightweightedness or some clever design choice. Interfacing with databases through Lua is never a simple, easy-to-learn process. As one of the goals of otouto is that it should be a bot which is easy to write plugins for, our approach to storing data is to treat our datastore like any ordinary Lua data structure. The "database" is a table accessible in the `database` value of the bot instance (usually `self.database`), and is saved as a JSON-encoded plaintext file each hour, or when the bot is told to halt. This way, keeping and interacting with persistent data is no different than interacting with a Lua table -- with one exception: Keys in tables used as associative arrays must not be numbers. If the index keys are too sparse, the JSON encoder/decoder will either change them to keys or throw an error.
+
+Alone, the database will have this structure:
+
+```
+{
+	users = {
+		["55994550"] = {
+			id = 55994550,
+			first_name = "Drew",
+			username = "topkecleon"
+		}
+	},
+	userdata = {
+		["55994550"] = {
+			nickname = "Worst coder ever",
+			lastfm = "topkecleon"
+		}
+	},
+	version = "3.11"
+}
+```
+
+`database.users` will store user information (usernames, IDs, etc) when the bot sees the user. Each table's key is the user's ID as a string.
+
+`database.userdata` is meant to store miscellanea from various plugins.
+
+`database.version` stores the last bot version that used it. This is to simplify migration to the next version of the bot an easy, automatic process.
+
+Data from other plugins is usually saved in a table with the same name of that plugin. For example, administration.lua stores data in `database.administration`.
 
 * * *
 
