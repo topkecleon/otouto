@@ -95,7 +95,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 
 	for _, plugin in ipairs(self.plugins) do
-		for _, trigger in pairs(plugin.triggers or {}) do
+		for _, trigger in ipairs(plugin.triggers or {}) do
 			if string.match(msg.text_lower, trigger) then
 				local success, result = pcall(function()
 					return plugin.action(self, msg, config)

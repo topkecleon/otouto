@@ -29,10 +29,17 @@ function reactions:init(config)
 	-- Generate a "help" message triggered by "/reactions".
 	help = 'Reactions:\n'
 	reactions.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('reactions').table
+	local username = self.info.username:lower()
 	for trigger,reaction in pairs(mapping) do
 		help = help .. '• ' .. config.cmd_pat .. trigger:gsub('.%?', '') .. ': ' .. reaction .. '\n'
-		table.insert(reactions.triggers, config.cmd_pat..trigger)
-		table.insert(reactions.triggers, config.cmd_pat..trigger..'@'..self.info.username:lower())
+		table.insert(reactions.triggers, '^'..config.cmd_pat..trigger)
+		table.insert(reactions.triggers, '^'..config.cmd_pat..trigger..'@'..username)
+		table.insert(reactions.triggers, config.cmd_pat..trigger..'$')
+		table.insert(reactions.triggers, config.cmd_pat..trigger..'@'..username..'$')
+		table.insert(reactions.triggers, '\n'..config.cmd_pat..trigger)
+		table.insert(reactions.triggers, '\n'..config.cmd_pat..trigger..'@'..username)
+		table.insert(reactions.triggers, config.cmd_pat..trigger..'\n')
+		table.insert(reactions.triggers, config.cmd_pat..trigger..'@'..username..'\n')
 	end
 end
 
