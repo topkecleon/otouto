@@ -323,4 +323,35 @@ utilities.char = {
 	utf_8 = '([%z\1-\127\194-\244][\128-\191]*)',
 }
 
+utilities.set_meta = {}
+utilities.set_meta.__index = utilities.set_meta
+function utilities.new_set()
+  return setmetatable({__count = 0}, utilities.set_meta)
+end
+function utilities.set_meta:add(x)
+  if x == "__count" then
+    return false
+  else
+    if not self[x] then
+      self[x] = true
+      self.__count = self.__count + 1
+    end
+    return true
+  end
+end
+function utilities.set_meta:remove(x)
+  if x == "__count" then
+    return false
+  else
+    if self[x] then
+      self[x] = nil
+      self.__count = self.__count - 1
+    end
+    return true
+  end
+end
+function utilities.set_meta:__len()
+  return self.__count
+end
+
 return utilities
