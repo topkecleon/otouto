@@ -3,7 +3,6 @@ local xkcd = {}
 local HTTP = require('socket.http')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
-local utf8 = require('lua-utf8') -- only needed if using lua <5.3
 
 xkcd.command = 'xkcd [i]'
 

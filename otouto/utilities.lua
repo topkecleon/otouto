@@ -9,6 +9,7 @@ local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
+local utf8 = require('lua-utf8') -- only needed if using lua <5.3
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
