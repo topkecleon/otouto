@@ -88,6 +88,10 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	msg.text = msg.text or msg.caption or ''
 	msg.text_lower = msg.text:lower()
 
+	if msg.reply_to_message then
+		msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
+	end
+
 	-- Support deep linking.
 	if msg.text:match('^'..config.cmd_pat..'start .+') then
 		msg.text = config.cmd_pat .. utilities.input(msg.text)

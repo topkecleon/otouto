@@ -4,6 +4,7 @@
 local blacklist = {}
 
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
 
 function blacklist:init()
 	if not self.database.blacklist then
@@ -15,8 +16,13 @@ blacklist.triggers = {
 	''
 }
 
+blacklist.error = false
+
 function blacklist:action(msg, config)
-	if self.database.blacklist[tostring(msg.from.id)] or self.database.blacklist[tostring(msg.chat.id)] then
+	if self.database.blacklist[tostring(msg.from.id)] then
+		return
+	elseif self.database.blacklist[tostring(msg.chat.id)] then
+		bindings.leaveChat(self, { chat_id = msg.chat.id })
 		return
 	end
 	if not (
