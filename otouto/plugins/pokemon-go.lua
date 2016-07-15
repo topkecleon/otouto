@@ -21,6 +21,9 @@ Set your Pokémon Go team for statistical purposes. The team must be valid, and 
   if not db.membership then
     db.membership = {}
   end
+  for _, set in pairs(db.membership) do
+  	setmetatable(set, utilities.set_meta)
+  end
 end
 
 local team_ref = {
