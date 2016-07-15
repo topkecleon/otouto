@@ -37,6 +37,7 @@ function blacklist:action(msg, config)
 	local targets = {}
 	if msg.reply_to_message then
 		table.insert(targets, {
+			id = msg.reply_to_message.from.id,
 			id_str = tostring(msg.reply_to_message.from.id),
 			name = utilities.build_name(msg.reply_to_message.from.first_name, msg.reply_to_message.from.last_name)
 		})
