@@ -8,10 +8,8 @@ xkcd.command = 'xkcd [i]'
 
 function xkcd:init(config)
 	xkcd.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('xkcd', true).table
-	xkcd.doc = [[```
-]]..config.cmd_pat..[[xkcd [i]
-Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.
-```]]
+	xkcd.doc = config.cmd_pat .. [[xkcd [i]
+Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.]]
 end
 
 function xkcd:action(msg, config)

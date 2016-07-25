@@ -16,7 +16,7 @@ function fortune:init(config)
 end
 
 fortune.command = 'fortune'
-fortune.doc = '`Returns a UNIX fortune.`'
+fortune.doc = 'Returns a UNIX fortune.'
 
 function fortune:action(msg)
 

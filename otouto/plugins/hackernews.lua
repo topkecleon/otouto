@@ -9,10 +9,8 @@ hackernews.command = 'hackernews'
 
 function hackernews:init(config)
 	hackernews.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hackernews', true):t('hn', true).table
-	hackernews.doc = [[```
-Returns four (if group) or eight (if private message) top stories from Hacker News.
-Alias: ]]..config.cmd_pat..[[hn
-```]]
+	hackernews.doc = [[Returns four (if group) or eight (if private message) top stories from Hacker News.
+Alias: ]] .. config.cmd_pat .. 'hn'
 end
 
 function hackernews:action(msg, config)

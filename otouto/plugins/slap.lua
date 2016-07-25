@@ -6,10 +6,7 @@ slap.command = 'slap [target]'
 
 function slap:init(config)
 	slap.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('slap', true).table
-	slap.doc = [[```
-]]..config.cmd_pat..[[slap [target]
-Slap somebody.
-```]]
+	slap.doc = config.cmd_pat .. 'slap [target] \nSlap somebody.'
 end
 
 local slaps = {

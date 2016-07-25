@@ -6,10 +6,8 @@ nick.command = 'nick <nickname>'
 
 function nick:init(config)
 	nick.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('nick', true).table
-	nick.doc = [[```
-]]..config.cmd_pat..[[nick <nickname>
-Set your nickname. Use "]]..config.cmd_pat..[[nick --" to delete it.
-```]]
+	nick.doc = config.cmd_pat .. [[nick <nickname>
+Set your nickname. Use "]] .. config.cmd_pat .. 'nick --" to delete it.'
 end
 
 function nick:action(msg, config)

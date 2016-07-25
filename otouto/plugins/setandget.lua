@@ -5,12 +5,10 @@ local utilities = require('otouto.utilities')
 function setandget:init(config)
 	self.database.setandget = self.database.setandget or {}
 	setandget.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('set', true):t('get', true).table
-	setandget.doc = [[```
-]]..config.cmd_pat..[[set <name> <value>
-Stores a value with the given name. Use "]]..config.cmd_pat..[[set <name> --" to delete the stored value.
-]]..config.cmd_pat..[[get [name]
-Returns the stored value or a list of stored values.
-```]]
+	setandget.doc = config.cmd_pat .. [[set <name> <value>
+Stores a value with the given name. Use "]] .. config.cmd_pat .. [[set <name> --" to delete the stored value.
+]] .. config.cmd_pat .. [[get [name]
+Returns the stored value or a list of stored values.]]
 end
 
 setandget.command = 'set <name> <value>'

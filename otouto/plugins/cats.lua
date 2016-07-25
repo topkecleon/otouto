@@ -13,7 +13,7 @@ function cats:init(config)
 end
 
 cats.command = 'cat'
-cats.doc = '`Returns a cat!`'
+cats.doc = 'Returns a cat!'
 
 function cats:action(msg, config)
 

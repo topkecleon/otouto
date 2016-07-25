@@ -3,7 +3,7 @@ local pun = {}
 local utilities = require('otouto.utilities')
 
 pun.command = 'pun'
-pun.doc = '`Returns a pun.`'
+pun.doc = 'Returns a pun.'
 
 function pun:init(config)
 	pun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pun').table

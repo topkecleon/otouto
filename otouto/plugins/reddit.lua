@@ -9,11 +9,9 @@ reddit.command = 'reddit [r/subreddit | query]'
 
 function reddit:init(config)
 	reddit.triggers = utilities.triggers(self.info.username, config.cmd_pat, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
-	reddit.doc = [[```
-]]..config.cmd_pat..[[reddit [r/subreddit | query]
+	reddit.doc = config.cmd_pat .. [[reddit [r/subreddit | query]
 Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
-Aliases: ]]..config.cmd_pat..[[r, /r/subreddit
-```]]
+Aliases: ]] .. config.cmd_pat .. 'r, /r/subreddit'
 end
 
 local format_results = function(posts)

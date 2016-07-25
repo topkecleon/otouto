@@ -10,11 +10,9 @@ urbandictionary.command = 'urbandictionary <query>'
 function urbandictionary:init(config)
 	urbandictionary.triggers = utilities.triggers(self.info.username, config.cmd_pat)
 		:t('urbandictionary', true):t('ud', true):t('urban', true).table
-	urbandictionary.doc = [[```
-]]..config.cmd_pat..[[urbandictionary <query>
+	urbandictionary.doc = config.cmd_pat .. [[urbandictionary <query>
 Returns a definition from Urban Dictionary.
-Aliases: ]]..config.cmd_pat..[[ud, ]]..config.cmd_pat..[[urban
-```]]
+Aliases: ]] .. config.cmd_pat .. 'ud, ' .. config.cmd_pat .. 'urban'
 end
 
 function urbandictionary:action(msg, config)

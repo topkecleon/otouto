@@ -8,10 +8,8 @@ time.command = 'time <location>'
 
 function time:init(config)
 	time.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('time', true).table
-	time.doc = [[```
-]]..config.cmd_pat..[[time <location>
-Returns the time, date, and timezone for the given location.
-```]]
+	time.doc = config.cmd_pat .. [[time <location>
+Returns the time, date, and timezone for the given location.]]
 end
 
 function time:action(msg, config)

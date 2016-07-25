@@ -12,16 +12,17 @@ apod.command = 'apod [date]'
 function apod:init(config)
 	apod.triggers = utilities.triggers(self.info.username, config.cmd_pat)
 		:t('apod', true):t('apodhd', true):t('apodtext', true).table
-	apod.doc = [[```
-]]..config.cmd_pat..[[apod [query]
+	apod.doc = config.cmd_pat .. [[apod [query]
 Returns the Astronomy Picture of the Day.
 If the query is a date, in the format YYYY-MM-DD, the APOD of that day is returned.
-]]..config.cmd_pat..[[apodhd [query]
+Examples:
+]] .. config.cmd_pat .. [[apodhd [query]
 Returns the image in HD, if available.
-]]..config.cmd_pat..[[apodtext [query]
+
+]] .. config.cmd_pat .. [[apodtext [query]
 Returns the explanation of the APOD.
-Source: nasa.gov
-```]]
+
+Source: nasa.gov]]
 end
 
 function apod:action(msg, config)

@@ -6,10 +6,8 @@ dice.command = 'roll <nDr>'
 
 function dice:init(config)
 	dice.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('roll', true).table
-	dice.doc = [[```
-]]..config.cmd_pat..[[roll <nDr>
-Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.
-```]]
+	dice.doc = config.cmd_pat .. [[roll <nDr>
+Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.]]
 end
 
 function dice:action(msg)

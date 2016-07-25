@@ -7,10 +7,7 @@ preview.command = 'preview <link>'
 
 function preview:init(config)
 	preview.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('preview', true).table
-	preview.doc = [[```
-]]..config.cmd_pat..[[preview <link>
-Returns a full-message, "unlinked" preview.
-```]]
+	preview.doc = config.cmd_pat .. 'preview <link> \nReturns a full-message, "unlinked" preview.'
 end
 
 function preview:action(msg)

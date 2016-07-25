@@ -11,7 +11,7 @@ local reactions = {}
 local utilities = require('otouto.utilities')
 
 reactions.command = 'reactions'
-reactions.doc = '`Returns a list of "reaction" emoticon commands.`'
+reactions.doc = 'Returns a list of "reaction" emoticon commands.'
 
 local mapping = {
 	['shrug'] = '¯\\_(ツ)_/¯',

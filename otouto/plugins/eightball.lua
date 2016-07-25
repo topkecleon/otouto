@@ -3,7 +3,7 @@ local eightball = {}
 local utilities = require('otouto.utilities')
 
 eightball.command = '8ball'
-eightball.doc = '`Returns an answer from a magic 8-ball!`'
+eightball.doc = 'Returns an answer from a magic 8-ball!'
 
 function eightball:init(config)
 	eightball.triggers = utilities.triggers(self.info.username, config.cmd_pat,

@@ -16,13 +16,11 @@ function lastfm:init(config)
 	end
 
 	lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('fmset', true).table
-	lastfm.doc = [[```
-]]..config.cmd_pat..[[np [username]
+	lastfm.doc = config.cmd_pat .. [[np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
-]]..config.cmd_pat..[[fmset <username>
-Sets your last.fm username. Otherwise, ]]..config.cmd_pat..[[np will use your Telegram username. Use "]]..config.cmd_pat..[[fmset --" to delete it.
-```]]
+]] .. config.cmd_pat .. [[fmset <username>
+Sets your last.fm username. Otherwise, ]] .. config.cmd_pat .. [[np will use your Telegram username. Use "]] .. config.cmd_pat .. [[fmset --" to delete it.]]
 end
 
 lastfm.command = 'lastfm'

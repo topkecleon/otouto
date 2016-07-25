@@ -9,11 +9,9 @@ gSearch.command = 'google <query>'
 
 function gSearch:init(config)
 	gSearch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('g', true):t('google', true):t('gnsfw', true).table
-	gSearch.doc = [[```
-]]..config.cmd_pat..[[google <query>
-Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]]..config.cmd_pat..[[gnsfw" to disable it.
-Alias: ]]..config.cmd_pat..[[g
-```]]
+	gSearch.doc = config.cmd_pat .. [[google <query>
+Returns four (if group) or eight (if private message) results from Google. Safe search is enabled by default, use "]] .. config.cmd_pat .. [[gnsfw" to disable it.
+Alias: ]] .. config.cmd_pat .. 'g'
 end
 
 function gSearch:action(msg, config)

@@ -15,11 +15,9 @@ function youtube:init(config)
 	end
 
 	youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
-	youtube.doc = [[```
-]]..config.cmd_pat..[[youtube <query>
+	youtube.doc = config.cmd_pat .. [[youtube <query>
 Returns the top result from YouTube.
-Alias: ]]..config.cmd_pat..[[yt
-```]]
+Alias: ]] .. config.cmd_pat .. 'yt'
 end
 
 youtube.command = 'youtube <query>'

@@ -6,10 +6,7 @@ echo.command = 'echo <text>'
 
 function echo:init(config)
 	echo.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('echo', true).table
-	echo.doc = [[```
-]]..config.cmd_pat..[[echo <text>
-Repeats a string of text.
-```]]
+	echo.doc = config.cmd_pat .. 'echo <text> \nRepeats a string of text.'
 end
 
 function echo:action(msg)

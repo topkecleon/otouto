@@ -93,7 +93,7 @@ function blacklist:action(msg, config)
 				self.database.blacklist[target.id_str] = true
 				output = output .. target.name .. ' is now blacklisted.\n'
 				if config.drua_block_on_blacklist and target.id > 0 then
-					require('drua-tg').block(target.id)
+					require('otouto.drua-tg').block(target.id)
 				end
 			end
 		end
@@ -107,7 +107,7 @@ function blacklist:action(msg, config)
 				self.database.blacklist[target.id_str] = nil
 				output = output .. target.name .. ' is no longer blacklisted.\n'
 				if config.drua_block_on_blacklist and target.id > 0 then
-					require('drua-tg').unblock(target.id)
+					require('otouto.drua-tg').unblock(target.id)
 				end
 			end
 		end

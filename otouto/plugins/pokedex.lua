@@ -9,11 +9,9 @@ pokedex.command = 'pokedex <query>'
 
 function pokedex:init(config)
 	pokedex.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pokedex', true):t('dex', true).table
-	pokedex.doc = [[```
-]]..config.cmd_pat..[[pokedex <query>
+	pokedex.doc = config.cmd_pat .. [[pokedex <query>
 Returns a Pokedex entry from pokeapi.co.
-Alias: ]]..config.cmd_pat..[[dex
-```]]
+Alias: ]] .. config.cmd_pat .. 'dex'
 end
 
 function pokedex:action(msg, config)

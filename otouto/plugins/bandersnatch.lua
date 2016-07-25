@@ -6,10 +6,7 @@ bandersnatch.command = 'bandersnatch'
 
 function bandersnatch:init(config)
 	bandersnatch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bandersnatch'):t('bc').table
-	bandersnatch.doc = [[```
-Shun the frumious Bandersnatch.
-Alias: ]]..config.cmd_pat..[[bc
-```]]
+	bandersnatch.doc = 'Shun the frumious Bandersnatch. \nAlias: ' .. config.cmd_pat .. 'bc'
 end
 
 local fullnames = { "Wimbledon Tennismatch", "Rinkydink Curdlesnoot", "Butawhiteboy Cantbekhan", "Benadryl Claritin", "Bombadil Rivendell", "Wanda's Crotchfruit", "Biblical Concubine", "Syphilis Cankersore", "Buckminster Fullerene", "Bourgeoisie Capitalist" }

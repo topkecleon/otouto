@@ -7,12 +7,10 @@ currency.command = 'cash [amount] <from> to <to>'
 
 function currency:init(config)
 	currency.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('cash', true).table
-	currency.doc = [[```
-]]..config.cmd_pat..[[cash [amount] <from> to <to>
-Example: ]]..config.cmd_pat..[[cash 5 USD to EUR
+	currency.doc = config.cmd_pat .. [[cash [amount] <from> to <to>
+Example: ]] .. config.cmd_pat .. [[cash 5 USD to EUR
 Returns exchange rates for various currencies.
-Source: Google Finance.
-```]]
+Source: Google Finance.]]
 end
 
 function currency:action(msg, config)

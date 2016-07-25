@@ -9,12 +9,10 @@ dilbert.command = 'dilbert [date]'
 
 function dilbert:init(config)
 	dilbert.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('dilbert', true).table
-	dilbert.doc = [[```
-]]..config.cmd_pat..[[dilbert [YYYY-MM-DD]
+	dilbert.doc = config.cmd_pat .. [[dilbert [YYYY-MM-DD]
 Returns the latest Dilbert strip or that of the provided date.
 Dates before the first strip will return the first strip. Dates after the last trip will return the last strip.
-Source: dilbert.com
-```]]
+Source: dilbert.com]]
 end
 
 function dilbert:action(msg, config)

@@ -8,10 +8,8 @@ calc.command = 'calc <expression>'
 
 function calc:init(config)
 	calc.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('calc', true).table
-	calc.doc = [[```
-]]..config.cmd_pat..[[calc <expression>
-Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.
-```]]
+	calc.doc = config.cmd_pat .. [[calc <expression>
+Returns solutions to mathematical expressions and conversions between common units. Results provided by mathjs.org.]]
 end
 
 function calc:action(msg, config)

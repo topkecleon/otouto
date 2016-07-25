@@ -13,10 +13,8 @@ function weather:init(config)
 	end
 
 	weather.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('weather', true).table
-	weather.doc = [[```
-]]..config.cmd_pat..[[weather <location>
-Returns the current weather conditions for a given location.
-```]]
+	weather.doc = config.cmd_pat .. [[weather <location>
+Returns the current weather conditions for a given location.]]
 end
 
 weather.command = 'weather <location>'

@@ -7,11 +7,9 @@ gMaps.command = 'location <query>'
 
 function gMaps:init(config)
 	gMaps.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('location', true):t('loc', true).table
-	gMaps.doc = [[```
-]]..config.cmd_pat..[[location <query>
+	gMaps.doc = config.cmd_pat .. [[location <query>
 Returns a location from Google Maps.
-Alias: ]]..config.cmd_pat..[[loc
-```]]
+Alias: ]] .. config.cmd_pat .. 'loc'
 end
 
 function gMaps:action(msg, config)

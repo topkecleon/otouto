@@ -5,7 +5,7 @@ local commit = {}
 local utilities = require('otouto.utilities')
 
 commit.command = 'commit'
-commit.doc = '`Returns a commit message from whatthecommit.com.`'
+commit.doc = 'Returns a commit message from whatthecommit.com.'
 
 function commit:init(config)
 	commit.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('commit').table

@@ -37,11 +37,9 @@ function hearthstone:init(config)
 	end
 
 	hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
-	hearthstone.doc = [[```
-]]..config.cmd_pat..[[hearthstone <query>
+	hearthstone.doc = config.cmd_pat .. [[hearthstone <query>
 Returns Hearthstone card info.
-Alias: ]]..config.cmd_pat..[[hs
-```]]
+Alias: ]] .. config.cmd_pat .. 'hs'
 end
 
 hearthstone.command = 'hearthstone <query>'

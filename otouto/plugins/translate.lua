@@ -9,10 +9,8 @@ translate.command = 'translate [text]'
 
 function translate:init(config)
 	translate.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('translate', true):t('tl', true).table
-	translate.doc = [[```
-]]..config.cmd_pat..[[translate [text]
-Translates input or the replied-to message into the bot's language.
-```]]
+	translate.doc = config.cmd_pat .. [[translate [text]
+Translates input or the replied-to message into the bot's language.]]
 end
 
 function translate:action(msg, config)

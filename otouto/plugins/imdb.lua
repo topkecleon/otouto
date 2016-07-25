@@ -9,10 +9,7 @@ imdb.command = 'imdb <query>'
 
 function imdb:init(config)
 	imdb.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('imdb', true).table
-	imdb.doc = [[```
-]]..config.cmd_pat..[[imdb <query>
-Returns an IMDb entry.
-```]]
+	imdb.doc = config.cmd_pat .. 'imdb <query> \nReturns an IMDb entry.'
 end
 
 function imdb:action(msg, config)

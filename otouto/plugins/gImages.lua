@@ -20,11 +20,9 @@ function gImages:init(config)
 	end
 
 	gImages.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('image', true):t('i', true):t('insfw', true).table
-	gImages.doc = [[```
-]]..config.cmd_pat..[[image <query>
-Returns a randomized top result from Google Images. Safe search is enabled by default; use "]]..config.cmd_pat..[[insfw" to disable it. NSFW results will not display an image preview.
-Alias: ]]..config.cmd_pat..[[i
-```]]
+	gImages.doc = config.cmd_pat .. [[image <query>
+Returns a randomized top result from Google Images. Safe search is enabled by default; use "]] .. config.cmd_pat .. [[insfw" to disable it. NSFW results will not display an image preview.
+Alias: ]] .. config.cmd_pat .. 'i'
 end
 
 gImages.command = 'image <query>'

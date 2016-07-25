@@ -12,11 +12,9 @@ function bible:init(config)
 	end
 
 	bible.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bible', true):t('b', true).table
-	bible.doc = [[```
-]]..config.cmd_pat..[[bible <reference>
+	bible.doc = config.cmd_pat .. [[bible <reference>
 Returns a verse from the American Standard Version of the Bible, or an apocryphal verse from the King James Version. Results from biblia.com.
-Alias: ]]..config.cmd_pat..[[b
-```]]
+Alias: ]] .. config.cmd_pat .. 'b'
 end
 
 bible.command = 'bible <reference>'

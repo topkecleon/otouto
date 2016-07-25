@@ -11,11 +11,6 @@ local ltn12 = require('ltn12')
 local utilities = require('otouto.utilities')
 
 bing.command = 'bing <query>'
-bing.doc = [[```
-/bing <query>
-Returns the top web search results from Bing.
-Aliases: /g, /google
-```]]
 
 bing.search_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/Web?Query=\'%s\'&$format=json'
 
@@ -26,6 +21,9 @@ function bing:init(config)
 		return
 	end
 	bing.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bing', true):t('g', true):t('google', true).table
+	bing.doc = config.cmd_pat .. [[bing <query>
+Returns the top web search results from Bing.
+Aliases: ]] .. config.cmd_pat .. 'g, ' .. config.cmd_pat .. 'google'
 end
 
 function bing:action(msg, config)

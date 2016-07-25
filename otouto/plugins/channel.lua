@@ -3,9 +3,10 @@ local channel = {}
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
---channel.command = 'ch <channel> \\n <message>'
-channel.doc = [[```
-/ch <channel>
+function channel:init(config)
+	channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
+	channel.command = 'ch <channel> \\n <message>'
+	channel.doc = config.cmd_pat .. [[ch <channel>
 <message>
 
 Sends a message to a channel. Channel may be specified via ID or username. Messages are markdown-enabled. Users may only send messages to channels for which they are the owner or an administrator.
@@ -15,13 +16,7 @@ The following markdown syntax is supported:
  _italic text_
  [text](URL)
  `inline fixed-width code`
- `‌`‌`pre-formatted fixed-width code block`‌`‌`
-
-Due to the frequent dysfunction and incompletion of the API method used to determine the administrators of a channel, this command may not work for the owners of some channels.
-```]]
-
-function channel:init(config)
-	channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
+ `‌`‌`pre-formatted fixed-width code block`‌`‌`]]
 end
 
 function channel:action(msg, config)
@@ -51,7 +46,7 @@ function channel:action(msg, config)
 					output = 'Please enter a message to be sent. Markdown is supported.'
 				end
 			else
-				output = 'Sorry, you do not appear to be an administrator for that channel.\nThere is currently a known bug in the getChatAdministrators method, where administrator lists will often not show a channel\'s owner.'
+				output = 'Sorry, you do not appear to be an administrator for that channel.'
 			end
 		else
 			output = 'Sorry, I was unable to retrieve a list of administrators for that channel.\n`' .. t.description .. '`'

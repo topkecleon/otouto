@@ -6,10 +6,7 @@ shout.command = 'shout <text>'
 
 function shout:init(config)
 	shout.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('shout', true).table
-	shout.doc = [[```
-]]..config.cmd_pat..[[shout <text>
-Shouts something. Input may be the replied-to message.
-```]]
+	shout.doc = config.cmd_pat .. 'shout <text> \nShouts something. Input may be the replied-to message.'
 end
 
 function shout:action(msg)

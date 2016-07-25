@@ -27,6 +27,7 @@ function control:action(msg, config)
 		end
 		package.loaded['otouto.bindings'] = nil
 		package.loaded['otouto.utilities'] = nil
+		package.loaded['otouto.drua-tg'] = nil
 		package.loaded['config'] = nil
 		if not msg.text_lower:match('%-config') then
 			for k, v in pairs(require('config')) do

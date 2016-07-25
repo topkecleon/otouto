@@ -19,10 +19,11 @@
 	 now support multiple arguments. Added get_targets function. No migration is
 	 necessary.
 
-]]--
+	1.11.1 - Bugfixes. /hammer can now be used in PM.
+]]
 
 local JSON = require('dkjson')
-local drua = dofile('drua-tg.lua')
+local drua = require('otouto.drua-tg')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
@@ -49,7 +50,7 @@ function administration:init(config)
 	administration.flags = administration.init_flags(config.cmd_pat)
 	administration.init_command(self, config)
 
-	administration.doc = '`Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.`'
+	administration.doc = 'Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.'
 	administration.command = 'groups [query]'
 
 	-- In the worst case, don't send errors in reply to random messages.
@@ -1199,7 +1200,9 @@ function administration.init_command(self_, config_)
 						elseif target.rank >= administration.get_rank(self, msg.from.id, msg.chat.id, config) then
 							output = output .. target.name .. ' is too privileged to be globally banned.\n'
 						else
-							administration.kick_user(self, msg.chat.id, target.id, 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name), config)
+							if group then
+								administration.kick_user(self, msg.chat.id, target.id, 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name), config)
+							end
 							if #targets == 1 then
 								for k,v in pairs(self.database.administration.groups) do
 									if not v.flags[6] then
@@ -1209,7 +1212,7 @@ function administration.init_command(self_, config_)
 								end
 							end
 							self.database.blacklist[target.id_str] = true
-							if group.flags[6] == true then
+							if group and group.flags[6] == true then
 								group.mods[target.id_str] = nil
 								group.bans[target.id_str] = true
 								output = output .. target.name .. ' has been globally and locally banned.\n'

@@ -8,10 +8,7 @@ function remind:init(config)
 	self.database.reminders = self.database.reminders or {}
 
 	remind.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('remind', true).table
-	remind.doc = [[```
-	]]..config.cmd_pat..[[remind <duration> <message>
-	Repeats a message after a duration of time, in minutes.
-	```]]
+	remind.doc = config.cmd_pat .. 'remind <duration> <message> \nRepeats a message after a duration of time, in minutes.'
 end
 
 function remind:action(msg)

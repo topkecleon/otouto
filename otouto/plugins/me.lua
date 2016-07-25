@@ -5,7 +5,7 @@ local utilities = require('otouto.utilities')
 function me:init(config)
 	me.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('me', true).table
 	me.command = 'me'
-	me.doc = '`Returns userdata stored by the bot.`'
+	me.doc = 'Returns userdata stored by the bot.'
 end
 
 function me:action(msg, config)

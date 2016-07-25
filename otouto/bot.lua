@@ -4,7 +4,7 @@ local bot = {}
 local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 
-bot.version = '3.11'
+bot.version = '3.12'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -12,7 +12,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	utilities = require('otouto.utilities')
 
 	assert(
-		config.bot_api_key and config.bot_api_key ~= '',
+		config.bot_api_key ~= '',
 		'You did not set your bot token in the config!'
 	)
 	self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
@@ -29,21 +29,6 @@ function bot:init(config) -- The function run when the bot is started or reloade
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
 
-	-- MIGRATION CODE 3.10 -> 3.11
-	if self.database.users and self.database.version ~= '3.11' then
-		self.database.userdata = {}
-		for id, user in pairs(self.database.users) do
-			self.database.userdata[id] = {}
-			self.database.userdata[id].nickname = user.nickname
-			self.database.userdata[id].lastfm = user.lastfm
-			user.nickname = nil
-			user.lastfm = nil
-			user.id_str = nil
-			user.name = nil
-		end
-	end
-	-- END MIGRATION CODE
-
 	-- Table to cache user info (usernames, IDs, etc).
 	self.database.users = self.database.users or {}
 	-- Table to store userdata (nicknames, lastfm usernames, etc).
@@ -58,6 +43,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 		local p = require('otouto.plugins.'..v)
 		table.insert(self.plugins, p)
 		if p.init then p.init(self, config) end
+		if p.doc then p.doc = '```\n'..p.doc..'\n```' end
 	end
 
 	print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')

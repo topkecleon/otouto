@@ -6,10 +6,9 @@ whoami.command = 'whoami'
 
 function whoami:init(config)
 	whoami.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('who', true):t('whoami').table
-	whoami.doc = [[```
+	whoami.doc = [[
 Returns user and chat info for you or the replied-to message.
-Alias: ]]..config.cmd_pat..[[who
-```]]
+Alias: ]] .. config.cmd_pat .. 'who'
 end
 
 function whoami:action(msg)

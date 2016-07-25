@@ -9,11 +9,9 @@ wikipedia.command = 'wikipedia <query>'
 
 function wikipedia:init(config)
 	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true):t('w', true).table
-	wikipedia.doc = [[```
-]]..config.cmd_pat..[[wikipedia <query>
+	wikipedia.doc = config.cmd_pat .. [[wikipedia <query>
 Returns an article from Wikipedia.
-Aliases: ]]..config.cmd_pat..[[w, ]]..config.cmd_pat..[[wiki
-```]]
+Aliases: ]] .. config.cmd_pat .. 'w, ' .. config.cmd_pat .. 'wiki'
 end
 
 local get_title = function(search)
