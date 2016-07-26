@@ -25,8 +25,8 @@ function patterns:action(msg)
 		utilities.send_reply(self, msg, 'Malformed pattern!')
 	else
 		output = output:sub(1, 4000)
-		output = 'Did you mean:\n"' .. output .. '"'
-		utilities.send_reply(self, msg.reply_to_message, output)
+		output = '*Did you mean:*\n"' .. utilities.md_escape(utilities.trim(output)) .. '"'
+		utilities.send_reply(self, msg.reply_to_message, output, true)
 	end
 end
 
