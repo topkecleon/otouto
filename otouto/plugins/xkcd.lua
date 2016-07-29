@@ -13,7 +13,6 @@ Returns the latest xkcd strip and its alt text. If a number is given, returns th
 end
 
 function xkcd:action(msg, config)
-
 	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
@@ -47,10 +46,9 @@ function xkcd:action(msg, config)
 	end
 	local jdat = JSON.decode(jstr)
 
-	local output = '*' .. jdat.safe_title .. ' (*[' .. jdat.num .. '](' .. jdat.img .. ')*)*\n_' .. jdat.alt:gsub('_', '\\_') .. '_'
+	local output = '*' .. utilities.fix_UTF8(jdat.safe_title) .. ' (*[' .. jdat.num .. '](' .. jdat.img .. ')*)*\n_' .. utilities.fix_UTF8(jdat.alt):gsub('_', '\\_') .. '_'
 
 	utilities.send_message(self, msg.chat.id, output, false, nil, true)
-
 end
 
 return xkcd

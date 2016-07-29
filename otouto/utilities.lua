@@ -9,6 +9,7 @@ local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
+local utf8 = require('lua-utf8') -- only needed if using lua <5.3
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -310,6 +311,16 @@ function utilities.pretty_float(x)
 	else
 		return tostring(x)
 	end
+end
+
+-- This function converts a string back into "proper" utf-8 from an ascii representation of utf-8
+-- it is only useful for fixing improper encoding caused by bad JSON escaping
+function utilities.fix_UTF8(str)
+	local t = {}
+	for p, c in utf8.codes(str) do
+		table.insert(t, string.char(c))
+	end
+	return table.concat(t)
 end
 
  -- This table will store unsavory characters that are not properly displayed,
