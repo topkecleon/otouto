@@ -38,10 +38,10 @@ function bing:action(msg, config)
 	end
 	local url = bing.search_url:format(URL.escape(input))
 	local resbody = {}
-	local _,b,_ = https.request{
-	    url = url,
-	    headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) },
-	    sink = ltn12.sink.table(resbody),
+	local _,b,_ = https.request {
+		url = url,
+		headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) },
+    sink = ltn12.sink.table(resbody),
 	}
 	if b ~= 200 then
 		utilities.send_reply(self, msg, config.errors.results)

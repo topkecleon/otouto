@@ -70,7 +70,7 @@ function apod:action(msg, config)
 		img_url = jdat.hdurl or jdat.url
 	end
 
-	local output = date .. '[' .. jdat.title  .. '](' .. img_url .. ')'
+	local output = date .. '[' .. jdat.title .. '](' .. img_url .. ')'
 
 	if string.match(msg.text, '^'..config.cmd_pat..'apodtext*') then
 		output = output .. '\n' .. jdat.explanation
