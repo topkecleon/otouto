@@ -14,7 +14,7 @@ Returns an article from Wikipedia.
 Aliases: ]] .. config.cmd_pat .. 'w, ' .. config.cmd_pat .. 'wiki'
 end
 
-local get_title = function(search)
+local function get_title(search)
 	for _,v in ipairs(search) do
 		if not v.snippet:match('may refer to:') then
 			return v.title
