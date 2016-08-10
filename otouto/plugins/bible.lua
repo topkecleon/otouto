@@ -36,7 +36,7 @@ function bible:action(msg, config)
 		output, res = HTTP.request(url)
 	end
 
-	if not output or res ~= 200  or output:len() == 0 then
+	if not output or res ~= 200 or output:len() == 0 then
 		output = config.errors.results
 	end
 

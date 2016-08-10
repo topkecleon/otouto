@@ -14,9 +14,9 @@ function hearthstone:init(config)
 		-- This stuff doesn't play well with lua-sec. Disable it for now; hack in curl.
 		--local jstr, res = HTTPS.request('https://api.hearthstonejson.com/v1/latest/enUS/cards.json')
 		--if res ~= 200 then
-		--  print('Error connecting to hearthstonejson.com.')
-		--  print('hearthstone.lua will not be enabled.')
-		--  return
+		--	print('Error connecting to hearthstonejson.com.')
+		--	print('hearthstone.lua will not be enabled.')
+		--	return
 		--end
 		--local jdat = JSON.decode(jstr)
 
