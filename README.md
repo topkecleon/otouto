@@ -156,7 +156,6 @@ While tg is running, you may start/reload otouto with `administration.lua` enabl
 | /gadd       | Adds a group to the administrative system.                      | 5 | N |
 | /grem       | Removes a group from the administrative system.                 | 5 | Y |
 | /glist      | Returns a list of all administrated groups and their governors. | 5 | N |
-| /broadcast  | Broadcasts a message to all administrated groups.               | 5 | N |
 
 Internal commands can only be run within an administrated group.
 
