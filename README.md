@@ -247,7 +247,7 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 | `remind.lua`          | /remind <duration> <message>  | Reminds a user of something after a duration of minutes.            |
 | `channel.lua`         | /ch <channel> \n <message>    | Sends a markdown-enabled message to a channel.                      |
 | `isup.lua`            | /isup <url>                   | Returns the status of a website.                                    |
-| `starwars-crawl.lua`  | /sw <title | number>          | Returns the opening crawl from the specified Star Wars film. | /sw  |
+| `starwars-crawl.lua`  | /sw <title ¦ number>          | Returns the opening crawl from the specified Star Wars film. | /sw  |
 | `chuckfact.lua`       | /chuck                        | Returns a fact about Chuck Norris.                           | /cn  |
 | `catfact.lua`         | /catfact                      | Returns a fact about cats.                                          |
 

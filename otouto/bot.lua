@@ -55,14 +55,13 @@ function bot:init(config)
 	-- and messages from blacklisted users also go into self.panoptic_plugins.
 	self.plugins = {}
 	self.panoptic_plugins = {}
-	local t = {} -- Petty pseudo-optimization.
 	for _, pname in ipairs(config.plugins) do
 		local plugin = require('otouto.plugins.'..pname)
 		table.insert(self.plugins, plugin)
 		if plugin.init then plugin.init(self, config) end
 		if plugin.panoptic then table.insert(self.panoptic_plugins, plugin) end
 		if plugin.doc then plugin.doc = '```\n'..plugin.doc..'\n```' end
-		if not plugin.triggers then plugin.triggers = t end
+		if not plugin.triggers then plugin.triggers = {} end
 	end
 
 	print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
