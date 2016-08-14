@@ -12,10 +12,9 @@ end
 
 function preview:action(msg)
 
-	local input = utilities.input(msg.text)
-
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		utilities.send_message(self, msg.chat.id, preview.doc, true, nil, true)
+		utilities.send_reply(self, msg, preview.doc, true)
 		return
 	end
 
@@ -36,8 +35,8 @@ function preview:action(msg)
 	end
 
 	-- Invisible zero-width, non-joiner.
-	local output = '[​](' .. input .. ')'
-	utilities.send_message(self, msg.chat.id, output, false, nil, true)
+	local output = '<a href="' .. input .. '">' .. utilities.char.zwnj .. '</a>'
+	utilities.send_message(self, msg.chat.id, output, false, nil, 'html')
 
 end
 

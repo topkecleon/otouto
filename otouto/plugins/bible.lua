@@ -5,11 +5,9 @@ local URL = require('socket.url')
 local utilities = require('otouto.utilities')
 
 function bible:init(config)
-	if not config.biblia_api_key then
-		print('Missing config value: biblia_api_key.')
-		print('bible.lua will not be enabled.')
-		return
-	end
+	assert(config.biblia_api_key,
+		'bible.lua requires a Biblia API key from http://api.biblia.com.'
+	)
 
 	bible.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bible', true):t('b', true).table
 	bible.doc = config.cmd_pat .. [[bible <reference>
@@ -21,9 +19,9 @@ bible.command = 'bible <reference>'
 
 function bible:action(msg, config)
 
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		utilities.send_message(self, msg.chat.id, bible.doc, true, msg.message_id, true)
+		utilities.send_reply(self, msg, bible.doc, true)
 		return
 	end
 

@@ -5,52 +5,48 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 xkcd.command = 'xkcd [i]'
+xkcd.base_url = 'https://xkcd.com/info.0.json'
+xkcd.strip_url = 'http://xkcd.com/%s/info.0.json'
 
 function xkcd:init(config)
 	xkcd.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('xkcd', true).table
 	xkcd.doc = config.cmd_pat .. [[xkcd [i]
 Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.]]
+	local jstr = HTTP.request(xkcd.base_url)
+	if jstr then
+		local data = JSON.decode(jstr)
+		if data then
+			xkcd.latest = data.num
+		end
+	end
+	xkcd.latest = xkcd.latest or 1700
 end
 
 function xkcd:action(msg, config)
-
-	local jstr, res = HTTP.request('http://xkcd.com/info.0.json')
-	if res ~= 200 then
+	local input = utilities.get_word(msg.text, 2)
+	if input == 'r' then
+		input = math.random(xkcd.latest)
+	elseif tonumber(input) then
+		input = tonumber(input)
+	else
+		input = xkcd.latest
+	end
+	local url = xkcd.strip_url:format(input)
+	local jstr, code = HTTP.request(url)
+	if code == 404 then
+		utilities.send_reply(self, msg, config.errors.results)
+	elseif code ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
-		return
+	else
+		local data = JSON.decode(jstr)
+		local output = string.format('*%s (*[%s](%s)*)*\n_%s_',
+			data.safe_title:gsub('*', '*\\**'),
+			data.num,
+			data.img,
+			data.alt:gsub('_', '_\\__')
+		)
+		utilities.send_message(self, msg.chat.id, output, false, nil, true)
 	end
-	local latest = JSON.decode(jstr).num
-	local strip_num = latest
-
-	local input = utilities.input(msg.text)
-	if input then
-		if input == '404' then
-			utilities.send_message(self, msg.chat.id, '*404*\nNot found.', false, nil, true)
-			return
-		elseif tonumber(input) then
-			if tonumber(input) > latest then
-				strip_num = latest
-			else
-				strip_num = input
-			end
-		elseif input == 'r' then
-			strip_num = math.random(latest)
-		end
-	end
-
-	local res_url = 'http://xkcd.com/' .. strip_num .. '/info.0.json'
-
-	jstr, res = HTTP.request(res_url)
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
-	end
-	local jdat = JSON.decode(jstr)
-
-	local output = '*' .. jdat.safe_title .. ' (*[' .. jdat.num .. '](' .. jdat.img .. ')*)*\n_' .. jdat.alt:gsub('_', '\\_') .. '_'
-
-	utilities.send_message(self, msg.chat.id, output, false, nil, true)
-
 end
 
 return xkcd

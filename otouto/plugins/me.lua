@@ -9,33 +9,59 @@ function me:init(config)
 end
 
 function me:action(msg, config)
-
-	local userdata = self.database.userdata[tostring(msg.from.id)] or {}
-
+	local user
 	if msg.from.id == config.admin then
 		if msg.reply_to_message then
-			userdata = self.database.userdata[tostring(msg.reply_to_message.from.id)]
+			user = msg.reply_to_message.from
 		else
 			local input = utilities.input(msg.text)
 			if input then
-				local user_id = utilities.id_from_username(self, input)
-				if user_id then
-					userdata = self.database.userdata[tostring(user_id)] or {}
+				if tonumber(input) then
+					user = self.database.users[input]
+					if not user then
+						utilities.send_reply(self, msg, 'Unrecognized ID.')
+						return
+					end
+				elseif input:match('^@') then
+					user = utilities.resolve_username(self, input)
+					if not user then
+						utilities.send_reply(self, msg, 'Unrecognized username.')
+						return
+					end
+				else
+					utilities.send_reply(self, msg, 'Invalid username or ID.')
+					return
 				end
 			end
 		end
 	end
+	user = user or msg.from
+	local userdata = self.database.userdata[tostring(user.id)] or {}
 
-	local output = ''
+	local data = {}
 	for k,v in pairs(userdata) do
-		output = output .. '*' .. k .. ':* `' .. tostring(v) .. '`\n'
+		table.insert(data, string.format(
+			'<b>%s</b> <code>%s</code>\n',
+			utilities.html_escape(k),
+			utilities.html_escape(v)
+		))
 	end
 
-	if output == '' then
+	local output
+	if #data == 0 then
 		output = 'There is no data stored for this user.'
+	else
+		output = string.format(
+			'<b>%s</b> <code>[%s]</code><b>:</b>\n',
+			utilities.html_escape(utilities.build_name(
+				user.first_name,
+				user.last_name
+			)),
+			user.id
+		) .. table.concat(data)
 	end
 
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
 
 end
 

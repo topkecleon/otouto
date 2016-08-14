@@ -1,63 +1,75 @@
-local hackernews = {}
-
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
-local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
+
+local hackernews = {}
 
 hackernews.command = 'hackernews'
+
+local function get_hackernews_results()
+	local results = {}
+	local jstr, code = HTTPS.request(hackernews.topstories_url)
+	if code ~= 200 then return end
+	local data = JSON.decode(jstr)
+	for i = 1, 8 do
+		local ijstr, icode = HTTPS.request(hackernews.res_url:format(data[i]))
+		if icode ~= 200 then return end
+		local idata = JSON.decode(ijstr)
+		local result
+		if idata.url then
+			result = string.format(
+				'\n• <code>[</code><a href="%s">%s</a><code>]</code> <a href="%s">%s</a>',
+				utilities.html_escape(hackernews.art_url:format(idata.id)),
+				idata.id,
+				utilities.html_escape(idata.url),
+				utilities.html_escape(idata.title)
+			)
+		else
+			result = string.format(
+				'\n• <code>[</code><a href="%s">%s</a><code>]</code> %s',
+				utilities.html_escape(hackernews.art_url:format(idata.id)),
+				idata.id,
+				utilities.html_escape(idata.title)
+			)
+		end
+		table.insert(results, result)
+	end
+	return results
+end
 
 function hackernews:init(config)
 	hackernews.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hackernews', true):t('hn', true).table
 	hackernews.doc = [[Returns four (if group) or eight (if private message) top stories from Hacker News.
 Alias: ]] .. config.cmd_pat .. 'hn'
+	hackernews.topstories_url = 'https://hacker-news.firebaseio.com/v0/topstories.json'
+	hackernews.res_url = 'https://hacker-news.firebaseio.com/v0/item/%s.json'
+	hackernews.art_url = 'https://news.ycombinator.com/item?id=%s'
+	hackernews.last_update = 0
+	if config.hackernews_onstart == true then
+		hackernews.results = get_hackernews_results()
+		if hackernews.results then hackernews.last_update = os.time() / 60 end
+	end
 end
 
 function hackernews:action(msg, config)
-
-	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
-
-	local jstr, res = HTTPS.request('https://hacker-news.firebaseio.com/v0/topstories.json')
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
+	local now = os.time() / 60
+	if not hackernews.results or hackernews.last_update + config.hackernews_interval < now then
+		bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' })
+		hackernews.results = get_hackernews_results()
+		if not hackernews.results then
+			utilities.send_reply(self, msg, config.errors.connection)
+			return
+		end
+		hackernews.last_update = now
 	end
-
-	local jdat = JSON.decode(jstr)
-
-	local res_count = 4
-	if msg.chat.id == msg.from.id then
-		res_count = 8
-	end
-
-	local output = '*Hacker News:*\n'
+	-- Four results in a group, eight in private.
+	local res_count = msg.chat.id == msg.from.id and 8 or 4
+	local output = '<b>Top Stories from Hacker News:</b>'
 	for i = 1, res_count do
-		local res_url = 'https://hacker-news.firebaseio.com/v0/item/' .. jdat[i] .. '.json'
-		jstr, res = HTTPS.request(res_url)
-		if res ~= 200 then
-			utilities.send_reply(self, msg, config.errors.connection)
-			return
-		end
-		local res_jdat = JSON.decode(jstr)
-		local title = res_jdat.title:gsub('%[.+%]', ''):gsub('%(.+%)', ''):gsub('&amp;', '&')
-		if title:len() > 48 then
-			title = title:sub(1, 45) .. '...'
-		end
-		local url = res_jdat.url
-		if not url then
-			utilities.send_reply(self, msg, config.errors.connection)
-			return
-		end
-		if url:find('%(') then
-			output = output .. '• ' .. title .. '\n' .. url:gsub('_', '\\_') .. '\n'
-		else
-			output = output .. '• [' .. title .. '](' .. url .. ')\n'
-		end
-
+		output = output .. hackernews.results[i]
 	end
-
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
-
+	utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
 end
 
 return hackernews

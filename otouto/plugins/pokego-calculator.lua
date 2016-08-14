@@ -97,8 +97,12 @@ function pgc:action(msg)
 	if egg_count < 1 then
 		recommendation = 'Wait until you have atleast sixty Pokémon to evolve before using a lucky egg.'
 	else
-		recommendation = 'Use %s lucky egg(s) for %s evolutions.'
-		recommendation = recommendation:format(egg_count, egg_count*60)
+		recommendation = string.format(
+			'Use %s lucky egg%s for %s evolutions.',
+			egg_count,
+			egg_count == 1 and '' or 's',
+			egg_count * 60
+		)
 	end
 	s = s:format(total_evolutions, recommendation)
 	output = output .. s

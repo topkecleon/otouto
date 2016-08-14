@@ -8,11 +8,9 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 function youtube:init(config)
-	if not config.google_api_key then
-		print('Missing config value: google_api_key.')
-		print('youtube.lua will not be enabled.')
-		return
-	end
+	assert(config.google_api_key,
+		'youtube.lua requires a Google API key from http://console.developers.google.com.'
+	)
 
 	youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
 	youtube.doc = config.cmd_pat .. [[youtube <query>
@@ -24,14 +22,10 @@ youtube.command = 'youtube <query>'
 
 function youtube:action(msg, config)
 
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, youtube.doc, true, msg.message_id, true)
-			return
-		end
+		utilities.send_reply(self, msg, youtube.doc, true)
+		return
 	end
 
 	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)

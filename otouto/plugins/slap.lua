@@ -109,7 +109,21 @@ local slaps = {
 function slap:action(msg)
 	local input = utilities.input(msg.text)
 	local victor_id = msg.from.id
-	local victim_id = utilities.id_from_message(self, msg)
+	local victim_id
+	if msg.reply_to_message then
+		victim_id = msg.reply_to_message.from.id
+	else
+		if input then
+			if tonumber(input) then
+				victim_id = tonumber(input)
+			elseif input:match('^@') then
+				local t = utilities.resolve_username(self, input)
+				if t then
+					victim_id = t.id
+				end
+			end
+		end
+	end
 	-- IDs
 	if victim_id then
 		if victim_id == victor_id then

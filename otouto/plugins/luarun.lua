@@ -2,10 +2,21 @@ local luarun = {}
 
 local utilities = require('otouto.utilities')
 local URL = require('socket.url')
-local JSON = require('dkjson')
+local JSON, serpent
 
 function luarun:init(config)
 	luarun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lua', true):t('return', true).table
+	if config.luarun_serpent then
+		serpent = require('serpent')
+		luarun.serialize = function(t)
+			return serpent.block(t, {comment=false})
+		end
+	else
+		JSON = require('dkjson')
+		luarun.serialize = function(t)
+			return JSON.encode(t, {indent=true})
+		end
+	end
 end
 
 function luarun:action(msg, config)
@@ -28,6 +39,7 @@ function luarun:action(msg, config)
 		local bot = require('otouto.bot')
 		local bindings = require('otouto.bindings')
 		local utilities = require('otouto.utilities')
+		local drua = require('otouto.drua-tg')
 		local JSON = require('dkjson')
 		local URL = require('socket.url')
 		local HTTP = require('socket.http')
@@ -38,7 +50,7 @@ function luarun:action(msg, config)
 		output = 'Done!'
 	else
 		if type(output) == 'table' then
-			local s = JSON.encode(output, {indent=true})
+			local s = luarun.serialize(output)
 			if URL.escape(s):len() < 4000 then
 				output = s
 			end

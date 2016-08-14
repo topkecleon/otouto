@@ -6,11 +6,10 @@ local utilities = require('otouto.utilities')
 
 function fortune:init(config)
 	local s = io.popen('fortune'):read('*all')
-	if s:match('not found$') then
-		print('fortune is not installed on this computer.')
-		print('fortune.lua will not be enabled.')
-		return
-	end
+	assert(
+		not s:match('not found$'),
+		'fortune.lua requires the fortune program to be installed.'
+	)
 
 	fortune.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('fortune').table
 end

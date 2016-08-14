@@ -9,11 +9,9 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 function lastfm:init(config)
-	if not config.lastfm_api_key then
-		print('Missing config value: lastfm_api_key.')
-		print('lastfm.lua will not be enabled.')
-		return
-	end
+	assert(config.lastfm_api_key,
+		'lastfm.lua requires a last.fm API key from http://last.fm/api.'
+	)
 
 	lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('fmset', true).table
 	lastfm.doc = config.cmd_pat .. [[np [username]

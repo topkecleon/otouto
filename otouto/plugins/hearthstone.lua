@@ -5,44 +5,35 @@ local hearthstone = {}
 --local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
+local HTTPS = require('ssl.https')
 
 function hearthstone:init(config)
+	hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
+	hearthstone.command = 'hearthstone <query>'
+
 	if not self.database.hearthstone or os.time() > self.database.hearthstone.expiration then
 
 		print('Downloading Hearthstone database...')
 
-		-- This stuff doesn't play well with lua-sec. Disable it for now; hack in curl.
-		--local jstr, res = HTTPS.request('https://api.hearthstonejson.com/v1/latest/enUS/cards.json')
-		--if res ~= 200 then
-		--  print('Error connecting to hearthstonejson.com.')
-		--  print('hearthstone.lua will not be enabled.')
-		--  return
-		--end
-		--local jdat = JSON.decode(jstr)
-
-		local s = io.popen('curl -s https://api.hearthstonejson.com/v1/latest/enUS/cards.json'):read('*all')
-		local d = JSON.decode(s)
-
-		if not d then
+		local jstr, res = HTTPS.request('https://api.hearthstonejson.com/v1/latest/enUS/cards.json')
+		if not jstr or res ~= 200 then
 			print('Error connecting to hearthstonejson.com.')
 			print('hearthstone.lua will not be enabled.')
+			hearthstone.command = nil
+			hearthstone.triggers = nil
 			return
 		end
-
-		self.database.hearthstone = d
+		self.database.hearthstone = JSON.decode(jstr)
 		self.database.hearthstone.expiration = os.time() + 600000
 
 		print('Download complete! It will be stored for a week.')
 
 	end
 
-	hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
 	hearthstone.doc = config.cmd_pat .. [[hearthstone <query>
 Returns Hearthstone card info.
 Alias: ]] .. config.cmd_pat .. 'hs'
 end
-
-hearthstone.command = 'hearthstone <query>'
 
 local function format_card(card)
 
@@ -102,9 +93,9 @@ end
 
 function hearthstone:action(msg, config)
 
-	local input = utilities.input(msg.text_lower)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		utilities.send_message(self, msg.chat.id, hearthstone.doc, true, msg.message_id, true)
+		utilities.send_reply(self, msg, hearthstone.doc, true)
 		return
 	end
 

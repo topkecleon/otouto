@@ -9,8 +9,6 @@
 	It requires tg (http://github.com/vysheng/tg) with supergroup support.
 	For more documentation, read the the manual (otou.to/rtfm).
 
-	Remember to load this before blacklist.lua.
-
 	Important notices about updates will be here!
 
 	1.11 - Removed /kickme and /broadcast. Users should leave manually, and
@@ -20,6 +18,8 @@
 	 necessary.
 
 	1.11.1 - Bugfixes. /hammer can now be used in PM.
+
+	1.13 - Global banlist reinstated. Added default antiflood values to config. Bugfixes: Modding a user will no longer add him. Fixed kicks/bans in reply to join/leave notifications.
 ]]
 
 local JSON = require('dkjson')
@@ -36,11 +36,12 @@ function administration:init(config)
 			admins = {},
 			groups = {},
 			activity = {},
-			autokick_timer = os.date('%d')
+			autokick_timer = os.date('%d'),
+			globalbans = {}
 		}
 	end
 
-	self.admin_temp = {
+	administration.temp = {
 		help = {},
 		flood = {}
 	}
@@ -49,13 +50,25 @@ function administration:init(config)
 
 	administration.flags = administration.init_flags(config.cmd_pat)
 	administration.init_command(self, config)
+	administration.antiflood = config.administration.antiflood or {
+		text = 5,
+		voice = 5,
+		audio = 5,
+		contact = 5,
+		photo = 10,
+		video = 10,
+		location = 10,
+		document = 10,
+		sticker = 20
+	}
 
 	administration.doc = 'Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.'
 	administration.command = 'groups [query]'
 
 	-- In the worst case, don't send errors in reply to random messages.
 	administration.error = false
-
+	-- Accept forwarded messages and messages from blacklisted users.
+	administration.panoptic = true
 end
 
 function administration.init_flags(cmd_pat) return {
@@ -106,18 +119,6 @@ function administration.init_flags(cmd_pat) return {
 	}
 } end
 
-administration.antiflood = {
-	text = 5,
-	voice = 5,
-	audio = 5,
-	contact = 5,
-	photo = 10,
-	video = 10,
-	location = 10,
-	document = 10,
-	sticker = 20
-}
-
 administration.ranks = {
 	[0] = 'Banned',
 	[1] = 'Users',
@@ -159,8 +160,8 @@ function administration:get_rank(user_id_str, chat_id_str, config)
 		end
 	end
 
-	-- Return 0 if the user_id_str is blacklisted (and antihammer is not enabled).
-	if self.database.blacklist[user_id_str] then
+	-- Return 0 if the user_id_str is globally banned (and antihammer is not enabled).
+	if self.database.administration.globalbans[user_id_str] then
 		return 0
 	end
 
@@ -172,8 +173,9 @@ end
 -- Returns an array of "user" tables.
 function administration:get_targets(msg, config)
 	if msg.reply_to_message then
+		local d = msg.reply_to_message.new_chat_member or msg.reply_to_message.left_chat_member or msg.reply_to_message.from
 		local target = {}
-		for k,v in pairs(msg.reply_to_message.from) do
+		for k,v in pairs(d) do
 			target[k] = v
 		end
 		target.name = utilities.build_name(target.first_name, target.last_name)
@@ -184,7 +186,7 @@ function administration:get_targets(msg, config)
 		local input = utilities.input(msg.text)
 		if input then
 			local t = {}
-			for _, user in ipairs(utilities.index(input)) do
+			for user in input:gmatch('%g+') do
 				if self.database.users[user] then
 					local target = {}
 					for k,v in pairs(self.database.users[user]) do
@@ -195,10 +197,11 @@ function administration:get_targets(msg, config)
 					target.rank = administration.get_rank(self, target.id, msg.chat.id, config)
 					table.insert(t, target)
 				elseif tonumber(user) then
+					local id = math.abs(tonumber(user))
 					local target = {
-						id = tonumber(user),
-						id_str = user,
-						name = 'Unknown ('..user..')',
+						id = id,
+						id_str = tostring(id),
+						name = 'Unknown ('..id..')',
 						rank = administration.get_rank(self, user, msg.chat.id, config)
 					}
 					table.insert(t, target)
@@ -227,7 +230,7 @@ function administration:mod_format(id)
 	id = tostring(id)
 	local user = self.database.users[id] or { first_name = 'Unknown' }
 	local name = utilities.build_name(user.first_name, user.last_name)
-	name = utilities.markdown_escape(name)
+	name = utilities.md_escape(name)
 	local output = '• ' .. name .. ' `[' .. id .. ']`\n'
 	return output
 end
@@ -356,36 +359,36 @@ function administration.init_command(self_, config_)
 						if not group.antiflood then
 							group.antiflood = JSON.decode(JSON.encode(administration.antiflood))
 						end
-						if not self.admin_temp.flood[chat_id_str] then
-							self.admin_temp.flood[chat_id_str] = {}
+						if not administration.temp.flood[chat_id_str] then
+							administration.temp.flood[chat_id_str] = {}
 						end
-						if not self.admin_temp.flood[chat_id_str][from_id_str] then
-							self.admin_temp.flood[chat_id_str][from_id_str] = 0
+						if not administration.temp.flood[chat_id_str][from_id_str] then
+							administration.temp.flood[chat_id_str][from_id_str] = 0
 						end
 						if msg.sticker then -- Thanks Brazil for discarding switches.
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.sticker
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.sticker
 						elseif msg.photo then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
 						elseif msg.document then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.document
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.document
 						elseif msg.audio then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.audio
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.audio
 						elseif msg.contact then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.contact
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.contact
 						elseif msg.video then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.video
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.video
 						elseif msg.location then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.location
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.location
 						elseif msg.voice then
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.voice
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.voice
 						else
-							self.admin_temp.flood[chat_id_str][from_id_str] = self.admin_temp.flood[chat_id_str][from_id_str] + group.antiflood.text
+							administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.text
 						end
-						if self.admin_temp.flood[chat_id_str][from_id_str] > 99 then
+						if administration.temp.flood[chat_id_str][from_id_str] > 99 then
 							user.do_kick = true
 							user.reason = 'antiflood'
 							user.output = administration.flags[5].kicked:gsub('GROUPNAME', msg.chat.title)
-							self.admin_temp.flood[chat_id_str][from_id_str] = nil
+							administration.temp.flood[chat_id_str][from_id_str] = nil
 						end
 					end
 
@@ -586,7 +589,7 @@ function administration.init_command(self_, config_)
 				else
 					local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
 					for i = 1, rank do
-						for _, val in ipairs(self.admin_temp.help[i]) do
+						for _, val in ipairs(administration.temp.help[i]) do
 							output = output .. '• ' .. config.cmd_pat .. val .. '\n'
 						end
 					end
@@ -685,7 +688,7 @@ function administration.init_command(self_, config_)
 		},
 
 		{ -- /motd
-			triggers = utilities.triggers(self_.info.username, config_.cmd_pat):t('motd').table,
+			triggers = utilities.triggers(self_.info.username, config_.cmd_pat):t('motd'):t('qotd').table,
 
 			command = 'motd',
 			privilege = 1,
@@ -821,7 +824,7 @@ function administration.init_command(self_, config_)
 			triggers = utilities.triggers(self_.info.username, config_.cmd_pat):t('setmotd', true):t('setqotd', true).table,
 
 			command = 'setmotd <motd>',
-			privilege = 2,
+			privilege = config_.administration.moderator_setmotd and 2 or 3,
 			interior = true,
 			doc = 'Sets the group\'s message of the day. Markdown is supported. Pass "--" to delete the message.',
 
@@ -977,8 +980,7 @@ function administration.init_command(self_, config_)
 				local output = ''
 				local input = utilities.input(msg.text)
 				if input then
-					local index = utilities.index(input)
-					for _, i in ipairs(index) do
+					for i in input:gmatch('%g+') do
 						local n = tonumber(i)
 						if n and administration.flags[n] then
 							if group.flags[n] == true then
@@ -1069,7 +1071,10 @@ function administration.init_command(self_, config_)
 								group.bans[target.id_str] = nil
 							end
 							if group.grouptype == 'supergroup' then
-								drua.channel_set_admin(msg.chat.id, target.id, 2)
+								local chat_member = bindings.getChatMember(self, { chat_id = msg.chat.id, user_id = target.id })
+								if chat_member and chat_member.result.status == 'member' then
+									drua.channel_set_admin(msg.chat.id, target.id, 2)
+								end
 							end
 						end
 					end
@@ -1138,7 +1143,10 @@ function administration.init_command(self_, config_)
 							utilities.send_reply(self, msg, target.name .. ' is the new governor.')
 						end
 						if group.grouptype == 'supergroup' then
-							drua.channel_set_admin(msg.chat.id, target.id, 2)
+							local chat_member = bindings.getChatMember(self, { chat_id = msg.chat.id, user_id = target.id })
+							if chat_member and chat_member.result.status == 'member' then
+								drua.channel_set_admin(msg.chat.id, target.id, 2)
+							end
 							administration.update_desc(self, msg.chat.id, config)
 						end
 					end
@@ -1195,7 +1203,7 @@ function administration.init_command(self_, config_)
 					for _, target in ipairs(targets) do
 						if target.err then
 							output = output .. target.err .. '\n'
-						elseif self.database.blacklist[target.id_str] then
+						elseif self.database.administration.globalbans[target.id_str] then
 							output = output .. target.name .. ' is already globally banned.\n'
 						elseif target.rank >= administration.get_rank(self, msg.from.id, msg.chat.id, config) then
 							output = output .. target.name .. ' is too privileged to be globally banned.\n'
@@ -1211,7 +1219,7 @@ function administration.init_command(self_, config_)
 									end
 								end
 							end
-							self.database.blacklist[target.id_str] = true
+							self.database.administration.globalbans[target.id_str] = true
 							if group and group.flags[6] == true then
 								group.mods[target.id_str] = nil
 								group.bans[target.id_str] = true
@@ -1243,10 +1251,10 @@ function administration.init_command(self_, config_)
 					for _, target in ipairs(targets) do
 						if target.err then
 							output = output .. target.err .. '\n'
-						elseif not self.database.blacklist[target.id_str] then
+						elseif not self.database.administration.globalbans[target.id_str] then
 							output = output .. target.name .. ' is not globally banned.\n'
 						else
-							self.database.blacklist[target.id_str] = nil
+							self.database.administration.globalbans[target.id_str] = nil
 							output = output .. target.name .. ' has been globally unbanned.\n'
 						end
 					end
@@ -1333,7 +1341,7 @@ function administration.init_command(self_, config_)
 
 			action = function(self, msg, group, config)
 				if msg.chat.id == msg.from.id then
-					utilities.send_message(self, msg.chat.id, 'No.')
+					utilities.send_message(self, msg.chat.id, 'This is not a group.')
 				elseif group then
 					utilities.send_reply(self, msg, 'I am already administrating this group.')
 				else
@@ -1344,8 +1352,7 @@ function administration.init_command(self_, config_)
 					end
 					local input = utilities.input(msg.text)
 					if input then
-						local index = utilities.index(input)
-						for _, i in ipairs(index) do
+						for i in input:gmatch('%g+') do
 							local n = tonumber(i)
 							if n and administration.flags[n] and flags[n] ~= true then
 								flags[n] = true
@@ -1442,11 +1449,11 @@ function administration.init_command(self_, config_)
 	-- Generate help messages and ahelp keywords.
 	self_.database.administration.help = {}
 	for i,_ in ipairs(administration.ranks) do
-		self_.admin_temp.help[i] = {}
+		administration.temp.help[i] = {}
 	end
 	for _,v in ipairs(administration.commands) do
 		if v.command then
-			table.insert(self_.admin_temp.help[v.privilege], v.command)
+			table.insert(administration.temp.help[v.privilege], v.command)
 			if v.doc then
 				v.keyword = utilities.get_word(v.command, 1)
 			end
@@ -1475,7 +1482,7 @@ function administration:action(msg, config)
 end
 
 function administration:cron()
-	self.admin_temp.flood = {}
+	administration.temp.flood = {}
 	if os.date('%d') ~= self.database.administration.autokick_timer then
 		self.database.administration.autokick_timer = os.date('%d')
 		for _,v in pairs(self.database.administration.groups) do

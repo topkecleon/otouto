@@ -6,11 +6,9 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 function weather:init(config)
-	if not config.owm_api_key then
-		print('Missing config value: owm_api_key.')
-		print('weather.lua will not be enabled.')
-		return
-	end
+	assert(config.owm_api_key,
+		'weather.lua requires an OpenWeatherMap API key from http://openweathermap.org/API.'
+	)
 
 	weather.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('weather', true).table
 	weather.doc = config.cmd_pat .. [[weather <location>
@@ -21,14 +19,10 @@ weather.command = 'weather <location>'
 
 function weather:action(msg, config)
 
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, weather.doc, true, msg.message_id, true)
-			return
-		end
+		utilities.send_reply(self, msg, weather.doc, true)
+		return
 	end
 
 	local coords = utilities.get_coords(input, config)

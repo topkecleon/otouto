@@ -14,14 +14,10 @@ end
 
 function imdb:action(msg, config)
 
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, imdb.doc, true, msg.message_id, true)
-			return
-		end
+		utilities.send_reply(self, msg, imdb.doc, true)
+		return
 	end
 
 	local url = 'http://www.omdbapi.com/?t=' .. URL.escape(input)

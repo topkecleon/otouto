@@ -11,22 +11,19 @@ function pokedex:init(config)
 	pokedex.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pokedex', true):t('dex', true).table
 	pokedex.doc = config.cmd_pat .. [[pokedex <query>
 Returns a Pokedex entry from pokeapi.co.
+Queries must be a number of the name of a Pokémon.
 Alias: ]] .. config.cmd_pat .. 'dex'
 end
 
 function pokedex:action(msg, config)
 
-	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
-
-	local input = utilities.input(msg.text_lower)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, pokedex.doc, true, msg.message_id, true)
-			return
-		end
+		utilities.send_reply(self, msg, pokedex.doc, true)
+		return
 	end
+
+	bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
 
 	local url = 'http://pokeapi.co'
 
@@ -38,6 +35,11 @@ function pokedex:action(msg, config)
 	end
 
 	local dex_jdat = JSON.decode(dex_jstr)
+
+	if not dex_jdat.descriptions or not dex_jdat.descriptions[1] then
+		utilities.send_reply(self, msg, config.errors.results)
+		return
+	end
 
 	local desc_url = url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
 	local desc_jstr, _ = HTTP.request(desc_url)

@@ -1,5 +1,4 @@
  -- Credit to Juan (tg:JuanPotato; gh:JuanPotato) for this plugin.
- -- Or rather, the seven lines that actually mean anything.
 
 local bing = {}
 
@@ -15,54 +14,65 @@ bing.command = 'bing <query>'
 bing.search_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/Web?Query=\'%s\'&$format=json'
 
 function bing:init(config)
-	if not config.bing_api_key then
-		print('Missing config value: bing_api_key.')
-		print('bing.lua will not be enabled.')
-		return
-	end
-	bing.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bing', true):t('g', true):t('google', true).table
-	bing.doc = config.cmd_pat .. [[bing <query>
-Returns the top web search results from Bing.
-Aliases: ]] .. config.cmd_pat .. 'g, ' .. config.cmd_pat .. 'google'
+	assert(config.bing_api_key,
+		'bing.lua requires a Bing API key from http://datamarket.azure.com/dataset/bing/search.'
+	)
+
+	bing.headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) }
+	bing.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+		:t('bing', true):t('g', true):t('google', true).table
+	bing.doc = [[
+/bing <query>
+Returns the top web results from Bing.
+Aliases: /g, /google
+	]]
+	bing.doc = bing.doc:gsub('/', config.cmd_pat)
+
 end
 
 function bing:action(msg, config)
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text ~= '' then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_reply(self, msg, bing.doc, true)
-			return
-		end
+		utilities.send_reply(self, msg, bing.doc, true)
+		return
 	end
+
 	local url = bing.search_url:format(URL.escape(input))
 	local resbody = {}
-	local _,b,_ = https.request{
+	local _, code = https.request{
 	    url = url,
-	    headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) },
+	    headers = bing.headers,
 	    sink = ltn12.sink.table(resbody),
 	}
-	if b ~= 200 then
+	if code ~= 200 then
+		utilities.send_reply(self, msg, config.errors.connection)
+		return
+	end
+
+	local data = JSON.decode(table.concat(resbody))
+	-- Four results in a group, eight in private.
+	local limit = msg.chat.type == 'private' and 8 or 4
+	-- No more results than provided.
+	limit = limit > #data.d.results and #data.d.results or limit
+	if limit == 0 then
 		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
-	local dat = JSON.decode(table.concat(resbody))
-	local limit = 4
-	if msg.chat.type == 'private' then
-		limit = 8
-	end
-	if limit > #dat.d.results then
-		limit = #dat.d.results
-	end
+
 	local reslist = {}
 	for i = 1, limit do
-		local result = dat.d.results[i]
-		local s = '• [' .. result.Title:gsub('%]', '\\]') .. '](' .. result.Url:gsub('%)', '\\)') .. ')'
-		table.insert(reslist, s)
+		table.insert(reslist, string.format(
+			'• <a href="%s">%s</a>',
+			utilities.html_escape(data.d.results[i].Url),
+			utilities.html_escape(data.d.results[i].Title)
+		))
 	end
-	local output = '*Search results for* _' .. utilities.md_escape(input) .. '_ *:*\n' .. table.concat(reslist, '\n')
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	local output = string.format(
+		'<b>Search results for</b> <i>%s</i><b>:</b>\n%s',
+		utilities.html_escape(input),
+		table.concat(reslist, '\n')
+	)
+	utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
 end
 
 return bing

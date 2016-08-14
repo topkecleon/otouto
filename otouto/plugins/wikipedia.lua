@@ -12,101 +12,79 @@ function wikipedia:init(config)
 	wikipedia.doc = config.cmd_pat .. [[wikipedia <query>
 Returns an article from Wikipedia.
 Aliases: ]] .. config.cmd_pat .. 'w, ' .. config.cmd_pat .. 'wiki'
-end
-
-local get_title = function(search)
-	for _,v in ipairs(search) do
-		if not v.snippet:match('may refer to:') then
-			return v.title
-		end
-	end
-	return false
+	wikipedia.search_url = 'https://' .. config.lang .. '.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
+	wikipedia.res_url = 'https://' .. config.lang .. '.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+	wikipedia.art_url = 'https://' .. config.lang .. '.wikipedia.org/wiki/'
 end
 
 function wikipedia:action(msg, config)
-
-	-- Get the query. If it's not in the message, check the replied-to message.
-	-- If those don't exist, send the help text.
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
-			return
-		end
+		utilities.send_reply(self, msg, wikipedia.doc, true)
+		return
 	end
 
-	-- This kinda sucks, but whatever.
-	input = input:gsub('#', ' sharp')
-
-	-- Disclaimer: These variables will be reused.
-	local jstr, res, jdat
-
-	-- All pretty standard from here.
-	local search_url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
-
-	jstr, res = HTTPS.request(search_url .. URL.escape(input))
-	if res ~= 200 then
+	local jstr, code = HTTPS.request(wikipedia.search_url .. URL.escape(input))
+	if code ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	jdat = JSON.decode(jstr)
-	if jdat.query.searchinfo.totalhits == 0 then
+	local data = JSON.decode(jstr)
+	if data.query.searchinfo.totalhits == 0 then
 		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 
-	local title = get_title(jdat.query.search)
+	local title
+	for _, v in ipairs(data.query.search) do
+		if not v.snippet:match('may refer to:') then
+			title = v.title
+			break
+		end
+	end
 	if not title then
 		utilities.send_reply(self, msg, config.errors.results)
 		return
 	end
 
-	local res_url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
-
-	jstr, res = HTTPS.request(res_url .. URL.escape(title))
-	if res ~= 200 then
+	local res_jstr, res_code = HTTPS.request(wikipedia.res_url .. URL.escape(title))
+	if res_code ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	local _
-	local text = JSON.decode(jstr).query.pages
-	_, text = next(text)
+	local _, text = next(JSON.decode(res_jstr).query.pages)
 	if not text then
 		utilities.send_reply(self, msg, config.errors.results)
 		return
-	else
-		text = text.extract
 	end
 
-	-- Remove needless bits from the article, take only the first paragraph.
-	text = text:gsub('</?.->', '')
+	text = text.extract
+	-- Remove crap and take only the first paragraph.
+	text = text:gsub('</?.->', ''):gsub('%[.+%]', '')
 	local l = text:find('\n')
 	if l then
 		text = text:sub(1, l-1)
 	end
-
-	-- This block can be annoying to read.
-	-- We use the initial title to make the url for later use. Then we remove
-	-- the extra bits that won't be in the article. We determine whether the
-	-- first part of the text is the title, and if so, we embolden that.
-	-- Otherwise, we prepend the text with a bold title. Then we append a "Read
-	-- More" link.
-	local url = 'https://en.wikipedia.org/wiki/' .. URL.escape(title)
-	title = title:gsub('%(.+%)', '')
-	local output
-	if string.match(text:sub(1, title:len()), title) then
-		output = '*' .. title .. '*' .. text:sub(title:len()+1)
+	local url = wikipedia.art_url .. URL.escape(title)
+	title = utilities.html_escape(title)
+	-- If the beginning of the article is the title, embolden that.
+	-- Otherwise, we'll add a title in bold.
+	local short_title = title:gsub('%(.+%)', '')
+	local combined_text, count = text:gsub('^'..short_title, '<b>'..short_title..'</b>')
+	local body
+	if count == 1 then
+		body = combined_text
 	else
-		output = '*' .. title:gsub('%(.+%)', '') .. '*\n' .. text:gsub('%[.+%]','')
+		body = '<b>' .. title .. '</b>\n' .. text
 	end
-	output = output .. '\n[Read more.](' .. url:gsub('%)', '\\)') .. ')'
-
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
-
+	local output = string.format(
+		'%s\n<a href="%s">Read more.</a>',
+		body,
+		utilities.html_escape(url)
+	)
+	utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
 end
 
 return wikipedia

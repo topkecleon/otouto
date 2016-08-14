@@ -1,10 +1,18 @@
-local patterns = {}
-
 local utilities = require('otouto.utilities')
 
-patterns.triggers = {
-	'^/?s/.-/.-$'
-}
+local patterns = {}
+
+patterns.command = 's/<pattern>/<substitution>'
+patterns.help_word = 'sed'
+patterns.doc = [[
+s/<pattern>/<substitution>
+Replace all matches for the given pattern.
+Uses Lua patterns.
+	]]
+
+function patterns:init(config)
+	patterns.triggers = { config.cmd_pat .. '?s/.-/.-$' }
+end
 
 function patterns:action(msg)
 	if not msg.reply_to_message then return true end
@@ -24,8 +32,8 @@ function patterns:action(msg)
 	if res == false then
 		utilities.send_reply(self, msg, 'Malformed pattern!')
 	else
-		output = output:sub(1, 4000)
-		output = '*Did you mean:*\n"' .. utilities.md_escape(utilities.trim(output)) .. '"'
+		output = utilities.trim(output:sub(1, 4000))
+		output = utilities.style.enquote('Did you mean', output)
 		utilities.send_reply(self, msg.reply_to_message, output, true)
 	end
 end

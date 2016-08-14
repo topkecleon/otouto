@@ -8,7 +8,8 @@ pokemon_go.command = 'pokego <team>'
 function pokemon_go:init(config)
   pokemon_go.triggers = utilities.triggers(self.info.username, config.cmd_pat)
     :t('pokego', true):t('pokégo', true)
-    :t('pokemongo', true):t('pokémongo', true).table
+    :t('pokemongo', true):t('pokémongo', true)
+    :t('pogo', true):t('mongo', true).table
   pokemon_go.doc = config.cmd_pat .. [[pokego <team>
 Set your Pokémon Go team for statistical purposes. The team must be valid, and can be referred to by name or color (or the first letter of either). Giving no team name will show statistics.]]
   local db = self.database.pokemon_go

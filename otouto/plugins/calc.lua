@@ -13,29 +13,16 @@ Returns solutions to mathematical expressions and conversions between common uni
 end
 
 function calc:action(msg, config)
-
-	local input = utilities.input(msg.text)
+	local input = utilities.input_from_msg(msg)
 	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, calc.doc, true, msg.message_id, true)
-			return
-		end
-	end
-
-	local url = 'https://api.mathjs.org/v1/?expr=' .. URL.escape(input)
-
-	local output = HTTPS.request(url)
-	if not output then
-		utilities.send_reply(self, msg, config.errors.connection)
+		utilities.send_reply(self, msg, calc.doc, true)
 		return
 	end
 
-	output = '`' .. output .. '`'
-
-	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
-
+	local url = 'https://api.mathjs.org/v1/?expr=' .. URL.escape(input)
+	local output = HTTPS.request(url)
+	output = output and '`'..output..'`' or config.errors.connection
+	utilities.send_reply(self, msg, output, true)
 end
 
 return calc

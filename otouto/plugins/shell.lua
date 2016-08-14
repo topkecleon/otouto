@@ -20,7 +20,9 @@ function shell:action(msg, config)
 		return
 	end
 
-	local output = io.popen(input):read('*all')
+	local f = io.popen(input)
+	local output = f:read('*all')
+	f:close()
 	if output:len() == 0 then
 		output = 'Done!'
 	else

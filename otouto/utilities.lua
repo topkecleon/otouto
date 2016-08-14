@@ -12,45 +12,38 @@ local bindings = require('otouto.bindings')
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
+ -- Edit: To keep things working and allow for HTML messages, you can now pass a
+ -- string for use_markdown and that will be sent as the parse mode.
 function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
+	local parse_mode
+	if type(use_markdown) == 'string' then
+		parse_mode = use_markdown
+	elseif use_markdown == true then
+		parse_mode = 'markdown'
+	end
 	return bindings.request(self, 'sendMessage', {
 		chat_id = chat_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
 		reply_to_message_id = reply_to_message_id,
-		parse_mode = use_markdown and 'Markdown' or nil
+		parse_mode = parse_mode
 	} )
 end
 
 function utilities:send_reply(old_msg, text, use_markdown)
-	return bindings.request(self, 'sendMessage', {
-		chat_id = old_msg.chat.id,
-		text = text,
-		disable_web_page_preview = true,
-		reply_to_message_id = old_msg.message_id,
-		parse_mode = use_markdown and 'Markdown' or nil
-	} )
+	return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown)
 end
 
  -- get the indexed word in a string
 function utilities.get_word(s, i)
 	s = s or ''
 	i = i or 1
-	local t = {}
+	local n = 0
 	for w in s:gmatch('%g+') do
-		table.insert(t, w)
+		n = n + 1
+		if n == i then return w end
 	end
-	return t[i] or false
-end
-
- -- Like get_word(), but better.
- -- Returns the actual index.
-function utilities.index(s)
-	local t = {}
-	for w in s:gmatch('%g+') do
-		table.insert(t, w)
-	end
-	return t
+	return false
 end
 
  -- Returns the string after the first space.
@@ -59,6 +52,10 @@ function utilities.input(s)
 		return false
 	end
 	return s:sub(s:find(' ')+1)
+end
+
+function utilities.input_from_msg(msg)
+	return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters
@@ -82,13 +79,13 @@ end
  -- Loads a JSON file as a table.
 function utilities.load_data(filename)
 	local f = io.open(filename)
-	if not f then
+	if f then
+		local s = f:read('*all')
+		f:close()
+		return JSON.decode(s)
+	else
 		return {}
 	end
-	local s = f:read('*all')
-	f:close()
-	local data = JSON.decode(s)
-	return data
 end
 
  -- Saves a table to a JSON file.
@@ -153,85 +150,14 @@ function utilities:resolve_username(input)
 	end
 end
 
- -- Simpler than above function; only returns an ID.
- -- Returns nil if no ID is available.
-function utilities:id_from_username(input)
-	input = input:gsub('^@', '')
-	for _, user in pairs(self.database.users) do
-		if user.username and user.username:lower() == input:lower() then
-			return user.id
-		end
-	end
-end
-
- -- Simpler than below function; only returns an ID.
- -- Returns nil if no ID is available.
-function utilities:id_from_message(msg)
-	if msg.reply_to_message then
-		return msg.reply_to_message.from.id
-	else
-		local input = utilities.input(msg.text)
-		if input then
-			if tonumber(input) then
-				return tonumber(input)
-			elseif input:match('^@') then
-				return utilities.id_from_username(self, input)
-			end
-		end
-	end
-end
-
-function utilities:user_from_message(msg, no_extra)
-
-	local input = utilities.input(msg.text_lower)
-	local target = {}
-	if msg.reply_to_message then
-		for k,v in pairs(self.database.users[msg.reply_to_message.from.id_str]) do
-			target[k] = v
-		end
-	elseif input and tonumber(input) then
-		target.id = tonumber(input)
-		if self.database.users[input] then
-			for k,v in pairs(self.database.users[input]) do
-				target[k] = v
-			end
-		end
-	elseif input and input:match('^@') then
-		local uname = input:gsub('^@', '')
-		for _,v in pairs(self.database.users) do
-			if v.username and uname == v.username:lower() then
-				for key, val in pairs(v) do
-					target[key] = val
-				end
-			end
-		end
-		if not target.id then
-			target.err = 'Sorry, I don\'t recognize that username.'
-		end
-	else
-		target.err = 'Please specify a user via reply, ID, or username.'
-	end
-
-	if not no_extra then
-		if target.id then
-			target.id_str = tostring(target.id)
-		end
-		if not target.first_name then
-			target.first_name = 'User'
-		end
-		target.name = utilities.build_name(target.first_name, target.last_name)
-	end
-
-	return target
-
-end
-
 function utilities:handle_exception(err, message, config)
-
-	if not err then err = '' end
-
-	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
-
+	local output = string.format(
+		'\n[%s]\n%s: %s\n%s\n',
+		os.date('%F %T'),
+		self.info.username,
+		err or '',
+		message
+	)
 	if config.log_chat then
 		output = '```' .. output .. '```'
 		utilities.send_message(self, config.log_chat, output, true, nil, true)
@@ -265,16 +191,15 @@ function utilities.download_file(url, filename)
 	return filename
 end
 
-function utilities.markdown_escape(text)
-	text = text:gsub('_', '\\_')
-	text = text:gsub('%[', '\\[')
-	text = text:gsub('%]', '\\]')
-	text = text:gsub('%*', '\\*')
-	text = text:gsub('`', '\\`')
-	return text
+function utilities.md_escape(text)
+	return text:gsub('_', '\\_')
+			:gsub('%[', '\\['):gsub('%]', '\\]')
+			:gsub('%*', '\\*'):gsub('`', '\\`')
 end
 
-utilities.md_escape = utilities.markdown_escape
+function utilities.html_escape(text)
+	return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
+end
 
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
@@ -320,7 +245,7 @@ utilities.char = {
 	rtl_override = '‮',
 	rtl_mark = '‏',
 	em_dash = '—',
-	utf_8 = '([%z\1-\127\194-\244][\128-\191]*)',
+	utf_8 = '[%z\1-\127\194-\244][\128-\191]',
 }
 
 utilities.set_meta = {}
@@ -352,6 +277,13 @@ function utilities.set_meta:remove(x)
 end
 function utilities.set_meta:__len()
   return self.__count
+end
+
+ -- Styling functions to keep things consistent and easily changeable across plugins.
+ -- More to be added.
+utilities.style = {}
+utilities.style.enquote = function(title, body)
+	return '*' .. title:gsub('*', '\\*') .. ':*\n"' .. utilities.md_escape(body) .. '"'
 end
 
 return utilities

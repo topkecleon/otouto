@@ -1,39 +1,15 @@
- -- This plugin will allow the admin to blacklist users who will be unable to
- -- use the bot. This plugin should be at the top of your plugin list in config.
+local utilities = require('otouto.utilities')
 
 local blacklist = {}
 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
-function blacklist:init()
-	if not self.database.blacklist then
-		self.database.blacklist = {}
-	end
+function blacklist:init(config)
+	blacklist.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+		:t('blacklist', true):t('unblacklist', true).table
+	blacklist.error = false
 end
 
-blacklist.triggers = {
-	''
-}
-
-blacklist.error = false
-
 function blacklist:action(msg, config)
-	if self.database.blacklist[tostring(msg.from.id)] then
-		return
-	elseif self.database.blacklist[tostring(msg.chat.id)] then
-		bindings.leaveChat(self, { chat_id = msg.chat.id })
-		return
-	end
-	if not (
-		msg.from.id == config.admin
-		and (
-			msg.text:match('^'..config.cmd_pat..'blacklist')
-			or msg.text:match('^'..config.cmd_pat..'unblacklist')
-		)
-	) then
-		return true
-	end
+	if msg.from.id ~= config.admin then return true end
 	local targets = {}
 	if msg.reply_to_message then
 		table.insert(targets, {
@@ -44,7 +20,7 @@ function blacklist:action(msg, config)
 	else
 		local input = utilities.input(msg.text)
 		if input then
-			for _, user in ipairs(utilities.index(input)) do
+			for user in input:gmatch('%g+') do
 				if self.database.users[user] then
 					table.insert(targets, {
 						id = self.database.users[user].id,
