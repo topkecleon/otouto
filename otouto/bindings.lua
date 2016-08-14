@@ -52,7 +52,7 @@ function bindings:request(method, parameters, file)
         sink = ltn12.sink.table(response)
     }
     local data = table.concat(response)
-    if not success or success == 1 then
+    if not success then
         print(method .. ': Connection error. [' .. code  .. ']')
         return false, false
     else

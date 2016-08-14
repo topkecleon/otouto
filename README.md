@@ -5,7 +5,7 @@ The plugin-wielding, multipurpose Telegram bot.
 
 otouto is a plugin-based, IRC-style bot written for the [Telegram Bot API](http://core.telegram.org/bots/api). Originally written in February of 2015 as a set of Lua scripts to run on [telegram-cli](http://github.com/vysheng/tg), otouto was open-sourced and migrated to the bot API later in June that year.
 
-otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
+otouto (including all plugins and documentation) is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
 
 **The Manual**
 
@@ -45,7 +45,7 @@ This section includes an exhaustive list of possible configuration values for ot
 | `log_chat`    | nil     | Telegram ID of the recipient for error messages.   |
 | `cmd_pat`     | `"/"`   | Character (or string) to be used for bot commands. |
 | `lang`        | `"en"`  | Two-letter ISO 639-1 language code.                |
-| `about_text`  | `...`   | Informational text to be returned by /about.       |
+| `about_text`  | ...   | Informational text to be returned by /about.       |
 
 #### Error messages
 These are the generic error messages used by most plugins. These belong in a table named `errors`.
@@ -103,7 +103,7 @@ Some plugins have many configuration values which warrant their own section of t
 The `greetings` table is a list of custom responses for the greetings plugin. Each value is an array of triggers, and the key for that array is the response. The default values are inserted by the greetings plugin if there is no user configuration. In the responses, `#NAME` is replaced with the user's name or nickname. The bot's name is automatically appended to all triggers. Triggers are not case sensitive.
 
 #### reactions.lua
-The `reactions` table is also a list of custom responses, for the reactions plugin. Each value is a key/value pair, where the key is the trigger, and the value is the reaction. The reactions plugin differs from the greetings plugin by how it is triggered: A reaction command must be at the beginning or end of a line.
+The `reactions` table is also a list of custom responses, for the reactions plugin. Each value is a key/value pair, where the key is the trigger, and the value is the reaction. The reactions plugin differs from the greetings plugin by how it is triggered: A reaction command must be at the beginning or end of a line. Reactions may be formatted with HTML. Configuration values should be pre-escaped.
 
 ## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
