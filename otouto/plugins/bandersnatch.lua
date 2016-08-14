@@ -5,8 +5,8 @@ local utilities = require('otouto.utilities')
 bandersnatch.command = 'bandersnatch'
 
 function bandersnatch:init(config)
-	bandersnatch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bandersnatch'):t('bc').table
-	bandersnatch.doc = 'Shun the frumious Bandersnatch. \nAlias: ' .. config.cmd_pat .. 'bc'
+    bandersnatch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('bandersnatch'):t('bc').table
+    bandersnatch.doc = 'Shun the frumious Bandersnatch. \nAlias: ' .. config.cmd_pat .. 'bc'
 end
 
 local fullnames = { "Wimbledon Tennismatch", "Rinkydink Curdlesnoot", "Butawhiteboy Cantbekhan", "Benadryl Claritin", "Bombadil Rivendell", "Wanda's Crotchfruit", "Biblical Concubine", "Syphilis Cankersore", "Buckminster Fullerene", "Bourgeoisie Capitalist" }
@@ -17,15 +17,15 @@ local lastnames = { "Coddleswort", "Crumplesack", "Curdlesnoot", "Calldispatch",
 
 function bandersnatch:action(msg)
 
-	local output
+    local output
 
-	if math.random(10) == 10 then
-		output = fullnames[math.random(#fullnames)]
-	else
-		output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
-	end
+    if math.random(10) == 10 then
+        output = fullnames[math.random(#fullnames)]
+    else
+        output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
+    end
 
-	utilities.send_message(self, msg.chat.id, '_'..output..'_', true, nil, true)
+    utilities.send_message(self, msg.chat.id, '_'..output..'_', true, nil, true)
 
 end
 

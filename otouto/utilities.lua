@@ -15,47 +15,47 @@ local bindings = require('otouto.bindings')
  -- Edit: To keep things working and allow for HTML messages, you can now pass a
  -- string for use_markdown and that will be sent as the parse mode.
 function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
-	local parse_mode
-	if type(use_markdown) == 'string' then
-		parse_mode = use_markdown
-	elseif use_markdown == true then
-		parse_mode = 'markdown'
-	end
-	return bindings.request(self, 'sendMessage', {
-		chat_id = chat_id,
-		text = text,
-		disable_web_page_preview = disable_web_page_preview,
-		reply_to_message_id = reply_to_message_id,
-		parse_mode = parse_mode
-	} )
+    local parse_mode
+    if type(use_markdown) == 'string' then
+        parse_mode = use_markdown
+    elseif use_markdown == true then
+        parse_mode = 'markdown'
+    end
+    return bindings.request(self, 'sendMessage', {
+        chat_id = chat_id,
+        text = text,
+        disable_web_page_preview = disable_web_page_preview,
+        reply_to_message_id = reply_to_message_id,
+        parse_mode = parse_mode
+    } )
 end
 
 function utilities:send_reply(old_msg, text, use_markdown)
-	return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown)
+    return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown)
 end
 
  -- get the indexed word in a string
 function utilities.get_word(s, i)
-	s = s or ''
-	i = i or 1
-	local n = 0
-	for w in s:gmatch('%g+') do
-		n = n + 1
-		if n == i then return w end
-	end
-	return false
+    s = s or ''
+    i = i or 1
+    local n = 0
+    for w in s:gmatch('%g+') do
+        n = n + 1
+        if n == i then return w end
+    end
+    return false
 end
 
  -- Returns the string after the first space.
 function utilities.input(s)
-	if not s:find(' ') then
-		return false
-	end
-	return s:sub(s:find(' ')+1)
+    if not s:find(' ') then
+        return false
+    end
+    return s:sub(s:find(' ')+1)
 end
 
 function utilities.input_from_msg(msg)
-	return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
+    return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters
@@ -72,180 +72,180 @@ end
 
  -- Trims whitespace from a string.
 function utilities.trim(str)
-	local s = str:gsub('^%s*(.-)%s*$', '%1')
-	return s
+    local s = str:gsub('^%s*(.-)%s*$', '%1')
+    return s
 end
 
  -- Loads a JSON file as a table.
 function utilities.load_data(filename)
-	local f = io.open(filename)
-	if f then
-		local s = f:read('*all')
-		f:close()
-		return JSON.decode(s)
-	else
-		return {}
-	end
+    local f = io.open(filename)
+    if f then
+        local s = f:read('*all')
+        f:close()
+        return JSON.decode(s)
+    else
+        return {}
+    end
 end
 
  -- Saves a table to a JSON file.
 function utilities.save_data(filename, data)
-	local s = JSON.encode(data)
-	local f = io.open(filename, 'w')
-	f:write(s)
-	f:close()
+    local s = JSON.encode(data)
+    local f = io.open(filename, 'w')
+    f:write(s)
+    f:close()
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
 function utilities.get_coords(input, config)
 
-	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
+    local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
-	local jstr, res = HTTP.request(url)
-	if res ~= 200 then
-		return config.errors.connection
-	end
+    local jstr, res = HTTP.request(url)
+    if res ~= 200 then
+        return config.errors.connection
+    end
 
-	local jdat = JSON.decode(jstr)
-	if jdat.status == 'ZERO_RESULTS' then
-		return config.errors.results
-	end
+    local jdat = JSON.decode(jstr)
+    if jdat.status == 'ZERO_RESULTS' then
+        return config.errors.results
+    end
 
-	return {
-		lat = jdat.results[1].geometry.location.lat,
-		lon = jdat.results[1].geometry.location.lng
-	}
+    return {
+        lat = jdat.results[1].geometry.location.lat,
+        lon = jdat.results[1].geometry.location.lng
+    }
 
 end
 
  -- Get the number of values in a key/value table.
 function utilities.table_size(tab)
-	local i = 0
-	for _,_ in pairs(tab) do
-		i = i + 1
-	end
-	return i
+    local i = 0
+    for _,_ in pairs(tab) do
+        i = i + 1
+    end
+    return i
 end
 
  -- Just an easy way to get a user's full name.
  -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
-	if last then
-		return first .. ' ' .. last
-	else
-		return first
-	end
+    if last then
+        return first .. ' ' .. last
+    else
+        return first
+    end
 end
 
 function utilities:resolve_username(input)
-	input = input:gsub('^@', '')
-	for _, user in pairs(self.database.users) do
-		if user.username and user.username:lower() == input:lower() then
-			local t = {}
-			for key, val in pairs(user) do
-				t[key] = val
-			end
-			return t
-		end
-	end
+    input = input:gsub('^@', '')
+    for _, user in pairs(self.database.users) do
+        if user.username and user.username:lower() == input:lower() then
+            local t = {}
+            for key, val in pairs(user) do
+                t[key] = val
+            end
+            return t
+        end
+    end
 end
 
 function utilities:handle_exception(err, message, config)
-	local output = string.format(
-		'\n[%s]\n%s: %s\n%s\n',
-		os.date('%F %T'),
-		self.info.username,
-		err or '',
-		message
-	)
-	if config.log_chat then
-		output = '```' .. output .. '```'
-		utilities.send_message(self, config.log_chat, output, true, nil, true)
-	else
-		print(output)
-	end
+    local output = string.format(
+        '\n[%s]\n%s: %s\n%s\n',
+        os.date('%F %T'),
+        self.info.username,
+        err or '',
+        message
+    )
+    if config.log_chat then
+        output = '```' .. output .. '```'
+        utilities.send_message(self, config.log_chat, output, true, nil, true)
+    else
+        print(output)
+    end
 
 end
 
 function utilities.download_file(url, filename)
-	if not filename then
-		filename = url:match('.+/(.-)$') or os.time()
-		filename = '/tmp/' .. filename
-	end
-	local body = {}
-	local doer = HTTP
-	local do_redir = true
-	if url:match('^https') then
-		doer = HTTPS
-		do_redir = false
-	end
-	local _, res = doer.request{
-		url = url,
-		sink = ltn12.sink.table(body),
-		redirect = do_redir
-	}
-	if res ~= 200 then return false end
-	local file = io.open(filename, 'w+')
-	file:write(table.concat(body))
-	file:close()
-	return filename
+    if not filename then
+        filename = url:match('.+/(.-)$') or os.time()
+        filename = '/tmp/' .. filename
+    end
+    local body = {}
+    local doer = HTTP
+    local do_redir = true
+    if url:match('^https') then
+        doer = HTTPS
+        do_redir = false
+    end
+    local _, res = doer.request{
+        url = url,
+        sink = ltn12.sink.table(body),
+        redirect = do_redir
+    }
+    if res ~= 200 then return false end
+    local file = io.open(filename, 'w+')
+    file:write(table.concat(body))
+    file:close()
+    return filename
 end
 
 function utilities.md_escape(text)
-	return text:gsub('_', '\\_')
-			:gsub('%[', '\\['):gsub('%]', '\\]')
-			:gsub('%*', '\\*'):gsub('`', '\\`')
+    return text:gsub('_', '\\_')
+            :gsub('%[', '\\['):gsub('%]', '\\]')
+            :gsub('%*', '\\*'):gsub('`', '\\`')
 end
 
 function utilities.html_escape(text)
-	return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
+    return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
 end
 
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
 function utilities.triggers_meta:t(pattern, has_args)
-	local username = self.username:lower()
-	table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
-	table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
-	if has_args then
-		table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
-		table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
-	end
-	return self
+    local username = self.username:lower()
+    table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
+    table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
+    if has_args then
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
+    end
+    return self
 end
 
 function utilities.triggers(username, cmd_pat, trigger_table)
-	local self = setmetatable({}, utilities.triggers_meta)
-	self.username = username
-	self.cmd_pat = cmd_pat
-	self.table = trigger_table or {}
-	return self
+    local self = setmetatable({}, utilities.triggers_meta)
+    self.username = username
+    self.cmd_pat = cmd_pat
+    self.table = trigger_table or {}
+    return self
 end
 
 function utilities.with_http_timeout(timeout, fun)
-	local original = HTTP.TIMEOUT
-	HTTP.TIMEOUT = timeout
-	fun()
-	HTTP.TIMEOUT = original
+    local original = HTTP.TIMEOUT
+    HTTP.TIMEOUT = timeout
+    fun()
+    HTTP.TIMEOUT = original
 end
 
 function utilities.pretty_float(x)
-	if x % 1 == 0 then
-		return tostring(math.floor(x))
-	else
-		return tostring(x)
-	end
+    if x % 1 == 0 then
+        return tostring(math.floor(x))
+    else
+        return tostring(x)
+    end
 end
 
  -- This table will store unsavory characters that are not properly displayed,
  -- or are just not fun to type.
 utilities.char = {
-	zwnj = '‌',
-	arabic = '[\216-\219][\128-\191]',
-	rtl_override = '‮',
-	rtl_mark = '‏',
-	em_dash = '—',
-	utf_8 = '[%z\1-\127\194-\244][\128-\191]',
+    zwnj = '‌',
+    arabic = '[\216-\219][\128-\191]',
+    rtl_override = '‮',
+    rtl_mark = '‏',
+    em_dash = '—',
+    utf_8 = '[%z\1-\127\194-\244][\128-\191]',
 }
 
 utilities.set_meta = {}
@@ -283,7 +283,7 @@ end
  -- More to be added.
 utilities.style = {}
 utilities.style.enquote = function(title, body)
-	return '*' .. title:gsub('*', '\\*') .. ':*\n"' .. utilities.md_escape(body) .. '"'
+    return '*' .. title:gsub('*', '\\*') .. ':*\n"' .. utilities.md_escape(body) .. '"'
 end
 
 return utilities

@@ -292,26 +292,26 @@ Additionally, any method can be called as a key in the `bindings` table (for exa
 
 ```
 bindings.request(
-	self,
-	'sendMessage',
-	{
-		chat_id = 987654321,
-		text = 'Quick brown fox.',
-		reply_to_message_id = 54321,
-		disable_web_page_preview = false,
-		parse_method = 'Markdown'
-	}
+    self,
+    'sendMessage',
+    {
+        chat_id = 987654321,
+        text = 'Quick brown fox.',
+        reply_to_message_id = 54321,
+        disable_web_page_preview = false,
+        parse_method = 'Markdown'
+    }
 )
 
 bindings.sendMessage(
-	self,
-	{
-		chat_id = 987654321,
-		text = 'Quick brown fox.',
-		reply_to_message_id = 54321,
-		disable_web_page_preview = false,
-		parse_method = 'Markdown'
-	}
+    self,
+    {
+        chat_id = 987654321,
+        text = 'Quick brown fox.',
+        reply_to_message_id = 54321,
+        disable_web_page_preview = false,
+        parse_method = 'Markdown'
+    }
 )
 ```
 
@@ -342,20 +342,20 @@ Alone, the database will have this structure:
 
 ```
 {
-	users = {
-		["55994550"] = {
-			id = 55994550,
-			first_name = "Drew",
-			username = "topkecleon"
-		}
-	},
-	userdata = {
-		["55994550"] = {
-			nickname = "Worst coder ever",
-			lastfm = "topkecleon"
-		}
-	},
-	version = "3.11"
+    users = {
+        ["55994550"] = {
+            id = 55994550,
+            first_name = "Drew",
+            username = "topkecleon"
+        }
+    },
+    userdata = {
+        ["55994550"] = {
+            nickname = "Worst coder ever",
+            lastfm = "topkecleon"
+        }
+    },
+    version = "3.11"
 }
 ```
 

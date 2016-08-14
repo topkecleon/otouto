@@ -8,19 +8,19 @@ commit.command = 'commit'
 commit.doc = 'Returns a commit message from whatthecommit.com.'
 
 function commit:init(config)
-	commit.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('commit').table
+    commit.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('commit').table
 end
 
 function commit:action(msg)
-	bindings.request(
-		self,
-		'sendMessage',
-		{
-			chat_id = msg.chat.id,
-			text = '```\n' .. (http.request('http://whatthecommit.com/index.txt')) .. '\n```',
-			parse_mode = 'Markdown'
-		}
-	)
+    bindings.request(
+        self,
+        'sendMessage',
+        {
+            chat_id = msg.chat.id,
+            text = '```\n' .. (http.request('http://whatthecommit.com/index.txt')) .. '\n```',
+            parse_mode = 'Markdown'
+        }
+    )
 end
 
 return commit

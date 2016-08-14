@@ -9,58 +9,58 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 function gImages:init(config)
-	assert(config.google_api_key and config.google_cse_key,
-		'gImages.lua requires a Google API key from http://console.developers.google.com and a Google Custom Search Engine key from http://cse.google.com/cse.'
-	)
+    assert(config.google_api_key and config.google_cse_key,
+        'gImages.lua requires a Google API key from http://console.developers.google.com and a Google Custom Search Engine key from http://cse.google.com/cse.'
+    )
 
-	gImages.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('image', true):t('i', true):t('insfw', true).table
-	gImages.doc = config.cmd_pat .. [[image <query>
+    gImages.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('image', true):t('i', true):t('insfw', true).table
+    gImages.doc = config.cmd_pat .. [[image <query>
 Returns a randomized top result from Google Images. Safe search is enabled by default; use "]] .. config.cmd_pat .. [[insfw" to disable it. NSFW results will not display an image preview.
 Alias: ]] .. config.cmd_pat .. 'i'
-	gImages.search_url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. config.google_api_key .. '&cx=' .. config.google_cse_key
+    gImages.search_url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. config.google_api_key .. '&cx=' .. config.google_cse_key
 end
 
 gImages.command = 'image <query>'
 
 function gImages:action(msg, config)
 
-	local input = utilities.input_from_msg(msg)
-	if not input then
-		utilities.send_reply(self, msg, gImages.doc, true)
-		return
-	end
+    local input = utilities.input_from_msg(msg)
+    if not input then
+        utilities.send_reply(self, msg, gImages.doc, true)
+        return
+    end
 
-	local url = gImages.search_url
+    local url = gImages.search_url
 
-	if not string.match(msg.text, '^'..config.cmd_pat..'i[mage]*nsfw') then
-		url = url .. '&safe=high'
-	end
+    if not string.match(msg.text, '^'..config.cmd_pat..'i[mage]*nsfw') then
+        url = url .. '&safe=high'
+    end
 
-	url = url .. '&q=' .. URL.escape(input)
+    url = url .. '&q=' .. URL.escape(input)
 
-	local jstr, res = HTTPS.request(url)
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
-	end
+    local jstr, res = HTTPS.request(url)
+    if res ~= 200 then
+        utilities.send_reply(self, msg, config.errors.connection)
+        return
+    end
 
-	local jdat = JSON.decode(jstr)
-	if jdat.searchInformation.totalResults == '0' then
-		utilities.send_reply(self, msg, config.errors.results)
-		return
-	end
+    local jdat = JSON.decode(jstr)
+    if jdat.searchInformation.totalResults == '0' then
+        utilities.send_reply(self, msg, config.errors.results)
+        return
+    end
 
-	local i = math.random(jdat.queries.request[1].count)
-	local img_url = jdat.items[i].link
-	local img_title = jdat.items[i].title
-	local output = '[' .. img_title .. '](' .. img_url .. ')'
+    local i = math.random(jdat.queries.request[1].count)
+    local img_url = jdat.items[i].link
+    local img_title = jdat.items[i].title
+    local output = '[' .. img_title .. '](' .. img_url .. ')'
 
 
-	if msg.text:match('nsfw') then
-		utilities.send_reply(self, '*NSFW*\n'..msg, output)
-	else
-		utilities.send_message(self, msg.chat.id, output, false, nil, true)
-	end
+    if msg.text:match('nsfw') then
+        utilities.send_reply(self, '*NSFW*\n'..msg, output)
+    else
+        utilities.send_message(self, msg.chat.id, output, false, nil, true)
+    end
 
 end
 
