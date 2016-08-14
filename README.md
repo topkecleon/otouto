@@ -244,10 +244,10 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 | `dilbert.lua`         | /dilbert [date]               | Returns a Dilbert strip.                                            |
 | `patterns.lua`        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                              |
 | `me.lua`              | /me                           | Returns user-specific data stored by the bot.                       |
-| `remind.lua`          | /remind <duration> <message>  | Reminds a user of something after a duration of minutes.            |
-| `channel.lua`         | /ch <channel> \n <message>    | Sends a markdown-enabled message to a channel.                      |
-| `isup.lua`            | /isup <url>                   | Returns the status of a website.                                    |
-| `starwars-crawl.lua`  | /sw <title ¦ number>          | Returns the opening crawl from the specified Star Wars film. | /sw  |
+| `remind.lua`          | /remind ‹duration› ‹message›  | Reminds a user of something after a duration of minutes.            |
+| `channel.lua`         | /ch ‹channel› \n ‹message›    | Sends a markdown-enabled message to a channel.                      |
+| `isup.lua`            | /isup ‹url›                   | Returns the status of a website.                                    |
+| `starwars-crawl.lua`  | /sw ‹title ¦ number›          | Returns the opening crawl from the specified Star Wars film. | /sw  |
 | `chuckfact.lua`       | /chuck                        | Returns a fact about Chuck Norris.                           | /cn  |
 | `catfact.lua`         | /catfact                      | Returns a fact about cats.                                          |
 
