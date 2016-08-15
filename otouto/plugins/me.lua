@@ -41,7 +41,7 @@ function me:action(msg, config)
     local data = {}
     for k,v in pairs(userdata) do
         table.insert(data, string.format(
-            '<b>%s</b> <code>%s</code>\n',
+            '<b>%s:</b> <code>%s</code>\n',
             utilities.html_escape(k),
             utilities.html_escape(v)
         ))

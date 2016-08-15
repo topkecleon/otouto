@@ -13,7 +13,7 @@ Example (forty pidgeys and three hundred pidgey candies):
 end
 
  -- This function written by Juan Potato. MIT-licensed.
-local pidgey_calc = function(candies_to_evolve, mons, candies)
+local function pidgey_calc(candies_to_evolve, mons, candies)
     local transferred = 0;
     local evolved = 0;
 
@@ -52,7 +52,7 @@ local pidgey_calc = function(candies_to_evolve, mons, candies)
     }
 end
 
-local single_job = function(input)
+local function single_job(input)
     local req_candy, mons, candies = input:match('^(%d+) (%d+) (%d+)$')
     req_candy = tonumber(req_candy)
     mons = tonumber(mons)

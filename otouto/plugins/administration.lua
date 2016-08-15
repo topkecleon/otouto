@@ -50,17 +50,7 @@ function administration:init(config)
 
     administration.flags = administration.init_flags(config.cmd_pat)
     administration.init_command(self, config)
-    administration.antiflood = config.administration.antiflood or {
-        text = 5,
-        voice = 5,
-        audio = 5,
-        contact = 5,
-        photo = 10,
-        video = 10,
-        location = 10,
-        document = 10,
-        sticker = 20
-    }
+    administration.antiflood = config.administration.antiflood
 
     administration.doc = 'Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.'
     administration.command = 'groups [query]'

@@ -9,9 +9,6 @@ function remind:init(config)
 
     remind.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('remind', true).table
 
-    config.remind = config.remind or {}
-    setmetatable(config.remind, { __index = function() return 1000 end })
-
     remind.doc = config.cmd_pat .. [[remind <duration> <message>
 Repeats a message after a duration of time, in minutes.
 The maximum length of a reminder is %s characters. The maximum duration of a timer is %s minutes. The maximum number of reminders for a group is %s. The maximum number of reminders in private is %s.]]

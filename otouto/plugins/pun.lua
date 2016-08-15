@@ -67,7 +67,7 @@ local puns = {
     "I don't trust people with graph paper. They're always plotting something",
     "I had a friend who was addicted to brake fluid. He says he can stop anytime.",
     "The form said I had Type A blood, but it was a Type O.",
-    "I went to to the shop to buy eight Sprites -  I came home and realised I'd picked 7Up.",
+    "I went to to the shop to buy eight Sprites - I came home and realised I'd picked 7Up.",
     "There was an explosion at a pie factory. 3.14 people died.",
     "A man drove his car into a tree and found out how a Mercedes bends.",
     "The experienced carpenter really nailed it, but the new guy screwed everything up.",

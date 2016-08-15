@@ -14,7 +14,7 @@ Returns the top posts or results for a given subreddit or query. If no argument 
 Aliases: ]] .. config.cmd_pat .. 'r, /r/subreddit'
 end
 
-local format_results = function(posts)
+local function format_results(posts)
     local output = ''
     for _,v in ipairs(posts) do
         local post = v.data
