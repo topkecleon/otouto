@@ -16,7 +16,7 @@ function shell:action(msg, config)
     input = input:gsub('—', '--')
 
     if not input then
-        utilities.send_reply(self, msg, 'Please specify a command to run.')
+        utilities.send_reply(msg, 'Please specify a command to run.')
         return
     end
 
@@ -28,7 +28,7 @@ function shell:action(msg, config)
     else
         output = '```\n' .. output .. '\n```'
     end
-    utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+    utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

@@ -22,24 +22,24 @@ end
 function translate:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, translate.doc, true)
+        utilities.send_reply(msg, translate.doc, true)
         return
     end
 
     local url = translate.base_url:format(URL.escape(input))
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
-    utilities.send_reply(self, msg.reply_to_message or msg, utilities.style.enquote('Translation', data.text[1]), true)
+    utilities.send_reply(msg.reply_to_message or msg, utilities.style.enquote('Translation', data.text[1]), true)
 end
 
 return translate

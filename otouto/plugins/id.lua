@@ -56,7 +56,7 @@ function id:action(msg)
     else
         output = id.format(msg.from)
     end
-    utilities.send_reply(self, msg, output, 'html')
+    utilities.send_reply(msg, output, 'html')
 end
 
 return id

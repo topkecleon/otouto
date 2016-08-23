@@ -137,7 +137,7 @@ local puns = {
 
 function pun:action(msg)
 
-    utilities.send_reply(self, msg, puns[math.random(#puns)])
+    utilities.send_reply(msg, puns[math.random(#puns)])
 
 end
 

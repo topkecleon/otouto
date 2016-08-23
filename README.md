@@ -283,7 +283,7 @@ Interactions with the bot API are straightforward. See the [Bindings section](#b
 Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
 
 ## Bindings
-Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts four arguments: `self`, `method`, `parameters`, `file`. (At the very least, `self` should be a table containing `BASE_URL`, which is bot's API endpoint, ending with a slash, eg `https://api.telegram.org/bot123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ987654321/`.)
+Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts three arguments: `method`, `parameters`, `file`. Before using it, initialize the bindings module with its `init` function, passing your bot token as the argument.
 
 `method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
 
@@ -291,7 +291,6 @@ Additionally, any method can be called as a key in the `bindings` table (for exa
 
 ```
 bindings.request(
-    self,
     'sendMessage',
     {
         chat_id = 987654321,
@@ -302,34 +301,31 @@ bindings.request(
     }
 )
 
-bindings.sendMessage(
-    self,
-    {
-        chat_id = 987654321,
-        text = 'Quick brown fox.',
-        reply_to_message_id = 54321,
-        disable_web_page_preview = false,
-        parse_method = 'Markdown'
-    }
-)
+bindings.sendMessage{
+    chat_id = 987654321,
+    text = 'Quick brown fox.',
+    reply_to_message_id = 54321,
+    disable_web_page_preview = false,
+    parse_method = 'Markdown'
+}
 ```
 
 Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
 
 ```
-utilities.send_message(self, 987654321, 'Quick brown fox.', false, 54321, true)
+utilities.send_message(987654321, 'Quick brown fox.', false, 54321, true)
 ```
 
 Uploading a file for the `sendPhoto` method would look like this:
 
 ```
-bindings.sendPhoto(self, { chat_id = 987654321 }, { photo = 'dankmeme.jpg' } )
+bindings.sendPhoto({ chat_id = 987654321 }, { photo = 'dankmeme.jpg' } )
 ```
 
 and using `sendPhoto` with a file ID would look like this:
 
 ```
-bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' } )
+bindings.sendPhoto{ chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' }
 ```
 
 Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".

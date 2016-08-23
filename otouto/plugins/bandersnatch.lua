@@ -25,7 +25,7 @@ function bandersnatch:action(msg)
         output = firstnames[math.random(#firstnames)] .. ' ' .. lastnames[math.random(#lastnames)]
     end
 
-    utilities.send_message(self, msg.chat.id, '_'..output..'_', true, nil, true)
+    utilities.send_message(msg.chat.id, '_'..output..'_', true, nil, true)
 
 end
 

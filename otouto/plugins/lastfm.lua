@@ -30,17 +30,17 @@ function lastfm:action(msg, config)
     self.database.userdata[from_id_str] = self.database.userdata[from_id_str] or {}
 
     if string.match(msg.text, '^'..config.cmd_pat..'lastfm') then
-        utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, true)
         return
     elseif string.match(msg.text, '^'..config.cmd_pat..'fmset') then
         if not input then
-            utilities.send_message(self, msg.chat.id, lastfm.doc, true, msg.message_id, true)
+            utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, true)
         elseif input == '--' or input == utilities.char.em_dash then
             self.database.userdata[from_id_str].lastfm = nil
-            utilities.send_reply(self, msg, 'Your last.fm username has been forgotten.')
+            utilities.send_reply(msg, 'Your last.fm username has been forgotten.')
         else
             self.database.userdata[from_id_str].lastfm = input
-            utilities.send_reply(self, msg, 'Your last.fm username has been set to "' .. input .. '".')
+            utilities.send_reply(msg, 'Your last.fm username has been set to "' .. input .. '".')
         end
         return
     end
@@ -58,7 +58,7 @@ function lastfm:action(msg, config)
         alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..config.cmd_pat..'fmset <username>.'
         self.database.userdata[from_id_str].lastfm = username
     else
-        utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
+        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
         return
     end
 
@@ -70,19 +70,19 @@ function lastfm:action(msg, config)
             jstr, res = HTTP.request(url)
     end)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.error then
-        utilities.send_reply(self, msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
+        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
         return
     end
 
     jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
     if not jdat then
-        utilities.send_reply(self, msg, 'No history for this user.' .. alert)
+        utilities.send_reply(msg, 'No history for this user.' .. alert)
         return
     end
 
@@ -102,7 +102,7 @@ function lastfm:action(msg, config)
     end
 
     output = output .. title .. ' - ' .. artist .. alert
-    utilities.send_message(self, msg.chat.id, output)
+    utilities.send_message(msg.chat.id, output)
 
 end
 

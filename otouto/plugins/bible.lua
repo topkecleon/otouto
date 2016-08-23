@@ -21,7 +21,7 @@ function bible:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, bible.doc, true)
+        utilities.send_reply(msg, bible.doc, true)
         return
     end
 
@@ -42,7 +42,7 @@ function bible:action(msg, config)
         output = 'The text is too long to post here. Try being more specific.'
     end
 
-    utilities.send_reply(self, msg, output)
+    utilities.send_reply(msg, output)
 
 end
 

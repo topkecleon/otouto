@@ -30,11 +30,11 @@ function patterns:action(msg)
         end
     )
     if res == false then
-        utilities.send_reply(self, msg, 'Malformed pattern!')
+        utilities.send_reply(msg, 'Malformed pattern!')
     else
         output = utilities.trim(output:sub(1, 4000))
         output = utilities.style.enquote('Did you mean', output)
-        utilities.send_reply(self, msg.reply_to_message, output, true)
+        utilities.send_reply(msg.reply_to_message, output, true)
     end
 end
 

@@ -73,7 +73,7 @@ end
 function pgc:action(msg)
     local input = utilities.input(msg.text)
     if not input then
-        utilities.send_reply(self, msg, pgc.doc, true)
+        utilities.send_reply(msg, pgc.doc, true)
         return
     end
     input = input .. '\n'
@@ -106,7 +106,7 @@ function pgc:action(msg)
     end
     s = s:format(total_evolutions, recommendation)
     output = output .. s
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return pgc

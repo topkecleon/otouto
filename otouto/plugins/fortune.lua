@@ -18,13 +18,10 @@ fortune.command = 'fortune'
 fortune.doc = 'Returns a UNIX fortune.'
 
 function fortune:action(msg)
-
     local fortunef = io.popen('fortune')
-    local output = fortunef:read('*all')
-    output = '```\n' .. output .. '\n```'
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    local output = '```\n' .. fortunef:read('*all') .. '\n```'
     fortunef:close()
-
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 end
 
 return fortune

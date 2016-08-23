@@ -1,10 +1,23 @@
 --[[
-    bindings.lua (rev. 2016/05/28)
+    bindings.lua (rev. 2016/08/20)
     otouto's bindings for the Telegram bot API.
     https://core.telegram.org/bots/api
-    Copyright 2016 topkecleon. Published under the AGPLv3.
-
     See the "Bindings" section of README.md for usage information.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License version 3 as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ]]--
 
 local bindings = {}
@@ -14,6 +27,11 @@ local JSON = require('dkjson')
 local ltn12 = require('ltn12')
 local MP_ENCODE = require('multipart-post').encode
 
+function bindings.init(token)
+    bindings.BASE_URL = 'https://api.telegram.org/bot' .. token .. '/'
+    return bindings
+end
+
  -- Build and send a request to the API.
  -- Expecting self, method, and parameters, where method is a string indicating
  -- the API method and parameters is a key/value table of parameters with their
@@ -21,7 +39,7 @@ local MP_ENCODE = require('multipart-post').encode
  -- Returns the table response with success. Returns false and the table
  -- response with failure. Returns false and false with a connection error.
  -- To mimic old/normal behavior, it errs if used with an invalid method.
-function bindings:request(method, parameters, file)
+function bindings.request(method, parameters, file)
     parameters = parameters or {}
     for k,v in pairs(parameters) do
         parameters[k] = tostring(v)
@@ -42,7 +60,7 @@ function bindings:request(method, parameters, file)
     local response = {}
     local body, boundary = MP_ENCODE(parameters)
     local success, code = HTTPS.request{
-        url = self.BASE_URL .. method,
+        url = bindings.BASE_URL .. method,
         method = 'POST',
         headers = {
             ["Content-Type"] =    "multipart/form-data; boundary=" .. boundary,
@@ -69,8 +87,8 @@ function bindings:request(method, parameters, file)
 end
 
 function bindings.gen(_, key)
-    return function(self, params, file)
-        return bindings.request(self, key, params, file)
+    return function(params, file)
+        return bindings.request(key, params, file)
     end
 end
 setmetatable(bindings, { __index = bindings.gen })

@@ -17,12 +17,12 @@ end
 function chuck:action(msg, config)
     local jstr, code = HTTP.request(chuck.url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
     local data = JSON.decode(jstr)
     local output = '*Chuck Norris Fact*\n_' .. data.value.joke .. '_'
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 end
 
 return chuck

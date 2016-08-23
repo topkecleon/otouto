@@ -18,13 +18,13 @@ end
 function remind:action(msg, config)
     local input = utilities.input(msg.text)
     if not input then
-        utilities.send_reply(self, msg, remind.doc, true)
+        utilities.send_reply(msg, remind.doc, true)
         return
     end
 
     local duration = tonumber(utilities.get_word(input, 1))
     if not duration then
-        utilities.send_reply(self, msg, remind.doc, true)
+        utilities.send_reply(msg, remind.doc, true)
         return
     end
 
@@ -35,12 +35,12 @@ function remind:action(msg, config)
     end
     local message = utilities.input(input)
     if not message then
-        utilities.send_reply(self, msg, remind.doc, true)
+        utilities.send_reply(msg, remind.doc, true)
         return
     end
 
     if #message > config.remind.max_length then
-        utilities.send_reply(self, msg, 'The maximum length of reminders is ' .. config.remind.max_length .. '.')
+        utilities.send_reply(msg, 'The maximum length of reminders is ' .. config.remind.max_length .. '.')
         return
     end
 
@@ -62,7 +62,7 @@ function remind:action(msg, config)
             duration == 1 and '' or 's'
         )
     end
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 function remind:cron(config)
@@ -75,7 +75,7 @@ function remind:cron(config)
             -- Otherwise, add it to the replacement table.
             if time > reminder.time then
                 local output = utilities.style.enquote('Reminder', reminder.message)
-                local res = utilities.send_message(self, chat_id, output, true, nil, true)
+                local res = utilities.send_message(chat_id, output, true, nil, true)
                 -- If the message fails to send, save it for later (if enabled in config).
                 if res or not config.remind.persist then
                     group[k] = nil

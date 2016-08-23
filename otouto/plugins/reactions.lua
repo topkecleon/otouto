@@ -25,12 +25,12 @@ end
 
 function reactions:action(msg, config)
     if string.match(msg.text_lower, config.cmd_pat..'reactions') then
-        utilities.send_message(self, msg.chat.id, reactions.help, true, nil, 'html')
+        utilities.send_message(msg.chat.id, reactions.help, true, nil, 'html')
         return
     end
     for trigger,reaction in pairs(config.reactions) do
         if string.match(msg.text_lower, config.cmd_pat..trigger) then
-            utilities.send_message(self, msg.chat.id, reaction, true, nil, 'html')
+            utilities.send_message(msg.chat.id, reaction, true, nil, 'html')
             return
         end
     end

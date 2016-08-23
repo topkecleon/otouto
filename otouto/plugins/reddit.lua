@@ -67,15 +67,15 @@ function reddit:action(msg, config)
     end
     local jstr, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
     else
         local jdat = JSON.decode(jstr)
         if #jdat.data.children == 0 then
-            utilities.send_reply(self, msg, config.errors.results)
+            utilities.send_reply(msg, config.errors.results)
         else
             local output = format_results(jdat.data.children)
             output = source .. output
-            utilities.send_message(self, msg.chat.id, output, true, nil, true)
+            utilities.send_message(msg.chat.id, output, true, nil, true)
         end
     end
 end

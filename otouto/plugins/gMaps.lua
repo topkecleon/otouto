@@ -19,21 +19,21 @@ end
 function gMaps:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, gMaps.doc, true)
+        utilities.send_reply(msg, gMaps.doc, true)
         return
     end
 
     local coords = utilities.get_coords(input, config)
     if type(coords) == 'string' then
-        utilities.send_reply(self, msg, coords)
+        utilities.send_reply(msg, coords)
     end
 
-    bindings.sendLocation(self, {
+    bindings.sendLocation{
         chat_id = msg.chat.id,
         latitude = coords.lat,
         longitude = coords.lon,
         reply_to_message_id = msg.message_id
-    } )
+    }
 end
 
 return gMaps

@@ -15,14 +15,14 @@ end
 function calc:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, calc.doc, true)
+        utilities.send_reply(msg, calc.doc, true)
         return
     end
 
     local url = 'https://api.mathjs.org/v1/?expr=' .. URL.escape(input)
     local output = HTTPS.request(url)
     output = output and '`'..output..'`' or config.errors.connection
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return calc

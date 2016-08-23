@@ -33,13 +33,13 @@ function apod:action(msg, config)
 
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.error then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -50,7 +50,7 @@ function apod:action(msg, config)
         date,
         utilities.html_escape(data.explanation)
     )
-    utilities.send_message(self, msg.chat.id, output, false, nil, 'html')
+    utilities.send_message(msg.chat.id, output, false, nil, 'html')
 end
 
 return apod

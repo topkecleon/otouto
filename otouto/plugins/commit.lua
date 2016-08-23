@@ -12,15 +12,11 @@ function commit:init(config)
 end
 
 function commit:action(msg)
-    bindings.request(
-        self,
-        'sendMessage',
-        {
-            chat_id = msg.chat.id,
-            text = '```\n' .. (http.request('http://whatthecommit.com/index.txt')) .. '\n```',
-            parse_mode = 'Markdown'
-        }
-    )
+    bindings.sendMessage{
+        chat_id = msg.chat.id,
+        text = '```\n' .. (http.request('http://whatthecommit.com/index.txt')) .. '\n```',
+        parse_mode = 'Markdown'
+    }
 end
 
 return commit

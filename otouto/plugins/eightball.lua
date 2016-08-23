@@ -51,7 +51,7 @@ function eightball:action(msg)
         output = ball_answers[math.random(#ball_answers)]
     end
 
-    utilities.send_reply(self, msg, output)
+    utilities.send_reply(msg, output)
 
 end
 

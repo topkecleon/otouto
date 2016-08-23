@@ -33,7 +33,7 @@ end
 function bing:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, bing.doc, true)
+        utilities.send_reply(msg, bing.doc, true)
         return
     end
 
@@ -45,7 +45,7 @@ function bing:action(msg, config)
         sink = ltn12.sink.table(resbody),
     }
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
@@ -55,7 +55,7 @@ function bing:action(msg, config)
     -- No more results than provided.
     limit = limit > #data.d.results and #data.d.results or limit
     if limit == 0 then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -72,7 +72,7 @@ function bing:action(msg, config)
         utilities.html_escape(input),
         table.concat(reslist, '\n')
     )
-    utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
+    utilities.send_message(msg.chat.id, output, true, nil, 'html')
 end
 
 return bing

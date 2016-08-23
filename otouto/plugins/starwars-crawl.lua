@@ -40,11 +40,11 @@ local corrected_numbers = {
 function starwars:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, starwars.doc, true)
+        utilities.send_reply(msg, starwars.doc, true)
         return
     end
 
-    bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' } )
+    bindings.sendChatAction{ chat_id = msg.chat.id, action = 'typing' }
 
     local film
     if tonumber(input) then
@@ -60,19 +60,19 @@ function starwars:action(msg, config)
     end
 
     if not film then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
     local url = starwars.base_url .. film
     local jstr, code = HTTP.request(url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local output = '*' .. JSON.decode(jstr).opening_crawl .. '*'
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 end
 
 return starwars

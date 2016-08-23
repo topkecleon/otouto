@@ -21,13 +21,13 @@ function weather:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, weather.doc, true)
+        utilities.send_reply(msg, weather.doc, true)
         return
     end
 
     local coords = utilities.get_coords(input, config)
     if type(coords) == 'string' then
-        utilities.send_reply(self, msg, coords)
+        utilities.send_reply(msg, coords)
         return
     end
 
@@ -35,13 +35,13 @@ function weather:action(msg, config)
 
     local jstr, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.cod ~= 200 then
-        utilities.send_reply(self, msg, 'Error: City not found.')
+        utilities.send_reply(msg, 'Error: City not found.')
         return
     end
 
@@ -49,7 +49,7 @@ function weather:action(msg, config)
     local fahrenheit = string.format('%.2f', celsius * (9/5) + 32)
     local output = '`' .. celsius .. '°C | ' .. fahrenheit .. '°F, ' .. jdat.weather[1].description .. '.`'
 
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 
 end
 

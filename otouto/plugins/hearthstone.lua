@@ -95,7 +95,7 @@ function hearthstone:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, hearthstone.doc, true)
+        utilities.send_reply(msg, hearthstone.doc, true)
         return
     end
 
@@ -108,11 +108,11 @@ function hearthstone:action(msg, config)
 
     output = utilities.trim(output)
     if output:len() == 0 then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
-    utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+    utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

@@ -20,19 +20,19 @@ end
 function wikipedia:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, wikipedia.doc, true)
+        utilities.send_reply(msg, wikipedia.doc, true)
         return
     end
 
     local jstr, code = HTTPS.request(wikipedia.search_url .. URL.escape(input))
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.query.searchinfo.totalhits == 0 then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -44,19 +44,19 @@ function wikipedia:action(msg, config)
         end
     end
     if not title then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
     local res_jstr, res_code = HTTPS.request(wikipedia.res_url .. URL.escape(title))
     if res_code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local _, text = next(JSON.decode(res_jstr).query.pages)
     if not text then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -84,7 +84,7 @@ function wikipedia:action(msg, config)
         body,
         utilities.html_escape(url)
     )
-    utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
+    utilities.send_message(msg.chat.id, output, true, nil, 'html')
 end
 
 return wikipedia

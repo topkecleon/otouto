@@ -21,11 +21,11 @@ function help:action(msg, config)
         for _,plugin in ipairs(self.plugins) do
             if plugin.help_word == input:gsub('^/', '') then
                 local output = '*Help for* _' .. plugin.help_word .. '_*:*\n' .. plugin.doc
-                utilities.send_message(self, msg.chat.id, output, true, nil, true)
+                utilities.send_message(msg.chat.id, output, true, nil, true)
                 return
             end
         end
-        utilities.send_reply(self, msg, 'Sorry, there is no help for that command.')
+        utilities.send_reply(msg, 'Sorry, there is no help for that command.')
     else
         -- Generate the help message on first run.
         if not help.text then
@@ -41,11 +41,11 @@ function help:action(msg, config)
         end
         -- Attempt to send the help message via PM.
         -- If msg is from a group, tell the group whether the PM was successful.
-        local res = utilities.send_message(self, msg.from.id, help.text, true, nil, true)
+        local res = utilities.send_message(msg.from.id, help.text, true, nil, true)
         if not res then
-            utilities.send_reply(self, msg, 'Please [message me privately](http://telegram.me/' .. self.info.username .. '?start=help) for a list of commands.', true)
+            utilities.send_reply(msg, 'Please [message me privately](http://telegram.me/' .. self.info.username .. '?start=help) for a list of commands.', true)
         elseif msg.chat.type ~= 'private' then
-            utilities.send_reply(self, msg, 'I have sent you the requested information in a private message.')
+            utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
         end
     end
 end

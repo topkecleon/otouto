@@ -1,5 +1,22 @@
--- utilities.lua
--- Functions shared among plugins.
+--[[
+    utilities.lua
+    Functions shared among otouto plugins.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License version 3 as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+]]--
 
 local utilities = {}
 
@@ -14,24 +31,42 @@ local bindings = require('otouto.bindings')
  -- we'll provide a couple of aliases to real bindings here.
  -- Edit: To keep things working and allow for HTML messages, you can now pass a
  -- string for use_markdown and that will be sent as the parse mode.
-function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
+function utilities.send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
     local parse_mode
     if type(use_markdown) == 'string' then
         parse_mode = use_markdown
     elseif use_markdown == true then
         parse_mode = 'markdown'
     end
-    return bindings.request(self, 'sendMessage', {
-        chat_id = chat_id,
-        text = text,
-        disable_web_page_preview = disable_web_page_preview,
-        reply_to_message_id = reply_to_message_id,
-        parse_mode = parse_mode
-    } )
+    return bindings.request(
+        'sendMessage',
+        {
+            chat_id = chat_id,
+            text = text,
+            disable_web_page_preview = disable_web_page_preview,
+            reply_to_message_id = reply_to_message_id,
+            parse_mode = parse_mode
+        }
+    )
 end
 
-function utilities:send_reply(old_msg, text, use_markdown)
-    return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown)
+function utilities.send_reply(msg, text, use_markdown)
+    local parse_mode
+    if type(use_markdown) == 'string' then
+        parse_mode = use_markdown
+    elseif use_markdown == true then
+        parse_mode = 'markdown'
+    end
+    return bindings.request(
+        'sendMessage',
+        {
+            chat_id = msg.chat.id,
+            text = text,
+            disable_web_page_preview = true,
+            reply_to_message_id = msg.message_id,
+            parse_mode = parse_mode
+        }
+    )
 end
 
  -- get the indexed word in a string
@@ -150,17 +185,17 @@ function utilities:resolve_username(input)
     end
 end
 
-function utilities:handle_exception(err, message, config)
+function utilities:handle_exception(err, message, log_chat)
     local output = string.format(
-        '\n[%s]\n%s: %s\n%s\n',
+        '[%s]\n%s: %s\n%s\n',
         os.date('%F %T'),
         self.info.username,
         err or '',
         message
     )
-    if config.log_chat then
-        output = '```' .. output .. '```'
-        utilities.send_message(self, config.log_chat, output, true, nil, true)
+    if log_chat then
+        output = '<code>' .. utilities.html_escape(output) .. '</code>'
+        return utilities.send_message(log_chat, output, true, nil, 'html')
     else
         print(output)
     end

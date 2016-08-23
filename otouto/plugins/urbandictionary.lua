@@ -22,14 +22,14 @@ end
 function urbandictionary:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, urbandictionary.doc, true)
+        utilities.send_reply(msg, urbandictionary.doc, true)
         return
     end
 
     local url = urbandictionary.base_url .. URL.escape(input)
     local jstr, code = HTTP.request(url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
@@ -44,7 +44,7 @@ function urbandictionary:action(msg, config)
             utilities.trim((data.list[1].example or '')):gsub('_', '_\\__')
         )
     end
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return urbandictionary

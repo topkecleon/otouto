@@ -43,7 +43,7 @@ function nick:action(msg, config)
         output = name .. '\'s nickname has been set to "' .. input .. '".'
     end
 
-    utilities.send_reply(self, msg, output)
+    utilities.send_reply(msg, output)
 
 end
 

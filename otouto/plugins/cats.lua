@@ -24,14 +24,14 @@ function cats:action(msg, config)
 
     local str, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     str = str:match('<img src="(.-)">')
     local output = '[Cat!]('..str..')'
 
-    utilities.send_message(self, msg.chat.id, output, false, nil, true)
+    utilities.send_message(msg.chat.id, output, false, nil, true)
 
 end
 

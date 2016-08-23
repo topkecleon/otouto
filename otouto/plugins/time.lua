@@ -16,13 +16,13 @@ end
 function time:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, time.doc, true)
+        utilities.send_reply(msg, time.doc, true)
         return
     end
 
     local coords = utilities.get_coords(input, config)
     if type(coords) == 'string' then
-        utilities.send_reply(self, msg, coords)
+        utilities.send_reply(msg, coords)
         return
     end
 
@@ -31,13 +31,13 @@ function time:action(msg, config)
     local url = time.base_url:format(coords.lat, coords.lon, utc)
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.status == 'ZERO_RESULTS' then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -53,7 +53,7 @@ function time:action(msg, config)
         data.timeZoneName,
         utcoff
     )
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return time

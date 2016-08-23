@@ -19,7 +19,7 @@ function rms:init(config)
 end
 
 function rms:action(msg, config)
-    bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'upload_photo' })
+    bindings.sendChatAction{ chat_id = msg.chat.id, action = 'upload_photo' }
     local choice = rms.LIST[math.random(#rms.LIST)]
     local filename = '/tmp/' .. choice
     local image_file = io.open(filename)
@@ -28,7 +28,7 @@ function rms:action(msg, config)
     else
         utilities.download_file(rms.BASE_URL .. choice, filename)
     end
-    bindings.sendPhoto(self, { chat_id = msg.chat.id }, { photo = filename })
+    bindings.sendPhoto({ chat_id = msg.chat.id }, { photo = filename })
 end
 
 return rms

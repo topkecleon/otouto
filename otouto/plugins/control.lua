@@ -35,14 +35,14 @@ function control:action(msg, config)
             end
         end
         bot.init(self, config)
-        utilities.send_reply(self, msg, 'Bot reloaded!')
+        utilities.send_reply(msg, 'Bot reloaded!')
     elseif msg.text_lower:match('^'..cmd_pat..'halt') then
         self.is_started = false
-        utilities.send_reply(self, msg, 'Stopping bot!')
+        utilities.send_reply(msg, 'Stopping bot!')
     elseif msg.text_lower:match('^'..cmd_pat..'script') then
         local input = msg.text_lower:match('^'..cmd_pat..'script\n(.+)')
         if not input then
-            utilities.send_reply(self, msg, 'usage: ```\n'..cmd_pat..'script\n'..cmd_pat..'command <arg>\n...\n```', true)
+            utilities.send_reply(msg, 'usage: ```\n'..cmd_pat..'script\n'..cmd_pat..'command <arg>\n...\n```', true)
             return
         end
         input = input .. '\n'

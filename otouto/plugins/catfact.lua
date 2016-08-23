@@ -17,12 +17,12 @@ end
 function catfact:action(msg, config)
     local jstr, code = HTTP.request(catfact.url)
     if code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
     local data = JSON.decode(jstr)
     local output = '*Cat Fact*\n_' .. data.facts[1] .. '_'
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 end
 
 return catfact

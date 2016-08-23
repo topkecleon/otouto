@@ -16,7 +16,7 @@ function imdb:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, imdb.doc, true)
+        utilities.send_reply(msg, imdb.doc, true)
         return
     end
 
@@ -24,14 +24,14 @@ function imdb:action(msg, config)
 
     local jstr, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
 
     if jdat.Response ~= 'True' then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -40,7 +40,7 @@ function imdb:action(msg, config)
     output = output .. '_' .. jdat.Plot .. '_\n'
     output = output .. '[Read more.](http://imdb.com/title/' .. jdat.imdbID .. ')'
 
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 
 end
 

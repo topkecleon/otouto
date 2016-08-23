@@ -26,7 +26,7 @@ function gImages:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, gImages.doc, true)
+        utilities.send_reply(msg, gImages.doc, true)
         return
     end
 
@@ -40,13 +40,13 @@ function gImages:action(msg, config)
 
     local jstr, res = HTTPS.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.searchInformation.totalResults == '0' then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -57,9 +57,9 @@ function gImages:action(msg, config)
 
 
     if msg.text:match('nsfw') then
-        utilities.send_reply(self, '*NSFW*\n'..msg, output)
+        utilities.send_reply('*NSFW*\n'..msg, output)
     else
-        utilities.send_message(self, msg.chat.id, output, false, nil, true)
+        utilities.send_message(msg.chat.id, output, false, nil, true)
     end
 
 end

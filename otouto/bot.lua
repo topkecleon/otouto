@@ -1,3 +1,23 @@
+--[[
+    bot.lua
+    The heart and sole of otouto, ie the init and main loop.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License version 3 as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+]]--
+
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared plugins.
@@ -7,19 +27,13 @@ bot.version = '3.13'
  -- Function to be run on start and reload.
 function bot:init(config)
 
-    bindings = require('otouto.bindings')
+    bindings = require('otouto.bindings').init(config.bot_api_key)
     utilities = require('otouto.utilities')
-
-    assert(
-        config.bot_api_key,
-        'You did not set your bot token in the config!'
-    )
-    self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
 
     -- Fetch bot information. Try until it succeeds.
     repeat
         print('Fetching bot information...')
-        self.info = bindings.getMe(self)
+        self.info = bindings.getMe()
     until self.info
     self.info = self.info.result
 
@@ -132,11 +146,11 @@ function bot:on_msg_receive(msg, config)
                     -- not, use the generic one specified in config. If it's set
                     -- to false, do nothing.
                     if plugin.error then
-                        utilities.send_reply(self, msg, plugin.error)
+                        utilities.send_reply(msg, plugin.error)
                     elseif plugin.error == nil then
-                        utilities.send_reply(self, msg, config.errors.generic)
+                        utilities.send_reply(msg, config.errors.generic)
                     end
-                    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+                    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config.log_chat)
                     msg = nil
                     return
                 -- Continue if the return value is true.
@@ -156,7 +170,7 @@ function bot:run(config)
     bot.init(self, config)
     while self.is_started do
         -- Update loop.
-        local res = bindings.getUpdates(self, { timeout = 20, offset = self.last_update + 1 } )
+        local res = bindings.getUpdates{ timeout = 20, offset = self.last_update + 1 }
         if res then
             -- Iterate over every new message.
             for _,v in ipairs(res.result) do
@@ -176,7 +190,7 @@ function bot:run(config)
                 if v.cron then -- Call each plugin's cron function, if it has one.
                     local result, err = pcall(function() v.cron(self, config) end)
                     if not result then
-                        utilities.handle_exception(self, err, 'CRON: ' .. i, config)
+                        utilities.handle_exception(self, err, 'CRON: ' .. i, config.log_chat)
                     end
                 end
             end

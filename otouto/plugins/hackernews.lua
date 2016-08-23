@@ -55,10 +55,10 @@ end
 function hackernews:action(msg, config)
     local now = os.time() / 60
     if not hackernews.results or hackernews.last_update + config.hackernews_interval < now then
-        bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'typing' })
+        bindings.sendChatAction{ chat_id = msg.chat.id, action = 'typing' }
         hackernews.results = get_hackernews_results()
         if not hackernews.results then
-            utilities.send_reply(self, msg, config.errors.connection)
+            utilities.send_reply(msg, config.errors.connection)
             return
         end
         hackernews.last_update = now
@@ -69,7 +69,7 @@ function hackernews:action(msg, config)
     for i = 1, res_count do
         output = output .. hackernews.results[i]
     end
-    utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
+    utilities.send_message(msg.chat.id, output, true, nil, 'html')
 end
 
 return hackernews

@@ -25,7 +25,7 @@ function channel:action(msg, config)
     local output
     if input then
         local chat_id = utilities.get_word(input, 1)
-        local admin_list, t = bindings.getChatAdministrators(self, { chat_id = chat_id } )
+        local admin_list, t = bindings.getChatAdministrators{ chat_id = chat_id }
         if admin_list then
             local is_admin = false
             for _, admin in ipairs(admin_list.result) do
@@ -36,7 +36,7 @@ function channel:action(msg, config)
             if is_admin then
                 local text = input:match('\n(.+)')
                 if text then
-                    local success, result = utilities.send_message(self, chat_id, text, true, nil, true)
+                    local success, result = utilities.send_message(chat_id, text, true, nil, true)
                     if success then
                         output = 'Your message has been sent!'
                     else
@@ -54,7 +54,7 @@ function channel:action(msg, config)
     else
         output = channel.doc
     end
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return channel

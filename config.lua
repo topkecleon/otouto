@@ -110,8 +110,9 @@ Send /help to get started.
     },
 
     administration = {
-        -- Whether moderators can set a group's message of the day.
-        moderator_setmotd = false,
+        -- Conversation, group, or channel for kick/ban notifications.
+        -- Defaults to config.log_chat if left empty.
+        log_chat = nil,
         -- Default antiflood values.
         antiflood = {
             text = 5,
@@ -123,6 +124,27 @@ Send /help to get started.
             location = 10,
             document = 10,
             sticker = 20
+        },
+        -- Default flag settings.
+        flags = {
+            -- unlisted
+            [1] = false,
+            -- antisquig
+            [2] = false,
+            -- antisquig++
+            [3] = false,
+            -- antibot
+            [4] = false,
+            --antiflood
+            [5] = false,
+            -- antihammer
+            [6] = false,
+            -- nokicklog
+            [7] = false,
+            -- antilink
+            [8] = false,
+            -- modrights
+            [9] = false
         }
     },
 
@@ -151,7 +173,6 @@ Send /help to get started.
         'whoami',
         'wikipedia',
         'xkcd',
-        -- Put new plugins above this line.
         'help',
         'greetings'
     }

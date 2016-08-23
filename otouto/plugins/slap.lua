@@ -158,7 +158,7 @@ function slap:action(msg)
         victor_name = self.info.first_name
     end
     local output = utilities.char.zwnj .. slaps[math.random(#slaps)]:gsub('VICTIM', victim_name):gsub('VICTOR', victor_name)
-    utilities.send_message(self, msg.chat.id, output)
+    utilities.send_message(msg.chat.id, output)
 end
 
 return slap

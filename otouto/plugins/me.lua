@@ -19,17 +19,17 @@ function me:action(msg, config)
                 if tonumber(input) then
                     user = self.database.users[input]
                     if not user then
-                        utilities.send_reply(self, msg, 'Unrecognized ID.')
+                        utilities.send_reply(msg, 'Unrecognized ID.')
                         return
                     end
                 elseif input:match('^@') then
                     user = utilities.resolve_username(self, input)
                     if not user then
-                        utilities.send_reply(self, msg, 'Unrecognized username.')
+                        utilities.send_reply(msg, 'Unrecognized username.')
                         return
                     end
                 else
-                    utilities.send_reply(self, msg, 'Invalid username or ID.')
+                    utilities.send_reply(msg, 'Invalid username or ID.')
                     return
                 end
             end
@@ -61,7 +61,7 @@ function me:action(msg, config)
         ) .. table.concat(data)
     end
 
-    utilities.send_message(self, msg.chat.id, output, true, nil, 'html')
+    utilities.send_message(msg.chat.id, output, true, nil, 'html')
 
 end
 

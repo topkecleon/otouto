@@ -24,7 +24,7 @@ function youtube:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, youtube.doc, true)
+        utilities.send_reply(msg, youtube.doc, true)
         return
     end
 
@@ -32,13 +32,13 @@ function youtube:action(msg, config)
 
     local jstr, res = HTTPS.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.pageInfo.totalResults == 0 then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
@@ -47,7 +47,7 @@ function youtube:action(msg, config)
     vid_title = vid_title:gsub('%(.+%)',''):gsub('%[.+%]','')
     local output = '[' .. vid_title .. '](' .. vid_url .. ')'
 
-    utilities.send_message(self, msg.chat.id, output, false, nil, true)
+    utilities.send_message(msg.chat.id, output, false, nil, true)
 
 end
 

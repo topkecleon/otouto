@@ -47,13 +47,13 @@ function whoami:action(msg)
         ) or '<b>' .. chat_name .. '</b>',
         chat_id
     )
-    bindings.sendMessage(self, {
+    bindings.sendMessage{
         chat_id = msg.chat.id,
         reply_to_message_id = msg.message_id,
         disable_web_page_preview = true,
         parse_mode = 'HTML',
         text = output
-    })
+    }
 end
 
 return whoami

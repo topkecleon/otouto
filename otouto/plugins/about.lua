@@ -13,7 +13,7 @@ function about:init(config)
 end
 
 function about:action(msg, config)
-    utilities.send_message(self, msg.chat.id, about.text, true, nil, true)
+    utilities.send_message(msg.chat.id, about.text, true, nil, true)
 end
 
 return about

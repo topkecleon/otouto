@@ -78,7 +78,7 @@ function pokemon_go:action(msg, config)
         output = table.concat(output_temp, '\n')
     end
 
-    utilities.send_reply(self, msg, output)
+    utilities.send_reply(msg, output)
 end
 
 return pokemon_go

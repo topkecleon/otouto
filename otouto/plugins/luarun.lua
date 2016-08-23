@@ -27,7 +27,7 @@ function luarun:action(msg, config)
 
     local input = utilities.input(msg.text)
     if not input then
-        utilities.send_reply(self, msg, 'Please enter a string to load.')
+        utilities.send_reply(msg, 'Please enter a string to load.')
         return
     end
 
@@ -35,17 +35,27 @@ function luarun:action(msg, config)
         input = 'return ' .. input
     end
 
-    local output = loadstring( [[
-        local bot = require('otouto.bot')
-        local bindings = require('otouto.bindings')
-        local utilities = require('otouto.utilities')
-        local drua = require('otouto.drua-tg')
-        local JSON = require('dkjson')
-        local URL = require('socket.url')
-        local HTTP = require('socket.http')
-        local HTTPS = require('ssl.https')
-        return function (self, msg, config) ]] .. input .. [[ end
-    ]] )()(self, msg, config)
+    local output, success =
+        loadstring("local bot = require('otouto.bot')\n\z
+        local bindings = require('otouto.bindings')\n\z
+        local utilities = require('otouto.utilities')\n\z
+        local drua = require('otouto.drua-tg')\n\z
+        local JSON = require('dkjson')\n\z
+        local URL = require('socket.url')\n\z
+        local HTTP = require('socket.http')\n\z
+        local HTTPS = require('ssl.https')\n\z
+        return function (self, msg, config)\n" .. input .. "\nend")
+
+    local function err_msg(x)
+        return "Error:\n" .. tostring(x)
+    end
+
+    if output == nil then
+        output = success
+    else
+        success, output = xpcall(output(), err_msg, self, msg, config)
+    end
+
     if output == nil then
         output = 'Done!'
     else
@@ -55,9 +65,9 @@ function luarun:action(msg, config)
                 output = s
             end
         end
-        output = '```\n' .. tostring(output) .. '\n```'
+        output = '<code>' .. utilities.html_escape(tostring(output)) .. '</code>'
     end
-    utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+    utilities.send_message(msg.chat.id, output, true, msg.message_id, 'html')
 
 end
 

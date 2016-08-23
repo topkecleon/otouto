@@ -17,7 +17,7 @@ end
 
 function dilbert:action(msg, config)
 
-    bindings.sendChatAction(self, { chat_id = msg.chat.id, action = 'upload_photo' } )
+    bindings.sendChatAction{ chat_id = msg.chat.id, action = 'upload_photo' }
 
     local input = utilities.input(msg.text)
     if not input then input = os.date('%F') end
@@ -26,7 +26,7 @@ function dilbert:action(msg, config)
     local url = 'http://dilbert.com/strip/' .. URL.escape(input)
     local str, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
         return
     end
 
@@ -42,7 +42,7 @@ function dilbert:action(msg, config)
 
     local strip_title = str:match('<meta property="article:publish_date" content="(.-)"/>')
 
-    bindings.sendPhoto(self, { chat_id = msg.chat.id, caption = strip_title }, { photo = strip_file } )
+    bindings.sendPhoto({ chat_id = msg.chat.id, caption = strip_title }, { photo = strip_file })
 
 end
 

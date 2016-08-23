@@ -14,7 +14,7 @@ function shout:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, shout.doc, true)
+        utilities.send_reply(msg, shout.doc, true)
         return
     end
 
@@ -44,7 +44,7 @@ function shout:action(msg)
         end
     end
     output = '```\n' .. utilities.trim(output) .. '\n```'
-    utilities.send_message(self, msg.chat.id, output, true, false, true)
+    utilities.send_message(msg.chat.id, output, true, false, true)
 
 end
 

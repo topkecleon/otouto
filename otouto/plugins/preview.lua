@@ -14,7 +14,7 @@ function preview:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, preview.doc, true)
+        utilities.send_reply(msg, preview.doc, true)
         return
     end
 
@@ -25,18 +25,18 @@ function preview:action(msg)
 
     local res = HTTP.request(input)
     if not res then
-        utilities.send_reply(self, msg, 'Please provide a valid link.')
+        utilities.send_reply(msg, 'Please provide a valid link.')
         return
     end
 
     if res:len() == 0 then
-        utilities.send_reply(self, msg, 'Sorry, the link you provided is not letting us make a preview.')
+        utilities.send_reply(msg, 'Sorry, the link you provided is not letting us make a preview.')
         return
     end
 
     -- Invisible zero-width, non-joiner.
     local output = '<a href="' .. input .. '">' .. utilities.char.zwnj .. '</a>'
-    utilities.send_message(self, msg.chat.id, output, false, nil, 'html')
+    utilities.send_message(msg.chat.id, output, false, nil, 'html')
 
 end
 

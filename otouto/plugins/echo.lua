@@ -14,7 +14,7 @@ function echo:action(msg)
     local input = utilities.input_from_msg(msg)
 
     if not input then
-        utilities.send_message(self, msg.chat.id, echo.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, echo.doc, true, msg.message_id, true)
     else
         local output
         if msg.chat.type == 'supergroup' then
@@ -22,7 +22,7 @@ function echo:action(msg)
         else
             output = utilities.md_escape(utilities.char.zwnj..input)
         end
-        utilities.send_message(self, msg.chat.id, output, true, nil, true)
+        utilities.send_message(msg.chat.id, output, true, nil, true)
     end
 
 

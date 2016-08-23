@@ -22,7 +22,7 @@ function greetings:action(msg, config)
     for response, triggers in pairs(config.greetings) do
         for _, trigger in pairs(triggers) do
             if string.match(msg.text_lower, trigger) then
-                utilities.send_message(self, msg.chat.id, response:gsub('#NAME', nick))
+                utilities.send_message(msg.chat.id, response:gsub('#NAME', nick))
                 return
             end
         end

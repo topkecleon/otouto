@@ -54,7 +54,7 @@ function blacklist:action(msg, config)
                 end
             end
         else
-            utilities.send_reply(self, msg, 'Please specify a user or users via reply, username, or ID, or a group or groups via ID.')
+            utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID, or a group or groups via ID.')
             return
         end
     end
@@ -88,7 +88,7 @@ function blacklist:action(msg, config)
             end
         end
     end
-    utilities.send_reply(self, msg, output)
+    utilities.send_reply(msg, output)
 end
 
 return blacklist

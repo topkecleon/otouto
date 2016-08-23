@@ -34,9 +34,9 @@ function xkcd:action(msg, config)
     local url = xkcd.strip_url:format(input)
     local jstr, code = HTTP.request(url)
     if code == 404 then
-        utilities.send_reply(self, msg, config.errors.results)
+        utilities.send_reply(msg, config.errors.results)
     elseif code ~= 200 then
-        utilities.send_reply(self, msg, config.errors.connection)
+        utilities.send_reply(msg, config.errors.connection)
     else
         local data = JSON.decode(jstr)
         local output = string.format('*%s (*[%s](%s)*)*\n_%s_',
@@ -45,7 +45,7 @@ function xkcd:action(msg, config)
             data.img,
             data.alt:gsub('_', '_\\__')
         )
-        utilities.send_message(self, msg.chat.id, output, false, nil, true)
+        utilities.send_message(msg.chat.id, output, false, nil, true)
     end
 end
 

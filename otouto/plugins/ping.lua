@@ -10,7 +10,7 @@ end
 
 function ping:action(msg, config)
     local output = msg.text_lower:match('^'..config.cmd_pat..'ping') and 'Pong!' or 'Annyong.'
-    utilities.send_message(self, msg.chat.id, output)
+    utilities.send_message(msg.chat.id, output)
 end
 
 return ping

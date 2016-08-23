@@ -18,7 +18,7 @@ end
 function isup:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(self, msg, isup.doc)
+        utilities.send_reply(msg, isup.doc, true)
         return
     end
 
@@ -37,7 +37,7 @@ function isup:action(msg, config)
     else
         output = 'This website is up.'
     end
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(msg, output, true)
 end
 
 return isup

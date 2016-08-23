@@ -17,7 +17,7 @@ function currency:action(msg, config)
 
     local input = msg.text:upper()
     if not input:match('%a%a%a TO %a%a%a') then
-        utilities.send_message(self, msg.chat.id, currency.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, currency.doc, true, msg.message_id, true)
         return
     end
 
@@ -34,13 +34,13 @@ function currency:action(msg, config)
         url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
         local str, res = HTTPS.request(url)
         if res ~= 200 then
-            utilities.send_reply(self, msg, config.errors.connection)
+            utilities.send_reply(msg, config.errors.connection)
             return
         end
 
         str = str:match('<span class=bld>(.*) %u+</span>')
         if not str then
-            utilities.send_reply(self, msg, config.errors.results)
+            utilities.send_reply(msg, config.errors.results)
             return
         end
 
@@ -52,7 +52,7 @@ function currency:action(msg, config)
     output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance`'
     output = '```\n' .. output .. '\n```'
 
-    utilities.send_message(self, msg.chat.id, output, true, nil, true)
+    utilities.send_message(msg.chat.id, output, true, nil, true)
 
 end
 
