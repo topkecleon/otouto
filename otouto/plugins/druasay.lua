@@ -21,6 +21,7 @@ end
 
 function druasay:action(msg, config)
     if msg.from.id == config.admin or msg.chat.type == 'private' then return end
+    local s = drua.sopen()
     for response, triggers in pairs(config.druasay) do
         for _, trigger in ipairs(triggers) do
             if msg.text_lower:match(trigger) then
@@ -30,11 +31,12 @@ function druasay:action(msg, config)
                 else
                     output = response
                 end
-                drua.message(msg.chat.id, output)
+                drua.message(s, msg.chat.id, output)
                 return
             end
         end
     end
+    drua.sclose(s)
 end
 
 return druasay
