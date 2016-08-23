@@ -337,11 +337,11 @@ function administration:update_desc(chat, config)
     end
     local s = '\n'..config.cmd_pat..'desc@' .. self.info.username .. ' for more information.'
     desc = desc:sub(1, 250-s:len()) .. s
-    drua.channel_set_about(chat, desc)
+    drua.oneshot(drua.channel_set_about, chat, desc)
 end
 
 function administration:kick_user(chat, target, reason, config)
-    drua.kick_user(chat, target)
+    drua.oneshot(drua.kick_user, chat, target)
     local victim = target
     if self.database.users[tostring(target)] then
         victim = utilities.build_name(
@@ -515,13 +515,13 @@ function administration.init_command(self_, config_)
                     else
                         -- Make the new user a group admin if he's a mod or higher.
                         if msg.chat.type == 'supergroup' then
-                            drua.channel_set_admin(msg.chat.id, msg.new_chat_member.id, 2)
+                            drua.oneshot(drua.channel_set_admin, msg.chat.id, msg.new_chat_member.id, 2)
                         end
                     end
 
                 elseif msg.new_chat_title then
                     if rank < (group.flags[9] and 2 or 3) then
-                        drua.rename_chat(msg.chat.id, group.name)
+                        drua.oneshot(drua.rename_chat, msg.chat.id, group.name)
                     else
                         group.name = msg.new_chat_title
                         if group.grouptype == 'supergroup' then
@@ -531,17 +531,17 @@ function administration.init_command(self_, config_)
                 elseif msg.new_chat_photo then
                     if group.grouptype == 'group' then
                         if rank < (group.flags[9] and 2 or 3) then
-                            drua.set_photo(msg.chat.id, group.photo)
+                            drua.oneshot(drua.set_photo, msg.chat.id, group.photo)
                         else
-                            group.photo = drua.get_photo(msg.chat.id)
+                            group.photo = drua.oneshot(drua.get_photo, msg.chat.id)
                         end
                     else
-                        group.photo = drua.get_photo(msg.chat.id)
+                        group.photo = drua.oneshot(drua.get_photo, msg.chat.id)
                     end
                 elseif msg.delete_chat_photo then
                     if group.grouptype == 'group' then
                         if rank < (group.flags[9] and 2 or 3) then
-                            drua.set_photo(msg.chat.id, group.photo)
+                            drua.oneshot(drua.set_photo, msg.chat.id, group.photo)
                         else
                             group.photo = nil
                         end
@@ -1026,7 +1026,7 @@ function administration.init_command(self_, config_)
                 end
                 local input = utilities.input(msg.text)
                 if input == '--' or input == utilities.char.em_dash then
-                    group.link = drua.export_link(msg.chat.id)
+                    group.link = drua.oneshot(drua.export_link, msg.chat.id)
                     utilities.send_reply(msg, 'The link has been regenerated.')
                 elseif input then
                     group.link = input
@@ -1154,6 +1154,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1168,11 +1169,12 @@ Use this command to configure the point values for each message type. When a use
                             if group.grouptype == 'supergroup' then
                                 local chat_member = bindings.getChatMember{ chat_id = msg.chat.id, user_id = target.id }
                                 if chat_member and chat_member.result.status == 'member' then
-                                    drua.channel_set_admin(msg.chat.id, target.id, 2)
+                                    drua.channel_set_admin(s, msg.chat.id, target.id, 2)
                                 end
                             end
                         end
                     end
+                    drua.sclose(s)
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1192,6 +1194,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1203,10 +1206,11 @@ Use this command to configure the point values for each message type. When a use
                                 group.mods[target.id_str] = nil
                             end
                             if group.grouptype == 'supergroup' then
-                                drua.channel_set_admin(msg.chat.id, target.id, 0)
+                                drua.channel_set_admin(s, msg.chat.id, target.id, 0)
                             end
                         end
                     end
+                    drua.sclose(s)
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1240,7 +1244,7 @@ Use this command to configure the point values for each message type. When a use
                         if group.grouptype == 'supergroup' then
                             local chat_member = bindings.getChatMember{ chat_id = msg.chat.id, user_id = target.id }
                             if chat_member and chat_member.result.status == 'member' then
-                                drua.channel_set_admin(msg.chat.id, target.id, 2)
+                                drua.oneshot(drua.channel_set_admin, msg.chat.id, target.id, 2)
                             end
                             administration.update_desc(self, msg.chat.id, config)
                         end
@@ -1273,7 +1277,7 @@ Use this command to configure the point values for each message type. When a use
                             utilities.send_reply(msg, target.name .. ' is no longer the governor.')
                         end
                         if group.grouptype == 'supergroup' then
-                            drua.channel_set_admin(msg.chat.id, target.id, 0)
+                            drua.oneshot(drua.channel_set_admin, msg.chat.id, target.id, 0)
                             administration.update_desc(self, msg.chat.id, config)
                         end
                     end
@@ -1295,6 +1299,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1307,12 +1312,10 @@ Use this command to configure the point values for each message type. When a use
                                 local reason = 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']'
                                 administration.kick_user(self, msg.chat.id, target.id, reason, config)
                             end
-                            if #targets == 1 then
-                                for k,v in pairs(self.database.administration.groups) do
-                                    if not v.flags[6] then
-                                        v.mods[target.id_str] = nil
-                                        bindings.kickChatMember{chat_id = k, user_id = target.id}
-                                    end
+                            for k,v in pairs(self.database.administration.groups) do
+                                if not v.flags[6] then
+                                    v.mods[target.id_str] = nil
+                                    drua.kick_user(s, k, target.id)
                                 end
                             end
                             self.database.administration.globalbans[target.id_str] = true
@@ -1325,6 +1328,7 @@ Use this command to configure the point values for each message type. When a use
                             end
                         end
                     end
+                    drua.sclose(s)
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1405,6 +1409,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1413,13 +1418,14 @@ Use this command to configure the point values for each message type. When a use
                         else
                             for chat_id, group in pairs(self.database.administration.groups) do
                                 if group.grouptype == 'supergroup' then
-                                    drua.channel_set_admin(chat_id, target.id, 0)
+                                    drua.channel_set_admin(s, chat_id, target.id, 0)
                                 end
                             end
                             self.database.administration.admins[target.id_str] = nil
                             output = output .. target.name .. ' is no longer an administrator.\n'
                         end
                     end
+                    drua.sclose(s)
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1461,6 +1467,7 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                             end
                         end
                     end
+                    local s = drua.sopen()
                     self.database.administration.groups[tostring(msg.chat.id)] = {
                         mods = {},
                         governor = msg.from.id,
@@ -1469,8 +1476,8 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                         rules = {},
                         grouptype = msg.chat.type,
                         name = msg.chat.title,
-                        link = drua.export_link(msg.chat.id),
-                        photo = drua.get_photo(msg.chat.id),
+                        link = drua.export_link(s, msg.chat.id),
+                        photo = drua.get_photo(s, msg.chat.id),
                         founded = os.time(),
                         autokicks = {},
                         autoban = 3,
@@ -1482,7 +1489,8 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                     administration.update_desc(self, msg.chat.id, config)
                     table.insert(self.database.administration.activity, tostring(msg.chat.id))
                     utilities.send_reply(msg, output)
-                    drua.channel_set_admin(msg.chat.id, self.info.id, 2)
+                    drua.channel_set_admin(s, msg.chat.id, self.info.id, 2)
+                    drua.sclose(s)
                 end
             end
         },

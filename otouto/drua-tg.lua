@@ -69,71 +69,85 @@ local drua = {
     PORT = 4567
 }
 
-function drua.send(command, do_receive)
+function drua.sopen()
     local s = SOCKET.connect(drua.IP, drua.PORT)
     assert(s, '\nUnable to connect to tg session.')
+    return s
+end
+
+function drua.sclose(s)
+    s:close()
+end
+
+function drua.oneshot(fun, ...)
+    local s = drua.sopen()
+    local out = fun(s, unpack(arg))
+    drua.sclose(s)
+    return out
+end
+
+function drua.send(s, command, do_receive)
     s:send(command..'\n')
     local output
     if do_receive then
         output = string.match(s:receive('*l'), 'ANSWER (%d+)')
         output = s:receive(tonumber(output)):gsub('\n$', '')
     end
-    s:close()
     return output
 end
 
-function drua.message(target, text)
+function drua.message(s, target, text)
     target = format_target(target)
     text = escape(text)
     local command = 'msg %s "%s"'
     command = command:format(target, text)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.send_photo(target, photo)
+function drua.send_photo(s, target, photo)
     target = format_target(target)
     local command = 'send_photo %s %s'
     command = command:format(target, photo)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.add_user(chat, target)
+function drua.add_user(s, chat, target)
     local a
     chat, a = format_target(chat)
     target = format_target(target)
     local command = comtab.add[a]:format(chat, target)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.kick_user(chat, target)
+function drua.kick_user(s, chat, target)
     -- Get the group info so tg will recognize the target.
-    drua.get_info(chat)
+    drua.get_info(s, chat)
     local a
     chat, a = format_target(chat)
     target = format_target(target)
     local command = comtab.kick[a]:format(chat, target)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.rename_chat(chat, name)
+function drua.rename_chat(s, chat, name)
     local a
     chat, a = format_target(chat)
     local command = comtab.rename[a]:format(chat, name)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.export_link(chat)
+function drua.export_link(s, chat)
     local a
     chat, a = format_target(chat)
     local command = comtab.link[a]:format(chat)
-    return drua.send(command, true)
+    return drua.send(s, command, true)
 end
 
-function drua.get_photo(chat)
+function drua.get_photo(s, chat)
     local a
     chat, a = format_target(chat)
     local command = comtab.photo_get[a]:format(chat)
-    local output = drua.send(command, true)
+    local output = drua.send(s, command, true)
     if output:match('FAIL') then
         return false
     else
@@ -141,42 +155,42 @@ function drua.get_photo(chat)
     end
 end
 
-function drua.set_photo(chat, photo)
+function drua.set_photo(s, chat, photo)
     local a
     chat, a = format_target(chat)
     local command = comtab.photo_set[a]:format(chat, photo)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.get_info(target)
+function drua.get_info(s, target)
     local a
     target, a = format_target(target)
     local command = comtab.info[a]:format(target)
-    return drua.send(command, true)
+    return drua.send(s, command, true)
 end
 
-function drua.channel_set_admin(chat, user, rank)
+function drua.channel_set_admin(s, chat, user, rank)
     chat = format_target(chat)
     user = format_target(user)
     local command = 'channel_set_admin %s %s %s'
     command = command:format(chat, user, rank)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.channel_set_about(chat, text)
+function drua.channel_set_about(s, chat, text)
     chat = format_target(chat)
     text = escape(text)
     local command = 'channel_set_about %s "%s"'
     command = command:format(chat, text)
-    return drua.send(command)
+    return drua.send(s, command)
 end
 
-function drua.block(user)
-    return drua.send('block_user user#' .. user)
+function drua.block(s, user)
+    return drua.send(s, 'block_user user#' .. user)
 end
 
-function drua.unblock(user)
-    return drua.send('unblock_user user#' .. user)
+function drua.unblock(s, user)
+    return drua.send(s, 'unblock_user user#' .. user)
 end
 
 return drua
