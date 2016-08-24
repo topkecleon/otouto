@@ -340,8 +340,8 @@ function administration:update_desc(chat, config)
     drua.channel_set_about(chat, desc)
 end
 
-function administration:kick_user(chat, target, reason, config)
-    drua.kick_user(chat, target)
+function administration:kick_user(chat, target, reason, config, s)
+    drua.kick_user(chat, target, s)
     local victim = target
     if self.database.users[tostring(target)] then
         victim = utilities.build_name(
@@ -812,6 +812,7 @@ function administration.init_command(self_, config_)
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -819,12 +820,13 @@ function administration.init_command(self_, config_)
                             output = output .. target.name .. ' is too privileged to be kicked.\n'
                         else
                             output = output .. target.name .. ' has been kicked.\n'
-                            administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config)
+                            administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config, s)
                             if msg.chat.type == 'supergroup' then
                                 bindings.unbanChatMember{ chat_id = msg.chat.id, user_id = target.id }
                             end
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -844,6 +846,7 @@ function administration.init_command(self_, config_)
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -853,11 +856,12 @@ function administration.init_command(self_, config_)
                             output = output .. target.name .. ' is too privileged to be banned.\n'
                         else
                             output = output .. target.name .. ' has been banned.\n'
-                            administration.kick_user(self, msg.chat.id, target.id, 'banned by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config)
+                            administration.kick_user(self, msg.chat.id, target.id, 'banned by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config, s)
                             group.mods[target.id_str] = nil
                             group.bans[target.id_str] = true
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1115,7 +1119,11 @@ function administration.init_command(self_, config_)
                             output = 'Not a valid message type or number.'
                         elseif key == 'autoban' then
                             group.autoban = tonumber(val)
-                            output = 'Users will now be autobanned after *' .. val .. '* autokicks.'
+                            output = string.format(
+                                'Users will now be automatically banned after *%s* automatic kick%s.',
+                                val,
+                                group.autoban == 1 and '' or 's'
+                            )
                         else
                             group.antiflood[key] = tonumber(val)
                             output = '*' .. key:gsub('^%l', string.upper) .. '* messages are now worth *' .. val .. '* points.'
@@ -1130,11 +1138,13 @@ function administration.init_command(self_, config_)
 usage: `%santiflood <type> <i>`
 example: `%santiflood text 5`
 Use this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:
-%s
+%sUsers are automatically banned after *%s* automatic kick%s.
                             ]],
                             config.cmd_pat,
                             config.cmd_pat,
-                            output
+                            output,
+                            group.autoban,
+                            group.autoban == 1 and '' or 's'
                         )
                     end
                     utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
@@ -1154,6 +1164,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1168,11 +1179,12 @@ Use this command to configure the point values for each message type. When a use
                             if group.grouptype == 'supergroup' then
                                 local chat_member = bindings.getChatMember{ chat_id = msg.chat.id, user_id = target.id }
                                 if chat_member and chat_member.result.status == 'member' then
-                                    drua.channel_set_admin(msg.chat.id, target.id, 2)
+                                    drua.channel_set_admin(msg.chat.id, target.id, 2, s)
                                 end
                             end
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1192,6 +1204,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1203,10 +1216,11 @@ Use this command to configure the point values for each message type. When a use
                                 group.mods[target.id_str] = nil
                             end
                             if group.grouptype == 'supergroup' then
-                                drua.channel_set_admin(msg.chat.id, target.id, 0)
+                                drua.channel_set_admin(msg.chat.id, target.id, 0, s)
                             end
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1295,6 +1309,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1307,12 +1322,10 @@ Use this command to configure the point values for each message type. When a use
                                 local reason = 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']'
                                 administration.kick_user(self, msg.chat.id, target.id, reason, config)
                             end
-                            if #targets == 1 then
-                                for k,v in pairs(self.database.administration.groups) do
-                                    if not v.flags[6] then
-                                        v.mods[target.id_str] = nil
-                                        bindings.kickChatMember{chat_id = k, user_id = target.id}
-                                    end
+                            for k,v in pairs(self.database.administration.groups) do
+                                if not v.flags[6] then
+                                    v.mods[target.id_str] = nil
+                                    drua.kick_user(k, target.id, s)
                                 end
                             end
                             self.database.administration.globalbans[target.id_str] = true
@@ -1325,6 +1338,7 @@ Use this command to configure the point values for each message type. When a use
                             end
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1405,6 +1419,7 @@ Use this command to configure the point values for each message type. When a use
                 local targets = administration.get_targets(self, msg, config)
                 if targets then
                     local output = ''
+                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1413,13 +1428,14 @@ Use this command to configure the point values for each message type. When a use
                         else
                             for chat_id, group in pairs(self.database.administration.groups) do
                                 if group.grouptype == 'supergroup' then
-                                    drua.channel_set_admin(chat_id, target.id, 0)
+                                    drua.channel_set_admin(chat_id, target.id, 0, s)
                                 end
                             end
                             self.database.administration.admins[target.id_str] = nil
                             output = output .. target.name .. ' is no longer an administrator.\n'
                         end
                     end
+                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
