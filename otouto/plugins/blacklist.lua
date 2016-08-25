@@ -1,4 +1,5 @@
 local utilities = require('otouto.utilities')
+local drua = require('otouto.drua-tg')
 
 local blacklist = {}
 
@@ -59,6 +60,7 @@ function blacklist:action(msg, config)
         end
     end
     local output = ''
+    local s = drua.sopen()
     if msg.text:match('^'..config.cmd_pat..'blacklist') then
         for _, target in ipairs(targets) do
             if target.err then
@@ -69,7 +71,7 @@ function blacklist:action(msg, config)
                 self.database.blacklist[target.id_str] = true
                 output = output .. target.name .. ' is now blacklisted.\n'
                 if config.drua_block_on_blacklist and target.id > 0 then
-                    require('otouto.drua-tg').block(target.id)
+                    drua.block(target.id, s)
                 end
             end
         end
@@ -83,11 +85,12 @@ function blacklist:action(msg, config)
                 self.database.blacklist[target.id_str] = nil
                 output = output .. target.name .. ' is no longer blacklisted.\n'
                 if config.drua_block_on_blacklist and target.id > 0 then
-                    require('otouto.drua-tg').unblock(target.id)
+                    drua.unblock(target.id, s)
                 end
             end
         end
     end
+    s:close()
     utilities.send_reply(msg, output)
 end
 
