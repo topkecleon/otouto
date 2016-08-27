@@ -22,10 +22,10 @@
 
 local bindings = {}
 
-local HTTPS = require('ssl.https')
-local JSON = require('dkjson')
+local https = require('ssl.https')
+local json = require('dkjson')
 local ltn12 = require('ltn12')
-local MP_ENCODE = require('multipart-post').encode
+local mp_encode = require('multipart-post').encode
 
 function bindings.init(token)
     bindings.BASE_URL = 'https://api.telegram.org/bot' .. token .. '/'
@@ -58,8 +58,8 @@ function bindings.request(method, parameters, file)
         parameters = {''}
     end
     local response = {}
-    local body, boundary = MP_ENCODE(parameters)
-    local success, code = HTTPS.request{
+    local body, boundary = mp_encode(parameters)
+    local success, code = https.request{
         url = bindings.BASE_URL .. method,
         method = 'POST',
         headers = {
@@ -74,7 +74,7 @@ function bindings.request(method, parameters, file)
         print(method .. ': Connection error. [' .. code  .. ']')
         return false, false
     else
-        local result = JSON.decode(data)
+        local result = json.decode(data)
         if not result then
             return false, false
         elseif result.ok then

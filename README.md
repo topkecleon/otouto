@@ -410,3 +410,4 @@ Contributions are appreciated in all forms. Monetary contributions will go towar
 | [n8 c00](http://telegram.me/n8_c00)           |
 | [Alex](http://telegram.me/sandu)              |
 | [Brayden](http://telegram.me/bb010g)          |
+| [Milad](http://telegram.me/thelad)            |
