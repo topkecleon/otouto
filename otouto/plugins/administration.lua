@@ -223,7 +223,7 @@ function administration:get_targets(msg, config)
         target.name = utilities.build_name(target.first_name, target.last_name)
         target.id_str = tostring(target.id)
         target.rank = administration.get_rank(self, target.id, msg.chat.id, config)
-        return { target }
+        return { target }, utilities.input(msg.text)
     else
         local input = utilities.input(msg.text)
         if input then
@@ -809,8 +809,9 @@ function administration.init_command(self_, config_)
             doc = 'Removes a user from the group. The target may be specified via reply, username, or ID.',
 
             action = function(self, msg, group, config)
-                local targets = administration.get_targets(self, msg, config)
+                local targets, reason = administration.get_targets(self, msg, config)
                 if targets then
+                    reason = reason and ': ' .. utilities.trim(reason) or ''
                     local output = ''
                     local s = drua.sopen()
                     for _, target in ipairs(targets) do
@@ -820,7 +821,7 @@ function administration.init_command(self_, config_)
                             output = output .. target.name .. ' is too privileged to be kicked.\n'
                         else
                             output = output .. target.name .. ' has been kicked.\n'
-                            administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config, s)
+                            administration.kick_user(self, msg.chat.id, target.id, 'kicked by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']' .. reason, config, s)
                             if msg.chat.type == 'supergroup' then
                                 bindings.unbanChatMember{ chat_id = msg.chat.id, user_id = target.id }
                             end
@@ -843,8 +844,9 @@ function administration.init_command(self_, config_)
             doc = 'Bans a user from the group. The target may be specified via reply, username, or ID.',
 
             action = function(self, msg, group, config)
-                local targets = administration.get_targets(self, msg, config)
+                local targets, reason = administration.get_targets(self, msg, config)
                 if targets then
+                    reason = reason and ': ' .. utilities.trim(reason) or ''
                     local output = ''
                     local s = drua.sopen()
                     for _, target in ipairs(targets) do
@@ -856,7 +858,7 @@ function administration.init_command(self_, config_)
                             output = output .. target.name .. ' is too privileged to be banned.\n'
                         else
                             output = output .. target.name .. ' has been banned.\n'
-                            administration.kick_user(self, msg.chat.id, target.id, 'banned by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']', config, s)
+                            administration.kick_user(self, msg.chat.id, target.id, 'banned by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']' .. reason, config, s)
                             group.mods[target.id_str] = nil
                             group.bans[target.id_str] = true
                         end
@@ -1306,8 +1308,9 @@ Use this command to configure the point values for each message type. When a use
             doc = 'Bans a user from all groups. The target may be specified via reply, username, or ID.',
 
             action = function(self, msg, group, config)
-                local targets = administration.get_targets(self, msg, config)
+                local targets, reason = administration.get_targets(self, msg, config)
                 if targets then
+                    reason = reason and ': ' .. utilities.trim(reason) or ''
                     local output = ''
                     local s = drua.sopen()
                     for _, target in ipairs(targets) do
@@ -1319,8 +1322,8 @@ Use this command to configure the point values for each message type. When a use
                             output = output .. target.name .. ' is too privileged to be globally banned.\n'
                         else
                             if group then
-                                local reason = 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']'
-                                administration.kick_user(self, msg.chat.id, target.id, reason, config)
+                                local reason_ = 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']' .. reason
+                                administration.kick_user(self, msg.chat.id, target.id, reason_, config)
                             end
                             for k,v in pairs(self.database.administration.groups) do
                                 if not v.flags[6] then
