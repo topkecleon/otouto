@@ -33,8 +33,13 @@ function remind:action(msg, config)
     elseif duration > config.remind.max_duration then
         duration = config.remind.max_duration
     end
-    local message = utilities.input(input)
-    if not message then
+
+    local message
+    if msg.reply_to_message and #msg.reply_to_message.text > 0 then
+        message = msg.reply_to_message.text
+    elseif utilities.input(input) then
+        message = utilities.input(input)
+    else
         utilities.send_reply(msg, remind.doc, true)
         return
     end

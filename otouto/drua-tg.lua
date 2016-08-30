@@ -108,14 +108,14 @@ function drua.message(target, text, s)
     text = escape(text)
     local command = 'msg %s "%s"'
     command = command:format(target, text)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.send_photo(target, photo, s)
     target = format_target(target)
     local command = 'send_photo %s %s'
     command = command:format(target, photo)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.add_user(chat, target, s)
@@ -123,24 +123,24 @@ function drua.add_user(chat, target, s)
     chat, a = format_target(chat)
     target = format_target(target)
     local command = comtab.add[a]:format(chat, target)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.kick_user(chat, target, s)
     -- Get the group info so tg will recognize the target.
-    drua.get_info(chat, _, s)
+    drua.get_info(chat, nil, s)
     local a
     chat, a = format_target(chat)
     target = format_target(target)
     local command = comtab.kick[a]:format(chat, target)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.rename_chat(chat, name, s)
     local a
     chat, a = format_target(chat)
     local command = comtab.rename[a]:format(chat, name)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.export_link(chat, s)
@@ -166,7 +166,7 @@ function drua.set_photo(chat, photo, s)
     local a
     chat, a = format_target(chat)
     local command = comtab.photo_set[a]:format(chat, photo)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.get_info(target, s)
@@ -181,7 +181,7 @@ function drua.channel_set_admin(chat, user, rank, s)
     user = format_target(user)
     local command = 'channel_set_admin %s %s %s'
     command = command:format(chat, user, rank)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.channel_set_about(chat, text, s)
@@ -189,15 +189,15 @@ function drua.channel_set_about(chat, text, s)
     text = escape(text)
     local command = 'channel_set_about %s "%s"'
     command = command:format(chat, text)
-    return drua.send(command, _, s)
+    return drua.send(command, nil, s)
 end
 
 function drua.block(user, s)
-    return drua.send('block_user user#' .. user, _, s)
+    return drua.send('block_user user#' .. user, nil, s)
 end
 
 function drua.unblock(user, s)
-    return drua.send('unblock_user user#' .. user, _, s)
+    return drua.send('unblock_user user#' .. user, nil, s)
 end
 
 return drua

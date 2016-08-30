@@ -1,5 +1,5 @@
 --[[
-    administration.lua, version 1.13.1
+    administration.lua, version 1.13.2
     This plugin provides self-hosted, single-realm group administration.
     It requires tg (http://github.com/vysheng/tg) with supergroup support.
     For more documentation, read the the manual (otou.to/rtfm).
@@ -34,6 +34,8 @@
      modrights, to give moderators access to changing the group photo, title,
      link, and motd (config option is deprecated. RIP). /unban will reset the
      target's autokick counter. Added configuration for default flag settings.
+
+    1.13.2 - /desc can now be used with a query.
 ]]--
 
 local drua = require('otouto.drua-tg')
@@ -715,19 +717,34 @@ function administration.init_command(self_, config_)
                 end
                 utilities.send_message(msg.chat.id, output, true, nil, true)
             end
-
         },
 
         { -- /desc
-            triggers = utilities.triggers(self_.info.username, config_.cmd_pat):t('desc'):t('description').table,
+            triggers = utilities.triggers(self_.info.username, config_.cmd_pat):t('desc', true):t('description', true).table,
 
             command = 'description',
             privilege = 1,
-            interior = true,
+            interior = false,
             doc = 'Returns a description of the group (in a private message), including its motd, rules, flags, governor, and moderators.',
 
             action = function(self, msg, group, config)
-                local output = administration.get_desc(self, msg.chat.id, config)
+                local chat = group and tostring(msg.chat.id) or nil
+                local input = utilities.input(msg.text)
+                if input then
+                    for chat_id_str, group_ in pairs(self.database.administration.groups) do
+                        if (not group_.flags[1]) and group_.link then -- no unlisted or unlinked groups
+                            if input == chat_id_str or string.match(group_.name:lower(), input:lower()) then
+                                chat = chat_id_str
+                                break
+                            end
+                        end
+                    end
+                end
+                if not chat then
+                    utilities.send_reply(msg, 'Group not found. Specify a group by name or ID, or use this command without arguments inside an administrated group.')
+                    return
+                end
+                local output = administration.get_desc(self, chat, config)
                 if utilities.send_message(msg.from.id, output, true, nil, true) then
                     if msg.from.id ~= msg.chat.id then
                         utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
