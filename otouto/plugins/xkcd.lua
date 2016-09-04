@@ -40,10 +40,10 @@ function xkcd:action(msg, config)
     else
         local data = JSON.decode(jstr)
         local output = string.format('*%s (*[%s](%s)*)*\n_%s_',
-            data.safe_title:gsub('*', '*\\**'),
+            utilities.fix_UTF8(data.safe_title):gsub('*', '*\\**'),
             data.num,
             data.img,
-            data.alt:gsub('_', '_\\__')
+            utilities.fix_UTF8(data.alt):gsub('_', '_\\__')
         )
         utilities.send_message(msg.chat.id, output, false, nil, true)
     end
