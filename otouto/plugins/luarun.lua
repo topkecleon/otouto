@@ -36,7 +36,7 @@ function luarun:action(msg, config)
     end
 
     local output, success =
-        loadstring("local bot = require('otouto.bot')\n\z
+        load("local bot = require('otouto.bot')\n\z
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
         local drua = require('otouto.drua-tg')\n\z

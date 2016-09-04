@@ -1066,7 +1066,7 @@ function administration.init_command(self_, config_)
 
             command = 'alist',
             privilege = 3,
-            interior = true,
+            interior = false,
             doc = 'Returns a list of administrators. Owner is denoted with a star character.',
 
             action = function(self, msg, group, config)

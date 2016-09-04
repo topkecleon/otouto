@@ -27,6 +27,8 @@ bot.version = '3.13'
  -- Function to be run on start and reload.
 function bot:init(config)
 
+    assert(config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
+
     bindings = require('otouto.bindings').init(config.bot_api_key)
     utilities = require('otouto.utilities')
 

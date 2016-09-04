@@ -18,7 +18,7 @@ otouto (including all plugins and documentation) is free software; you are free 
 | [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
 
 ## Setup
-You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
+You _must_ have Lua 5.3, luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
 
 To get started, clone the repository and set the following values in `config.lua`:
 
