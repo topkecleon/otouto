@@ -58,7 +58,7 @@ This section includes an exhaustive list of possible configuration values for ot
 | `log_chat`    | nil     | Telegram ID of the recipient for error messages.   |
 | `cmd_pat`     | `"/"`   | Character (or string) to be used for bot commands. |
 | `lang`        | `"en"`  | Two-letter ISO 639-1 language code.                |
-| `about_text`  | ...   | Informational text to be returned by /about.       |
+| `about_text`  | ...     | Informational text to be returned by /about.       |
 
 #### Error messages
 These are the generic error messages used by most plugins. These belong in a table named `errors`.
