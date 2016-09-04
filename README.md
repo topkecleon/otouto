@@ -3,7 +3,7 @@ The plugin-wielding, multipurpose Telegram bot.
 
 [Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Bot Development Group](http://telegram.me/BotDevelopment)
 
-otouto is a plugin-based, IRC-style bot written for the [Telegram Bot API](http://core.telegram.org/bots/api). Originally written in February of 2015 as a set of Lua scripts to run on [telegram-cli](http://github.com/vysheng/tg), otouto was open-sourced and migrated to the bot API later in June that year.
+otouto is a plugin-based, IRC-style bot written in Lua for the [Telegram Bot API](http://core.telegram.org/bots/api).
 
 otouto (including all plugins and documentation) is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
 
@@ -18,18 +18,31 @@ otouto (including all plugins and documentation) is free software; you are free 
 | [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
 
 ## Setup
-You _must_ have Lua 5.3, luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
+To get your bot running as soon as possible, see [Quick start](#quick-start).
+
+otouto uses Lua 5.3 and the following Lua libraries: luasocket, luasec, multipart-post, dkjson, and lpeg. It is recommended you install these with Luarocks. This can be done easily on Ubuntu 16.04 and later with the `install-dependencies.sh` script.
 
 To get started, clone the repository and set the following values in `config.lua`:
 
- - `bot_api_key` as your bot authorization token from the BotFather.
+ - `bot_api_key` as your bot authentication token from the BotFather.
  - `admin` as your Telegram ID.
 
-Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` array.
+Some plugins are not enabled by default. If you wish to enable them, add their names (sans file extension) to the `plugins` table in the configuration file.
 
-When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/halt" through Telegram. If you terminate the bot manually, you risk data loss. If you do you not want the bot to restart automatically, run it with `lua main.lua`.
+When you are ready to start the bot, run the `launch.sh` script. This script will automatically restart the bot five seconds after being stopped. If this behavior is undesired, start the bot manually with `lua5.3 main.lua`.
 
-Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys. See [Configuration](#configuration) for details.
+To stop the bot, send "/halt" through Telegram. You can exit with Ctrl-C (or two Ctrl-C if using `launch.sh`), but this is not recommended as it risks data loss.
+
+Note that certain plugins, such as `translate.lua` and `greetings.lua`, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys and/or other configuration values not set by default. See [Configuration](#configuration) for details.
+
+### Quick start
+1. Clone the repository.
+`git clone http://otou.to/code otouto`
+2. Install dependencies: Lua 5.3, and the following Lua libs: luasocket, luasec, multipart-post, dkjson, and lpeg.†
+3. Add your bot token and Telegram ID to `config.lua`.
+4. Start the bot with `./launch.sh`.
+
+**†** On Ubuntu 16.04, this can be done easily with the `install-dependencies.sh` script.
 
 ## Configuration
 otouto is configured in the `config.lua` file. It is the single point of configuration for the bot, and contains any necessary user-specific variables, such as API keys, custom error messages, and enabled plugins.
@@ -58,7 +71,7 @@ These are the generic error messages used by most plugins. These belong in a tab
 | `argument`   | `"Invalid argument."`             |
 | `syntax`     | `"Invalid syntax."`               |
 
-#### Plugins
+#### Plugins table
 This table is an array of the names of enabled plugins. To enable a plugin, add its name to the list.
 
 ### Plugin configuration values
@@ -120,9 +133,9 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 ## Group Administration
 The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups whch are owned by the bot owner. This works by sending TCP commands to an instance of tg running on the owner's account.
 
-To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
+To get started, compile the `test` branch of [tg-cli](http://github.com/vysheng/tg). On Ubuntu and Debian, this can be done easily with the `tg-install.sh` script.
 
-Once the installation is finished, enable the `administration` plugin in your config file. You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
+Once the compilation is finished, enable the `administration` plugin in your config file. You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
 
 While tg is running, you may start/reload otouto with `administration.lua` enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
 
