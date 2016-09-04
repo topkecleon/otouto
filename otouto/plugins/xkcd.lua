@@ -39,13 +39,14 @@ function xkcd:action(msg, config)
         utilities.send_reply(msg, config.errors.connection)
     else
         local data = JSON.decode(jstr)
-        local output = string.format('*%s (*[%s](%s)*)*\n_%s_',
-            utilities.fix_UTF8(data.safe_title):gsub('*', '*\\**'),
+        local output = string.format(
+            '<b>%s</b> (<a href="%s">%s</a>)\n<i>%s</i>',
+            utilities.html_escape(utilities.fix_utf8(data.safe_title)),
+            utilities.html_escape(data.img),
             data.num,
-            data.img,
-            utilities.fix_UTF8(data.alt):gsub('_', '_\\__')
+            utilities.html_escape(utilities.fix_utf8(data.alt))
         )
-        utilities.send_message(msg.chat.id, output, false, nil, true)
+        utilities.send_message(msg.chat.id, output, false, nil, 'html')
     end
 end
 

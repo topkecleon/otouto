@@ -321,14 +321,10 @@ utilities.style.enquote = function(title, body)
     return '*' .. title:gsub('*', '\\*') .. ':*\n"' .. utilities.md_escape(body) .. '"'
 end
 
--- Converts a string back into "proper" utf-8 from an ascii representation of utf-8
--- it is only useful for fixing improper encoding caused by bad JSON escaping
-function utilities.fix_UTF8(str)
-	local t = {}
-	for p, c in utf8.codes(str) do
-		table.insert(t, string.char(c))
-	end
-	return table.concat(t)
+ -- Converts a gross string back into proper UTF-8.
+ -- Useful for fixing improper encoding caused by bad JSON escaping.
+function utilities.fix_utf8(str)
+	return string.char(utf8.codepoint(str, 1, -1))
 end
 
 
