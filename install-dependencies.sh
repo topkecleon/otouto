@@ -8,7 +8,7 @@ if [ $(lsb_release -r | cut -f 2) == "16.04" ]; then
     rocklist="luasocket luasec multipart-post lpeg dkjson"
 else
     luaver="5.2"
-    rocklist="luasocket luasec multipart-post lpeg dkjson serpent"
+    rocklist="luasocket luasec multipart-post lpeg dkjson luautf8"
 fi
 
 echo "This script is intended for Ubuntu. It may work in Debian."
