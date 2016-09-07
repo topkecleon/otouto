@@ -17,6 +17,12 @@ function luarun:init(config)
             return JSON.encode(t, {indent=true})
         end
     end
+    -- Lua 5.2 compatibility.
+    -- "loadstring" was renamed "load" in 5.3.
+    luarun.loadstring = load or loadstring
+    luarun.err_msg = function(x)
+        return 'Error:\n' .. tostring(x)
+    end
 end
 
 function luarun:action(msg, config)
@@ -35,8 +41,8 @@ function luarun:action(msg, config)
         input = 'return ' .. input
     end
 
-    local output, success =
-        load("local bot = require('otouto.bot')\n\z
+    local output, success = luarun.loadstring(
+        "local bot = require('otouto.bot')\n\z
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
         local drua = require('otouto.drua-tg')\n\z
@@ -44,16 +50,13 @@ function luarun:action(msg, config)
         local URL = require('socket.url')\n\z
         local HTTP = require('socket.http')\n\z
         local HTTPS = require('ssl.https')\n\z
-        return function (self, msg, config)\n" .. input .. "\nend")
-
-    local function err_msg(x)
-        return "Error:\n" .. tostring(x)
-    end
+        return function (self, msg, config)\n" .. input .. "\nend"
+    )
 
     if output == nil then
         output = success
     else
-        success, output = xpcall(output(), err_msg, self, msg, config)
+        success, output = xpcall(output(), luarun.err_msg, self, msg, config)
     end
 
     if output == nil then

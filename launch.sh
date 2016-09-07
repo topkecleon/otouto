@@ -1,5 +1,8 @@
-# Launch otouto, after checking for Lua 5.3.
-# Restart otouto five seconds after halted.
+# Run otouto in Lua 5.3, if available.
+# (Specifying lua5.3 because "lua" is not linked to it in Ubuntu 16.04.)
+# Otherwise, use any generic installed Lua.
+# If none, give an error and a friendly suggestion.
+# If Lua was found, restart otouto five seconds after halting each time.
 
 #!/bin/sh
 
@@ -10,7 +13,13 @@ if type lua5.3 >/dev/null 2>/dev/null; then
         echo "otouto has stopped. ^C to exit."
         sleep 5s
     done
+elif type lua >/dev/null 2>/dev/null; then
+    while true; do
+        lua main.lua
+        echo "otouto has stopped. ^C to exit."
+        sleep 5s
+    done
 else
-    echo "Lua 5.3 was not found."
-    echo "If you're on Ubuntu 16.04+, try running ./install-dependencies.sh."
+    echo "Lua not found."
+    echo "If you're on Ubuntu, try running ./install-dependencies.sh."
 fi

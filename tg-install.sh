@@ -2,8 +2,7 @@
 
 #!/bin/sh
 
-echo "This script is intended for Ubuntu 16.04 and later. It will probably work on"
-echo "14.04 or 12.04 as well as Debian, but this is not guaranteed."
+echo "This script is intended for Ubuntu. It has been tested on 16.04 and 14.04."
 echo "This script will request root privileges to install the following packages:"
 echo "git libreadline-dev libssl-dev libevent-dev make"
 echo "Press enter to continue. Use Ctrl-C to exit."

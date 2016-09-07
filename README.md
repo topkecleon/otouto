@@ -20,7 +20,7 @@ otouto (including all plugins and documentation) is free software; you are free 
 ## Setup
 To get your bot running as soon as possible, see [Quick start](#quick-start).
 
-otouto uses Lua 5.3 and the following Lua libraries: luasocket, luasec, multipart-post, dkjson, and lpeg. It is recommended you install these with Luarocks. This can be done easily on Ubuntu 16.04 and later with the `install-dependencies.sh` script.
+otouto uses Lua (5.3 is recommended) and the following Lua libraries: luasocket, luasec, multipart-post, dkjson, and lpeg. If you are using Lua 5.2, luautf8 is also required. It is recommended you install these with Luarocks. This can be done easily on Ubuntu with the `install-dependencies.sh` script.
 
 To get started, clone the repository and set the following values in `config.lua`:
 
@@ -29,7 +29,7 @@ To get started, clone the repository and set the following values in `config.lua
 
 Some plugins are not enabled by default. If you wish to enable them, add their names (sans file extension) to the `plugins` table in the configuration file.
 
-When you are ready to start the bot, run the `launch.sh` script. This script will automatically restart the bot five seconds after being stopped. If this behavior is undesired, start the bot manually with `lua5.3 main.lua`.
+When you are ready to start the bot, run the `launch.sh` script. This script will automatically restart the bot five seconds after being stopped. If this behavior is undesired, start the bot manually with `lua main.lua`.
 
 To stop the bot, send "/halt" through Telegram. You can exit with Ctrl-C (or two Ctrl-C if using `launch.sh`), but this is not recommended as it risks data loss.
 
@@ -38,11 +38,11 @@ Note that certain plugins, such as `translate.lua` and `greetings.lua`, will req
 ### Quick start
 1. Clone the repository.
 `git clone http://otou.to/code otouto`
-2. Install dependencies: Lua 5.3, and the following Lua libs: luasocket, luasec, multipart-post, dkjson, and lpeg.†
+2. Install dependencies: Lua and the following Lua libs: luasocket, luasec, multipart-post, dkjson, and lpeg.†
 3. Add your bot token and Telegram ID to `config.lua`.
 4. Start the bot with `./launch.sh`.
 
-**†** On Ubuntu 16.04, this can be done easily with the `install-dependencies.sh` script.
+**†** On Ubuntu, this can be done easily with the `install-dependencies.sh` script.
 
 ## Configuration
 otouto is configured in the `config.lua` file. It is the single point of configuration for the bot, and contains any necessary user-specific variables, such as API keys, custom error messages, and enabled plugins.

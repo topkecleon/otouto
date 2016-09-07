@@ -26,6 +26,9 @@ local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
+ -- Lua 5.2 compatibility.
+ -- If no built-in utf8 is available, load the library.
+local utf8 = utf8 or require('lua-utf8')
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -324,8 +327,7 @@ end
  -- Converts a gross string back into proper UTF-8.
  -- Useful for fixing improper encoding caused by bad JSON escaping.
 function utilities.fix_utf8(str)
-	return string.char(utf8.codepoint(str, 1, -1))
+    return string.char(utf8.codepoint(str, 1, -1))
 end
-
 
 return utilities
