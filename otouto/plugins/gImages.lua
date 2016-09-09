@@ -57,9 +57,9 @@ function gImages:action(msg, config)
 
 
     if msg.text:match('nsfw') then
-        utilities.send_reply('*NSFW*\n'..msg, output)
+        utilities.send_message(msg, '*NSFW*\n'..output, true, msg.message_id, true)
     else
-        utilities.send_message(msg.chat.id, output, false, nil, true)
+        utilities.send_message(msg, output, false, msg.message_id, true)
     end
 
 end
