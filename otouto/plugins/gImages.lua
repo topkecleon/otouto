@@ -58,7 +58,7 @@ function gImages:action(msg, config)
     local output = '[' .. img_title .. '](' .. img_url .. ')'
 
 
-    if msg.text:match(gImages.nsfw_trigger) then
+    if msg.text_lower:match(gImages.nsfw_trigger) then
         utilities.send_message(msg, '*NSFW*\n'..output, true, msg.message_id, true)
     else
         utilities.send_message(msg, output, false, msg.message_id, true)
