@@ -14,7 +14,7 @@ fi
 echo "This script is intended for Ubuntu. It may work in Debian."
 echo "This script will request root privileges to install the following packages:"
 echo "lua$luaver liblua$luaver-dev git libssl-dev fortune-mod fortunes unzip make"
-echo "It will also request root privileges to install Luarocks to to /usr/local/"
+echo "It will also request root privileges to install Luarocks to /usr/local/"
 echo "along with the following rocks:"
 echo $rocklist
 echo "Press enter to continue. Use Ctrl-C to exit."

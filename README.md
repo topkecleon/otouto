@@ -1,11 +1,16 @@
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
-[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Bot Development Group](http://telegram.me/BotDevelopment)
+[Public Bot](http://telegram.me/mokubot) |
+[Official Channel](http://telegram.me/otouto) |
+[Bot Development Group](http://telegram.me/BotDevelopment)
 
-otouto is a plugin-based, IRC-style bot written in Lua for the [Telegram Bot API](http://core.telegram.org/bots/api).
+otouto is a plugin-based, IRC-style bot written in Lua for the
+[Telegram Bot API](http://core.telegram.org/bots/api).
 
-otouto (including all plugins and documentation) is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
+otouto (including all plugins and documentation) is free software; you are free
+to redistribute it and/or modify it under the terms of the GNU Affero General
+Public License, version 3. See **LICENSE** for details.
 
 **The Manual**
 
@@ -20,40 +25,56 @@ otouto (including all plugins and documentation) is free software; you are free 
 ## Setup
 To get your bot running as soon as possible, see [Quick start](#quick-start).
 
-otouto uses Lua (5.3 is recommended) and the following Lua libraries: luasocket, luasec, multipart-post, dkjson, and lpeg. If you are using Lua 5.2, luautf8 is also required. It is recommended you install these with Luarocks. This can be done easily on Ubuntu with the `install-dependencies.sh` script.
+otouto uses Lua (5.3 is recommended) and the following Lua libraries: luasocket,
+luasec, multipart-post, dkjson, and lpeg. If you are using Lua 5.2, luautf8 is
+also required. It is recommended you install these with Luarocks. This can be
+done easily on Ubuntu with the `install-dependencies.sh` script.
 
-To get started, clone the repository and set the following values in `config.lua`:
+To get started, clone the repository and set the following values in
+`config.lua`:
 
  - `bot_api_key` as your bot authentication token from the BotFather.
  - `admin` as your Telegram ID.
 
-Some plugins are not enabled by default. If you wish to enable them, add their names (sans file extension) to the `plugins` table in the configuration file.
+Some plugins are not enabled by default. If you wish to enable them, add their
+names (sans file extension) to the `plugins` table in the configuration file.
 
-When you are ready to start the bot, run the `launch.sh` script. This script will automatically restart the bot five seconds after being stopped. If this behavior is undesired, start the bot manually with `lua main.lua`.
+When you are ready to start the bot, run the `launch.sh` script. This script
+will automatically restart the bot five seconds after being stopped. If this
+behavior is undesired, start the bot manually with `lua main.lua`.
 
-To stop the bot, send "/halt" through Telegram. You can exit with Ctrl-C (or two Ctrl-C if using `launch.sh`), but this is not recommended as it risks data loss.
+To stop the bot, send "/halt" through Telegram. You can exit with Ctrl-C (or two
+Ctrl-C if using `launch.sh`), but this is not recommended as it risks data loss.
 
-Note that certain plugins, such as `translate.lua` and `greetings.lua`, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys and/or other configuration values not set by default. See [Configuration](#configuration) for details.
+Note that certain plugins, such as `translate.lua` and `greetings.lua`, will
+require privacy mode to be disabled. Additionally, some plugins may require or
+make use of various API keys and/or other configuration values not set by
+default. See [Configuration](#configuration) for details.
 
 ### Quick start
 1. Clone the repository.
 `git clone http://otou.to/code otouto`
-2. Install dependencies: Lua and the following Lua libs: luasocket, luasec, multipart-post, dkjson, and lpeg.†
+2. Install dependencies: Lua and the following Lua libs: luasocket, luasec,
+multipart-post, dkjson, and lpeg.†
 3. Add your bot token and Telegram ID to `config.lua`.
 4. Start the bot with `./launch.sh`.
 
-**†** On Ubuntu, this can be done easily with the `install-dependencies.sh` script.
+**†** On Ubuntu, this can be done easily with the `install-dependencies.sh`
+script.
 
 ## Configuration
-otouto is configured in the `config.lua` file. It is the single point of configuration for the bot, and contains any necessary user-specific variables, such as API keys, custom error messages, and enabled plugins.
+otouto is configured in the `config.lua` file. It is the single point of
+configuration for the bot, and contains any necessary user-specific variables,
+such as API keys, custom error messages, and enabled plugins.
 
-This section includes an exhaustive list of possible configuration values for otouto and official plugins.
+This section includes an exhaustive list of possible configuration values for
+otouto and official plugins.
 
 ### Bot configuration values
 
 | Name          | Default | Description                                        |
 |:--------------|:--------|:---------------------------------------------------|
-| `bot_api_key` | `""`    | Telegram bot API token.                            |
+| `bot_api_key` | nil     | Telegram bot API token.                            |
 | `admin`       | nil     | Telegram ID of the bot owner.                      |
 | `log_chat`    | nil     | Telegram ID of the recipient for error messages.   |
 | `cmd_pat`     | `"/"`   | Character (or string) to be used for bot commands. |
@@ -61,7 +82,8 @@ This section includes an exhaustive list of possible configuration values for ot
 | `about_text`  | ...     | Informational text to be returned by /about.       |
 
 #### Error messages
-These are the generic error messages used by most plugins. These belong in a table named `errors`.
+These are the generic error messages used by most plugins. These belong in a
+table named `errors`.
 
 | Name         | Default                           |
 |:-------------|:----------------------------------|
@@ -72,7 +94,8 @@ These are the generic error messages used by most plugins. These belong in a tab
 | `syntax`     | `"Invalid syntax."`               |
 
 #### Plugins table
-This table is an array of the names of enabled plugins. To enable a plugin, add its name to the list.
+This table is an array of the names of enabled plugins. To enable a plugin, add
+its name to the list.
 
 ### Plugin configuration values
 
@@ -92,7 +115,9 @@ This table is an array of the names of enabled plugins. To enable a plugin, add 
 | `hackernews_interval`     | The lifespan, in minutes, for each set of results hackernews.lua before refreshing.         |
 | `hackernews_onstart`      | Whether hackernews.lua should fetch articles at load (rather than waiting for demand).      |
 
-Some plugins have many configuration values which warrant their own section of the configuration file. That section will be the name of the plugin, without the file extension. They are listed below.
+Some plugins have many configuration values which warrant their own section of
+the configuration file. That section will be the name of the plugin, without the
+file extension. They are listed below.
 
 #### remind.lua
 
@@ -113,13 +138,24 @@ Some plugins have many configuration values which warrant their own section of t
 | `response`      | `"I don't know what to say to that."`                            | Generic response for when the API has no response. |
 
 #### greetings.lua
-The `greetings` table is a list of custom responses for the greetings plugin. Each value is an array of triggers, and the key for that array is the response. The default values are inserted by the greetings plugin if there is no user configuration. In the responses, `#NAME` is replaced with the user's name or nickname. The bot's name is automatically appended to all triggers. Triggers are not case sensitive.
+The `greetings` table is a list of custom responses for the greetings plugin.
+Each value is an array of triggers, and the key for that array is the response.
+The default values are inserted by the greetings plugin if there is no user
+configuration. In the responses, `#NAME` is replaced with the user's name or
+nickname. The bot's name is automatically appended to all triggers. Triggers are
+not case sensitive.
 
 #### reactions.lua
-The `reactions` table is also a list of custom responses, for the reactions plugin. Each value is a key/value pair, where the key is the trigger, and the value is the reaction. The reactions plugin differs from the greetings plugin by how it is triggered: A reaction command must be at the beginning or end of a line. Reactions may be formatted with HTML. Configuration values should be pre-escaped.
+The `reactions` table is also a list of custom responses, for the reactions
+plugin. Each value is a key/value pair, where the key is the trigger, and the
+value is the reaction. The reactions plugin differs from the greetings plugin by
+how it is triggered: A reaction command must be at the beginning or end of a
+line. Reactions may be formatted with HTML. Configuration values should be
+pre-escaped.
 
 ## Control plugins
-Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
+Some plugins are designed to be used by the bot's owner. Here are some examples,
+how they're used, and what they do.
 
 | Plugin          | Command    | Function                                           |
 |:----------------|:-----------|:---------------------------------------------------|
@@ -131,13 +167,28 @@ Some plugins are designed to be used by the bot's owner. Here are some examples,
 | `luarun.lua`    | /lua       | Executes Lua commands in the bot's environment.    |
 
 ## Group Administration
-The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups whch are owned by the bot owner. This works by sending TCP commands to an instance of tg running on the owner's account.
+The administration plugin enables self-hosted, single-realm group
+administration, supporting both normal groups and supergroups whch are owned by
+the bot owner. This works by sending TCP commands to an instance of tg running
+on the owner's account.
 
-To get started, compile the `test` branch of [tg-cli](http://github.com/vysheng/tg). On Ubuntu and Debian, this can be done easily with the `tg-install.sh` script.
+To get started, compile the `test` branch of
+[tg-cli](http://github.com/vysheng/tg). On Ubuntu and Debian, this can be done
+easily with the `tg-install.sh` script.
 
-Once the compilation is finished, enable the `administration` plugin in your config file. You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
+Once the compilation is finished, enable the `administration` plugin in your
+config file. You may have reason to change the default TCP port (4567); if that
+is the case, remember to change it in `tg-launch.sh` as well. Run
+`./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your
+phone number and go through the login process the first time. The script is set
+to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
 
-While tg is running, you may start/reload otouto with `administration.lua` enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
+While tg is running, you may start/reload otouto with `administration.lua`
+enabled, and have access to a wide variety of administrative commands and
+automata. The administration "database" is stored in `administration.json`. To
+start using otouto to administrate a group (note that you must be the owner (or
+an administrator)), send `/gadd` to that group. For a list of commands, use
+`/ahelp`. Below I'll describe various functions now available to you.
 
 | Command     | Function                                        | Privilege | Internal? |
 |:------------|:------------------------------------------------|:----------|:----------|
@@ -183,7 +234,8 @@ Internal commands can only be run within an administrated group.
 | 4 | Administrator | Can globally ban/unban users, promote/demote governors.           | Global |
 | 5 | Owner         | Can add/remove groups, broadcast, promote/demote administrators.  | Global |
 
-Obviously, each greater rank inherits the privileges of the lower, positive ranks.
+Obviously, each greater rank inherits the privileges of the lower, positive
+ranks.
 
 ### Flags
 
@@ -197,7 +249,13 @@ Obviously, each greater rank inherits the privileges of the lower, positive rank
 | 6 | antihammer  | Allows globally-banned users to enter a group.                                   |
 
 #### antiflood
-antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
+antiflood (flag 5) provides a system of automatic flood protection by removing
+users who post too much. It is entirely configurable by a group's governor, an
+administrator, or the bot owner. For each message to a particular group, a user
+is awarded a certain number of "points". The number of points is different for
+each message type. When the user reaches 100 points, he is removed. Points are
+reset each minute. In this way, if a user posts twenty messages within one
+minute, he is removed.
 
 **Default antiflood values:**
 
@@ -213,7 +271,10 @@ antiflood (flag 5) provides a system of automatic flood protection by removing u
 | video    | 10 |
 | sticker  | 20 |
 
-Additionally, antiflood can be configured to automatically ban a user after he has been automatically kicked from a single group a certain number of times in one day. This is configurable as the antiflood value `autoban` and is set to three by default.
+Additionally, antiflood can be configured to automatically ban a user after he
+has been automatically kicked from a single group a certain number of times in
+one day. This is configurable as the antiflood value `autoban` and is set to
+three by default.
 
 ## List of plugins
 
@@ -264,9 +325,12 @@ Additionally, antiflood can be configured to automatically ban a user after he h
 | `catfact.lua`         | /catfact                      | Returns a fact about cats.                                          |
 
 ## Plugins
-otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot).
+otouto uses a robust plugin system, similar to yagop's
+[Telegram-Bot](http://github.com/yagop/telegram-bot).
 
-Most plugins are intended for public use, but a few are for other purposes, like those for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
+Most plugins are intended for public use, but a few are for other purposes, like
+those for [use by the bot's owner](#control-plugins). See
+[here](#list-of-plugins) for a list of plugins.
 
 There are five standard plugin components.
 
@@ -283,26 +347,48 @@ There are five standard plugin components.
 | `help_word` | Keyword for command-specific help. Generated if absent.        |
 
 
-No component is required, but some depend on others. For example, `action` will never be run if there's no `triggers`, and `doc` will never be seen if there's no `command`.
+No component is required, but some depend on others. For example, `action` will
+never be run if there's no `triggers`, and `doc` will never be seen if there's
+no `command`.
 
 If a plugin's `action` returns `true`, `on_msg_receive` will continue its loop.
 
-When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
+When an action or cron function fails, the exception is caught and passed to the
+`handle_exception` utilty and is either printed to the console or send to the
+chat/channel defined in `log_chat` in config.lua.
 
-The `panoptic` value is a boolean (or nil; its absence means false) to state whether the plugin should be included in the `panoptic_plugins` table. Plugins in this table are the only plugins whose triggers are checked against a message's text if that message is forwarded or from a blacklisted user.
+The `panoptic` value is a boolean (or nil; its absence means false) to state
+whether the plugin should be included in the `panoptic_plugins` table. Plugins
+in this table are the only plugins whose triggers are checked against a
+message's text if that message is forwarded or from a blacklisted user.
 
-Interactions with the bot API are straightforward. See the [Bindings section](#bindings) for details.
+Interactions with the bot API are straightforward. See the
+[Bindings section](#bindings) for details.
 
-Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
+Several functions used in multiple plugins are defined in utilities.lua. Refer
+to that file for usage and documentation.
 
 ## Bindings
-Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts three arguments: `method`, `parameters`, `file`. Before using it, initialize the bindings module with its `init` function, passing your bot token as the argument.
+Calls to the Telegram bot API are performed with the `bindings.lua` file through
+the multipart-post library. otouto's bindings file supports all standard API
+methods and all arguments. Its main function, `bindings.request`, accepts three
+arguments: `method`, `parameters`, `file`. Before using it, initialize the
+bindings module with its `init` function, passing your bot token as the
+argument.
 
-`method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
+`method` is the name of the API method. `parameters` (optional) is a table of
+key/value pairs of the method's parameters to be sent with the method. `file`
+(super optional) is a table of a single key/value pair, where the key is the
+name of the parameter and the value is the filename (if these are included in
+`parameters` instead, otouto will attempt to send the filename as a file ID).
 
-Additionally, any method can be called as a key in the `bindings` table (for example, `bindings.getMe`). The `bindings.gen` function (which is also the __index function in its metatable) will forward its arguments to `bindings.request` in their proper form. In this way, the following two function calls are equivalent:
+Additionally, any method can be called as a key in the `bindings` table
+(for example, `bindings.getMe`). The `bindings.gen` function (which is also the
+`__index` function in its metatable) will forward its arguments to
+`bindings.request` in their proper form. In this way, the following two function
+calls are equivalent:
 
-```
+```lua
 bindings.request(
     'sendMessage',
     {
@@ -323,32 +409,54 @@ bindings.sendMessage{
 }
 ```
 
-Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
+Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the
+behavior of otouto's old bindings: `send_message` and `send_reply`.
+`send_message` accepts these arguments: `self`, `chat_id`, `text`,
+`disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following
+function call is equivalent to the two above:
 
-```
+```lua
 utilities.send_message(987654321, 'Quick brown fox.', false, 54321, true)
 ```
 
 Uploading a file for the `sendPhoto` method would look like this:
 
-```
+```lua
 bindings.sendPhoto({ chat_id = 987654321 }, { photo = 'dankmeme.jpg' } )
 ```
 
 and using `sendPhoto` with a file ID would look like this:
 
-```
-bindings.sendPhoto{ chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' }
+```lua
+bindings.sendPhoto{
+    chat_id = 987654321,
+    photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
+}
 ```
 
-Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+Upon success, bindings will return the deserialized result from the API. Upon
+failure, it will return false and the result. In the case of a connection error,
+it will return two false values. If an invalid method name is given, bindings
+will throw an exception. This is to mimic the behavior of more conventional
+bindings as well as to prevent "silent errors".
 
 ## Database
-otouto doesn't use one. This isn't because of dedication to lightweightedness or some clever design choice. Interfacing with databases through Lua is never a simple, easy-to-learn process. As one of the goals of otouto is that it should be a bot which is easy to write plugins for, our approach to storing data is to treat our datastore like any ordinary Lua data structure. The "database" is a table accessible in the `database` value of the bot instance (usually `self.database`), and is saved as a JSON-encoded plaintext file each hour, or when the bot is told to halt. This way, keeping and interacting with persistent data is no different than interacting with a Lua table -- with one exception: Keys in tables used as associative arrays must not be numbers. If the index keys are too sparse, the JSON encoder/decoder will either change them to keys or throw an error.
+otouto doesn't use one. This isn't because of dedication to lightweightedness or
+some clever design choice. Interfacing with databases through Lua is never a
+simple, easy-to-learn process. As one of the goals of otouto is that it should
+be a bot which is easy to write plugins for, our approach to storing data is to
+treat our datastore like any ordinary Lua data structure. The "database" is a
+table accessible in the `database` value of the bot instance (usually
+`self.database`), and is saved as a JSON-encoded plaintext file each hour, or
+when the bot is told to halt. This way, keeping and interacting with persistent
+data is no different than interacting with a Lua table -- with one exception:
+Keys in tables used as associative arrays must not be numbers. If the index keys
+are too sparse, the JSON encoder/decoder will either change them to keys or
+throw an error.
 
 Alone, the database will have this structure:
 
-```
+```lua
 {
     users = {
         ["55994550"] = {
@@ -367,19 +475,27 @@ Alone, the database will have this structure:
 }
 ```
 
-`database.users` will store user information (usernames, IDs, etc) when the bot sees the user. Each table's key is the user's ID as a string.
+`database.users` will store user information (usernames, IDs, etc) when the bot
+sees the user. Each table's key is the user's ID as a string.
 
 `database.userdata` is meant to store miscellanea from various plugins.
 
-`database.version` stores the last bot version that used it. This is to simplify migration to the next version of the bot an easy, automatic process.
+`database.version` stores the last bot version that used it. This is to simplify
+migration to the next version of the bot an easy, automatic process.
 
-Data from other plugins is usually saved in a table with the same name of that plugin. For example, administration.lua stores data in `database.administration`.
+Data from other plugins is usually saved in a table with the same name of that
+plugin. For example, administration.lua stores data in
+`database.administration`.
 
 ## Output style
-otouto plugins should maintain a consistent visual style in their output. This provides a recognizable and comfortable user experience.
+otouto plugins should maintain a consistent visual style in their output. This
+provides a recognizable and comfortable user experience.
 
 ### Titles
-Title lines should be **bold**, including any names and trailing punctuation (such as colons). The exception to this rule is if the title line includes a query, which should be _italic_. It is also acceptable to have a link somewhere inside a title, usually within parentheses. eg:
+Title lines should be **bold**, including any names and trailing punctuation
+(such as colons). The exception to this rule is if the title line includes a
+query, which should be _italic_. It is also acceptable to have a link somewhere
+inside a title, usually within parentheses. eg:
 
 > **Star Wars: Episode IV - A New Hope (1977)**
 >
@@ -388,7 +504,8 @@ Title lines should be **bold**, including any names and trailing punctuation (su
 > **Changelog for otouto (**[Github](http://github.com/topkecleon/otouto)**):**
 
 ### Lists
-Numerated lists should be done with the number and its following punctuation bolded. Unnumbered lists should use the bullet character ( • ). eg:
+Numerated lists should be done with the number and its following punctuation
+bolded. Unnumbered lists should use the bullet character ( • ). eg:
 
 > **1.** Life as a quick brown fox.
 >
@@ -401,22 +518,44 @@ and
 > • The art of jumping over lazy dogs.
 
 ### Links
-Always name your links. Even then, use them with discretion. Excessive links make a post look messy. Links are reasonable when a user may want to learn more about something, but should be avoided when all desirable information is provided. One appropriate use of linking is to provide a preview of an image, as xkcd.lua and apod.lua do.
+Always name your links. Even then, use them with discretion. Excessive links
+make a post look messy. Links are reasonable when a user may want to learn more
+about something, but should be avoided when all desirable information is
+provided. One appropriate use of linking is to provide a preview of an image, as
+xkcd.lua and apod.lua do.
 
 ### Other Stuff
-User IDs should appear within brackets, monospaced (`[123456789]`). Descriptions and information should be in plain text, but "flavor" text should be italic. The standard size for arbitrary lists (such as search results) is eight within a private conversation and four elsewhere. This is a trivial pair of numbers (leftover from the deprecated Google search API), but consistency is noticeable and desirable.
+User IDs should appear within brackets, monospaced (`[123456789]`). Descriptions
+and information should be in plain text, but "flavor" text should be italic. The
+standard size for arbitrary lists (such as search results) is eight within a
+private conversation and four elsewhere. This is a trivial pair of numbers
+(leftover from the deprecated Google search API), but consistency is noticeable
+and desirable.
 
 ## Contributors
-Everybody is free to contribute to otouto. If you are interested, you are invited to [fork the repo](http://github.com/topkecleon/otouto/fork) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the [Bot Development group](http://telegram.me/BotDevelopment).
+Everybody is free to contribute to otouto. If you are interested, you are
+invited to [fork the repo](http://github.com/topkecleon/otouto/fork) and start
+making pull requests. If you have an idea and you are not sure how to implement
+it, open an issue or bring it up in the
+[Bot Development group](http://telegram.me/BotDevelopment).
 
-The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
+The creator and maintainer of otouto is
+[topkecleon](http://github.com/topkecleon). He can be contacted via
+[Telegram](http://telegram.me/topkecleon),
+[Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
 
 [List of contributors.](https://github.com/topkecleon/otouto/graphs/contributors)
 
-There are a a few ways to contribute if you are not a programmer. For one, your feedback is always appreciated. Drop me a line on Telegram or on Twitter. Secondly, we are always looking for new ideas for plugins. Most new plugins start with community input. Feel free to suggest them on Github or in the Bot Dev group. You can also donate Bitcoin to the following address:
+There are a a few ways to contribute if you are not a programmer. For one, your
+feedback is always appreciated. Drop me a line on Telegram or on Twitter.
+Secondly, we are always looking for new ideas for plugins. Most new plugins
+start with community input. Feel free to suggest them on Github or in the Bot
+Dev group. You can also donate Bitcoin to the following address:
 `1BxegZJ73hPu218UrtiY8druC7LwLr82gS`
 
-Contributions are appreciated in all forms. Monetary contributions will go toward server costs. Donators will be eternally honored (at their discretion) on this page.
+Contributions are appreciated in all forms. Monetary contributions will go
+toward server costs. Donators will be eternally honored (at their discretion) on
+this page.
 
 | Donators (in chronological order)             |
 |:----------------------------------------------|
