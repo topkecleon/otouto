@@ -18,6 +18,8 @@ function gImages:init(config)
 Returns a randomized top result from Google Images. Safe search is enabled by default; use "]] .. config.cmd_pat .. [[insfw" to disable it. NSFW results will not display an image preview.
 Alias: ]] .. config.cmd_pat .. 'i'
     gImages.search_url = 'https://www.googleapis.com/customsearch/v1?&searchType=image&imgSize=xlarge&alt=json&num=8&start=1&key=' .. config.google_api_key .. '&cx=' .. config.google_cse_key
+    -- Put this up here in case config changes after triggers are generated.
+    gImages.nsfw_trigger = '^' .. config.cmd_pat .. 'insfw'
 end
 
 gImages.command = 'image <query>'
@@ -56,7 +58,7 @@ function gImages:action(msg, config)
     local output = '[' .. img_title .. '](' .. img_url .. ')'
 
 
-    if msg.text:match('nsfw') then
+    if msg.text:match(gImages.nsfw_trigger) then
         utilities.send_message(msg, '*NSFW*\n'..output, true, msg.message_id, true)
     else
         utilities.send_message(msg, output, false, msg.message_id, true)
