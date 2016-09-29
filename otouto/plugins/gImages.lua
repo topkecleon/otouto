@@ -1,5 +1,9 @@
- -- You need a Google API key and a Google Custom Search Engine set up to use this, in config.google_api_key and config.google_cse_key, respectively.
- -- You must also sign up for the CSE in the Google Developer Console, and enable image results.
+--[[
+    You need a Google API key and a Google Custom Search Engine set up to use
+    this, in config.google_api_key and config.google_cse_key, respectively. You
+    must also sign up for the CSE in the Google Developer Console, and enable
+    image results.
+]] --
 
 local gImages = {}
 
@@ -59,9 +63,9 @@ function gImages:action(msg, config)
 
 
     if msg.text_lower:match(gImages.nsfw_trigger) then
-        utilities.send_message(msg, '*NSFW*\n'..output, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, '*NSFW*\n'..output, true, msg.message_id, true)
     else
-        utilities.send_message(msg, output, false, msg.message_id, true)
+        utilities.send_message(msg.chat.id, output, false, msg.message_id, true)
     end
 
 end
