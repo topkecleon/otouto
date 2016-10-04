@@ -20,15 +20,18 @@ function time:action(msg, config)
         return
     end
 
-    local coords = utilities.get_coords(input, config)
-    if type(coords) == 'string' then
-        utilities.send_reply(msg, coords)
+    local lat, lon = utilities.get_coords(input)
+    if lat == nil then
+        utilities.send_reply(msg, config.errors.connection)
+        return
+    elseif lat == false then
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
     local now = os.time()
     local utc = os.time(os.date('!*t', now))
-    local url = time.base_url:format(coords.lat, coords.lon, utc)
+    local url = time.base_url:format(lat, lon, utc)
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
         utilities.send_reply(msg, config.errors.connection)

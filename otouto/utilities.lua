@@ -123,25 +123,18 @@ function utilities.save_data(filename, data)
 end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
-function utilities.get_coords(input, config)
-
+ -- Returns nil for a connection error and false for zero results.
+function utilities.get_coords(input)
     local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
-
     local jstr, res = HTTP.request(url)
     if res ~= 200 then
-        return config.errors.connection
+        return
     end
-
     local jdat = JSON.decode(jstr)
     if jdat.status == 'ZERO_RESULTS' then
-        return config.errors.results
+        return false
     end
-
-    return {
-        lat = jdat.results[1].geometry.location.lat,
-        lon = jdat.results[1].geometry.location.lng
-    }
-
+    return jdat.results[1].geometry.location.lat, jdat.results[1].geometry.location.lng
 end
 
  -- Get the number of values in a key/value table.
@@ -219,8 +212,10 @@ end
 
 function utilities.md_escape(text)
     return text:gsub('_', '\\_')
-            :gsub('%[', '\\['):gsub('%]', '\\]')
-            :gsub('%*', '\\*'):gsub('`', '\\`')
+        :gsub('%[', '\\[')
+        :gsub('%]', '\\]')
+        :gsub('%*', '\\*')
+        :gsub('`', '\\`')
 end
 
 function utilities.html_escape(text)

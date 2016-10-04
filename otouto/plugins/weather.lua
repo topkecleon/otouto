@@ -25,13 +25,16 @@ function weather:action(msg, config)
         return
     end
 
-    local coords = utilities.get_coords(input, config)
-    if type(coords) == 'string' then
-        utilities.send_reply(msg, coords)
+    local lat, lon = utilities.get_coords(input)
+    if lat == nil then
+        utilities.send_reply(msg, config.errors.connection)
+        return
+    elseif lat == false then
+        utilities.send_reply(msg, config.errors.results)
         return
     end
 
-    local url = 'http://api.openweathermap.org/data/2.5/weather?APPID=' .. config.owm_api_key .. '&lat=' .. coords.lat .. '&lon=' .. coords.lon
+    local url = 'http://api.openweathermap.org/data/2.5/weather?APPID=' .. config.owm_api_key .. '&lat=' .. lat .. '&lon=' .. lon
 
     local jstr, res = HTTP.request(url)
     if res ~= 200 then

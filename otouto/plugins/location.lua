@@ -23,15 +23,19 @@ function gMaps:action(msg, config)
         return
     end
 
-    local coords = utilities.get_coords(input, config)
-    if type(coords) == 'string' then
-        utilities.send_reply(msg, coords)
+    local lat, lon = utilities.get_coords(input)
+    if lat == nil then
+        utilities.send_reply(msg, config.errors.connection)
+        return
+    elseif lat == false then
+        utilities.send_reply(msg, config.errors.results)
+        return
     end
 
     bindings.sendLocation{
         chat_id = msg.chat.id,
-        latitude = coords.lat,
-        longitude = coords.lon,
+        latitude = lat,
+        longitude = lon,
         reply_to_message_id = msg.message_id
     }
 end

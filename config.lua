@@ -162,7 +162,7 @@ Send /help to get started.
         'dice',
         'echo',
         'eightball',
-        'gMaps',
+        'location',
         'hackernews',
         'imdb',
         'nick',
