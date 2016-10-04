@@ -11,18 +11,16 @@ urbandictionary.base_url = 'http://api.urbandictionary.com/v0/define?term='
 function urbandictionary:init(config)
     urbandictionary.triggers = utilities.triggers(self.info.username, config.cmd_pat)
         :t('urbandictionary', true):t('ud', true):t('urban', true).table
-    urbandictionary.doc = [[
-/urbandictionary <query>
+    urbandictionary.doc = [[/urbandictionary <query>
 Returns a definition from Urban Dictionary.
-Aliases: /ud, /urban
-    ]]
+Aliases: /ud, /urban]]
     urbandictionary.doc = urbandictionary.doc:gsub('/', config.cmd_pat)
 end
 
 function urbandictionary:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, urbandictionary.doc, true)
+        utilities.send_reply(msg, urbandictionary.doc, 'html')
         return
     end
 
@@ -38,13 +36,13 @@ function urbandictionary:action(msg, config)
     if data.result_type == 'no_results' then
         output = config.errors.results
     else
-        output = string.format('*%s*\n\n%s\n\n_%s_',
-            data.list[1].word:gsub('*', '*\\**'),
-            utilities.trim(utilities.md_escape(data.list[1].definition)),
-            utilities.trim((data.list[1].example or '')):gsub('_', '_\\__')
+        output = string.format('<b>%s</b>\n\n%s\n\n<i>%s</i>',
+            utilities.html_escape(data.list[1].word),
+            utilities.trim(utilities.html_escape(data.list[1].definition)),
+            utilities.trim(utilities.html_escape(data.list[1].example or ''))
         )
     end
-    utilities.send_reply(msg, output, true)
+    utilities.send_reply(msg, output, 'html')
 end
 
 return urbandictionary

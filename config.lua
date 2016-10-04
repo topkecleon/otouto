@@ -67,7 +67,7 @@ Send /help to get started.
         max_reminders_private = 50
     },
 
-    chatter = {
+    cleverbot = {
         cleverbot_api = 'https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text=',
         connection = 'I don\'t feel like talking right now.',
         response = 'I don\'t know what to say to that.'
@@ -113,6 +113,9 @@ Send /help to get started.
         -- Conversation, group, or channel for kick/ban notifications.
         -- Defaults to config.log_chat if left empty.
         log_chat = nil,
+        -- Default autoban setting.
+        -- A user is banned after being autokicked this many times in a day.
+        autoban = 3,
         -- Default antiflood values.
         antiflood = {
             text = 5,

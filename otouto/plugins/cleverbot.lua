@@ -13,7 +13,7 @@ function cleverbot:init(config)
         '^' .. self.info.first_name:lower() .. ', ',
         '^@' .. self.info.username:lower() .. ', '
     }
-    cleverbot.url = config.chatter.cleverbot_api
+    cleverbot.url = config.cleverbot.cleverbot_api
     cleverbot.error = false
 end
 
@@ -22,12 +22,12 @@ function cleverbot:action(msg, config)
     local input = msg.text_lower:gsub(cleverbot.name, ''):gsub(cleverbot.name, '')
     local jstr, code = HTTPS.request(cleverbot.url .. URL.escape(input))
     if code ~= 200 then
-        utilities.send_message(msg.chat.id, config.chatter.connection)
+        utilities.send_message(msg.chat.id, config.cleverbot.connection)
         return
     end
     local data = JSON.decode(jstr)
     if not data.clever then
-        utilities.send_message(msg.chat.id, config.chatter.response)
+        utilities.send_message(msg.chat.id, config.cleverbot.response)
         return
     end
     utilities.send_message(msg.chat.id, data.clever)

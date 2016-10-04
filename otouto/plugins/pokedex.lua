@@ -19,7 +19,7 @@ function pokedex:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, pokedex.doc, true)
+        utilities.send_reply(msg, pokedex.doc, 'html')
         return
     end
 

@@ -3,22 +3,8 @@
     Functions shared among otouto plugins.
 
     Copyright 2016 topkecleon <drew@otou.to>
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Affero General Public License version 3 as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
-
-local utilities = {}
 
 local HTTP = require('socket.http')
 local ltn12 = require('ltn12')
@@ -29,6 +15,8 @@ local bindings = require('otouto.bindings')
  -- Lua 5.2 compatibility.
  -- If no built-in utf8 is available, load the library.
 local utf8 = utf8 or require('lua-utf8')
+
+local utilities = {}
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -159,7 +147,7 @@ end
  -- Get the number of values in a key/value table.
 function utilities.table_size(tab)
     local i = 0
-    for _,_ in pairs(tab) do
+    for _ in pairs(tab) do
         i = i + 1
     end
     return i
@@ -260,13 +248,6 @@ function utilities.triggers(username, cmd_pat, trigger_table)
     return self
 end
 
-function utilities.with_http_timeout(timeout, fun)
-    local original = HTTP.TIMEOUT
-    HTTP.TIMEOUT = timeout
-    fun()
-    HTTP.TIMEOUT = original
-end
-
 function utilities.pretty_float(x)
     if x % 1 == 0 then
         return tostring(math.floor(x))
@@ -315,13 +296,6 @@ function utilities.set_meta:remove(x)
 end
 function utilities.set_meta:__len()
   return self.__count
-end
-
- -- Styling functions to keep things consistent and easily changeable across plugins.
- -- More to be added.
-utilities.style = {}
-utilities.style.enquote = function(title, body)
-    return '*' .. title:gsub('*', '\\*') .. ':*\n"' .. utilities.md_escape(body) .. '"'
 end
 
  -- Converts a gross string back into proper UTF-8.

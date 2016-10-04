@@ -95,7 +95,7 @@ function hearthstone:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, hearthstone.doc, true)
+        utilities.send_reply(msg, hearthstone.doc, 'html')
         return
     end
 

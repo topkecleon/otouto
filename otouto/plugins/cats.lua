@@ -2,6 +2,7 @@ local cats = {}
 
 local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
 
 function cats:init(config)
     if not config.thecatapi_key then
@@ -29,9 +30,7 @@ function cats:action(msg, config)
     end
 
     str = str:match('<img src="(.-)">')
-    local output = '[Cat!]('..str..')'
-
-    utilities.send_message(msg.chat.id, output, false, nil, true)
+    bindings.sendPhoto{chat_id = msg.chat.id, photo = str}
 
 end
 

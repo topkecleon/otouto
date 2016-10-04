@@ -22,7 +22,7 @@ end
 function translate:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, translate.doc, true)
+        utilities.send_reply(msg, translate.doc, 'html')
         return
     end
 
@@ -39,7 +39,9 @@ function translate:action(msg, config)
         return
     end
 
-    utilities.send_reply(msg.reply_to_message or msg, utilities.style.enquote('Translation', data.text[1]), true)
+    local output = '<b>Translation:</b>\n"' .. utilities.html_escape(data.text[1]) .. '"'
+
+    utilities.send_reply(msg.reply_to_message or msg, output, 'html')
 end
 
 return translate

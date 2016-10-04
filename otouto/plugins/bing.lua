@@ -21,11 +21,9 @@ function bing:init(config)
     bing.headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) }
     bing.triggers = utilities.triggers(self.info.username, config.cmd_pat)
         :t('bing', true):t('g', true):t('google', true).table
-    bing.doc = [[
-/bing <query>
+    bing.doc = [[/bing <query>
 Returns the top web results from Bing.
-Aliases: /g, /google
-    ]]
+Aliases: /g, /google]]
     bing.doc = bing.doc:gsub('/', config.cmd_pat)
 
 end
@@ -33,7 +31,7 @@ end
 function bing:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, bing.doc, true)
+        utilities.send_reply(msg, bing.doc, 'html')
         return
     end
 

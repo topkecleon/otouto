@@ -3,26 +3,14 @@
     The heart and sole of otouto, ie the init and main loop.
 
     Copyright 2016 topkecleon <drew@otou.to>
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Affero General Public License version 3 as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared plugins.
 
-bot.version = '3.13'
+bot.version = '3.14'
 
  -- Function to be run on start and reload.
 function bot:init(config)
@@ -45,14 +33,11 @@ function bot:init(config)
         self.database = utilities.load_data(self.database_name)
     end
 
-    -- Migration code 1.12 -> 1.13
-    -- Back to administration global ban list; copy over current blacklist.
-    if self.database.version ~= '3.13' then
-        if self.database.administration then
-            self.database.administration.globalbans = self.database.administration.globalbans or self.database.blacklist or {}
-            utilities.save_data(self.database_name, self.database)
-            self.database = utilities.load_data(self.database_name)
-        end
+    -- Migration code 1.13 -> 1.14
+    -- "database.reminders" -> "database.remind"
+    if self.database.version ~= '3.14' then
+        self.database.remind = self.database.reminders
+        self.database.reminders = nil
     end
     -- End migration code.
 
@@ -76,7 +61,9 @@ function bot:init(config)
         table.insert(self.plugins, plugin)
         if plugin.init then plugin.init(self, config) end
         if plugin.panoptic then table.insert(self.panoptic_plugins, plugin) end
-        if plugin.doc then plugin.doc = '```\n'..plugin.doc..'\n```' end
+        if plugin.doc then
+            plugin.doc = '<pre>'..utilities.html_escape(plugin.doc)..'</pre>'
+        end
         if not plugin.triggers then plugin.triggers = {} end
     end
 
@@ -129,12 +116,10 @@ function bot:on_msg_receive(msg, config)
     end
 
     -- Support deep linking.
-    if msg.text:match('^'..config.cmd_pat..'start .+') then
+    if msg.text:match('^/start .+') then
         msg.text = config.cmd_pat .. utilities.input(msg.text)
         msg.text_lower = msg.text:lower()
     end
-
-    -- If the message is forwarded or comes from a blacklisted yser,
 
     -- Do the thing.
     for _, plugin in ipairs(plugint) do
@@ -153,18 +138,14 @@ function bot:on_msg_receive(msg, config)
                         utilities.send_reply(msg, config.errors.generic)
                     end
                     utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config.log_chat)
-                    msg = nil
                     return
                 -- Continue if the return value is true.
                 elseif result ~= true then
-                    msg = nil
                     return
                 end
             end
         end
     end
-    msg = nil
-
 end
 
  -- main

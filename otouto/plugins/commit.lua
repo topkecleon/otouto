@@ -12,9 +12,10 @@ function commit:init(config)
 end
 
 function commit:action(msg)
+    local output = http.request('http://whatthecommit.com/index.txt') or 'Minor text fixes'
     bindings.sendMessage{
         chat_id = msg.chat.id,
-        text = '```\n' .. (http.request('http://whatthecommit.com/index.txt')) .. '\n```',
+        text = '```\n' .. output .. '\n```',
         parse_mode = 'Markdown'
     }
 end

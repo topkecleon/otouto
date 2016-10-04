@@ -14,7 +14,7 @@ function dice:action(msg)
 
     local input = utilities.input(msg.text_lower)
     if not input then
-        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, 'html')
         return
     end
 
@@ -25,7 +25,7 @@ function dice:action(msg)
         count = 1
         range = input:match('^d?([%d]+)$')
     else
-        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, 'html')
         return
     end
 

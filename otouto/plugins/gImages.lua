@@ -11,6 +11,7 @@ local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
 
 function gImages:init(config)
     assert(config.google_api_key and config.google_cse_key,
@@ -32,7 +33,7 @@ function gImages:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, gImages.doc, true)
+        utilities.send_reply(msg, gImages.doc, 'html')
         return
     end
 
@@ -59,13 +60,12 @@ function gImages:action(msg, config)
     local i = math.random(jdat.queries.request[1].count)
     local img_url = jdat.items[i].link
     local img_title = jdat.items[i].title
-    local output = '[' .. img_title .. '](' .. img_url .. ')'
-
 
     if msg.text_lower:match(gImages.nsfw_trigger) then
+        local output = '[' .. img_title .. '](' .. img_url .. ')'
         utilities.send_message(msg.chat.id, '*NSFW*\n'..output, true, msg.message_id, true)
     else
-        utilities.send_message(msg.chat.id, output, false, msg.message_id, true)
+        bindings.sendPhoto{chat_id = msg.chat.id, photo = img_url, caption = img_title}
     end
 
 end

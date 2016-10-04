@@ -1,9 +1,9 @@
 local reddit = {}
 
-local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
+local HTTPS = require('ssl.https')
 
 reddit.command = 'reddit [r/subreddit | query]'
 
@@ -65,7 +65,7 @@ function reddit:action(msg, config)
         url = reddit.rall_url .. limit
         source = '*/r/all*\n'
     end
-    local jstr, res = HTTP.request(url)
+    local jstr, res = HTTPS.request(url)
     if res ~= 200 then
         utilities.send_reply(msg, config.errors.connection)
     else

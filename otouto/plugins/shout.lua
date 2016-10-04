@@ -14,7 +14,7 @@ function shout:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, shout.doc, true)
+        utilities.send_reply(msg, shout.doc, 'html')
         return
     end
 

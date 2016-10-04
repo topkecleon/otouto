@@ -17,7 +17,7 @@ function currency:action(msg, config)
 
     local input = msg.text:upper()
     if not input:match('%a%a%a TO %a%a%a') then
-        utilities.send_message(msg.chat.id, currency.doc, true, msg.message_id, true)
+        utilities.send_message(msg.chat.id, currency.doc, true, msg.message_id, 'html')
         return
     end
 

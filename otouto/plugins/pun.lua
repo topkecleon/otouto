@@ -132,7 +132,8 @@ local puns = {
     "The career of a skier can go downhill very fast.",
     "In democracy, it's your vote that counts. In feudalism, it's your count that votes.",
     "A sea lion is nothing but an ionized seal.",
-    "The vegetables from my garden aren't that great. I guess you could say they're mediokra."
+    "The vegetables from my garden aren't that great. I guess you could say they're mediokra.",
+    "Did you hear about the restaurant on the International Space Station? It lacks atmosphere, but the food is out of this world."
 }
 
 function pun:action(msg)

@@ -40,7 +40,7 @@ local corrected_numbers = {
 function starwars:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, starwars.doc, true)
+        utilities.send_reply(msg, starwars.doc, 'html')
         return
     end
 

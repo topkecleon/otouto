@@ -21,7 +21,7 @@ function weather:action(msg, config)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, weather.doc, true)
+        utilities.send_reply(msg, weather.doc, 'html')
         return
     end
 

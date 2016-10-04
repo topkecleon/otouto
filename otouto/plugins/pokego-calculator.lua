@@ -73,7 +73,7 @@ end
 function pgc:action(msg)
     local input = utilities.input(msg.text)
     if not input then
-        utilities.send_reply(msg, pgc.doc, true)
+        utilities.send_reply(msg, pgc.doc, 'html')
         return
     end
     input = input .. '\n'

@@ -22,7 +22,7 @@ function setandget:action(msg, config)
     if msg.text_lower:match('^'..config.cmd_pat..'set') then
 
         if not input then
-            utilities.send_message(msg.chat.id, setandget.doc, true, nil, true)
+            utilities.send_message(msg.chat.id, setandget.doc, true, nil, 'html')
             return
         end
 
@@ -30,7 +30,7 @@ function setandget:action(msg, config)
         local value = utilities.input(input)
 
         if not name or not value then
-            utilities.send_message(msg.chat.id, setandget.doc, true, nil, true)
+            utilities.send_message(msg.chat.id, setandget.doc, true, nil, 'html')
         elseif value == '--' or value == '—' then
             self.database.setandget[chat_id_str][name] = nil
             utilities.send_message(msg.chat.id, 'That value has been deleted.')

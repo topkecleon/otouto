@@ -5,19 +5,7 @@
     For more documentation, read the the manual (otou.to/rtfm).
 
     Copyright 2016 topkecleon <drew@otou.to>
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Affero General Public License version 3 as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
 --[[
@@ -36,6 +24,10 @@
      target's autokick counter. Added configuration for default flag settings.
 
     1.13.2 - /desc can now be used with a query.
+
+    1.13.3 - Removed activity array. Group listings sorted alphabetically.
+     Removed unneeded "founded" and "grouptype" variables from group data. Added
+     default autoban setting to config.
 ]]--
 
 local drua = require('otouto.drua-tg')
@@ -50,7 +42,6 @@ function administration:init(config)
         self.database.administration = {
             admins = {},
             groups = {},
-            activity = {},
             autokick_timer = os.date('%d'),
             globalbans = {}
         }
@@ -66,22 +57,8 @@ function administration:init(config)
     administration.flags = administration.init_flags(config.cmd_pat)
     administration.init_command(self, config)
 
-    -- Migration 3.13 -> 3.13.1
-    for _, group in pairs(self.database.administration.groups) do
-        for i = 7, 9 do
-            if group.flags[i] == nil then
-                group.flags[i] = config.administration.flags[i]
-            end
-        end
-        group.antiflood = group.antiflood or {}
-        for k, v in pairs(config.administration.antiflood) do
-            group.antiflood[k] = group.antiflood[k] or config.administration.antiflood[k]
-        end
-    end
-    -- End migration
-
-    administration.doc = 'Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.'
     administration.command = 'groups [query]'
+    administration.doc = 'Returns a list of administrated groups.\nUse '..config.cmd_pat..'ahelp for more administrative commands.'
 
     -- In the worst case, don't send errors in reply to random messages.
     administration.error = false
@@ -385,16 +362,15 @@ function administration.init_command(self_, config_)
                 local from_id_str = tostring(msg.from.id)
                 local chat_id_str = tostring(msg.chat.id)
 
-                if rank < 2 then
+                if rank == 0 then -- banned
+                    user.do_kick = true
+                    user.dont_unban = true
+                    user.reason = 'banned'
+                    user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
+                elseif rank == 1 then
                     local from_name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 
-                    -- banned
-                    if rank == 0 then
-                        user.do_kick = true
-                        user.dont_unban = true
-                        user.reason = 'banned'
-                        user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
-                    elseif group.flags[2] and ( -- antisquig
+                    if group.flags[2] and ( -- antisquig
                         msg.text:match(utilities.char.arabic)
                         or msg.text:match(utilities.char.rtl_override)
                         or msg.text:match(utilities.char.rtl_mark)
@@ -526,12 +502,12 @@ function administration.init_command(self_, config_)
                         drua.rename_chat(msg.chat.id, group.name)
                     else
                         group.name = msg.new_chat_title
-                        if group.grouptype == 'supergroup' then
+                        if msg.chat.type == 'supergroup' then
                             administration.update_desc(self, msg.chat.id, config)
                         end
                     end
                 elseif msg.new_chat_photo then
-                    if group.grouptype == 'group' then
+                    if msg.chat.type == 'group' then
                         if rank < (group.flags[9] and 2 or 3) then
                             drua.set_photo(msg.chat.id, group.photo)
                         else
@@ -541,7 +517,7 @@ function administration.init_command(self_, config_)
                         group.photo = drua.get_photo(msg.chat.id)
                     end
                 elseif msg.delete_chat_photo then
-                    if group.grouptype == 'group' then
+                    if msg.chat.type == 'group' then
                         if rank < (group.flags[9] and 2 or 3) then
                             drua.set_photo(msg.chat.id, group.photo)
                         else
@@ -592,16 +568,6 @@ function administration.init_command(self_, config_)
                     utilities.send_message(msg.new_chat_member.id, output, true, nil, true)
                 end
 
-                -- Last active time for group listing.
-                if msg.text:len() > 0 then
-                    for i,v in pairs(self.database.administration.activity) do
-                        if v == chat_id_str then
-                            table.remove(self.database.administration.activity, i)
-                            table.insert(self.database.administration.activity, 1, chat_id_str)
-                        end
-                    end
-                end
-
                 return true
 
             end
@@ -613,26 +579,28 @@ function administration.init_command(self_, config_)
             command = 'groups \\[query]',
             privilege = 1,
             interior = false,
-            doc = 'Returns a list of groups matching the query, or a list of all administrated groups.',
+            doc = 'Returns a list of groups matching a query, or a list of all administrated groups.',
 
             action = function(self, msg, _, config)
                 local input = utilities.input(msg.text)
-                local search_res = ''
-                local grouplist = ''
-                for _, chat_id_str in ipairs(self.database.administration.activity) do
-                    local group = self.database.administration.groups[chat_id_str]
+                local group_list = {}
+                local result_list = {}
+                for _, group in pairs(self.database.administration.groups) do
                     if (not group.flags[1]) and group.link then -- no unlisted or unlinked groups
-                        grouplist = grouplist .. '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
+                        local line = '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')'
+                        table.insert(group_list, line)
                         if input and string.match(group.name:lower(), input:lower()) then
-                            search_res = search_res .. '• [' .. utilities.md_escape(group.name) .. '](' .. group.link .. ')\n'
+                            table.insert(result_list, line)
                         end
                     end
                 end
                 local output
-                if search_res ~= '' then
-                    output = '*Groups matching* _' .. input .. '_ *:*\n' .. search_res
-                elseif grouplist ~= '' then
-                    output = '*Groups:*\n' .. grouplist
+                if #result_list > 0 then
+                    table.sort(result_list)
+                    output = '*Groups matching* _' .. input:gsub('_', '_\\__') .. '_*:*\n' .. table.concat(result_list, '\n')
+                elseif #group_list > 0 then
+                    table.sort(group_list)
+                    output = '*Groups:*\n' .. table.concat(group_list, '\n')
                 else
                     output = 'There are currently no listed groups.'
                 end
@@ -764,13 +732,17 @@ function administration.init_command(self_, config_)
             doc = 'Returns the group\'s list of rules, or a specific rule.',
 
             action = function(self, msg, group, config)
-                local output
-                local input = utilities.get_word(msg.text_lower, 2)
-                input = tonumber(input)
+                local output = ''
+                local input = utilities.input(msg.text)
                 if #group.rules > 0 then
-                    if input and group.rules[input] then
-                        output = '*' .. input .. '.* ' .. group.rules[input]
-                    else
+                    if input then
+                        for i in input:gmatch('%g+') do
+                            if group.rules[tonumber(i)] then
+                                output = output .. '*' .. i .. '.* ' .. group.rules[tonumber(i)] .. '\n'
+                            end
+                        end
+                    end
+                    if output == '' or not input then
                         output = '*Rules for ' .. msg.chat.title .. ':*\n'
                         for i,v in ipairs(group.rules) do
                             output = output .. '*' .. i .. '.* ' .. v .. '\n'
@@ -958,7 +930,7 @@ function administration.init_command(self_, config_)
                         local output = '*MOTD for ' .. msg.chat.title .. ':*\n' .. input
                         utilities.send_message(msg.chat.id, output, true, nil, true)
                     end
-                    if group.grouptype == 'supergroup' then
+                    if msg.chat.type == 'supergroup' then
                         administration.update_desc(self, msg.chat.id, config)
                     end
                 else
@@ -1195,7 +1167,7 @@ Use this command to configure the point values for each message type. When a use
                                 group.mods[target.id_str] = true
                                 group.bans[target.id_str] = nil
                             end
-                            if group.grouptype == 'supergroup' then
+                            if msg.chat.type == 'supergroup' then
                                 local chat_member = bindings.getChatMember{ chat_id = msg.chat.id, user_id = target.id }
                                 if chat_member and chat_member.result.status == 'member' then
                                     drua.channel_set_admin(msg.chat.id, target.id, 2, s)
@@ -1234,7 +1206,7 @@ Use this command to configure the point values for each message type. When a use
                                 output = output .. target.name .. ' is no longer a moderator.\n'
                                 group.mods[target.id_str] = nil
                             end
-                            if group.grouptype == 'supergroup' then
+                            if msg.chat.type == 'supergroup' then
                                 drua.channel_set_admin(msg.chat.id, target.id, 0, s)
                             end
                         end
@@ -1270,7 +1242,7 @@ Use this command to configure the point values for each message type. When a use
                             group.governor = target.id
                             utilities.send_reply(msg, target.name .. ' is the new governor.')
                         end
-                        if group.grouptype == 'supergroup' then
+                        if msg.chat.type == 'supergroup' then
                             local chat_member = bindings.getChatMember{ chat_id = msg.chat.id, user_id = target.id }
                             if chat_member and chat_member.result.status == 'member' then
                                 drua.channel_set_admin(msg.chat.id, target.id, 2)
@@ -1305,7 +1277,7 @@ Use this command to configure the point values for each message type. When a use
                             group.governor = msg.from.id
                             utilities.send_reply(msg, target.name .. ' is no longer the governor.')
                         end
-                        if group.grouptype == 'supergroup' then
+                        if msg.chat.type == 'supergroup' then
                             drua.channel_set_admin(msg.chat.id, target.id, 0)
                             administration.update_desc(self, msg.chat.id, config)
                         end
@@ -1447,7 +1419,7 @@ Use this command to configure the point values for each message type. When a use
                             output = output .. target.name .. ' is not an administrator.\n'
                         else
                             for chat_id, group in pairs(self.database.administration.groups) do
-                                if group.grouptype == 'supergroup' then
+                                if tonumber(chat_id) < -1000000000000 then
                                     drua.channel_set_admin(chat_id, target.id, 0, s)
                                 end
                             end
@@ -1482,43 +1454,41 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                 elseif group then
                     utilities.send_reply(msg, 'I am already administrating this group.')
                 else
-                    local output = 'I am now administrating this group.'
-                    local flags = {}
+                    self.database.administration.groups[tostring(msg.chat.id)] = {
+                        name = msg.chat.title,
+                        photo = drua.get_photo(msg.chat.id),
+                        link = drua.export_link(msg.chat.id),
+                        governor = msg.from.id,
+                        mods = {},
+                        bans = {},
+                        autoban = config.administration.autoban,
+                        autokicks = {},
+                        antiflood = {},
+                        flags = {},
+                        rules = {},
+                        tempbans = {}
+                    }
+                    group = self.database.administration.groups[tostring(msg.chat.id)]
+                    for k, v in pairs(config.administration.antiflood) do
+                        group.antiflood[k] = config.administration.antiflood[k]
+                    end
                     for i = 1, #administration.flags do
-                        flags[i] = config.administration.flags[i]
+                        group.flags[i] = config.administration.flags[i]
                     end
                     local input = utilities.input(msg.text)
+                    local output = 'I am now administrating this group.'
                     if input then
                         for i in input:gmatch('%g+') do
                             local n = tonumber(i)
-                            if n and administration.flags[n] and flags[n] ~= true then
-                                flags[n] = true
+                            if n and administration.flags[n] and group.flags[n] ~= true then
+                                group.flags[n] = true
                                 output = output .. '\n' .. administration.flags[n].short
                             end
                         end
                     end
-                    self.database.administration.groups[tostring(msg.chat.id)] = {
-                        mods = {},
-                        governor = msg.from.id,
-                        bans = {},
-                        flags = flags,
-                        rules = {},
-                        grouptype = msg.chat.type,
-                        name = msg.chat.title,
-                        link = drua.export_link(msg.chat.id),
-                        photo = drua.get_photo(msg.chat.id),
-                        founded = os.time(),
-                        autokicks = {},
-                        autoban = 3,
-                        antiflood = {}
-                    }
-                    for k, v in pairs(config.administration.antiflood) do
-                        self.database.administration.groups[tostring(msg.chat.id)].antiflood[k] = config.administration.antiflood[k]
-                    end
                     administration.update_desc(self, msg.chat.id, config)
-                    table.insert(self.database.administration.activity, tostring(msg.chat.id))
-                    utilities.send_reply(msg, output)
                     drua.channel_set_admin(msg.chat.id, self.info.id, 2)
+                    utilities.send_reply(msg, output)
                 end
             end
         },
@@ -1537,11 +1507,6 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                 if self.database.administration.groups[input] then
                     local chat_name = self.database.administration.groups[input].name
                     self.database.administration.groups[input] = nil
-                    for i,v in ipairs(self.database.administration.activity) do
-                        if v == input then
-                            table.remove(self.database.administration.activity, i)
-                        end
-                    end
                     output = 'I am no longer administrating _' .. utilities.md_escape(chat_name) .. '_.'
                 else
                     if input == tostring(msg.chat.id) then

@@ -11,12 +11,9 @@ apod.command = 'apod [date]'
 
 function apod:init(config)
     apod.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('apod', true).table
-    apod.doc = [[
-/apod [YYYY-MM-DD]
+    apod.doc = config.cmd_pat .. [[apod [YYYY-MM-DD]
 Returns the Astronomy Picture of the Day.
-Source: nasa.gov
-    ]]
-    apod.doc = apod.doc:gsub('/', config.cmd_pat)
+Source: nasa.gov]]
     apod.base_url = 'https://api.nasa.gov/planetary/apod?api_key=' .. (config.nasa_api_key or 'DEMO_KEY')
 end
 

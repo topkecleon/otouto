@@ -16,45 +16,55 @@ The following markdown syntax is supported:
  _italic text_
  [text](URL)
  `inline fixed-width code`
- `‌`‌`pre-formatted fixed-width code block`‌`‌`]]
+ ```pre-formatted fixed-width code block```]]
 end
 
 function channel:action(msg, config)
-    -- An exercise in using zero early returns. :)
     local input = utilities.input(msg.text)
-    local output
-    if input then
-        local chat_id = utilities.get_word(input, 1)
-        local admin_list, t = bindings.getChatAdministrators{ chat_id = chat_id }
-        if admin_list then
-            local is_admin = false
-            for _, admin in ipairs(admin_list.result) do
-                if admin.user.id == msg.from.id then
-                    is_admin = true
-                end
-            end
-            if is_admin then
-                local text = input:match('\n(.+)')
-                if text then
-                    local success, result = utilities.send_message(chat_id, text, true, nil, true)
-                    if success then
-                        output = 'Your message has been sent!'
-                    else
-                        output = 'Sorry, I was unable to send your message.\n`' .. result.description .. '`'
-                    end
-                else
-                    output = 'Please enter a message to be sent. Markdown is supported.'
-                end
-            else
-                output = 'Sorry, you do not appear to be an administrator for that channel.'
-            end
-        else
-            output = 'Sorry, I was unable to retrieve a list of administrators for that channel.\n`' .. t.description .. '`'
-        end
-    else
-        output = channel.doc
+    if not input then
+        utilities.send_reply(msg, channel.doc, 'html')
+        return
     end
-    utilities.send_reply(msg, output, true)
+
+    local chat_id = utilities.get_word(input, 1)
+    local chat, t = bindings.getChat{chat_id = chat_id}
+    if not chat then
+        utilities.send_reply(msg, 'Sorry, I was unable to retrieve information for that channel.\n`' .. t.description .. '`', true)
+        return
+    elseif chat.result.type ~= 'channel' then
+        utilities.send_reply(msg, 'Sorry, that group does not appear to be a channel.')
+        return
+    end
+
+    local admin_list, t = bindings.getChatAdministrators{ chat_id = chat_id }
+    if not admin_list then
+        utilities.send_reply(msg, 'Sorry, I was unable to retrieve a list of administrators for that channel.\n`' .. t.description .. '`', true)
+        return
+    end
+
+    local is_admin = false
+    for _, admin in ipairs(admin_list.result) do
+        if admin.user.id == msg.from.id then
+            is_admin = true
+        end
+    end
+    if not is_admin then
+        utilities.send_reply(msg, 'Sorry, you do not appear to be an administrator for that channel.')
+        return
+    end
+
+    local text = input:match('\n(.+)')
+    if not text then
+        utilities.send_reply(msg, 'Please enter a message to be sent on a new line. Markdown is supported.')
+        return
+    end
+
+    local success, result = utilities.send_message(chat_id, text, true, nil, true)
+    if success then
+        utilities.send_reply(msg, 'Your message has been sent!')
+    else
+        utilities.send_reply(msg, 'Sorry, I was unable to send your message.\n`' .. result.description .. '`', true)
+    end
 end
 
 return channel

@@ -15,7 +15,7 @@ end
 function calc:action(msg, config)
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, calc.doc, true)
+        utilities.send_reply(msg, calc.doc, 'html')
         return
     end
 

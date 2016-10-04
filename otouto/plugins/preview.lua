@@ -14,7 +14,7 @@ function preview:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
-        utilities.send_reply(msg, preview.doc, true)
+        utilities.send_reply(msg, preview.doc, 'html')
         return
     end
 

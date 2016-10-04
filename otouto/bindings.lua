@@ -5,19 +5,7 @@
     See the "Bindings" section of README.md for usage information.
 
     Copyright 2016 topkecleon <drew@otou.to>
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Affero General Public License version 3 as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
 local bindings = {}
@@ -25,7 +13,7 @@ local bindings = {}
 local https = require('ssl.https')
 local json = require('dkjson')
 local ltn12 = require('ltn12')
-local mp_encode = require('multipart-post').encode
+local mp = require('multipart-post')
 
 function bindings.init(token)
     bindings.BASE_URL = 'https://api.telegram.org/bot' .. token .. '/'
@@ -58,7 +46,7 @@ function bindings.request(method, parameters, file)
         parameters = {''}
     end
     local response = {}
-    local body, boundary = mp_encode(parameters)
+    local body, boundary = mp.encode(parameters)
     local success, code = https.request{
         url = bindings.BASE_URL .. method,
         method = 'POST',
@@ -79,8 +67,9 @@ function bindings.request(method, parameters, file)
             return false, false
         elseif result.ok then
             return result
+        elseif result.description == 'Method not found' then
+            error(method .. ': Method not found.')
         else
-            assert(result.description ~= 'Method not found', method .. ': Method not found.')
             return false, result
         end
     end

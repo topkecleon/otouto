@@ -9,19 +9,25 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
 function lastfm:init(config)
-    assert(config.lastfm_api_key,
+    assert(
+        config.lastfm_api_key,
         'lastfm.lua requires a last.fm API key from http://last.fm/api.'
     )
 
-    lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('fmset', true).table
+    lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('npfull', true):t('fmset', true).table
     lastfm.doc = config.cmd_pat .. [[np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
+]] .. config.cmd_pat .. [[npfull [username]
+Works like ]] .. config.cmd_pat .. [[np, but returns more info, differently formatted and including album art, if available.
+
 ]] .. config.cmd_pat .. [[fmset <username>
 Sets your last.fm username. Otherwise, ]] .. config.cmd_pat .. [[np will use your Telegram username. Use "]] .. config.cmd_pat .. [[fmset --" to delete it.]]
-end
 
-lastfm.command = 'lastfm'
+    lastfm.command = 'lastfm'
+
+    lastfm.base_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
+end
 
 function lastfm:action(msg, config)
 
@@ -29,12 +35,12 @@ function lastfm:action(msg, config)
     local from_id_str = tostring(msg.from.id)
     self.database.userdata[from_id_str] = self.database.userdata[from_id_str] or {}
 
-    if string.match(msg.text, '^'..config.cmd_pat..'lastfm') then
-        utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, true)
+    if string.match(msg.text_lower, '^'..config.cmd_pat..'lastfm') then
+        utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, 'html')
         return
-    elseif string.match(msg.text, '^'..config.cmd_pat..'fmset') then
+    elseif string.match(msg.text_lower, '^'..config.cmd_pat..'fmset') then
         if not input then
-            utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, true)
+            utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, 'html')
         elseif input == '--' or input == utilities.char.em_dash then
             self.database.userdata[from_id_str].lastfm = nil
             utilities.send_reply(msg, 'Your last.fm username has been forgotten.')
@@ -44,8 +50,6 @@ function lastfm:action(msg, config)
         end
         return
     end
-
-    local url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
 
     local username
     local alert = ''
@@ -62,13 +66,11 @@ function lastfm:action(msg, config)
         return
     end
 
-    url = url .. URL.escape(username)
+    local orig = HTTP.TIMEOUT
+    HTTP.TIMEOUT = 1
+    local jstr, res = HTTP.request(lastfm.base_url .. URL.escape(username))
+    HTTP.TIMEOUT = orig
 
-    local jstr, res
-    utilities.with_http_timeout(
-        1, function ()
-            jstr, res = HTTP.request(url)
-    end)
     if res ~= 200 then
         utilities.send_reply(msg, config.errors.connection)
         return
@@ -80,29 +82,51 @@ function lastfm:action(msg, config)
         return
     end
 
-    jdat = jdat.recenttracks.track[1] or jdat.recenttracks.track
-    if not jdat then
+    local track = jdat.recenttracks.track[1] or jdat.recenttracks.track
+    if not track then
         utilities.send_reply(msg, 'No history for this user.' .. alert)
         return
     end
 
-    local output = input or msg.from.first_name
-    output = '🎵  ' .. output
-
-    if jdat['@attr'] and jdat['@attr'].nowplaying then
-        output = output .. ' is currently listening to:\n'
+    local output = utilities.html_escape(input or msg.from.first_name)
+    if track['@attr'] and track['@attr'].nowplaying then
+        output = output .. ' is currently listening to:'
     else
-        output = output .. ' last listened to:\n'
+        output = output .. ' last listened to:'
     end
 
-    local title = jdat.name or 'Unknown'
-    local artist = 'Unknown'
-    if jdat.artist then
-        artist = jdat.artist['#text']
+    if msg.text_lower:match('^' .. config.cmd_pat .. 'npfull') then
+
+        output = '<b>' .. utilities.html_escape(output) .. '</b>'
+        if track.name and #track.name > 0 then
+            output = output .. '\n🎵 ' .. utilities.html_escape(track.name)
+        else
+            output = output .. '\n🎵 Unknown'
+        end
+        if track.artist and track.artist['#text'] and #track.artist['#text'] > 0 then
+            output = output .. '\n👤 ' .. utilities.html_escape(track.artist['#text'])
+        end
+        if track.album and track.album['#text'] and #track.album['#text'] > 0 then
+            output = output .. '\n💿 ' .. utilities.html_escape(track.album['#text'])
+        end
+        -- album art
+        if track.image and track.image[3] and #track.image[3]['#text'] > 0 then
+            output = '<a href="' .. utilities.html_escape(track.image[3]['#text']) .. '">' .. utilities.char.zwnj .. '</a>' .. output
+        end
+
+    else
+
+        output = output .. '\n'
+        if track.artist and track.artist['#text'] and #track.artist['#text'] > 0 then
+            output = output .. utilities.html_escape(track.artist['#text']) .. ' - '
+        end
+        output = output .. utilities.html_escape((track.name or 'Unknown'))
+
     end
 
-    output = output .. title .. ' - ' .. artist .. alert
-    utilities.send_message(msg.chat.id, output)
+    output = output .. alert
+
+    utilities.send_message(msg.chat.id, output, nil, nil, 'html')
 
 end
 

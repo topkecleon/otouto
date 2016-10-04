@@ -10,7 +10,6 @@ function fortune:init(config)
         not s:match('not found$'),
         'fortune.lua requires the fortune program to be installed.'
     )
-
     fortune.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('fortune').table
 end
 
