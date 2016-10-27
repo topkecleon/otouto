@@ -22,7 +22,7 @@ function wikipedia:init()
 Returns an article from Wikipedia.
 Aliases: ]] .. self.config.cmd_pat .. 'w, ' .. self.config.cmd_pat .. 'wiki'
     wikipedia.search_url = 'https://' .. self.config.lang .. '.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
-    wikipedia.res_url = 'https://' .. self.config.lang .. '.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+    wikipedia.res_url = 'https://' .. self.config.lang .. '.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exchars=4000&explaintext=&titles='
     wikipedia.art_url = 'https://' .. self.config.lang .. '.wikipedia.org/wiki/'
 end
 
@@ -70,8 +70,6 @@ function wikipedia:action(msg)
     end
 
     text = text.extract
-    -- Remove crap and take only the first paragraph.
-    text = text:gsub('</?.->', ''):gsub('%[.+%]', '')
     local l = text:find('\n')
     if l then
         text = text:sub(1, l-1)
