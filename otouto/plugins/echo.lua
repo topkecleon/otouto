@@ -1,12 +1,19 @@
-local echo = {}
+--[[
+    echo.lua
+    Returns input.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-echo.command = 'echo <text>'
+local echo = {}
 
-function echo:init(config)
-    echo.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('echo', true).table
-    echo.doc = config.cmd_pat .. 'echo <text> \nRepeats a string of text.'
+function echo:init()
+    echo.command = 'echo <text>'
+    echo.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('echo', true).table
+    echo.doc = self.config.cmd_pat .. 'echo <text> \nRepeats a string of text.'
 end
 
 function echo:action(msg)

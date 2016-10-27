@@ -101,8 +101,8 @@ its name to the list.
 
 | Name                      | Description
 |:--------------------------|:--------------------------------------------------------------------------------------------|
-| `google_api_key`          | [Google API](http://console.developers.google.com) key for `gImages.lua` and `youtube.lua`. |
-| `google_cse_key`          | [Google CSE](http://cse.google.com/cse) key for `gImages.lua`.                              |
+| `google_api_key`          | [Google API](http://console.developers.google.com) key for `google_images.lua` and `youtube.lua`. |
+| `google_cse_key`          | [Google CSE](http://cse.google.com/cse) key for `google_images.lua`.                              |
 | `lastfm_api_key`          | [last.fm API](http://last.fm/api) key for `lastfm.lua`.                                     |
 | `owm_api_key`             | [OpenWeatherMap API](http://openweathermap.org/API) key for `weather.lua`.                  |
 | `biblia_api_key`          | [Biblia API](http://api.biblia.com) key for `bible.lua`.                                    |
@@ -225,7 +225,7 @@ Internal commands can only be run within an administrated group.
 
 ### Description of Privileges
 
-|  | Title         | Description                                                       | Scope  |
+|   | Title         | Description                                                       | Scope  |
 |:-:|:--------------|:------------------------------------------------------------------|:-------|
 | 0 | Banned        | Cannot enter the group(s).                                        | Either |
 | 1 | User          | Default rank.                                                     | Local  |
@@ -239,7 +239,7 @@ ranks.
 
 ### Flags
 
-|  | Name        | Description                                                                      |
+|   | Name        | Description                                                                      |
 |:-:|:------------|:---------------------------------------------------------------------------------|
 | 1 | unlisted    | Removes a group from the /groups listing.                                        |
 | 2 | antisquig   | Automatically removes users for posting Arabic script or RTL characters.         |
@@ -247,6 +247,9 @@ ranks.
 | 4 | antibot     | Prevents bots from being added by non-moderators.                                |
 | 5 | antiflood   | Prevents flooding by rate-limiting messages per user.                            |
 | 6 | antihammer  | Allows globally-banned users to enter a group.                                   |
+| 7 | nokicklog   | Prevents kick and ban notifications from appearing in the designated kick log.   |
+| 8 | antilink    | Automatically removes users for posting external group links.                    |
+| 9 | modrights   | Allows moderators to set a grouo's title, photo, motd, and link.                 |
 
 #### antiflood
 antiflood (flag 5) provides a system of automatic flood protection by removing
@@ -285,8 +288,8 @@ three by default.
 | `ping.lua`            | /ping                         | The simplest plugin ever!                                           |
 | `echo.lua`            | /echo ‹text›                  | Repeats a string of text.                                           |
 | `bing.lua`            | /bing ‹query›                 | Returns Bing web results.                                    | /g   |
-| `gImages.lua`         | /images ‹query›               | Returns a Google image result.                               | /i   |
-| `gMaps.lua`           | /location ‹query›             | Returns location data from Google Maps.                      | /loc |
+| `google_images.lua`         | /images ‹query›               | Returns a Google image result.                               | /i   |
+| `location.lua`        | /location ‹query›             | Returns location data from Google Maps.                      | /loc |
 | `youtube.lua`         | /youtube ‹query›              | Returns the top video result from YouTube.                   | /yt  |
 | `wikipedia.lua`       | /wikipedia ‹query›            | Returns the summary of a Wikipedia article.                  | /w   |
 | `lastfm.lua`          | /np [username]                | Returns the song you are currently listening to.                    |
@@ -316,13 +319,13 @@ three by default.
 | `apod.lua`            | /apod [date]                  | Returns the NASA Astronomy Picture of the Day.                      |
 | `dilbert.lua`         | /dilbert [date]               | Returns a Dilbert strip.                                            |
 | `patterns.lua`        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                              |
-| `me.lua`              | /me                           | Returns user-specific data stored by the bot.                       |
 | `remind.lua`          | /remind ‹duration› ‹message›  | Reminds a user of something after a duration of minutes.            |
 | `channel.lua`         | /ch ‹channel› \n ‹message›    | Sends a markdown-enabled message to a channel.                      |
 | `isup.lua`            | /isup ‹url›                   | Returns the status of a website.                                    |
 | `starwars-crawl.lua`  | /sw ‹title ¦ number›          | Returns the opening crawl from the specified Star Wars film. | /sw  |
 | `chuckfact.lua`       | /chuck                        | Returns a fact about Chuck Norris.                           | /cn  |
 | `catfact.lua`         | /catfact                      | Returns a fact about cats.                                          |
+| `wait.lua`            | /wait ‹duration› ‹command›    | Runs a given command after a given span of minutes.                 |
 
 ## Plugins
 otouto uses a robust plugin system, similar to yagop's
@@ -332,7 +335,7 @@ Most plugins are intended for public use, but a few are for other purposes, like
 those for [use by the bot's owner](#control-plugins). See
 [here](#list-of-plugins) for a list of plugins.
 
-There are five standard plugin components.
+A list of standard plugin components:
 
 | Component   | Description                                                    |
 |:------------|:---------------------------------------------------------------|
@@ -343,7 +346,6 @@ There are five standard plugin components.
 | `command`   | Basic command and syntax. Listed in the help text.             |
 | `doc`       | Usage for the plugin. Returned by "/help $command".            |
 | `error`     | Plugin-specific error message; false for no message.           |
-| `panoptic`  | True if plugin should see all messages. (See below.)           |
 | `help_word` | Keyword for command-specific help. Generated if absent.        |
 
 
@@ -356,11 +358,6 @@ If a plugin's `action` returns `true`, `on_msg_receive` will continue its loop.
 When an action or cron function fails, the exception is caught and passed to the
 `handle_exception` utilty and is either printed to the console or send to the
 chat/channel defined in `log_chat` in config.lua.
-
-The `panoptic` value is a boolean (or nil; its absence means false) to state
-whether the plugin should be included in the `panoptic_plugins` table. Plugins
-in this table are the only plugins whose triggers are checked against a
-message's text if that message is forwarded or from a blacklisted user.
 
 Interactions with the bot API are straightforward. See the
 [Bindings section](#bindings) for details.

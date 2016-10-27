@@ -1,20 +1,27 @@
- -- Requires that the "fortune" program is installed on your computer.
+--[[
+    fortune.lua
+    Returns UNIX fortunes.
 
-local fortune = {}
+    Requires that the "fortune" program is installed on your computer.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-function fortune:init(config)
+local fortune = {}
+
+function fortune:init()
     local s = io.popen('fortune'):read('*all')
     assert(
         not s:match('not found$'),
         'fortune.lua requires the fortune program to be installed.'
     )
-    fortune.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('fortune').table
+    fortune.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('fortune').table
+    fortune.command = 'fortune'
+    fortune.doc = 'Returns a UNIX fortune.'
 end
-
-fortune.command = 'fortune'
-fortune.doc = 'Returns a UNIX fortune.'
 
 function fortune:action(msg)
     local fortunef = io.popen('fortune')

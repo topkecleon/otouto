@@ -1,19 +1,26 @@
-local time = {}
+--[[
+    time.lua
+    Returns the time, date, and timezone for a given location.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-time.command = 'time <location>'
-time.base_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=%s,%s&timestamp=%s'
+local time = {}
 
-function time:init(config)
-    time.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('time', true).table
-    time.doc = config.cmd_pat .. [[time <location>
+function time:init()
+    time.command = 'time <location>'
+    time.base_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=%s,%s&timestamp=%s'
+    time.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('time', true).table
+    time.doc = self.config.cmd_pat .. [[time <location>
 Returns the time, date, and timezone for the given location.]]
 end
 
-function time:action(msg, config)
+function time:action(msg)
     local input = utilities.input_from_msg(msg)
     if not input then
         utilities.send_reply(msg, time.doc, 'html')
@@ -22,10 +29,10 @@ function time:action(msg, config)
 
     local lat, lon = utilities.get_coords(input)
     if lat == nil then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     elseif lat == false then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 
@@ -34,13 +41,13 @@ function time:action(msg, config)
     local url = time.base_url:format(lat, lon, utc)
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.status == 'ZERO_RESULTS' then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

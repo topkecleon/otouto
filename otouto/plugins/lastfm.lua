@@ -1,51 +1,57 @@
- -- TODO: Add support for librefm API.
- -- Just kidding, nobody actually uses that.
+--[[
+    lastfm.lua
+    Returns the currently-playing or last-played song for a given last.fm user.
+    Allows users to store their last.fm usernames.
 
-local lastfm = {}
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-function lastfm:init(config)
+local lastfm = {}
+
+function lastfm:init()
     assert(
-        config.lastfm_api_key,
+        self.config.lastfm_api_key,
         'lastfm.lua requires a last.fm API key from http://last.fm/api.'
     )
 
-    lastfm.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lastfm', true):t('np', true):t('npfull', true):t('fmset', true).table
-    lastfm.doc = config.cmd_pat .. [[np [username]
+    self.database.userdata.lastfm = self.database.userdata.lastfm or {}
+    lastfm.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+        :t('lastfm', true):t('np', true):t('npfull', true):t('fmset', true).table
+    lastfm.doc = [[/np [username]
 Returns what you are or were last listening to. If you specify a username, info will be returned for that username.
 
-]] .. config.cmd_pat .. [[npfull [username]
-Works like ]] .. config.cmd_pat .. [[np, but returns more info, differently formatted and including album art, if available.
+/npfull [username]
+Works like /np, but returns more info, differently formatted and including album art, if available.
 
-]] .. config.cmd_pat .. [[fmset <username>
-Sets your last.fm username. Otherwise, ]] .. config.cmd_pat .. [[np will use your Telegram username. Use "]] .. config.cmd_pat .. [[fmset --" to delete it.]]
-
+/fmset <username>
+Sets your last.fm username. Otherwise, /np will use your Telegram username. Use "/fmset --" to delete it.]]
+    lastfm.doc = lastfm.doc:gsub('/', self.config.cmd_pat)
     lastfm.command = 'lastfm'
-
-    lastfm.base_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. config.lastfm_api_key .. '&user='
+    lastfm.base_url = 'http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&api_key=' .. self.config.lastfm_api_key .. '&user='
 end
 
-function lastfm:action(msg, config)
+function lastfm:action(msg)
 
     local input = utilities.input(msg.text)
-    local from_id_str = tostring(msg.from.id)
-    self.database.userdata[from_id_str] = self.database.userdata[from_id_str] or {}
+    local id_str = tostring(msg.from.id)
 
-    if string.match(msg.text_lower, '^'..config.cmd_pat..'lastfm') then
+    if string.match(msg.text_lower, '^'..self.config.cmd_pat..'lastfm') then
         utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, 'html')
         return
-    elseif string.match(msg.text_lower, '^'..config.cmd_pat..'fmset') then
+    elseif string.match(msg.text_lower, '^'..self.config.cmd_pat..'fmset') then
         if not input then
             utilities.send_message(msg.chat.id, lastfm.doc, true, msg.message_id, 'html')
         elseif input == '--' or input == utilities.char.em_dash then
-            self.database.userdata[from_id_str].lastfm = nil
+            self.database.userdata.lastfm[id_str] = nil
             utilities.send_reply(msg, 'Your last.fm username has been forgotten.')
         else
-            self.database.userdata[from_id_str].lastfm = input
+            self.database.userdata.lastfm[id_str] = input
             utilities.send_reply(msg, 'Your last.fm username has been set to "' .. input .. '".')
         end
         return
@@ -55,14 +61,14 @@ function lastfm:action(msg, config)
     local alert = ''
     if input then
         username = input
-    elseif self.database.userdata[from_id_str].lastfm then
-        username = self.database.userdata[from_id_str].lastfm
+    elseif self.database.userdata.lastfm[id_str] then
+        username = self.database.userdata.lastfm[id_str]
     elseif msg.from.username then
         username = msg.from.username
-        alert = '\n\nYour username has been set to ' .. username .. '.\nTo change it, use '..config.cmd_pat..'fmset <username>.'
-        self.database.userdata[from_id_str].lastfm = username
+        alert = '\n\nYour username has been set to ' .. utilities.html_escape(username) .. '.\nTo change it, use '..self.config.cmd_pat..'fmset &lt;username&gt;.'
+        self.database.userdata.lastfm[id_str] = username
     else
-        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
+        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..self.config.cmd_pat..'fmset.')
         return
     end
 
@@ -72,13 +78,13 @@ function lastfm:action(msg, config)
     HTTP.TIMEOUT = orig
 
     if res ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.error then
-        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..config.cmd_pat..'fmset.')
+        utilities.send_reply(msg, 'Please specify your last.fm username or set it with '..self.config.cmd_pat..'fmset.')
         return
     end
 
@@ -95,7 +101,7 @@ function lastfm:action(msg, config)
         output = output .. ' last listened to:'
     end
 
-    if msg.text_lower:match('^' .. config.cmd_pat .. 'npfull') then
+    if msg.text_lower:match('^' .. self.config.cmd_pat .. 'npfull') then
 
         output = '<b>' .. utilities.html_escape(output) .. '</b>'
         if track.name and #track.name > 0 then

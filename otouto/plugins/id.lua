@@ -1,11 +1,23 @@
+--[[
+    id.lua
+    Returns usernames, IDs, and display names of given users.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
+
 local utilities = require('otouto.utilities')
 
 local id = {}
 
-function id:init(config)
-    id.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('id', true).table
+function id:init()
+    assert(
+        self.named_plugins.users or self.named_plugins.administration,
+        'This plugin requires users.lua or administration.lua to be loaded first.'
+    )
+    id.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('id', true).table
     id.command = 'id <user>'
-    id.doc = config.cmd_pat .. [[id <user> ...
+    id.doc = self.config.cmd_pat .. [[id <user> ...
 Returns the name, ID, and username (if applicable) for the given users.
 Arguments must be usernames and/or IDs. Input is also accepted via reply. If no input is given, returns info for the user.
     ]]

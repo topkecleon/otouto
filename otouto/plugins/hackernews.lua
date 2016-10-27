@@ -1,11 +1,17 @@
+--[[
+    hackernews.lua
+    Returns four or eight of the top posts from Hacker News.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
+
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
 local hackernews = {}
-
-hackernews.command = 'hackernews'
 
 local function get_hackernews_results()
     local results = {}
@@ -38,27 +44,28 @@ local function get_hackernews_results()
     return results
 end
 
-function hackernews:init(config)
-    hackernews.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hackernews', true):t('hn', true).table
+function hackernews:init()
+    hackernews.command = 'hackernews'
+    hackernews.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('hackernews', true):t('hn', true).table
     hackernews.doc = [[Returns four (if group) or eight (if private message) top stories from Hacker News.
-Alias: ]] .. config.cmd_pat .. 'hn'
+Alias: ]] .. self.config.cmd_pat .. 'hn'
     hackernews.topstories_url = 'https://hacker-news.firebaseio.com/v0/topstories.json'
     hackernews.res_url = 'https://hacker-news.firebaseio.com/v0/item/%s.json'
     hackernews.art_url = 'https://news.ycombinator.com/item?id=%s'
     hackernews.last_update = 0
-    if config.hackernews_onstart == true then
+    if self.config.hackernews_onstart == true then
         hackernews.results = get_hackernews_results()
         if hackernews.results then hackernews.last_update = os.time() / 60 end
     end
 end
 
-function hackernews:action(msg, config)
+function hackernews:action(msg)
     local now = os.time() / 60
-    if not hackernews.results or hackernews.last_update + config.hackernews_interval < now then
-        bindings.sendChatAction{ chat_id = msg.chat.id, action = 'typing' }
+    if not hackernews.results or hackernews.last_update + self.config.hackernews_interval < now then
+        bindings.sendChatAction{chat_id = msg.chat.id, action = 'typing'}
         hackernews.results = get_hackernews_results()
         if not hackernews.results then
-            utilities.send_reply(msg, config.errors.connection)
+            utilities.send_reply(msg, self.config.errors.connection)
             return
         end
         hackernews.last_update = now

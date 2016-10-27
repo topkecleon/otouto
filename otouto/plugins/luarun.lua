@@ -1,12 +1,21 @@
-local luarun = {}
+--[[
+    luarun.lua
+    Allows the bot owner to run arbitrary Lua code inside the bot instance.
+    "/return" is alias for "/lua return".
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 local URL = require('socket.url')
 local JSON, serpent
 
-function luarun:init(config)
-    luarun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lua', true):t('return', true).table
-    if config.luarun_serpent then
+local luarun = {}
+
+function luarun:init()
+    luarun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('lua', true):t('return', true).table
+    if self.config.luarun_serpent then
         serpent = require('serpent')
         luarun.serialize = function(t)
             return serpent.block(t, {comment=false})
@@ -18,16 +27,14 @@ function luarun:init(config)
         end
     end
     -- Lua 5.2 compatibility.
-    -- "loadstring" was renamed "load" in 5.3.
-    luarun.loadstring = load or loadstring
     luarun.err_msg = function(x)
         return 'Error:\n' .. tostring(x)
     end
 end
 
-function luarun:action(msg, config)
+function luarun:action(msg)
 
-    if msg.from.id ~= config.admin then
+    if msg.from.id ~= self.config.admin then
         return true
     end
 
@@ -37,11 +44,11 @@ function luarun:action(msg, config)
         return
     end
 
-    if msg.text_lower:match('^'..config.cmd_pat..'return') then
+    if msg.text_lower:match('^'..self.config.cmd_pat..'return') then
         input = 'return ' .. input
     end
 
-    local output, success = luarun.loadstring(
+    local output, success = (load or loadstring)(
         "local bot = require('otouto.bot')\n\z
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
@@ -50,13 +57,13 @@ function luarun:action(msg, config)
         local URL = require('socket.url')\n\z
         local HTTP = require('socket.http')\n\z
         local HTTPS = require('ssl.https')\n\z
-        return function (self, msg, config)\n" .. input .. "\nend"
+        return function (self, msg)\n" .. input .. "\nend"
     )
 
     if output == nil then
         output = success
     else
-        success, output = xpcall(output(), luarun.err_msg, self, msg, config)
+        success, output = xpcall(output(), luarun.err_msg, self, msg)
     end
 
     if output == nil then

@@ -1,12 +1,19 @@
-local pun = {}
+--[[
+    pun.lua
+    Returns a pun.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-pun.command = 'pun'
-pun.doc = 'Returns a pun.'
+local pun = {}
 
-function pun:init(config)
-    pun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('pun').table
+function pun:init()
+    pun.command = 'pun'
+    pun.doc = 'Returns a pun.'
+    pun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('pun').table
 end
 
 local puns = {
@@ -45,6 +52,7 @@ local puns = {
     "It takes a lot of balls to golf the way I do.",
     "Why did everyone want to hang out with the mushroom? Because he was a fungi.",
     "How much does a hipster weigh? An instagram.",
+    "How did the hipster burn his mouth? He drank coffee before it was cool.",
     "I used to be addicted to soap, but I'm clean now.",
     "When life gives you melons, you’re probably dyslexic.",
     "What's with all the blind jokes? I just don't see the point.",
@@ -116,7 +124,6 @@ local puns = {
     "I stayed up all night wondering where the sun went. Then it dawned on me.",
     "What's the difference between a man and his dog? The man wears a suit; the dog just pants.",
     "A psychic midget who escapes from prison is a small medium at large.",
-    "I've been to the dentist several times, so I know the drill.",
     "The roundest knight at King Arthur's round table was Sir Cumference. He acquired his size from too much pi.",
     "She was only a whiskey maker, but he loved her still.",
     "Male deer have buck teeth.",
@@ -133,7 +140,12 @@ local puns = {
     "In democracy, it's your vote that counts. In feudalism, it's your count that votes.",
     "A sea lion is nothing but an ionized seal.",
     "The vegetables from my garden aren't that great. I guess you could say they're mediokra.",
-    "Did you hear about the restaurant on the International Space Station? It lacks atmosphere, but the food is out of this world."
+    "Did you hear about the restaurant on the International Space Station? It lacks atmosphere, but the food is out of this world.",
+    "What did the pirate say on his 80th birthday? Aye matey!",
+    "Why do chicken coops only have two doors? If they had four, they'd be chicken sedans.",
+    "There's a rumor going around about butter, but I shouldn't spread it.",
+    "What did the buffalo say when his kid left for school? Bison.",
+    "What's the difference between a hippo and a Zippo? One's real heavy, and the other's a little lighter."
 }
 
 function pun:action(msg)

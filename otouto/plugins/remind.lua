@@ -1,26 +1,32 @@
-local remind = {}
+--[[
+    remind.lua
+    Allows users to set reminders.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-remind.command = 'remind <duration> <message>'
+local remind = {}
 
-function remind:init(config)
+function remind:init()
     self.database.remind = self.database.remind or {}
 
-    remind.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('remind', true).table
+    remind.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('remind', true).table
 
-    remind.doc = config.cmd_pat .. [[remind <duration> <message>
+    remind.doc = self.config.cmd_pat .. [[remind <duration> <message>
 Repeats a message after a duration of time, in minutes.
 The maximum length of a reminder is %s characters. The maximum duration of a timer is %s minutes. The maximum number of reminders for a group is %s. The maximum number of reminders in private is %s.]]
     remind.doc = remind.doc:format(
-        config.remind.max_length,
-        config.remind.max_duration,
-        config.remind.max_reminders_group,
-        config.remind.max_reminders_private
+        self.config.remind.max_length,
+        self.config.remind.max_duration,
+        self.config.remind.max_reminders_group,
+        self.config.remind.max_reminders_private
     )
 end
 
-function remind:action(msg, config)
+function remind:action(msg)
     local input = utilities.input(msg.text)
     if not input then
         utilities.send_reply(msg, remind.doc, 'html')
@@ -35,8 +41,8 @@ function remind:action(msg, config)
 
     if duration < 1 then
         duration = 1
-    elseif duration > config.remind.max_duration then
-        duration = config.remind.max_duration
+    elseif duration > self.config.remind.max_duration then
+        duration = self.config.remind.max_duration
     end
 
     local message
@@ -49,17 +55,17 @@ function remind:action(msg, config)
         return
     end
 
-    if #message > config.remind.max_length then
-        utilities.send_reply(msg, 'The maximum length of reminders is ' .. config.remind.max_length .. '.')
+    if #message > self.config.remind.max_length then
+        utilities.send_reply(msg, 'The maximum length of reminders is ' .. self.config.remind.max_length .. '.')
         return
     end
 
     local chat_id_str = tostring(msg.chat.id)
     local output
     self.database.remind[chat_id_str] = self.database.remind[chat_id_str] or {}
-    if msg.chat.type == 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= config.remind.max_reminders_private then
+    if msg.chat.type == 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= self.config.remind.max_reminders_private then
         output = 'Sorry, you already have the maximum number of reminders.'
-    elseif msg.chat.type ~= 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= config.remind.max_reminders_group then
+    elseif msg.chat.type ~= 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= self.config.remind.max_reminders_group then
         output = 'Sorry, this group already has the maximum number of reminders.'
     else
         table.insert(self.database.remind[chat_id_str], {
@@ -75,7 +81,7 @@ function remind:action(msg, config)
     utilities.send_reply(msg, output, true)
 end
 
-function remind:cron(config)
+function remind:cron()
     local time = os.time()
     -- Iterate over the group entries in the reminders database.
     for chat_id, group in pairs(self.database.remind) do
@@ -87,7 +93,7 @@ function remind:cron(config)
                 local output = '<b>Reminder:</b>\n"' .. utilities.html_escape(reminder.message) .. '"'
                 local res = utilities.send_message(chat_id, output, true, nil, 'html')
                 -- If the message fails to send, save it for later (if enabled in config).
-                if res or not config.remind.persist then
+                if res or not self.config.remind.persist then
                     group[k] = nil
                 end
             end

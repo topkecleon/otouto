@@ -1,4 +1,12 @@
- -- Based on a plugin by matthewhesketh.
+--[[
+    chuckfact.lua
+    Returns $100% true facts about Chuck Norris.
+
+    Based on a plugin by matthewhesketh.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local JSON = require('dkjson')
 local HTTP = require('socket.http')
@@ -6,18 +14,18 @@ local utilities = require('otouto.utilities')
 
 local chuck = {}
 
-function chuck:init(config)
-    chuck.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+function chuck:init()
+    chuck.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('chuck', true):t('cn', true):t('chucknorris', true).table
     chuck.command = 'chuck'
     chuck.doc = 'Returns a fact about Chuck Norris.'
     chuck.url = 'http://api.icndb.com/jokes/random'
 end
 
-function chuck:action(msg, config)
+function chuck:action(msg)
     local jstr, code = HTTP.request(chuck.url)
     if code ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
     local data = JSON.decode(jstr)

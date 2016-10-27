@@ -1,14 +1,19 @@
- -- Plugin for the Hearthstone database provided by hearthstonejson.com.
+ --[[
+    hearthstone.lua
+    Returns Hearthstone card data.
 
-local hearthstone = {}
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
---local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local HTTPS = require('ssl.https')
 
-function hearthstone:init(config)
-    hearthstone.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hearthstone', true):t('hs').table
+local hearthstone = {}
+
+function hearthstone:init()
+    hearthstone.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('hearthstone', true):t('hs').table
     hearthstone.command = 'hearthstone <query>'
 
     if not self.database.hearthstone or os.time() > self.database.hearthstone.expiration then
@@ -30,9 +35,9 @@ function hearthstone:init(config)
 
     end
 
-    hearthstone.doc = config.cmd_pat .. [[hearthstone <query>
+    hearthstone.doc = self.config.cmd_pat .. [[hearthstone <query>
 Returns Hearthstone card info.
-Alias: ]] .. config.cmd_pat .. 'hs'
+Alias: ]] .. self.config.cmd_pat .. 'hs'
 end
 
 local function format_card(card)
@@ -91,7 +96,7 @@ local function format_card(card)
 
 end
 
-function hearthstone:action(msg, config)
+function hearthstone:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
@@ -108,7 +113,7 @@ function hearthstone:action(msg, config)
 
     output = utilities.trim(output)
     if output:len() == 0 then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

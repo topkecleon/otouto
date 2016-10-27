@@ -158,6 +158,7 @@ end
 
 function utilities:resolve_username(input)
     input = input:gsub('^@', '')
+    if not self.database.users then return end
     for _, user in pairs(self.database.users) do
         if user.username and user.username:lower() == input:lower() then
             local t = {}
@@ -183,13 +184,11 @@ function utilities:handle_exception(err, message, log_chat)
     else
         print(output)
     end
-
 end
 
 function utilities.download_file(url, filename)
     if not filename then
-        filename = url:match('.+/(.-)$') or os.time()
-        filename = '/tmp/' .. filename
+        filename = os.tmpname()
     end
     local body = {}
     local doer = HTTP
@@ -212,14 +211,16 @@ end
 
 function utilities.md_escape(text)
     return text:gsub('_', '\\_')
-        :gsub('%[', '\\[')
-        :gsub('%]', '\\]')
-        :gsub('%*', '\\*')
-        :gsub('`', '\\`')
+               :gsub('%[', '\\[')
+               :gsub('%]', '\\]')
+               :gsub('%*', '\\*')
+               :gsub('`', '\\`')
 end
 
 function utilities.html_escape(text)
-    return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
+    return text:gsub('&', '&amp;')
+               :gsub('<', '&lt;')
+               :gsub('>', '&gt;')
 end
 
 utilities.triggers_meta = {}

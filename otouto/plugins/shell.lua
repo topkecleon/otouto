@@ -1,14 +1,22 @@
-local shell = {}
+--[[
+    shell.lua
+    Allows the execution of non-interactive shell commands by the bot owner.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-function shell:init(config)
-    shell.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('run', true).table
+local shell = {}
+
+function shell:init()
+    shell.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('run', true).table
 end
 
-function shell:action(msg, config)
+function shell:action(msg)
 
-    if msg.from.id ~= config.admin then
+    if msg.from.id ~= self.config.admin then
         return
     end
 

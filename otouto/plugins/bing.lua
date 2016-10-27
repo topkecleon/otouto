@@ -1,6 +1,12 @@
- -- Credit to Juan (tg:JuanPotato; gh:JuanPotato) for this plugin.
+--[[
+    bing.lua
+    Return web search results from Bing.
 
-local bing = {}
+    Credit to @JuanPotato for making this work.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local URL = require('socket.url')
 local JSON = require('dkjson')
@@ -9,33 +15,33 @@ local https = require('ssl.https')
 local ltn12 = require('ltn12')
 local utilities = require('otouto.utilities')
 
-bing.command = 'bing <query>'
+local bing = {}
 
-bing.search_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/Web?Query=\'%s\'&$format=json'
-
-function bing:init(config)
-    assert(config.bing_api_key,
+function bing:init()
+    assert(
+        self.config.bing_api_key,
         'bing.lua requires a Bing API key from http://datamarket.azure.com/dataset/bing/search.'
     )
 
-    bing.headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. config.bing_api_key) }
-    bing.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+    bing.headers = { ["Authorization"] = "Basic " .. mime.b64(":" .. self.config.bing_api_key) }
+    bing.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('bing', true):t('g', true):t('google', true).table
     bing.doc = [[/bing <query>
 Returns the top web results from Bing.
 Aliases: /g, /google]]
-    bing.doc = bing.doc:gsub('/', config.cmd_pat)
-
+    bing.doc = bing.doc:gsub('/', self.config.cmd_pat)
+    bing.command = 'bing <query>'
+    bing.search_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/Web?Query=\'language:' .. self.config.lang .. '%s\'&$format=json'
 end
 
-function bing:action(msg, config)
+function bing:action(msg)
     local input = utilities.input_from_msg(msg)
     if not input then
         utilities.send_reply(msg, bing.doc, 'html')
         return
     end
 
-    local url = bing.search_url:format(URL.escape(input))
+    local url = bing.search_url:format('%20' .. URL.escape(input))
     local resbody = {}
     local _, code = https.request{
         url = url,
@@ -43,7 +49,7 @@ function bing:action(msg, config)
         sink = ltn12.sink.table(resbody),
     }
     if code ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
@@ -53,7 +59,7 @@ function bing:action(msg, config)
     -- No more results than provided.
     limit = limit > #data.d.results and #data.d.results or limit
     if limit == 0 then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

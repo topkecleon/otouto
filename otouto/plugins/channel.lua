@@ -1,12 +1,20 @@
-local channel = {}
+--[[
+    channel.lua
+    Let users send markdown-formatted messages to their channels.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-function channel:init(config)
-    channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
+local channel = {}
+
+function channel:init()
+    channel.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ch', true).table
     channel.command = 'ch <channel> \\n <message>'
-    channel.doc = config.cmd_pat .. [[ch <channel>
+    channel.doc = self.config.cmd_pat .. [[ch <channel>
 <message>
 
 Sends a message to a channel. Channel may be specified via ID or username. Messages are markdown-enabled. Users may only send messages to channels for which they are the owner or an administrator.
@@ -19,7 +27,7 @@ The following markdown syntax is supported:
  ```pre-formatted fixed-width code block```]]
 end
 
-function channel:action(msg, config)
+function channel:action(msg)
     local input = utilities.input(msg.text)
     if not input then
         utilities.send_reply(msg, channel.doc, 'html')
@@ -36,7 +44,7 @@ function channel:action(msg, config)
         return
     end
 
-    local admin_list, t = bindings.getChatAdministrators{ chat_id = chat_id }
+    local admin_list, t = bindings.getChatAdministrators{chat_id = chat_id}
     if not admin_list then
         utilities.send_reply(msg, 'Sorry, I was unable to retrieve a list of administrators for that channel.\n`' .. t.description .. '`', true)
         return

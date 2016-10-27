@@ -1,26 +1,36 @@
- -- Thanks to @TiagoDanin for writing the original plugin.
+--[[
+    youtube.lua
+    Returns a YouTube result for the given query.
 
-local youtube = {}
+    Requires a Google API key.
+
+    Original plugin written by TiagoDanin.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-function youtube:init(config)
-    assert(config.google_api_key,
+local youtube = {}
+
+function youtube:init()
+    assert(
+        self.config.google_api_key,
         'youtube.lua requires a Google API key from http://console.developers.google.com.'
     )
 
-    youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
-    youtube.doc = config.cmd_pat .. [[youtube <query>
+    youtube.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('youtube', true):t('yt', true).table
+    youtube.doc = self.config.cmd_pat .. [[youtube <query>
 Returns the top result from YouTube.
-Alias: ]] .. config.cmd_pat .. 'yt'
+Alias: ]] .. self.config.cmd_pat .. 'yt'
+    youtube.command = 'youtube <query>'
 end
 
-youtube.command = 'youtube <query>'
-
-function youtube:action(msg, config)
+function youtube:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
@@ -28,17 +38,17 @@ function youtube:action(msg, config)
         return
     end
 
-    local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
+    local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. self.config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
 
     local jstr, res = HTTPS.request(url)
     if res ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
     if jdat.pageInfo.totalResults == 0 then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

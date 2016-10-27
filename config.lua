@@ -6,7 +6,8 @@ return {
     -- Your Telegram ID.
     admin = nil,
     -- Two-letter language code.
-    lang = 'en',
+    -- Fetches it from the system if available, or defaults to English.
+    lang = os.getenv('LANG') and os.getenv('LANG'):sub(1,2) or 'en',
     -- The channel, group, or user to send error reports to.
     -- If this is not set, errors will be printed to the console.
     log_chat = nil,
@@ -152,10 +153,13 @@ Send /help to get started.
     },
 
     plugins = { -- To enable a plugin, add its name to the list.
-        'about',
+        'users',
+        'end_forwards',
         'blacklist',
+        'about',
         'calc',
         'cats',
+        'colorhex',
         'commit',
         'control',
         'currency',
@@ -165,6 +169,7 @@ Send /help to get started.
         'location',
         'hackernews',
         'imdb',
+        'me',
         'nick',
         'ping',
         'pun',
@@ -176,8 +181,8 @@ Send /help to get started.
         'whoami',
         'wikipedia',
         'xkcd',
-        'help',
-        'greetings'
+        -- Add new plugins here.
+        'help'
     }
 
 }

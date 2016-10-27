@@ -1,16 +1,25 @@
--- For some reason you can't have an é in variable names. :(
-local pokemon_go = {}
+--[[
+    pokemon_go.lua
+    Simple counter for the membership of Pokemon Go teams.
+
+    Written by bb010g.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-pokemon_go.command = 'pokego <team>'
+-- For some reason you can't have an é in variable names. :(
+local pokemon_go = {}
 
-function pokemon_go:init(config)
-    pokemon_go.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+function pokemon_go:init()
+    pokemon_go.command = 'pokego <team>'
+    pokemon_go.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('pokego', true):t('pokégo', true)
         :t('pokemongo', true):t('pokémongo', true)
         :t('pogo', true):t('mongo', true).table
-    pokemon_go.doc = config.cmd_pat .. [[pokego <team>
+    pokemon_go.doc = self.config.cmd_pat .. [[pokego <team>
 Set your Pokémon Go team for statistical purposes. The team must be valid, and can be referred to by name or color (or the first letter of either). Giving no team name will show statistics.]]
     local db = self.database.pokemon_go
     if not db then
@@ -40,7 +49,7 @@ local team_ref = {
     y = "Instinct"
 }
 
-function pokemon_go:action(msg, config)
+function pokemon_go:action(msg)
     local output
     local input = utilities.input(msg.text_lower)
 

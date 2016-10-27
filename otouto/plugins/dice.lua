@@ -1,12 +1,19 @@
-local dice = {}
+--[[
+    dice.lua
+    Returns a set of random numbers. Accepts D&D notation.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-dice.command = 'roll <nDr>'
+local dice = {}
 
-function dice:init(config)
-    dice.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('roll', true).table
-    dice.doc = config.cmd_pat .. [[roll <nDr>
+function dice:init()
+    dice.command = 'roll <nDr>'
+    dice.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('roll', true).table
+    dice.doc = self.config.cmd_pat .. [[roll <nDr>
 Returns a set of dice rolls, where n is the number of rolls and r is the range. If only a range is given, returns only one roll.]]
 end
 

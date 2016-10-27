@@ -1,17 +1,24 @@
-local shout = {}
+--[[
+    shout.lua
+    Returns an obnoxious shout.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-shout.command = 'shout <text>'
-local utf8 = '('..utilities.char.utf_8..'*)'
+local shout = {}
 
-function shout:init(config)
-    shout.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('shout', true).table
-    shout.doc = config.cmd_pat .. 'shout <text> \nShouts something. Input may be the replied-to message.'
+local utf8_char = '('..utilities.char.utf_8..'*)'
+
+function shout:init()
+    shout.command = 'shout <text>'
+    shout.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('shout', true).table
+    shout.doc = self.config.cmd_pat .. 'shout <text> \nShouts something. Input may be the replied-to message.'
 end
 
 function shout:action(msg)
-
     local input = utilities.input_from_msg(msg)
     if not input then
         utilities.send_reply(msg, shout.doc, 'html')
@@ -24,7 +31,7 @@ function shout:action(msg)
     local output = ''
     local inc = 0
     local ilen = 0
-    for match in input:gmatch(utf8) do
+    for match in input:gmatch(utf8_char) do
         if ilen < 20 then
             ilen = ilen + 1
             output = output .. match .. ' '
@@ -32,7 +39,7 @@ function shout:action(msg)
     end
     ilen = 0
     output = output .. '\n'
-    for match in input:sub(2):gmatch(utf8) do
+    for match in input:sub(2):gmatch(utf8_char) do
         if ilen < 19 then
             local spacing = ''
             for _ = 1, inc do
@@ -45,7 +52,6 @@ function shout:action(msg)
     end
     output = '```\n' .. utilities.trim(output) .. '\n```'
     utilities.send_message(msg.chat.id, output, true, false, true)
-
 end
 
 return shout

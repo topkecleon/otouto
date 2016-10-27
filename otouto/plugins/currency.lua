@@ -1,19 +1,26 @@
-local currency = {}
+--[[
+    currency.lua
+    Performs currency conversion with Google Finance.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-currency.command = 'cash [amount] <from> to <to>'
+local currency = {}
 
-function currency:init(config)
-    currency.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('cash', true).table
-    currency.doc = config.cmd_pat .. [[cash [amount] <from> to <to>
-Example: ]] .. config.cmd_pat .. [[cash 5 USD to EUR
+function currency:init()
+    currency.command = 'cash [amount] <from> to <to>'
+    currency.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('cash', true).table
+    currency.doc = self.config.cmd_pat .. [[cash [amount] <from> to <to>
+Example: ]] .. self.config.cmd_pat .. [[cash 5 USD to EUR
 Returns exchange rates for various currencies.
 Source: Google Finance.]]
 end
 
-function currency:action(msg, config)
+function currency:action(msg)
 
     local input = msg.text:upper()
     if not input:match('%a%a%a TO %a%a%a') then
@@ -34,13 +41,13 @@ function currency:action(msg, config)
         url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
         local str, res = HTTPS.request(url)
         if res ~= 200 then
-            utilities.send_reply(msg, config.errors.connection)
+            utilities.send_reply(msg, self.config.errors.connection)
             return
         end
 
         str = str:match('<span class=bld>(.*) %u+</span>')
         if not str then
-            utilities.send_reply(msg, config.errors.results)
+            utilities.send_reply(msg, self.config.errors.results)
             return
         end
 

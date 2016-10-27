@@ -1,18 +1,42 @@
+--[[
+    pokego_calculator.lua
+    A calculator for optimizing the use of Lucky Eggs in Pokemon Go.
+
+    Copyright 2015-2016 Juan Potato
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to
+    deal in the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.
+]]--
+
 local utilities = require('otouto.utilities')
 
 local pgc = {}
 
-function pgc:init(config)
-    pgc.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('gocalc', true).table
-    pgc.doc = config.cmd_pat .. [[gocalc <required candy> <number of Pokémon> <number of candy>
+function pgc:init()
+    pgc.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('gocalc', true).table
+    pgc.doc = self.config.cmd_pat .. [[gocalc <required candy> <number of Pokémon> <number of candy>
 Calculates the number of Pokémon that must be transferred before evolving, how many evolutions the user is able to perform, and how many Pokémon and candy will be left over.
 All arguments must be positive numbers. Batch jobs may be performed by separating valid sets of arguments by lines.
 Example (forty pidgeys and three hundred pidgey candies):
-]] .. config.cmd_pat .. 'gocalc 12 40 300'
+]] .. self.config.cmd_pat .. 'gocalc 12 40 300'
     pgc.command = 'gocalc <required candy> <#pokemon> <#candy>'
 end
 
- -- This function written by Juan Potato. MIT-licensed.
 local function pidgey_calc(candies_to_evolve, mons, candies)
     local transferred = 0;
     local evolved = 0;

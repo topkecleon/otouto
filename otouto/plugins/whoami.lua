@@ -1,15 +1,23 @@
-local whoami = {}
+--[[
+    whoami.lua
+    Returns the user's or replied-to user's display name, username, and ID, in
+    addition to the group's display name, username, and ID.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-whoami.command = 'whoami'
+local whoami = {}
 
-function whoami:init(config)
-    whoami.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('who'):t('whoami').table
+function whoami:init()
+    whoami.command = 'whoami'
+    whoami.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('who'):t('whoami').table
     whoami.doc = [[
 Returns user and chat info for you or the replied-to message.
-Alias: ]] .. config.cmd_pat .. 'who'
+Alias: ]] .. self.config.cmd_pat .. 'who'
 end
 
 function whoami:action(msg)

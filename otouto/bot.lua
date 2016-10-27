@@ -1,6 +1,6 @@
 --[[
     bot.lua
-    The heart and sole of otouto, ie the init and main loop.
+    The heart and soul of otouto, ie the init and main loop.
 
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
@@ -8,66 +8,69 @@
 
 local bot = {}
 local bindings -- Bot API bindings.
-local utilities -- Miscellaneous and shared plugins.
+local utilities -- Miscellaneous and shared functions.
 
-bot.version = '3.14'
+bot.version = '3.15'
 
  -- Function to be run on start and reload.
-function bot:init(config)
+function bot:init()
 
-    assert(config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
+    assert(self.config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
 
-    bindings = require('otouto.bindings').init(config.bot_api_key)
+    bindings = require('otouto.bindings').init(self.config.bot_api_key)
     utilities = require('otouto.utilities')
 
     -- Fetch bot information. Try until it succeeds.
     repeat
-        print('Fetching bot information...')
+        print('Fetching bot information...\n')
         self.info = bindings.getMe()
     until self.info
     self.info = self.info.result
 
-    -- Load the "database"! ;)
-    self.database_name = config.database_name or self.info.username .. '.db'
+    -- todo: use a real database
+    self.database_name = self.config.database_name or self.info.username .. '.db'
     if not self.database then
         self.database = utilities.load_data(self.database_name)
     end
 
-    -- Migration code 1.13 -> 1.14
-    -- "database.reminders" -> "database.remind"
-    if self.database.version ~= '3.14' then
-        self.database.remind = self.database.reminders
-        self.database.reminders = nil
+    -- Migration 3.14 -> 3.15
+    if self.database.version == '3.14' then
+        local new_userdata = {}
+        for id, tab in pairs(self.database.userdata) do
+            if tab.nickname then
+                new_userdata.nick = new_userdata.nick or {}
+                new_userdata.nick[id] = tab.nickname
+            end
+            if tab.lastfm then
+                new_userdata.lastfm = new_userdata.lastfm or {}
+                new_userdata.lastfm = tab.lastfm
+            end
+        end
+        new_userdata.blacklist = self.database.blacklist
+        self.database.blacklist = nil
+        self.database.userdata = new_userdata
     end
     -- End migration code.
 
-    -- Table to cache user info (usernames, IDs, etc).
-    self.database.users = self.database.users or {}
-    -- Table to store userdata (nicknames, lastfm usernames, etc).
-    self.database.userdata = self.database.userdata or {}
-    -- Table to store the IDs of blacklisted users.
-    self.database.blacklist = self.database.blacklist or {}
     -- Save the bot's version in the database to make migration simpler.
     self.database.version = bot.version
-    -- Add updated bot info to the user info cache.
-    self.database.users[tostring(self.info.id)] = self.info
 
-    -- All plugins go into self.plugins. Plugins which accept forwarded messages
-    -- and messages from blacklisted users also go into self.panoptic_plugins.
+    -- Database table to store user-specific information, such as nicknames or
+    -- API usernames.
+    self.database.userdata = self.database.userdata or {}
+
     self.plugins = {}
-    self.panoptic_plugins = {}
-    for _, pname in ipairs(config.plugins) do
+    self.named_plugins = {}
+    for _, pname in ipairs(self.config.plugins) do
         local plugin = require('otouto.plugins.'..pname)
         table.insert(self.plugins, plugin)
-        if plugin.init then plugin.init(self, config) end
-        if plugin.panoptic then table.insert(self.panoptic_plugins, plugin) end
+        self.named_plugins[pname] = plugin
+        if plugin.init then plugin.init(self) end
         if plugin.doc then
             plugin.doc = '<pre>'..utilities.html_escape(plugin.doc)..'</pre>'
         end
         if not plugin.triggers then plugin.triggers = {} end
     end
-
-    print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
 
     -- Set loop variables.
     self.last_update = self.last_update or 0 -- Update offset.
@@ -75,59 +78,34 @@ function bot:init(config)
     self.last_database_save = self.last_database_save or os.date('%H') -- Last db save.
     self.is_started = true
 
+    print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')\n')
+
 end
 
  -- Function to be run on each new message.
-function bot:on_msg_receive(msg, config)
+function bot:on_msg_receive(msg)
 
     -- Do not process old messages.
     if msg.date < os.time() - 5 then return end
 
-    -- plugint is the array of plugins we'll check the message against.
-    -- If the message is forwarded or from a blacklisted user, the bot will only
-    -- check against panoptic plugins.
-    local plugint = self.plugins
-    local from_id_str = tostring(msg.from.id)
-
-    -- Cache user info for those involved.
-    self.database.users[from_id_str] = msg.from
-    if msg.reply_to_message then
-        self.database.users[tostring(msg.reply_to_message.from.id)] = msg.reply_to_message.from
-    elseif msg.forward_from then
-        -- Forwards only go to panoptic plugins.
-        plugint = self.panoptic_plugins
-        self.database.users[tostring(msg.forward_from.id)] = msg.forward_from
-    elseif msg.new_chat_member then
-        self.database.users[tostring(msg.new_chat_member.id)] = msg.new_chat_member
-    elseif msg.left_chat_member then
-        self.database.users[tostring(msg.left_chat_member.id)] = msg.left_chat_member
-    end
-
-    -- Messages from blacklisted users only go to panoptic plugins.
-    if self.database.blacklist[from_id_str] then
-        plugint = self.panoptic_plugins
-    end
-
     -- If no text, use captions.
     msg.text = msg.text or msg.caption or ''
-    msg.text_lower = msg.text:lower()
     if msg.reply_to_message then
         msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
     end
 
     -- Support deep linking.
-    if msg.text:match('^/start .+') then
-        msg.text = config.cmd_pat .. utilities.input(msg.text)
-        msg.text_lower = msg.text:lower()
-    end
+    msg.text = msg.text:match('^/start (.+)$') or msg.text
+    msg.text_lower = msg.text:lower()
 
     -- Do the thing.
-    for _, plugin in ipairs(plugint) do
+    for _, plugin in ipairs(self.plugins) do
         for _, trigger in ipairs(plugin.triggers) do
             if string.match(msg.text_lower, trigger) then
                 local success, result = pcall(function()
-                    return plugin.action(self, msg, config)
+                    return plugin.action(self, msg)
                 end)
+
                 if not success then
                     -- If the plugin has an error message, send it. If it does
                     -- not, use the generic one specified in config. If it's set
@@ -135,9 +113,9 @@ function bot:on_msg_receive(msg, config)
                     if plugin.error then
                         utilities.send_reply(msg, plugin.error)
                     elseif plugin.error == nil then
-                        utilities.send_reply(msg, config.errors.generic)
+                        utilities.send_reply(msg, self.config.errors.generic)
                     end
-                    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config.log_chat)
+                    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, self.config.log_chat)
                     return
                 -- Continue if the return value is true.
                 elseif result ~= true then
@@ -149,21 +127,21 @@ function bot:on_msg_receive(msg, config)
 end
 
  -- main
-function bot:run(config)
-    bot.init(self, config)
+function bot:run()
+    bot.init(self)
     while self.is_started do
         -- Update loop.
-        local res = bindings.getUpdates{ timeout = 20, offset = self.last_update + 1 }
+        local res = bindings.getUpdates{timeout = 20, offset = self.last_update + 1}
         if res then
             -- Iterate over every new message.
             for _,v in ipairs(res.result) do
                 self.last_update = v.update_id
                 if v.message then
-                    bot.on_msg_receive(self, v.message, config)
+                    bot.on_msg_receive(self, v.message)
                 end
             end
         else
-            print('Connection error while fetching updates.')
+            print('[' .. os.date('%F %T') .. '] Connection error while fetching updates.')
         end
 
         -- Run cron jobs every minute.
@@ -171,9 +149,9 @@ function bot:run(config)
             self.last_cron = os.date('%M')
             for i,v in ipairs(self.plugins) do
                 if v.cron then -- Call each plugin's cron function, if it has one.
-                    local result, err = pcall(function() v.cron(self, config) end)
+                    local result, err = pcall(function() v.cron(self) end)
                     if not result then
-                        utilities.handle_exception(self, err, 'CRON: ' .. i, config.log_chat)
+                        utilities.handle_exception(self, err, 'CRON: ' .. i, self.config.log_chat)
                     end
                 end
             end
@@ -187,7 +165,7 @@ function bot:run(config)
     end
     -- Save the database before exiting.
     utilities.save_data(self.database_name, self.database)
-    print('Halted.')
+    print('Halted.\n')
 end
 
 return bot

@@ -1,13 +1,20 @@
-local preview = {}
+--[[
+    preview.lua
+    Returns a web page preview without text for a given URL.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 
-preview.command = 'preview <link>'
+local preview = {}
 
-function preview:init(config)
-    preview.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('preview', true).table
-    preview.doc = config.cmd_pat .. 'preview <link> \nReturns a full-message, "unlinked" preview.'
+function preview:init()
+    preview.command = 'preview <link>'
+    preview.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('preview', true).table
+    preview.doc = self.config.cmd_pat .. 'preview <link> \nReturns a full-message, "unlinked" preview.'
 end
 
 function preview:action(msg)

@@ -1,15 +1,66 @@
-local slap = {}
+--[[
+    slap.lua
+    Allows users to slap someone.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-slap.command = 'slap [target]'
+local slap = {}
 
-function slap:init(config)
-    slap.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('slap', true).table
-    slap.doc = config.cmd_pat .. 'slap [target] \nSlap somebody.'
+function slap:init()
+    slap.command = 'slap [target]'
+    slap.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('slap', true).table
+    slap.doc = self.config.cmd_pat .. 'slap [target] \nSlap somebody.'
 end
 
-local slaps = {
+ -- Returns a user's nickname or full name.
+function slap:get_name(user)
+    local id_str = tostring(user.id)
+    if self.database.userdata.nick and self.database.userdata.nick[id_str] then
+        return self.database.userdata.nick[id_str]
+    elseif user.last_name then
+        return user.first_name .. ' ' .. user.last_name
+    else
+        return user.first_name
+    end
+end
+
+function slap:action(msg)
+    local victor = slap.get_name(self, msg.from)
+    local victim
+    local input = utilities.input(msg.text)
+    if msg.reply_to_message then
+        victim = slap.get_name(self, msg.reply_to_message.from)
+    elseif input then
+        victim = input
+        if input:match('^@(.+)$') == self.info.username then
+            victim = self.info.first_name
+        elseif input:match('^@.') then
+            local user = utilities.resolve_username(self, input)
+            if user then
+                victim = slap.get_name(self, user)
+            end
+        elseif tonumber(input) and self.database.users and self.database.users[input] then
+            victim = slap.get_name(self, self.database.users[input])
+        end
+    else
+        victim = slap.get_name(self, msg.from)
+    end
+
+    if victor == victim then
+        victor = self.info.first_name
+    end
+
+    local output = utilities.char.zwnj .. slap.slaps[math.random(#slap.slaps)]
+        :gsub('VICTOR', victor):gsub('VICTIM', victim)
+
+    utilities.send_message(msg.chat.id, output)
+end
+
+slap.slaps = {
     'VICTIM was shot by VICTOR.',
     'VICTIM was pricked to death.',
     'VICTIM walked into a cactus while trying to escape VICTOR.',
@@ -102,63 +153,10 @@ local slaps = {
     'VICTOR sent VICTIM down the memory hole.',
     'VICTIM was a mistake.',
     '"VICTIM was a mistake." - VICTOR',
-    'VICTOR checkmated VICTIM in two moves.'
+    'VICTOR checkmated VICTIM in two moves.',
+    'VICTIM was made redundant.',
+    'VICTIM was assimilated.',
+    'VICTIM is with Harambe now.'
 }
-
- -- optimize later
-function slap:action(msg)
-    local input = utilities.input(msg.text)
-    local victor_id = msg.from.id
-    local victim_id
-    if msg.reply_to_message then
-        victim_id = msg.reply_to_message.from.id
-    else
-        if input then
-            if tonumber(input) then
-                victim_id = tonumber(input)
-            elseif input:match('^@') then
-                local t = utilities.resolve_username(self, input)
-                if t then
-                    victim_id = t.id
-                end
-            end
-        end
-    end
-    -- IDs
-    if victim_id then
-        if victim_id == victor_id then
-            victor_id = self.info.id
-        end
-    else
-        if not input then
-            victor_id = self.info.id
-            victim_id = msg.from.id
-        end
-    end
-    -- Names
-    local victor_name, victim_name
-    if input and not victim_id then
-        victim_name = input
-    else
-        local victim_id_str = tostring(victim_id)
-        if self.database.userdata[victim_id_str] and self.database.userdata[victim_id_str].nickname then
-            victim_name = self.database.userdata[victim_id_str].nickname
-        elseif self.database.users[victim_id_str] then
-            victim_name = utilities.build_name(self.database.users[victim_id_str].first_name, self.database.users[victim_id_str].last_name)
-        else
-            victim_name = victim_id_str
-        end
-    end
-    local victor_id_str = tostring(victor_id)
-    if self.database.userdata[victor_id_str] and self.database.userdata[victor_id_str].nickname then
-        victor_name = self.database.userdata[victor_id_str].nickname
-    elseif self.database.users[victor_id_str] then
-        victor_name = utilities.build_name(self.database.users[victor_id_str].first_name, self.database.users[victor_id_str].last_name)
-    else
-        victor_name = self.info.first_name
-    end
-    local output = utilities.char.zwnj .. slaps[math.random(#slaps)]:gsub('VICTIM', victim_name):gsub('VICTOR', victor_name)
-    utilities.send_message(msg.chat.id, output)
-end
 
 return slap

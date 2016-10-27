@@ -1,23 +1,30 @@
- -- Credit to Heitor (tg:Wololo666; gh:heitorPB) for this plugin.
+--[[
+    apod.lua
+    Returns the NASA astronomy picture of the day along with related text.
 
-local apod = {}
+    Credit to @HeitorPB.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local URL = require('socket.url')
 local utilities = require('otouto.utilities')
 
-apod.command = 'apod [date]'
+local apod = {}
 
-function apod:init(config)
-    apod.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('apod', true).table
-    apod.doc = config.cmd_pat .. [[apod [YYYY-MM-DD]
+function apod:init()
+    apod.command = 'apod [date]'
+    apod.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('apod', true).table
+    apod.doc = self.config.cmd_pat .. [[apod [YYYY-MM-DD]
 Returns the Astronomy Picture of the Day.
 Source: nasa.gov]]
-    apod.base_url = 'https://api.nasa.gov/planetary/apod?api_key=' .. (config.nasa_api_key or 'DEMO_KEY')
+    apod.base_url = 'https://api.nasa.gov/planetary/apod?api_key=' .. (self.config.nasa_api_key or 'DEMO_KEY')
 end
 
-function apod:action(msg, config)
+function apod:action(msg)
     local input = utilities.input(msg.text)
     local url = apod.base_url
     local date = os.date('%F')
@@ -30,13 +37,13 @@ function apod:action(msg, config)
 
     local jstr, code = HTTPS.request(url)
     if code ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
     local data = JSON.decode(jstr)
     if data.error then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

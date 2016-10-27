@@ -1,25 +1,34 @@
-local setandget = {}
+--[[
+    setandget.lua
+    Allows users to set and retrieve arbitrary values.
+
+    Written as an example for some random guy who asked.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local utilities = require('otouto.utilities')
 
-function setandget:init(config)
+local setandget = {}
+
+function setandget:init()
     self.database.setandget = self.database.setandget or {}
-    setandget.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('set', true):t('get', true).table
-    setandget.doc = config.cmd_pat .. [[set <name> <value>
-Stores a value with the given name. Use "]] .. config.cmd_pat .. [[set <name> --" to delete the stored value.
-]] .. config.cmd_pat .. [[get [name]
+    setandget.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('set', true):t('get', true).table
+    setandget.doc = self.config.cmd_pat .. [[set <name> <value>
+Stores a value with the given name. Use "]] .. self.config.cmd_pat .. [[set <name> --" to delete the stored value.
+]] .. self.config.cmd_pat .. [[get [name]
 Returns the stored value or a list of stored values.]]
+    setandget.command = 'set <name> <value>'
 end
 
-setandget.command = 'set <name> <value>'
-
-function setandget:action(msg, config)
+function setandget:action(msg)
 
     local chat_id_str = tostring(msg.chat.id)
     local input = utilities.input(msg.text)
     self.database.setandget[chat_id_str] = self.database.setandget[chat_id_str] or {}
 
-    if msg.text_lower:match('^'..config.cmd_pat..'set') then
+    if msg.text_lower:match('^'..self.config.cmd_pat..'set') then
 
         if not input then
             utilities.send_message(msg.chat.id, setandget.doc, true, nil, 'html')
@@ -39,7 +48,7 @@ function setandget:action(msg, config)
             utilities.send_message(msg.chat.id, '"' .. name .. '" has been set to "' .. value .. '".', true)
         end
 
-    elseif msg.text_lower:match('^'..config.cmd_pat..'get') then
+    elseif msg.text_lower:match('^'..self.config.cmd_pat..'get') then
 
         if not input then
             local output

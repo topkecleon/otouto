@@ -1,18 +1,25 @@
-local imdb = {}
+--[[
+    imdb.lua
+    Returns the IMDb entry for a given query.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-imdb.command = 'imdb <query>'
+local imdb = {}
 
-function imdb:init(config)
-    imdb.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('imdb', true).table
-    imdb.doc = config.cmd_pat .. 'imdb <query> \nReturns an IMDb entry.'
+function imdb:init()
+    imdb.command = 'imdb <query>'
+    imdb.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('imdb', true).table
+    imdb.doc = self.config.cmd_pat .. 'imdb <query> \nReturns an IMDb entry.'
 end
 
-function imdb:action(msg, config)
+function imdb:action(msg)
 
     local input = utilities.input_from_msg(msg)
     if not input then
@@ -24,14 +31,14 @@ function imdb:action(msg, config)
 
     local jstr, res = HTTP.request(url)
     if res ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 
     local jdat = JSON.decode(jstr)
 
     if jdat.Response ~= 'True' then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 

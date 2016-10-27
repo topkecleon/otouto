@@ -1,4 +1,12 @@
- -- Based on a plugin by matthewhesketh.
+--[[
+    starwars_crawl.lua
+    Returns the opening "crawl" of a given Star Wars film.
+
+    Based on a plugin by matthewhesketh.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local HTTP = require('socket.http')
 local JSON = require('dkjson')
@@ -7,12 +15,12 @@ local utilities = require('otouto.utilities')
 
 local starwars = {}
 
-function starwars:init(config)
-    starwars.triggers = utilities.triggers(self.info.username, config.cmd_pat)
+function starwars:init()
+    starwars.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('starwars', true):t('sw', true).table
-    starwars.doc = config.cmd_pat .. [[starwars <query>
+    starwars.doc = self.config.cmd_pat .. [[starwars <query>
 Returns the opening crawl from the specified Star Wars film.
-Alias: ]] .. config.cmd_pat .. 'sw'
+Alias: ]] .. self.config.cmd_pat .. 'sw'
     starwars.command = 'starwars <query>'
     starwars.base_url = 'http://swapi.co/api/films/'
 end
@@ -37,14 +45,14 @@ local corrected_numbers = {
     7
 }
 
-function starwars:action(msg, config)
+function starwars:action(msg)
     local input = utilities.input_from_msg(msg)
     if not input then
         utilities.send_reply(msg, starwars.doc, 'html')
         return
     end
 
-    bindings.sendChatAction{ chat_id = msg.chat.id, action = 'typing' }
+    bindings.sendChatAction{chat_id = msg.chat.id, action = 'typing'}
 
     local film
     if tonumber(input) then
@@ -60,14 +68,14 @@ function starwars:action(msg, config)
     end
 
     if not film then
-        utilities.send_reply(msg, config.errors.results)
+        utilities.send_reply(msg, self.config.errors.results)
         return
     end
 
     local url = starwars.base_url .. film
     local jstr, code = HTTP.request(url)
     if code ~= 200 then
-        utilities.send_reply(msg, config.errors.connection)
+        utilities.send_reply(msg, self.config.errors.connection)
         return
     end
 

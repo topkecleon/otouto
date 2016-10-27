@@ -1,17 +1,23 @@
-local utilities = require('otouto.utilities')
+--[[
+    patterns.lua
+    Sed-like substitution using Lua patterns. Ignores commands with no reply-to
+    message.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
 
 local patterns = {}
 
-patterns.command = 's/<pattern>/<substitution>'
-patterns.help_word = 'sed'
-patterns.doc = [[
-s/<pattern>/<substitution>
-Replace all matches for the given pattern.
-Uses Lua patterns.
-]]
+local utilities = require('otouto.utilities')
 
-function patterns:init(config)
-    patterns.triggers = { config.cmd_pat .. '?s/.-/.-$' }
+function patterns:init()
+    patterns.command = 's/<pattern>/<substitution>'
+    patterns.help_word = 'sed'
+    patterns.doc = [[s/<pattern>/<substitution>
+    Replace all matches for the given pattern.
+    Uses Lua patterns.]]
+    patterns.triggers = { self.config.cmd_pat .. '?s/.-/.-$' }
 end
 
 function patterns:action(msg)
