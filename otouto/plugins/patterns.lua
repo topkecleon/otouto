@@ -13,10 +13,10 @@ local utilities = require('otouto.utilities')
 
 function patterns:init()
     patterns.command = 's/<pattern>/<substitution>'
-    patterns.help_word = 'sed'
+    patterns.help_word = 'patterns'
     patterns.doc = [[s/<pattern>/<substitution>
-    Replace all matches for the given pattern.
-    Uses Lua patterns.]]
+Replace all matches for the given pattern.
+Uses Lua patterns.]]
     patterns.triggers = { self.config.cmd_pat .. '?s/.-/.-$' }
 end
 
