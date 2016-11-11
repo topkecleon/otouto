@@ -74,14 +74,11 @@ end
 
  -- Returns the string after the first space.
 function utilities.input(s)
-    if not s:find(' ') then
-        return false
-    end
-    return s:sub(s:find(' ')+1)
+    return s:match('%s+(.+)')
 end
 
 function utilities.input_from_msg(msg)
-    return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
+    return msg.text:match('%s+(.+)') or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters

@@ -34,6 +34,7 @@ function wait:action(msg)
     end
     msg.date = msg.date + ( duration * 60 )
     msg.text = input
+    msg.text_lower = nil
     table.insert(self.database.wait, msg)
     utilities.send_reply(msg, 'Queued.')
 end

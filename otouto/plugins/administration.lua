@@ -195,6 +195,10 @@ function administration:get_targets(msg)
     else
         local input = utilities.input(msg.text)
         if input then
+            local reason
+            if input:match('\n') then
+                input, reason = input:match('^(.-)\n(.+)$')
+            end
             local t = {}
             for user in input:gmatch('%g+') do
                 if self.database.users[user] then
@@ -229,7 +233,7 @@ function administration:get_targets(msg)
                     table.insert(t, { err = 'Invalid username or ID ('..user..').' })
                 end
             end
-            return t
+            return t, reason
         else
             return false
         end
@@ -389,18 +393,22 @@ function administration.init_command(self_)
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.sticker
                         elseif msg.photo then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
-                        elseif msg.document then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.document
                         elseif msg.audio then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.audio
                         elseif msg.contact then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.contact
-                        elseif msg.video then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.video
                         elseif msg.location then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.location
                         elseif msg.voice then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.voice
+                        elseif msg.document then
+                            if msg.document.mime_type:match('^image') then
+                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
+                            elseif msg.document.mime_type:match('^video') then
+                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.video
+                            else
+                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.document
+                            end
                         else
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.text
                         end
@@ -414,7 +422,7 @@ function administration.init_command(self_)
 
                     -- antilink
                     if group.flags[8] and not (msg.forward_from and msg.forward_from.id == self.info.id) then
-                       for code_thing in msg.text:gmatch('[tT][eE][lL][eE][gG][rR][aA][mM]%.[mM][eE]/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)') do
+                       for code_thing in msg.text:gmatch('[tT][eE]?[lL][eE]?[gG][rR][aA]?[mM]%.[mMdD][eEoO][gG]?/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)') do
                             if not administration.is_internal_group_link(self, code_thing) then
                                 user.do_kick = true
                                 user.reason = 'antilink'
@@ -425,7 +433,7 @@ function administration.init_command(self_)
                         if msg.entities then
                             for _, entity in ipairs(msg.entities) do
                                 if entity.url then
-                                    local code_thing = entity.url:match('[tT][eE][lL][eE][gG][rR][aA][mM]%.[mM][eE]/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)')
+                                    local code_thing = entity.url:match('[tT][eE]?[lL][eE]?[gG][rR][aA]?[mM]%.[mMdD][eEoO][gG]?/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)')
                                     if code_thing then
                                         if not administration.is_internal_group_link(self, code_thing) then
                                             user.do_kick = true
@@ -572,6 +580,9 @@ function administration.init_command(self_)
 
             action = function(self, msg)
                 local input = utilities.input(msg.text)
+                if input and input:match('\n') then
+                    input = input:match('(.-)\n')
+                end
                 local group_list = {}
                 local result_list = {}
                 for _, group in pairs(self.database.administration.groups) do
@@ -1118,7 +1129,7 @@ function administration.init_command(self_)
 usage: `%santiflood <type> <i>`
 example: `%santiflood text 5`
 Use this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:
-%sUsers are automatically banned after *%s* automatic kick%s.
+%sUsers are automatically banned after *%s* automatic kick%s. Use the the *autoban* keyword to configure this.
                             ]],
                             self.config.cmd_pat,
                             self.config.cmd_pat,

@@ -159,7 +159,7 @@ Send /help to get started.
         'about',
         'calc',
         'cats',
-        'colorhex',
+        'hexcolor',
         'commit',
         'control',
         'currency',
