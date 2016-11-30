@@ -1,5 +1,5 @@
 --[[
-    administration.lua, version 1.15
+    administration.lua, version 1.15.1
     This plugin provides self-hosted, single-realm group administration.
     It requires tg (http://github.com/vysheng/tg) with supergroup support.
     For more documentation, read the the manual (otou.to/rtfm).
@@ -37,6 +37,12 @@ function administration:init()
             globalbans = {}
         }
     end
+
+    -- Migration Code 1.15 -> 1.15.1
+    for _, group in pairs(self.database.administration.groups) do
+        group.filter = group.filter or {}
+    end
+    -- End Migration Code
 
     administration.temp = {
         help = {},
@@ -312,8 +318,13 @@ function administration:update_desc(chat)
     drua.channel_set_about(chat, desc)
 end
 
+ -- if s is true, use the API. Otherwise, use s as the drua session.
 function administration:kick_user(chat, target, reason, s)
-    drua.kick_user(chat, target, s)
+    if s == true then
+        bindings.kickChatMember{chat = chat, target = target}
+    else
+        drua.kick_user(chat, target, s)
+    end
     local victim = target
     if self.database.users[tostring(target)] then
         victim = utilities.build_name(
@@ -402,9 +413,9 @@ function administration.init_command(self_)
                         elseif msg.voice then
                             administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.voice
                         elseif msg.document then
-                            if msg.document.mime_type:match('^image') then
+                            if msg.document.mime_type and msg.document.mime_type:match('^image') then
                                 administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
-                            elseif msg.document.mime_type:match('^video') then
+                            elseif msg.document.mime_type and msg.document.mime_type:match('^video') then
                                 administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.video
                             else
                                 administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.document
@@ -414,7 +425,7 @@ function administration.init_command(self_)
                         end
                         if administration.temp.flood[chat_id_str][from_id_str] > 99 then
                             user.do_kick = true
-                            user.reason = 'antiflood'
+                            user.reason = 'antiflood (' .. administration.temp.flood[chat_id_str][from_id_str] .. ')'
                             user.output = administration.flags[5].kicked:gsub('#GROUPNAME', msg.chat.title)
                             administration.temp.flood[chat_id_str][from_id_str] = nil
                         end
@@ -443,6 +454,16 @@ function administration.init_command(self_)
                                     end
                                 end
                             end
+                        end
+                    end
+
+                    -- filter
+                    for i = 1, #group.filter do
+                        if msg.text_lower:match(group.filter[i]) then
+                            user.do_kick = true
+                            user.reason = 'filter (' .. group.filter[i] .. ')'
+                            user.output = 'You were automatically kicked from ' .. msg.chat.title .. ' for using a filtered term: ' .. group.filter[i]
+                            break
                         end
                     end
 
@@ -895,6 +916,45 @@ function administration.init_command(self_)
             end
         },
 
+        { -- /filter
+            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):t('filter', true).table,
+
+            command = 'filter \\[term]',
+            privilege = 2,
+            interior = true,
+            doc = 'Adds or removes a word filter, or lists all word filters. Users are automatically kicked after using a filtered term.',
+
+            action = function(self, msg, group)
+                if administration.get_rank(self, msg.from.id, msg.chat.id) == 2 and not group.flags[9] then
+                    utilities.send_reply(msg, 'modrights `[9]` must be enabled for moderators to use this command.', true)
+                    return
+                end
+                local input = utilities.input(msg.text)
+                local output
+                if input then
+                    input = input:lower()
+                    local index
+                    for i = 1, #group.filter do
+                        if group.filter[i] == input then
+                            index = i
+                        end
+                    end
+                    if index then
+                        table.remove(group.filter, index)
+                        output = 'That term has been removed from the filter.'
+                    else
+                        table.insert(group.filter, input)
+                        output = 'That term has been added to the filter.'
+                    end
+                elseif #group.filter > 0 then
+                    output = '<b>Filtered Terms for ' .. utilities.html_escape(group.name) .. ':</b>\n• ' .. utilities.html_escape(table.concat(group.filter, '\n• '))
+                else
+                    output = 'There are currently no filtered terms.'
+                end
+                utilities.send_reply(msg, output, 'html')
+            end
+        },
+
         { -- /setmotd
             triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):t('setmotd', true):t('setqotd', true).table,
 
@@ -1301,7 +1361,6 @@ Use this command to configure the point values for each message type. When a use
                 if targets then
                     reason = reason and ': ' .. utilities.trim(reason) or ''
                     local output = ''
-                    local s = drua.sopen()
                     for _, target in ipairs(targets) do
                         if target.err then
                             output = output .. target.err .. '\n'
@@ -1312,12 +1371,11 @@ Use this command to configure the point values for each message type. When a use
                         else
                             if group then
                                 local reason_ = 'hammered by ' .. utilities.build_name(msg.from.first_name, msg.from.last_name) .. ' [' .. msg.from.id .. ']' .. reason
-                                administration.kick_user(self, msg.chat.id, target.id, reason_)
+                                administration.kick_user(self, msg.chat.id, target.id, reason_, true)
                             end
                             for k,v in pairs(self.database.administration.groups) do
                                 if not v.flags[6] then
                                     v.mods[target.id_str] = nil
-                                    drua.kick_user(k, target.id, s)
                                 end
                             end
                             self.database.administration.globalbans[target.id_str] = true
@@ -1330,7 +1388,6 @@ Use this command to configure the point values for each message type. When a use
                             end
                         end
                     end
-                    s:close()
                     utilities.send_reply(msg, output)
                 else
                     utilities.send_reply(msg, 'Please specify a user or users via reply, username, or ID.')
@@ -1466,7 +1523,8 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
                         antiflood = {},
                         flags = {},
                         rules = {},
-                        tempbans = {}
+                        tempbans = {},
+                        filter = {}
                     }
                     group = self.database.administration.groups[tostring(msg.chat.id)]
                     for k in pairs(self.config.administration.antiflood) do

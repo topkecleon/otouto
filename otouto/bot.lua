@@ -33,25 +33,6 @@ function bot:init()
         self.database = utilities.load_data(self.database_name)
     end
 
-    -- Migration 3.14 -> 3.15
-    if self.database.version == '3.14' then
-        local new_userdata = {}
-        for id, tab in pairs(self.database.userdata) do
-            if tab.nickname then
-                new_userdata.nick = new_userdata.nick or {}
-                new_userdata.nick[id] = tab.nickname
-            end
-            if tab.lastfm then
-                new_userdata.lastfm = new_userdata.lastfm or {}
-                new_userdata.lastfm = tab.lastfm
-            end
-        end
-        new_userdata.blacklist = self.database.blacklist
-        self.database.blacklist = nil
-        self.database.userdata = new_userdata
-    end
-    -- End migration code.
-
     -- Save the bot's version in the database to make migration simpler.
     self.database.version = bot.version
 

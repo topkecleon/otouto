@@ -28,13 +28,13 @@ function id.format(t)
         return string.format(
             '@%s, AKA <b>%s</b> <code>[%s]</code>.\n',
             t.username,
-            utilities.build_name(t.first_name, t.last_name),
+            utilities.html_escape(utilities.build_name(t.first_name, t.last_name)),
             t.id
         )
     else
         return string.format(
             '<b>%s</b> <code>[%s]</code>.\n',
-            utilities.build_name(t.first_name, t.last_name),
+            utilities.html_escape(utilities.build_name(t.first_name, t.last_name)),
             t.id
         )
     end
