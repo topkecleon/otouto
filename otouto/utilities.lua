@@ -128,10 +128,16 @@ function utilities.get_coords(input)
         return
     end
     local jdat = JSON.decode(jstr)
-    if jdat.status == 'ZERO_RESULTS' then
+    if not (
+        jdat.results[1].geometry.location.lat
+        and jdat.results[1].geometry.location.lng
+    ) then
+        return
+    elseif jdat.status == 'ZERO_RESULTS' then
         return false
+    else
+        return jdat.results[1].geometry.location.lat, jdat.results[1].geometry.location.lng
     end
-    return jdat.results[1].geometry.location.lat, jdat.results[1].geometry.location.lng
 end
 
  -- Get the number of values in a key/value table.

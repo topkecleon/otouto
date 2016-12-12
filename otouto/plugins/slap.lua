@@ -54,6 +54,9 @@ function slap:action(msg)
         victor = self.info.first_name
     end
 
+    victor = victor:gsub('%%', '%%%%')
+    victim = victim:gsub('%%', '%%%%')
+
     local output = utilities.char.zwnj .. slap.slaps[math.random(#slap.slaps)]
         :gsub('VICTOR', victor):gsub('VICTIM', victim)
 

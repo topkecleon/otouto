@@ -153,6 +153,9 @@ how it is triggered: A reaction command must be at the beginning or end of a
 line. Reactions may be formatted with HTML. Configuration values should be
 pre-escaped.
 
+#### eightball.lua
+The `eightball` table is an array of custom responses for the eightball plugin.
+
 ## Control plugins
 Some plugins are designed to be used by the bot's owner. Here are some examples,
 how they're used, and what they do.

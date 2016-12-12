@@ -51,7 +51,7 @@ function bindings.request(method, parameters, file)
         url = bindings.BASE_URL .. method,
         method = 'POST',
         headers = {
-            ["Content-Type"] =    "multipart/form-data; boundary=" .. boundary,
+            ["Content-Type"] = "multipart/form-data; boundary=" .. boundary,
             ["Content-Length"] = #body,
         },
         source = ltn12.source.string(body),
