@@ -386,6 +386,8 @@ function administration.init_command(self_)
                         from_name:match(utilities.char.arabic)
                         or from_name:match(utilities.char.rtl_override)
                         or from_name:match(utilities.char.rtl_mark)
+                        or from_name:match('^'..utilities.char.braille_space)
+                        or from_name:match(utilities.char.braille_space..'$')
                     ) then
                         user.do_kick = true
                         user.reason = 'antisquig++'
