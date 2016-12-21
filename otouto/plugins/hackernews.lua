@@ -11,6 +11,12 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
+ -- add to config later
+ -- Number of posts retrieved and given in PM.
+local max_post_count = 16
+ -- Number of posts given in group chats.
+local group_post_count = 4
+
 local hackernews = {}
 
 local function get_hackernews_results()
@@ -18,7 +24,7 @@ local function get_hackernews_results()
     local jstr, code = HTTPS.request(hackernews.topstories_url)
     if code ~= 200 then return end
     local data = JSON.decode(jstr)
-    for i = 1, 8 do
+    for i = 1, max_post_count do
         local ijstr, icode = HTTPS.request(hackernews.res_url:format(data[i]))
         if icode ~= 200 then return end
         local idata = JSON.decode(ijstr)
@@ -71,7 +77,7 @@ function hackernews:action(msg)
         hackernews.last_update = now
     end
     -- Four results in a group, eight in private.
-    local res_count = msg.chat.id == msg.from.id and 8 or 4
+    local res_count = msg.chat.id == msg.from.id and max_post_count or group_post_count
     local output = '<b>Top Stories from Hacker News:</b>'
     for i = 1, res_count do
         output = output .. hackernews.results[i]

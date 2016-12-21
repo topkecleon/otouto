@@ -128,12 +128,9 @@ function utilities.get_coords(input)
         return
     end
     local jdat = JSON.decode(jstr)
-    if not (
-        jdat.results[1].geometry.location.lat
-        and jdat.results[1].geometry.location.lng
-    ) then
+    if not jdat then
         return
-    elseif jdat.status == 'ZERO_RESULTS' then
+    elseif jdat.status == 'ZERO_RESULTS' or not jdat.results[1] then
         return false
     else
         return jdat.results[1].geometry.location.lat, jdat.results[1].geometry.location.lng

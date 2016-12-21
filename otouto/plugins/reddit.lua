@@ -45,10 +45,7 @@ end
 
 function reddit:action(msg)
     -- Eight results in PM, four results elsewhere.
-    local limit = 4
-    if msg.chat.type == 'private' then
-        limit = 8
-    end
+    local limit = msg.chat.type == 'private' and 8 or 4
     local text = msg.text_lower
     if text:match('^/r/.') then
         -- Normalize input so this hack works easily.
