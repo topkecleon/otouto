@@ -119,6 +119,15 @@ Some plugins have many configuration values which warrant their own section of
 the configuration file. That section will be the name of the plugin, without the
 file extension. They are listed below.
 
+### hackernews.lua
+
+| Name            | Default | Description                                     |
+|:----------------|:--------|:------------------------------------------------|
+| `interval`      | `60`    | The time, in minutes, between refetching links. |
+| `on_start`      | `false` | Whether to fetch links at load time.            |
+| `private_count` | `8`     | Number of links sent in private messages.       |
+| `group_count`   | `4`     | Number of links sent in group chats.            |
+
 #### remind.lua
 
 | Name                    | Default  | Description                                              |

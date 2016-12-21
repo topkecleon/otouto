@@ -11,20 +11,14 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
- -- add to config later
- -- Number of posts retrieved and given in PM.
-local max_post_count = 16
- -- Number of posts given in group chats.
-local group_post_count = 4
-
 local hackernews = {}
 
-local function get_hackernews_results()
+local function get_hackernews_results(count)
     local results = {}
     local jstr, code = HTTPS.request(hackernews.topstories_url)
     if code ~= 200 then return end
     local data = JSON.decode(jstr)
-    for i = 1, max_post_count do
+    for i = 1, count do
         local ijstr, icode = HTTPS.request(hackernews.res_url:format(data[i]))
         if icode ~= 200 then return end
         local idata = JSON.decode(ijstr)
@@ -59,17 +53,17 @@ Alias: ]] .. self.config.cmd_pat .. 'hn'
     hackernews.res_url = 'https://hacker-news.firebaseio.com/v0/item/%s.json'
     hackernews.art_url = 'https://news.ycombinator.com/item?id=%s'
     hackernews.last_update = 0
-    if self.config.hackernews_onstart == true then
-        hackernews.results = get_hackernews_results()
+    if self.config.hackernews.on_start == true then
+        hackernews.results = get_hackernews_results(self.config.hackernews.private_post_count)
         if hackernews.results then hackernews.last_update = os.time() / 60 end
     end
 end
 
 function hackernews:action(msg)
     local now = os.time() / 60
-    if not hackernews.results or hackernews.last_update + self.config.hackernews_interval < now then
+    if not hackernews.results or hackernews.last_update + self.config.hackernews.interval < now then
         bindings.sendChatAction{chat_id = msg.chat.id, action = 'typing'}
-        hackernews.results = get_hackernews_results()
+        hackernews.results = get_hackernews_results(self.config.hackernews.private_post_count)
         if not hackernews.results then
             utilities.send_reply(msg, self.config.errors.connection)
             return
@@ -77,7 +71,7 @@ function hackernews:action(msg)
         hackernews.last_update = now
     end
     -- Four results in a group, eight in private.
-    local res_count = msg.chat.id == msg.from.id and max_post_count or group_post_count
+    local res_count = msg.chat.id == msg.from.id and self.config.hackernews.private_post_count or self.config.hackernews.group_post_count
     local output = '<b>Top Stories from Hacker News:</b>'
     for i = 1, res_count do
         output = output .. hackernews.results[i]

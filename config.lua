@@ -53,15 +53,24 @@ Send /help to get started.
     nasa_api_key = nil,
     -- http://tech.yandex.com/keys/get
     yandex_key = nil,
-    -- Interval (in minutes) for hackernews.lua to update.
-    hackernews_interval = 60,
-    -- Whether hackernews.lua should update at load/reload.
-    hackernews_onstart = false,
     -- Whether luarun should use serpent instead of dkjson for serialization.
     luarun_serpent = false,
 
+    hackernews = {
+        -- Interval (in minutes) for hackernews.lua to fetch new posts.
+        -- This only triggers when someone runs the command; not as a cron job.
+        interval = 60,
+        -- Whether hackernews.lua should cache posts at load time.
+        on_start = false,
+        -- Max number of posts fetched, and number sent in PM.
+        private_count = 8,
+        -- Number of posts sent in groups.
+        group_count = 4
+    },
+
     remind = {
-        persist = true,
+        -- Should reminders be saved if they fail to send?
+        persist = false,
         max_length = 1000,
         max_duration = 526000,
         max_reminders_group = 10,
