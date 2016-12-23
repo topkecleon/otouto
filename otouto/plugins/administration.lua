@@ -559,11 +559,7 @@ function administration.init_command(self_)
                 end
 
                 if group.flags[5] and user.do_kick and not user.dont_unban then
-                    if group.autokicks[from_id_str] then
-                        group.autokicks[from_id_str] = group.autokicks[from_id_str] + 1
-                    else
-                        group.autokicks[from_id_str] = 1
-                    end
+                    group.autokicks[from_id_str] = (group.autokicks[from_id_str] or 0) + 1
                     if group.autokicks[from_id_str] >= group.autoban then
                         group.autokicks[from_id_str] = 0
                         group.bans[from_id_str] = true

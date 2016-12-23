@@ -54,7 +54,7 @@ Alias: ]] .. self.config.cmd_pat .. 'hn'
     hackernews.art_url = 'https://news.ycombinator.com/item?id=%s'
     hackernews.last_update = 0
     if self.config.hackernews.on_start == true then
-        hackernews.results = get_hackernews_results(self.config.hackernews.private_post_count)
+        hackernews.results = get_hackernews_results(self.config.hackernews.private_count)
         if hackernews.results then hackernews.last_update = os.time() / 60 end
     end
 end
@@ -63,7 +63,7 @@ function hackernews:action(msg)
     local now = os.time() / 60
     if not hackernews.results or hackernews.last_update + self.config.hackernews.interval < now then
         bindings.sendChatAction{chat_id = msg.chat.id, action = 'typing'}
-        hackernews.results = get_hackernews_results(self.config.hackernews.private_post_count)
+        hackernews.results = get_hackernews_results(self.config.hackernews.private_count)
         if not hackernews.results then
             utilities.send_reply(msg, self.config.errors.connection)
             return
@@ -71,7 +71,7 @@ function hackernews:action(msg)
         hackernews.last_update = now
     end
     -- Four results in a group, eight in private.
-    local res_count = msg.chat.id == msg.from.id and self.config.hackernews.private_post_count or self.config.hackernews.group_post_count
+    local res_count = msg.chat.id == msg.from.id and self.config.hackernews.private_count or self.config.hackernews.group_count
     local output = '<b>Top Stories from Hacker News:</b>'
     for i = 1, res_count do
         output = output .. hackernews.results[i]
