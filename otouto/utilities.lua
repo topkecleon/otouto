@@ -18,60 +18,6 @@ local utf8 = utf8 or require('lua-utf8')
 
 local utilities = {}
 
--- Maps a function f over a table t to produce a new table of the results.
-function utilities.map(f, t)
-    local u = {}
-    for i, v in pairs(t) do
-        u[i] = f(v)
-    end
-    return u
-end
--- map, but for integer tables (preferably consecutive).
-function utilities.imap(f, t)
-    local u = {}
-    for i = 1, #t do
-        u[i] = f(t[i])
-    end
-end
-
--- Folds or over a table of booleans.
-function utilities.table_or(t)
-    for _, v in pairs(t) do
-        if v ~= false then
-            return true
-        end
-    end
-    return false
-end
--- table_or, but for integer tables (preferably consecutive).
-function utilities.itable_or(t)
-    for i = 1, #t do
-        if t[v] ~= false then
-            return true
-        end
-    end
-    return false
-end
-
--- Folds and over a table of booleans.
-function utilities.table_and(t)
-    for _, v in pairs(t) do
-        if v == false then
-            return false
-        end
-    end
-    return true
-end
--- table_and, but for integer tables (preferably consecutive).
-function utilities.itable_and(t)
-    for i = 1, #t do
-        if t[v] == false then
-            return false
-        end
-    end
-    return true
-end
-
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
  -- Edit: To keep things working and allow for HTML messages, you can now pass a
@@ -309,14 +255,13 @@ end
  -- This table will store unsavory characters that are not properly displayed,
  -- or are just not fun to type.
 utilities.char = {
-    zwnj = utf8.char(0x200c),
+    zwnj = '‌',
     arabic = '[\216-\219][\128-\191]',
-    rtl_override = utf8.char(0x020e),
-    rtl_mark = utf8.char(0x200f),
-    rtl_isolate = utf8.char(0x2066),
+    rtl_override = '‮',
+    rtl_mark = '‏',
     em_dash = '—',
     utf_8 = '[%z\1-\127\194-\244][\128-\191]',
-    braille_space = utf8.char(0x2800),
+    braille_space = '⠀',
 }
 
 utilities.set_meta = {}
