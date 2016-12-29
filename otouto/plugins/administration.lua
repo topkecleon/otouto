@@ -1,5 +1,5 @@
 --[[
-    administration.lua, version 1.15.1
+    administration.lua, version 1.15.2
     This plugin provides self-hosted, single-realm group administration.
     It requires tg (http://github.com/vysheng/tg) with supergroup support.
     For more documentation, read the the manual (otou.to/rtfm).
@@ -1033,7 +1033,7 @@ function administration.init_command(self_)
             command = 'changerule <i> <rule>',
             privilege = 3,
             interior = true,
-            doc = 'Changes a single rule. Pass "--" to delete the rule. If i is a number for which there is no rule, adds a rule by the next incremented number.',
+            doc = 'Changes a single rule. Pass "--" to delete the rule. If i is a number for which there is no rule, adds a rule indexed higher than the highest-indexed rule.',
 
             action = function(self, msg, group)
                 local input = utilities.input(msg.text)
@@ -1057,7 +1057,37 @@ function administration.init_command(self_)
                             rule_num = #group.rules + 1
                         end
                         group.rules[rule_num] = new_rule
-                        output = '*' .. rule_num .. '*. ' .. new_rule
+                        output = '*' .. rule_num .. '.* ' .. new_rule
+                    end
+                end
+                utilities.send_reply(msg, output, true)
+            end
+        },
+
+        { -- /addrule
+            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):t('addrule', true).table,
+
+            command = 'addrule <i> <rule>',
+            privilege = 3,
+            interior = true,
+            doc = 'Inserts a single rule as i. If i is a number for which there is no rule, adds a rule indexed higher than the highest-indexed rule.',
+
+            action = function(self, msg, group)
+                local input = utilities.input(msg.text)
+                local output = 'usage: `'..self.config.cmd_pat..'addrule <i> <rule>`'
+                if input then
+                    local rule_num = tonumber(input:match('^%d+'))
+                    local new_rule = utilities.input(input)
+                    if not rule_num then
+                        output = 'Please specify where you want to add the new rule.'
+                    elseif not new_rule then
+                        output = 'Please specify the new rule.'
+                    else
+                        if not group.rules[rule_num] then
+                            rule_num = #group.rules + 1
+                        end
+                        table.insert(group.rules, rule_num, new_rule)
+                        output = '*' .. rule_num .. '.* ' .. new_rule
                     end
                 end
                 utilities.send_reply(msg, output, true)
