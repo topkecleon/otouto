@@ -51,6 +51,11 @@ function time:action(msg)
         return
     end
 
+    if not data.dstOffset then
+        utilities.send_reply(msg, self.config.errors.connection)
+        return
+    end
+
     local timestamp = now + data.rawOffset + data.dstOffset
     local utcoff = (data.rawOffset + data.dstOffset) / 3600
     if utcoff == math.abs(utcoff) then

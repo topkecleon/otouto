@@ -33,18 +33,20 @@ function hn:action(msg)
     end
     local parsed = feedparser.parse(res, hn.feed_url)
     local results = {}
-    for i = 1, (msg.chat.id == msg.from.id and self.config.hackernews.private_count or self.config.hackernews.group_count) do
+    for i = 1, msg.chat.id == msg.from.id and self.config.hackernews.private_count or self.config.hackernews.group_count do
         local entry = parsed.entries[i]
         local url = entry.summary:match('"(.+)"')
         table.insert(results, string.format(
             '• <code>[</code><a href="%s">%s</a><code>]</code> <a href="%s">%s</a>',
             utilities.html_escape(url),
             url:match('%d+$'),
-            utilities.html_escape(entry.link),
+            -- We don't want the title to be linked if it's a "self" post.
+            -- Pass an empty string for the URL if the link is the comment page.
+            url == entry.link and '' or utilities.html_escape(entry.link),
             utilities.html_escape(entry.title)
         ))
     end
-    local output = '<b>Latest Posts from Hacker News:</b>\n' .. table.concat(results, '\n')
+    local output = '<b>Top Posts from Hacker News:</b>\n' .. table.concat(results, '\n')
     utilities.send_message(msg.chat.id, output, true, nil, 'html')
 end
 

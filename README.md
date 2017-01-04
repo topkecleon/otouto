@@ -545,29 +545,20 @@ private conversation and four elsewhere. This is a trivial pair of numbers
 and desirable.
 
 ## Contributors
-Everybody is free to contribute to otouto. If you are interested, you are
-invited to [fork the repo](http://github.com/topkecleon/otouto/fork) and start
-making pull requests. If you have an idea and you are not sure how to implement
-it, open an issue or bring it up in the
-[Bot Development group](http://telegram.me/BotDevelopment).
+Everybody is free to contribute to otouto. The most direct way of doing this is
+to fork and start making pull requests. If you have an idea and are not sure how
+to implement it, open an issue or bring it up in the
+[otouto Meta group](https://telegram.me/oumeta).
 
 The creator and maintainer of otouto is
-[topkecleon](http://github.com/topkecleon). He can be contacted via
-[Telegram](http://telegram.me/topkecleon),
-[Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
+[topkecleon](https://telegram.me/topkecleon). A list of contributors can be
+found [here](http://github.com/topkecleon/otouto/graphs/contributors).
 
-[List of contributors.](https://github.com/topkecleon/otouto/graphs/contributors)
+If code or ideas aren't your thing, the project does accept monetary
+contributions. Bitcoin donations are accepted at the following address:
+`1BxegZJ73hPu218UrtiY8druC7LwLr82gS`.
 
-There are a a few ways to contribute if you are not a programmer. For one, your
-feedback is always appreciated. Drop me a line on Telegram or on Twitter.
-Secondly, we are always looking for new ideas for plugins. Most new plugins
-start with community input. Feel free to suggest them on Github or in the Bot
-Dev group. You can also donate Bitcoin to the following address:
-`1BxegZJ73hPu218UrtiY8druC7LwLr82gS`
-
-Contributions are appreciated in all forms. Monetary contributions will go
-toward server costs. Donators will be eternally honored (at their discretion) on
-this page.
+Here's a list of donors:
 
 | Donators (in chronological order)             |
 |:----------------------------------------------|

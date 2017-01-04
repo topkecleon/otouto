@@ -350,6 +350,25 @@ function administration:is_internal_group_link(code_thing)
     return false
 end
 
+local antisquig_triggers = {
+    utilities.char.arabic,
+    utilities.char.rtl_override,
+    utilities.char.rtl_mark,
+    utilities.char.rtl_isolate
+}
+local antisquig_name_triggers = {
+    '^'..utilities.char.braille_space,
+    utilities.char.braille_space..'$',
+    utilities.char.braille_space..utilities.char.braille_space -- because Lua doesn't have {2,}
+}
+
+local function antisquig_match(text)
+    return utilities.itable_or(utilities.imap(text:match, antisquig_triggers))
+end
+local function antisquig_name_match(text)
+    return antisquig_match(text) or utilities.itable_or(utilities.imap(text:match, antisquig_name_triggers))
+end
+
 function administration.init_command(self_)
     administration.commands = {
 
@@ -374,21 +393,11 @@ function administration.init_command(self_)
                 elseif rank == 1 then
                     local from_name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 
-                    if group.flags[2] and ( -- antisquig
-                        msg.text:match(utilities.char.arabic)
-                        or msg.text:match(utilities.char.rtl_override)
-                        or msg.text:match(utilities.char.rtl_mark)
-                    ) then
+                    if group.flags[2] and antisquig_match(msg.text) then -- antisquig
                         user.do_kick = true
                         user.reason = 'antisquig'
                         user.output = administration.flags[2].kicked:gsub('#GROUPNAME', msg.chat.title)
-                    elseif group.flags[3] and ( -- antisquig++
-                        from_name:match(utilities.char.arabic)
-                        or from_name:match(utilities.char.rtl_override)
-                        or from_name:match(utilities.char.rtl_mark)
-                        or from_name:match('^'..utilities.char.braille_space)
-                        or from_name:match(utilities.char.braille_space..'$')
-                    ) then
+                    elseif group.flags[3] and antisquig_name_match(from_name) then -- antisquig++
                         user.do_kick = true
                         user.reason = 'antisquig++'
                         user.output = administration.flags[3].kicked:gsub('#GROUPNAME', msg.chat.title)
@@ -493,11 +502,7 @@ function administration.init_command(self_)
                         new_user.reason = 'banned'
                         new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
                     elseif new_rank == 1 then
-                        if group.flags[3] and ( -- antisquig++
-                            noob_name:match(utilities.char.arabic)
-                            or noob_name:match(utilities.char.rtl_override)
-                            or noob_name:match(utilities.char.rtl_mark)
-                        ) then
+                        if group.flags[3] and antisquig_match(noob_name) then
                             new_user.do_kick = true
                             new_user.reason = 'antisquig++'
                             new_user.output = administration.flags[3].kicked:gsub('#GROUPNAME', msg.chat.title)
