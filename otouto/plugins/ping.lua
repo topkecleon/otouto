@@ -2,6 +2,8 @@
     ping.lua
     Sends a response, then updates it with the time it took to send.
 
+    I added marco/polo because a cute girl asked and I'm a sellout.
+
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -13,7 +15,7 @@ local socket = require('socket')
 local ping = {}
 
 function ping:init()
-    ping.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ping').table
+    ping.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ping'):t('marco').table
     ping.command = 'ping'
     ping.doc = self.config.cmd_pat .. [[ping
 Pong!
@@ -22,14 +24,15 @@ end
 
 function ping:action(msg)
     local a = socket.gettime()
-    local message = utilities.send_reply(msg, 'Pong!')
+    local answer = msg.text_lower:match('marco') and 'Polo!' or 'Pong!'
+    local message = utilities.send_reply(msg, answer)
     local b = socket.gettime()-a
     b = string.format('%.3f', b)
     if message then
         bindings.editMessageText{
             chat_id = msg.chat.id,
             message_id = message.result.message_id,
-            text = 'Pong!\n`' .. b .. '`',
+            text = answer .. '\n`' .. b .. '`',
             parse_mode = 'Markdown'
         }
     end
