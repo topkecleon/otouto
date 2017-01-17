@@ -368,7 +368,7 @@ No component is required, but some depend on others. For example, `action` will
 never be run if there's no `triggers`, and `doc` will never be seen if there's
 no `command`.
 
-If a plugin's `action` returns `true`, `on_msg_receive` will continue its loop.
+If a plugin's `action` returns `true`, `on_message` will continue its loop.
 
 When an action or cron function fails, the exception is caught and passed to the
 `handle_exception` utilty and is either printed to the console or send to the
@@ -547,8 +547,7 @@ and desirable.
 ## Contributors
 Everybody is free to contribute to otouto. The most direct way of doing this is
 to fork and start making pull requests. If you have an idea and are not sure how
-to implement it, open an issue or bring it up in the
-[otouto Meta group](https://telegram.me/oumeta).
+to implement it, feel free to open an issue.
 
 The creator and maintainer of otouto is
 [topkecleon](https://telegram.me/topkecleon). A list of contributors can be

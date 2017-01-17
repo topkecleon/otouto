@@ -44,7 +44,7 @@ function wait:cron()
     for k, msg in pairs(self.database.wait) do
         if msg.date < now then
             msg.date = os.time()
-            bot.on_msg_receive(self, msg)
+            bot.on_message(self, msg)
             self.database.wait[k] = nil
         end
     end

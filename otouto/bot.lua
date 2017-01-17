@@ -10,7 +10,7 @@ local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
 
-bot.version = '3.15'
+bot.version = '3.15.3'
 
  -- Function to be run on start and reload.
 function bot:init()
@@ -64,7 +64,7 @@ function bot:init()
 end
 
  -- Function to be run on each new message.
-function bot:on_msg_receive(msg)
+function bot:on_message(msg)
 
     -- Do not process old messages.
     if msg.date < os.time() - 5 then return end
@@ -112,14 +112,16 @@ function bot:run()
     bot.init(self)
     while self.is_started do
         -- Update loop.
-        local res = bindings.getUpdates{timeout = 20, offset = self.last_update + 1}
+        local res = bindings.getUpdates{
+            timeout = 20,
+            offset = self.last_update + 1,
+            allowed_updates = '["message"]'
+        }
         if res then
             -- Iterate over every new message.
             for _,v in ipairs(res.result) do
                 self.last_update = v.update_id
-                if v.message then
-                    bot.on_msg_receive(self, v.message)
-                end
+                bot.on_message(self, v.message)
             end
         else
             print('[' .. os.date('%F %T') .. '] Connection error while fetching updates.')

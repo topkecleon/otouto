@@ -1,5 +1,5 @@
 --[[
-    administration.lua, version 1.15.2
+    administration.lua, version 1.15.3
     This plugin provides self-hosted, single-realm group administration.
     It requires tg (http://github.com/vysheng/tg) with supergroup support.
     For more documentation, read the the manual (otou.to/rtfm).
@@ -62,6 +62,29 @@ function administration:init()
 
     if not self.config.administration.log_chat then
         self.config.administration.log_chat = self.config.log_chat
+    end
+
+    -- Prepare the patterns for antilink.
+    administration.invite_link_patterns = {}
+    for _, domain in pairs{ -- all known invite link domains
+        'telegram.me',
+        'telegram.dog',
+        'tlgrm.me',
+        't.me'
+    } do
+        local s = ''
+        for char in domain:gmatch('.') do
+            if char:match('%l') then
+                s = s .. '[' .. char:upper() .. char .. ']'
+            elseif char:match('[%%%.%^%$%+%-%*%?]') then
+                s = s .. '%' .. char
+            else
+                s = s .. char
+            end
+        end
+        -- /joinchat/ABC-123_DEF456
+        s = s .. '/[Jj][Oo][Ii][Nn][Cc][Hh][Aa][Tt]/([%w_%-]+)'
+        table.insert(administration.invite_link_patterns, s)
     end
 end
 
@@ -350,23 +373,25 @@ function administration:is_internal_group_link(code_thing)
     return false
 end
 
-local antisquig_triggers = {
-    utilities.char.arabic,
-    utilities.char.rtl_override,
-    utilities.char.rtl_mark,
-    utilities.char.rtl_isolate
-}
-local antisquig_name_triggers = {
-    '^'..utilities.char.braille_space,
-    utilities.char.braille_space..'$',
-    utilities.char.braille_space..utilities.char.braille_space -- because Lua doesn't have {2,}
-}
-
-local function antisquig_match(text)
-    return utilities.itable_or(utilities.imap(text:match, antisquig_triggers))
-end
-local function antisquig_name_match(text)
-    return antisquig_match(text) or utilities.itable_or(utilities.imap(text:match, antisquig_name_triggers))
+ -- Determine if the given message contains an external group link.
+function administration:antilink(msg)
+    for _, pattern in pairs(administration.invite_link_patterns) do
+        for code_thing in msg.text:gmatch(pattern) do
+            if not administration.is_internal_group_link(self, code_thing) then
+                return true
+            end
+        end
+        if msg.entities then
+            for _, entity in ipairs(msg.entities) do
+                if entity.url then
+                    local code_thing = entity.url:match(pattern)
+                    if code_thing and not administration.is_internal_group_link(self, code_thing) then
+                        return true
+                    end
+                end
+            end
+        end
+    end
 end
 
 function administration.init_command(self_)
@@ -393,11 +418,21 @@ function administration.init_command(self_)
                 elseif rank == 1 then
                     local from_name = utilities.build_name(msg.from.first_name, msg.from.last_name)
 
-                    if group.flags[2] and antisquig_match(msg.text) then -- antisquig
+                    if group.flags[2] and ( -- antisquig
+                        msg.text:match(utilities.char.arabic)
+                        or msg.text:match(utilities.char.rtl_override)
+                        or msg.text:match(utilities.char.rtl_mark)
+                    ) then
                         user.do_kick = true
                         user.reason = 'antisquig'
                         user.output = administration.flags[2].kicked:gsub('#GROUPNAME', msg.chat.title)
-                    elseif group.flags[3] and antisquig_name_match(from_name) then -- antisquig++
+                    elseif group.flags[3] and ( -- antisquig++
+                        from_name:match(utilities.char.arabic)
+                        or from_name:match(utilities.char.rtl_override)
+                        or from_name:match(utilities.char.rtl_mark)
+                        or from_name:match('^'..utilities.char.braille_space)
+                        or from_name:match(utilities.char.braille_space..'$')
+                    ) then
                         user.do_kick = true
                         user.reason = 'antisquig++'
                         user.output = administration.flags[3].kicked:gsub('#GROUPNAME', msg.chat.title)
@@ -443,29 +478,14 @@ function administration.init_command(self_)
                     end
 
                     -- antilink
-                    if group.flags[8] and not (msg.forward_from and msg.forward_from.id == self.info.id) then
-                       for code_thing in msg.text:gmatch('[tT][eE]?[lL][eE]?[gG][rR][aA]?[mM]%.[mMdD][eEoO][gG]?/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)') do
-                            if not administration.is_internal_group_link(self, code_thing) then
-                                user.do_kick = true
-                                user.reason = 'antilink'
-                                user.output = administration.flags[8].kicked:gsub('#GROUPNAME', msg.chat.title)
-                                break
-                            end
-                        end
-                        if msg.entities then
-                            for _, entity in ipairs(msg.entities) do
-                                if entity.url then
-                                    local code_thing = entity.url:match('[tT][eE]?[lL][eE]?[gG][rR][aA]?[mM]%.[mMdD][eEoO][gG]?/[jJ][oO][iI][nN][cC][hH][aA][tT]/([%w_%-]+)')
-                                    if code_thing then
-                                        if not administration.is_internal_group_link(self, code_thing) then
-                                            user.do_kick = true
-                                            user.reason = 'antilink'
-                                            user.output = administration.flags[8].kicked:gsub('#GROUPNAME', msg.chat.title)
-                                        end
-                                    end
-                                end
-                            end
-                        end
+                    if (
+                        group.flags[8]
+                        and not (msg.forward_from and msg.forward_from.id == self.info.id)
+                        and administration.antilink(self, msg)
+                    ) then
+                        user.do_kick = true
+                        user.reason = 'antilink'
+                        user.output = administration.flags[8].kicked:gsub('#GROUPNAME', msg.chat.title)
                     end
 
                     -- filter
@@ -502,7 +522,11 @@ function administration.init_command(self_)
                         new_user.reason = 'banned'
                         new_user.output = 'Sorry, you are banned from ' .. msg.chat.title .. '.'
                     elseif new_rank == 1 then
-                        if group.flags[3] and antisquig_match(noob_name) then
+                        if group.flags[3] and ( -- antisquig++
+                            noob_name:match(utilities.char.arabic)
+                            or noob_name:match(utilities.char.rtl_override)
+                            or noob_name:match(utilities.char.rtl_mark)
+                        ) then
                             new_user.do_kick = true
                             new_user.reason = 'antisquig++'
                             new_user.output = administration.flags[3].kicked:gsub('#GROUPNAME', msg.chat.title)
