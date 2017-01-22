@@ -489,12 +489,21 @@ function administration.init_command(self_)
                     end
 
                     -- filter
-                    for i = 1, #group.filter do
-                        if msg.text_lower:match(group.filter[i]) then
-                            user.do_kick = true
-                            user.reason = 'filter (' .. group.filter[i] .. ')'
-                            user.output = 'You were automatically kicked from ' .. msg.chat.title .. ' for using a filtered term: ' .. group.filter[i]
-                            break
+                    if not ( -- Someone got autorekt for forwarding a kick log.
+                        msg.forward_from
+                        and (
+                            msg.forward_from.id == self.info.id
+                            or msg.forward_from.id == self.config.administration.log_chat
+                            or msg.forward_from.id == self.config.log_chat
+                        )
+                    ) then
+                        for i = 1, #group.filter do
+                            if msg.text_lower:match(group.filter[i]) then
+                                user.do_kick = true
+                                user.reason = 'filter (' .. group.filter[i] .. ')'
+                                user.output = 'You were automatically kicked from ' .. msg.chat.title .. ' for using a filtered term: ' .. group.filter[i]
+                                break
+                            end
                         end
                     end
 
