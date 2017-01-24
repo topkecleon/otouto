@@ -15,7 +15,7 @@ local socket = require('socket')
 local ping = {}
 
 function ping:init()
-    ping.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ping'):t('marco').table
+    ping.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ping'):t('marco'):t('annyong').table
     ping.command = 'ping'
     ping.doc = self.config.cmd_pat .. [[ping
 Pong!
@@ -24,7 +24,7 @@ end
 
 function ping:action(msg)
     local a = socket.gettime()
-    local answer = msg.text_lower:match('marco') and 'Polo!' or 'Pong!'
+    local answer = msg.text_lower:match('ping') and 'Pong!' or (msg.text_lower:match('marco') and 'Marco!' or 'Annyong.')
     local message = utilities.send_reply(msg, answer)
     local b = socket.gettime()-a
     b = string.format('%.3f', b)
