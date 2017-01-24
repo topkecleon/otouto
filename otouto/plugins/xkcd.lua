@@ -6,7 +6,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local HTTP = require('socket.http')
+local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
@@ -15,11 +15,11 @@ local xkcd = {}
 function xkcd:init()
     xkcd.command = 'xkcd [i]'
     xkcd.base_url = 'https://xkcd.com/info.0.json'
-    xkcd.strip_url = 'http://xkcd.com/%s/info.0.json'
+    xkcd.strip_url = 'https://xkcd.com/%s/info.0.json'
     xkcd.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('xkcd', true).table
     xkcd.doc = self.config.cmd_pat .. [[xkcd [i]
 Returns the latest xkcd strip and its alt text. If a number is given, returns that number strip. If "r" is passed in place of a number, returns a random strip.]]
-    local jstr = HTTP.request(xkcd.base_url)
+    local jstr = HTTPS.request(xkcd.base_url)
     if jstr then
         local data = JSON.decode(jstr)
         if data then
@@ -39,7 +39,7 @@ function xkcd:action(msg)
         input = xkcd.latest
     end
     local url = xkcd.strip_url:format(input)
-    local jstr, code = HTTP.request(url)
+    local jstr, code = HTTPS.request(url)
     if code == 404 then
         utilities.send_reply(msg, self.config.errors.results)
     elseif code ~= 200 then
