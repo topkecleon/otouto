@@ -18,11 +18,13 @@ local feedparser = require('feedparser')
 
 local hn = {}
 
-hn.feed_url = 'https://news.ycombinator.com/rss'
-
 function hn:init()
     assert(not self.named_plugins.hackernews)
+    hn.feed_url = 'https://news.ycombinator.com/rss'
     hn.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('hackernews', true):t('hn', true).table
+    hn.command = 'hackernews'
+    hn.doc = [[Returns a list of top stories from Hacker News.
+Alias: ]] .. self.config.cmd_pat .. 'hn'
 end
 
 function hn:action(msg)

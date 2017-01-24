@@ -3,6 +3,7 @@
     Sends a response, then updates it with the time it took to send.
 
     I added marco/polo because a cute girl asked and I'm a sellout.
+    Brayden is not a cute girl, but he bought me a book.
 
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
