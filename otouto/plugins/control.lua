@@ -27,6 +27,13 @@ function control:init()
     cmd_pat = self.config.cmd_pat
     control.triggers = utilities.triggers(self.info.username, cmd_pat,
         {'^'..cmd_pat..'do'}):t('reload', true):t('halt').table
+
+    self.database.control = self.database.control or {}
+    -- Ability to send the bot owner a message after a successful restart.
+    if self.database.control.on_start then
+        utilities.send_message(self.database.control.on_start.id, self.database.control.on_start.text)
+        self.database.control.on_start = nil
+    end
 end
 
 function control:action(msg)
@@ -52,11 +59,18 @@ function control:action(msg)
                 self.config[k] = v
             end
         end
+        self.database.control.on_start = {
+            id = msg.chat.id,
+            text = 'Bot reloaded!'
+        }
         bot.init(self)
-        utilities.send_reply(msg, 'Bot reloaded!')
     elseif msg.text_lower:match('^'..cmd_pat..'halt') then
         self.is_started = false
         utilities.send_reply(msg, 'Stopping bot!')
+        self.database.control.on_start = {
+            id = msg.chat.id,
+            text = 'Bot started!'
+        }
     elseif msg.text_lower:match('^'..cmd_pat..'do') then
         local input = msg.text_lower:match('^'..cmd_pat..'do\n(.+)')
         if not input then
