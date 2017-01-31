@@ -264,7 +264,7 @@ ranks.
 | 6 | antihammer  | Allows globally-banned users to enter a group.                                   |
 | 7 | nokicklog   | Prevents kick and ban notifications from appearing in the designated kick log.   |
 | 8 | antilink    | Automatically removes users for posting external group links.                    |
-| 9 | modrights   | Allows moderators to set a grouo's title, photo, motd, and link.                 |
+| 9 | modrights   | Allows moderators to set a group's title, photo, motd, and link.                 |
 
 #### antiflood
 antiflood (flag 5) provides a system of automatic flood protection by removing
