@@ -408,7 +408,7 @@ bindings.request(
         text = 'Quick brown fox.',
         reply_to_message_id = 54321,
         disable_web_page_preview = false,
-        parse_method = 'Markdown'
+        parse_mode = 'Markdown'
     }
 )
 
@@ -417,7 +417,7 @@ bindings.sendMessage{
     text = 'Quick brown fox.',
     reply_to_message_id = 54321,
     disable_web_page_preview = false,
-    parse_method = 'Markdown'
+    parse_mode = 'Markdown'
 }
 ```
 
