@@ -430,12 +430,12 @@ function administration.init_command(self_)
                         from_name:match(utilities.char.arabic)
                         or from_name:match(utilities.char.rtl_override)
                         or from_name:match(utilities.char.rtl_mark)
-                        or from_name:match('^'..utilities.char.braille_space)
-                        or from_name:match(utilities.char.braille_space..'$')
-                        or from_name:match('^'..utilities.char.invisible_separator)
-                        or from_name:match(utilities.char.invisible_separator..'$')
-                        or from_name:match('^'..utilities.char.zwnj)
-                        or from_name:match(utilities.char.zwnj..'$')
+                        -- excessive space detection
+                        or from_name:match('[ '..
+                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..'][ '
+                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
+                        or from_name:match('^['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
+                        or from_name:match('['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']$')
                     ) then
                         user.do_kick = true
                         user.reason = 'antisquig++'
