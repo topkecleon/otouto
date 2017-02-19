@@ -432,7 +432,7 @@ function administration.init_command(self_)
                         or from_name:match(utilities.char.rtl_mark)
                         -- excessive space detection
                         or from_name:match('[ '..
-                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..'][ '
+                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..'][ '..
                             utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
                         or from_name:match('^['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
                         or from_name:match('['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']$')
