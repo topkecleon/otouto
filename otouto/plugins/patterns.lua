@@ -3,7 +3,7 @@
     Sed-like substitution using Lua patterns. Ignores commands with no reply-to
     message.
 
-    Copyright 2016 topkecleon <drew@otou.to>
+    Copyright 2017 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
@@ -21,23 +21,30 @@ Uses Lua patterns.]]
 end
 
 function patterns:action(msg)
+    -- Return if there is no message to change.
     if not msg.reply_to_message then return true end
-    local output = msg.reply_to_message.text
+
+    local input = msg.reply_to_message.text
     if msg.reply_to_message.from.id == self.info.id then
-        output = output:match('^Did you mean:\n"(.+)"$') or output
+        input = input:match('^Did you mean:\n"(.+)"$') or input
     end
-    local m1, m2 = msg.text:match('^/?s/(.-)/(.-)/?$')
-    if not m2 then return true end
-    local res
-    res, output = pcall(
-        function()
-            return output:gsub(m1, m2)
-        end
+
+    local pattern, substitution = -- Assuming config.cmd_pat is only one char.
+        msg.text:match('^' .. self.config.cmd_pat .. '?s/(.-)/(.-)/?$')
+
+    -- Return if there is no pattern or substitution.
+    if not substitution then return true end
+
+    local success, result = pcall(
+        function() return { input:gsub(pattern, substitution) } end
     )
-    if res == false then
+
+    if success == false then -- Error occurred; probably a bad pattern.
         utilities.send_reply(msg, 'Malformed pattern!')
-    else
-        output = utilities.trim(output:sub(1, 4000))
+    elseif result[2] == 0 then -- No substitutions occurred.
+        return
+    else -- Success.
+        local output = utilities.trim(result[1]:sub(1, 4000))
         output = '<b>Did you mean:</b>\n"' .. utilities.html_escape(output) .. '"'
         utilities.send_reply(msg.reply_to_message, output, 'html')
     end

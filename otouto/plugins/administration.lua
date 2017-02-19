@@ -9,7 +9,7 @@
     this plugin will host its own instance of users.lua which will only store
     info for users in its groups.
 
-    Copyright 2016 topkecleon <drew@otou.to>
+    Copyright 2017 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
