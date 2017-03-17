@@ -40,7 +40,7 @@ function wikipedia:action(msg)
     end
 
     local data = JSON.decode(jstr)
-    if data.query.searchinfo.totalhits == 0 then
+    if not data.query or data.query.searchinfo.totalhits == 0 then
         utilities.send_reply(msg, self.config.errors.results)
         return
     end

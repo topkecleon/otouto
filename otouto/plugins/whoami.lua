@@ -3,65 +3,83 @@
     Returns the user's or replied-to user's display name, username, and ID, in
     addition to the group's display name, username, and ID.
 
-    Copyright 2016 topkecleon <drew@otou.to>
+    Copyright 2017 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
 local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
 
-local whoami = {}
+local who = {}
 
-function whoami:init()
-    whoami.command = 'whoami'
-    whoami.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('who'):t('whoami').table
-    whoami.doc = [[
-Returns user and chat info for you or the replied-to message.
-Alias: ]] .. self.config.cmd_pat .. 'who'
+function who:init()
+    who.command = 'who'
+    who.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+        :t('who'):t('whoami').table
+    who.doc = 'Returns user and chat info for you or the replied-to message.'
 end
 
-function whoami:action(msg)
-    -- Operate on the replied-to message, if it exists.
+function who.format_id(id)
+    id = math.abs(id)
+    if id > 1000000000000 then id = id - 1000000000000 end
+    return id
+end
+
+function who.format_name(user)
+    if type(user) == 'string' then
+        return 'a channel <code>[' .. who.format_id(user) .. ']</code>'
+    end
+    local name = user.title or utilities.html_escape(utilities.build_name(
+        user.first_name, user.last_name
+    ))
+    local id = who.format_id(user.id)
+    if user.username then
+        return string.format(
+            '<b>%s</b> (@%s) <code>[%s]</code>',
+            name,
+            user.username,
+            id
+        )
+    else
+        return string.format(
+            '<b>%s</b> <code>[%s]</code>',
+            name,
+            id
+        )
+    end
+end
+
+function who:action(msg)
+    -- Operate on the replied-to message, if there is one.
     msg = msg.reply_to_message or msg
     -- If it's a private conversation, bot is chat, unless bot is from.
-    local chat = msg.from.id == msg.chat.id and self.info or msg.chat
-    -- Names for the user and group, respectively. HTML-escaped.
-    local from_name = utilities.html_escape(
-        utilities.build_name(
-            msg.from.first_name,
-            msg.from.last_name
+    local chat = (msg.from.id == msg.chat.id) and self.info or msg.chat
+    local output
+    if msg.new_chat_member or msg.left_chat_member then
+        local thing = msg.new_chat_member or msg.left_chat_member
+        output = string.format(
+            '%s %s %s %s %s.',
+            who.format_name(msg.from),
+            msg.new_chat_member and 'added' or 'removed',
+            who.format_name(thing),
+            msg.new_chat_member and 'to' or 'from',
+            who.format_name(chat)
         )
-    )
-    local chat_name = utilities.html_escape(
-        chat.title
-        or utilities.build_name(chat.first_name, chat.last_name)
-    )
-    -- "Normalize" a group ID so it's not arbitrarily modified by the bot API.
-    local chat_id = math.abs(chat.id)
-    if chat_id > 1000000000000 then chat_id = chat_id - 1000000000000 end
-    -- Do the thing.
-    local output = string.format(
-        'You are %s <code>[%s]</code>, and you are messaging %s <code>[%s]</code>.',
-        msg.from.username and string.format(
-            '@%s, also known as <b>%s</b>',
-            msg.from.username,
-            from_name
-        ) or '<b>' .. from_name .. '</b>',
-        msg.from.id,
-        msg.chat.username and string.format(
-            '@%s, also known as <b>%s</b>',
-            chat.username,
-            chat_name
-        ) or '<b>' .. chat_name .. '</b>',
-        chat_id
-    )
-    bindings.sendMessage{
-        chat_id = msg.chat.id,
-        reply_to_message_id = msg.message_id,
-        disable_web_page_preview = true,
-        parse_mode = 'HTML',
-        text = output
-    }
+    --elseif msg.forward_from and msg.forward_from_chat then
+        --output = string.format(
+            --'%s forwarded a message sent by %s to %s to %s.',
+            --who.format_name(msg.from),
+            --who.format_name(msg.forward_from),
+            --who.format_name(msg.forward_from_chat),
+            --who.format_name(chat)
+        --)
+    else
+        output = string.format(
+            'You are %s, and you are messaging %s.',
+            who.format_name(msg.from),
+            who.format_name(chat)
+        )
+    end
+    utilities.send_message(msg.chat.id, output, true, msg.message_id, 'html')
 end
 
-return whoami
+return who
