@@ -1,7 +1,7 @@
  -- For details on configuration values, see README.md#configuration.
 return {
 
-    -- Your authorization token from the botfather.
+    -- Your authorization token from the botfather. (string, put quotes)
     bot_api_key = nil,
     -- Your Telegram ID (number).
     admin = nil,
