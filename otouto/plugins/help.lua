@@ -46,7 +46,7 @@ function help:action(msg)
         -- If msg is from a group, tell the group whether the PM was successful.
         local res = utilities.send_message(msg.from.id, help.text, true, nil, 'html')
         if not res then
-            utilities.send_reply(msg, 'Please <a href="http://telegram.me/' .. self.info.username .. '?start=%2fhelp">message me privately</a> for a list of commands.', 'html')
+            utilities.send_reply(msg, 'Please <a href="http://t.me/' .. self.info.username .. '?start=help">message me privately</a> for a list of commands.', 'html')
         elseif msg.chat.type ~= 'private' then
             utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
         end

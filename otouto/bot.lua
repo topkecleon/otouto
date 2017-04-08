@@ -10,7 +10,7 @@ local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
 
-bot.version = '3.15.3'
+bot.version = '3.15.4'
 
  -- Function to be run on start and reload.
 function bot:init()
@@ -76,7 +76,12 @@ function bot:on_message(msg)
     end
 
     -- Support deep linking.
-    msg.text = msg.text:match('^/start (.+)$') or msg.text
+    local payload = msg.text:match('^/start (.+)$')
+    if payload then
+        msg.text = self.config.cmd_pat .. payload
+        print('payload', msg.text)
+    end
+
     msg.text_lower = msg.text:lower()
 
     -- Do the thing.

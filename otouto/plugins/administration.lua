@@ -1,5 +1,5 @@
 --[[
-    administration.lua, version 1.15.3
+    administration.lua, version 1.15.4
     This plugin provides self-hosted, single-realm group administration.
     It requires tg (http://github.com/vysheng/tg) with supergroup support.
     For more documentation, read the the manual (otou.to/rtfm).
@@ -430,12 +430,6 @@ function administration.init_command(self_)
                         from_name:match(utilities.char.arabic)
                         or from_name:match(utilities.char.rtl_override)
                         or from_name:match(utilities.char.rtl_mark)
-                        -- excessive space detection
-                        or from_name:match('[ '..
-                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..'][ '..
-                            utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
-                        or from_name:match('^['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']')
-                        or from_name:match('['..utilities.char.braille_space..utilities.char.invisible_separator..utilities.char.zwnj..']$')
                     ) then
                         user.do_kick = true
                         user.reason = 'antisquig++'
@@ -670,7 +664,8 @@ function administration.init_command(self_)
         },
 
         { -- /ahelp
-            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):t('ahelp', true).table,
+            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat)
+                :t('ahelp', true):t('ahelp_%-%d+_%d+').table,
 
             command = 'ahelp \\[command]',
             privilege = 1,
@@ -678,7 +673,6 @@ function administration.init_command(self_)
             doc = 'Returns a list of realm-related commands for your rank (in a private message), or command-specific help.',
 
             action = function(self, msg, group)
-                local rank = administration.get_rank(self, msg.from.id, msg.chat.id)
                 local input = utilities.get_word(msg.text_lower, 2)
                 if input then
                     input = input:gsub('^'..self.config.cmd_pat..'', '')
@@ -697,6 +691,9 @@ function administration.init_command(self_)
                         utilities.send_reply(msg, output)
                     end
                 else
+                    local chat_id, user_id = msg.text_lower:match('^'..self.config.cmd_pat..'ahelp_(%-%d+)_(%d+)$')
+                    chat_id, user_id = chat_id or msg.chat.id, user_id or msg.from.id
+                    local rank = administration.get_rank(self, user_id, chat_id)
                     local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
                     for i = 1, rank do
                         for _, val in ipairs(administration.temp.help[i]) do
@@ -709,6 +706,8 @@ function administration.init_command(self_)
                             utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
                         end
                     else
+                        local link = 'http://t.me/' .. self.info.username .. '?start=ahelp_' .. msg.chat.id .. '_' .. msg.from.id
+                        output = 'Please [message me privately](' .. link .. ') for the requested information.'
                         utilities.send_message(msg.chat.id, output, true, nil, true)
                     end
                 end
@@ -749,7 +748,7 @@ function administration.init_command(self_)
         },
 
         { -- /desc
-            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):t('desc', true):t('description', true).table,
+            triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat):   t('desc', true):t('description', true):t('desc_%-%d+').table,
 
             command = 'description',
             privilege = 1,
@@ -768,6 +767,8 @@ function administration.init_command(self_)
                             end
                         end
                     end
+                else
+                    chat = msg.text_lower:match('^'..self.config.cmd_pat..'desc_(%-%d+)$') or chat
                 end
                 if not chat then
                     utilities.send_reply(msg, 'Group not found. Specify a group by name or ID, or use this command without arguments inside an administrated group.')
@@ -779,6 +780,8 @@ function administration.init_command(self_)
                         utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
                     end
                 else
+                    local link = 'http://t.me/' .. self.info.username .. '?start=desc_' .. chat
+                    output = 'Please [message me privately](' .. link .. ') for the requested information.'
                     utilities.send_message(msg.chat.id, output, true, nil, true)
                 end
             end
