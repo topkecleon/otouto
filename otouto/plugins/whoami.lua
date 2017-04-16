@@ -18,20 +18,13 @@ function who:init()
     who.doc = 'Returns user and chat info for you or the replied-to message.'
 end
 
-function who.format_id(id)
-    id = math.abs(id)
-    if id > 1000000000000 then id = id - 1000000000000 end
-    return id
-end
-
 function who.format_name(user)
     if type(user) == 'string' then
-        return 'a channel <code>[' .. who.format_id(user) .. ']</code>'
+        return 'a channel <code>[' .. utilities.normalize_id(user) .. ']</code>'
     end
-    local name = user.title or utilities.html_escape(utilities.build_name(
-        user.first_name, user.last_name
-    ))
-    local id = who.format_id(user.id)
+    local name = user.title and utilities.html_escape(user.title) or utilities.
+        html_escape(utilities.build_name(user.first_name, user.last_name))
+    local id = utilities.normalize_id(user.id)
     if user.username then
         return string.format(
             '<b>%s</b> (@%s) <code>[%s]</code>',
