@@ -1,8 +1,8 @@
 --[[
-    google_translate.lua
-    A plugin for the Google translate API.
+    translate.lua
+    Returns an attempted translation of input.
 
-    Uses config.lang for the output language, unless specified.
+    Uses config.lang for the output language.
 
     Copyright 2017 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
@@ -17,21 +17,21 @@ local utilities = require('otouto.utilities')
 local tl = {}
 
 function tl:init()
-    assert(self.config.google_api_key,
-        'google_translate.lua requires a Google API key.')
+    assert(self.config.yandex_key,
+        'yandex_translate.lua requires a Yandex translate API key.')
 
     tl.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
-        :t('g?translate', true):t('g?tl', true).table
-    tl.command = 'gtranslate <text>'
+        :t('y?translate', true):t('y?tl', true).table
+    tl.command = 'ytranslate <text>'
     tl.doc = self.config.cmd_pat .. [[translate [lang \n] <text>
 ]] .. self.config.cmd_pat .. [[translate [lang] (in reply)
 Translates input or the replied-to message into the bot's default language.
 In non-reply commands, $text follows a line break after the command and language code.
-Translation service provided by Google.
-Aliases: /gtranslate, /tl, /gtl.]]
- -- "gtl" = "good translate"
-    tl.url = 'https://translation.googleapis.com/language/translate/v2?key=' ..
-        self.config.google_api_key .. '&format=text&target=%s&q=%s'
+Translation service provided by Yandex.
+Aliases: /ytranslate, /tl, /ytl.]]
+ -- "ytl" = "yucky translate"
+    tl.url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?key='
+        .. self.config.yandex_key .. '&lang=%s&text=%s'
 end
 
 function tl:action(msg)
@@ -62,15 +62,15 @@ function tl:action(msg)
     end
 
     local data = dkjson.decode(result)
-    if not data.data.translations[1] then
+    if data.code ~= 200 then
         utilities.send_reply(msg, self.config.errors.results)
         return
     end
 
     local output = string.format('<b>%s → %s:</b>\n%s',
-        data.data.translations[1].detectedSourceLanguage:upper(),
+        data.lang:match('^..'):upper(),
         lang:upper(),
-        utilities.html_escape(data.data.translations[1].translatedText)
+        utilities.html_escape(data.text[1])
     )
     utilities.send_reply(msg.reply_to_message or msg, output, 'html')
 end
