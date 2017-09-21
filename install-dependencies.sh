@@ -3,17 +3,17 @@
 
 #!/bin/sh
 
+rocklist="dkjson lpeg lrexlib-pcre luasec luasocket multipart-post"
 if [ $(lsb_release -r | cut -f 2) == "16.04" ]; then
     luaver="5.3"
-    rocklist="luasocket luasec multipart-post lpeg dkjson"
 else
     luaver="5.2"
-    rocklist="luasocket luasec multipart-post lpeg dkjson luautf8"
+    rocklist="$rocklist luautf8"
 fi
 
 echo "This script is intended for Ubuntu. It may work in Debian."
 echo "This script will request root privileges to install the following packages:"
-echo "lua$luaver liblua$luaver-dev git libssl-dev fortune-mod fortunes unzip make"
+echo "lua$luaver liblua$luaver-dev fortune-mod fortunes git libc6 libpcre3-dev libssl-dev make unzip"
 echo "It will also request root privileges to install Luarocks to /usr/local/"
 echo "along with the following rocks:"
 echo $rocklist
@@ -21,7 +21,7 @@ echo "Press enter to continue. Use Ctrl-C to exit."
 read
 
 sudo apt-get update
-sudo apt-get install -y lua$luaver liblua$luaver-dev git libssl-dev fortune-mod fortunes unzip make
+sudo apt-get install -y lua$luaver liblua$luaver-dev fortune-mod fortunes git libc6 libpcre3-dev libssl-dev make unzip
 git clone http://github.com/keplerproject/luarocks
 cd luarocks
 ./configure --lua-version=$luaver --versioned-rocks-dir --lua-suffix=$luaver
