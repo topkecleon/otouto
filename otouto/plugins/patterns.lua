@@ -12,12 +12,12 @@ local patterns = {}
 local utilities = require('otouto.utilities')
 
 function patterns:init()
-    patterns.command = 's/<pattern>/<substitution>'
+    patterns.command = 'gsub/<pattern>/<substitution>'
     patterns.help_word = 'patterns'
-    patterns.doc = [[s/<pattern>/<substitution>
+    patterns.doc = [[gsub/<pattern>/<substitution>
 Replace all matches for the given pattern.
 Uses Lua patterns.]]
-    patterns.triggers = { self.config.cmd_pat .. '?s/.-/.-$' }
+    patterns.triggers = { self.config.cmd_pat .. '?gsub/.-/.-$' }
 end
 
 function patterns:action(msg)
@@ -30,7 +30,7 @@ function patterns:action(msg)
     end
 
     local pattern, substitution = -- Assuming config.cmd_pat is only one char.
-        msg.text:match('^' .. self.config.cmd_pat .. '?s/(.-)/(.-)/?$')
+        msg.text:match('^' .. self.config.cmd_pat .. '?gsub/(.-)/(.-)/?$')
 
     -- Return if there is no pattern or substitution.
     if not substitution then return true end
