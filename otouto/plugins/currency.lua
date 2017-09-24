@@ -34,7 +34,7 @@ function currency:action(msg)
     amount = tonumber(amount) or 1
     local result = 1
 
-    local url = 'https://www.google.com/finance/converter'
+    local url = 'https://finance.google.com/finance/converter'
 
     if from ~= to then
 
