@@ -52,7 +52,7 @@ function regex:action(msg)
 
     local input = msg.reply_to_message.text
     if msg.reply_to_message.from.id == self.info.id then
-        input = input:match('^Did you mean:\n"(.+)"?$') or input
+        input = input:match('^Did you mean:\n"(.+)"%?$') or input
     end
 
     -- self.config.cmd_pat has to be one byte for this to work
