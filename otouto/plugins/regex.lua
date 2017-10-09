@@ -95,7 +95,7 @@ function regex:action(msg)
         return
     else -- Success.
         local output = utilities.trim(result:sub(1, 4000))
-        output = '<b>Did you mean:</b>\n"' .. utilities.html_escape(output) .. '"'
+        output = '<b>Did you mean:</b>\n"' .. utilities.html_escape(output) .. '"?'
         utilities.send_reply(msg.reply_to_message, output, 'html')
     end
 end
