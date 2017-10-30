@@ -25,7 +25,7 @@
 
 local utilities = require('otouto.utilities')
 
-local pgc = {}
+local pgc = {name = 'pgc'}
 
 function pgc:init()
     pgc.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('gocalc', true).table

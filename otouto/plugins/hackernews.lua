@@ -11,7 +11,7 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-local hackernews = {}
+local hackernews = {name = 'hackernews'}
 
 local function get_hackernews_results(count)
     local results = {}

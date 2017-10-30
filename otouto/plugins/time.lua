@@ -10,7 +10,7 @@ local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local time = {}
+local time = {name = 'time'}
 
 function time:init()
     time.command = 'time <location>'

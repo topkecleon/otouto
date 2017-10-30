@@ -13,7 +13,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local wikipedia = {}
+local wikipedia = {name = 'wikipedia'}
 
 function wikipedia:init()
     wikipedia.command = 'wikipedia <query>'

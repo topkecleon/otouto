@@ -9,7 +9,7 @@
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local location = {}
+local location = {name = 'location'}
 
 function location:init()
     location.command = 'location <query>'

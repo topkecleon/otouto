@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local remind = {}
+local remind = {name = 'remind'}
 
 function remind:init()
     self.database.remind = self.database.remind or {}

@@ -165,6 +165,7 @@ Send /help to get started.
         'users',
         'end_forwards',
         'blacklist',
+        'disable_plugins',
         'about',
         'calc',
         'cats',

@@ -9,7 +9,7 @@
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-local currency = {}
+local currency = {name = 'currency'}
 
 function currency:init()
     currency.command = 'cash [amount] <from> to <to>'

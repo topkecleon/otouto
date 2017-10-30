@@ -13,7 +13,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local translate = {}
+local translate = {name = 'translate'}
 
 function translate:init()
     assert(

@@ -15,7 +15,7 @@ local https = require('ssl.https')
 local ltn12 = require('ltn12')
 local utilities = require('otouto.utilities')
 
-local bing = {}
+local bing = {name = 'bing'}
 
 function bing:init()
     assert(

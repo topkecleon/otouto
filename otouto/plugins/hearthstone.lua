@@ -10,7 +10,7 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local HTTPS = require('ssl.https')
 
-local hearthstone = {}
+local hearthstone = {name = 'hearthstone'}
 
 function hearthstone:init()
     hearthstone.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('hearthstone', true):t('hs').table

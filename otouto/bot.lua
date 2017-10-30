@@ -39,6 +39,8 @@ function bot:init()
     -- Database table to store user-specific information, such as nicknames or
     -- API usernames.
     self.database.userdata = self.database.userdata or {}
+    -- Database table to store disabled plugins for chats.
+    self.database.disabled_plugins = self.database.disabled_plugins or {}
 
     self.plugins = {}
     self.named_plugins = {}
@@ -84,28 +86,33 @@ function bot:on_message(msg)
 
     msg.text_lower = msg.text:lower()
 
+    local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
+
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        for _, trigger in ipairs(plugin.triggers) do
-            if string.match(msg.text_lower, trigger) then
-                local success, result = pcall(function()
-                    return plugin.action(self, msg)
-                end)
+        if not (disabled_plugins and disabled_plugins[plugin.name]) then
+            for _, trigger in ipairs(plugin.triggers) do
+                if string.match(msg.text_lower, trigger) then
+                    local success, result = pcall(function()
+                        return plugin.action(self, msg)
+                    end)
 
-                if not success then
-                    -- If the plugin has an error message, send it. If it does
-                    -- not, use the generic one specified in config. If it's set
-                    -- to false, do nothing.
-                    if plugin.error then
-                        utilities.send_reply(msg, plugin.error)
-                    elseif plugin.error == nil then
-                        utilities.send_reply(msg, self.config.errors.generic)
+                    if not success then
+                        -- If the plugin has an error message, send it. If it does
+                        -- not, use the generic one specified in config. If it's set
+                        -- to false, do nothing.
+                        if plugin.error then
+                            utilities.send_reply(msg, plugin.error)
+                        elseif plugin.error == nil then
+                            utilities.send_reply(msg, self.config.errors.generic)
+                        end
+                        utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text,
+                            self.config.log_chat)
+                        return
+                    -- Continue if the return value is true.
+                    elseif result ~= true then
+                        return
                     end
-                    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, self.config.log_chat)
-                    return
-                -- Continue if the return value is true.
-                elseif result ~= true then
-                    return
                 end
             end
         end

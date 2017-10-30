@@ -11,7 +11,7 @@ local URL = require('socket.url')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local dilbert = {}
+local dilbert = {name = 'dilbert'}
 
 function dilbert:init()
     dilbert.command = 'dilbert [date]'

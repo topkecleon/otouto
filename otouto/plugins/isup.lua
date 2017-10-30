@@ -11,7 +11,7 @@ local HTTP = require('socket.http')
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-local isup = {}
+local isup = {name = 'isup'}
 
 function isup:init()
     isup.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)

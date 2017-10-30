@@ -10,7 +10,7 @@
 
 local utilities = require('otouto.utilities')
 
-local fortune = {}
+local fortune = {name = 'fortune'}
 
 function fortune:init()
     local s = io.popen('fortune'):read('*all')

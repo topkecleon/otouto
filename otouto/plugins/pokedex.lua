@@ -11,7 +11,7 @@ local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local pokedex = {}
+local pokedex = {name = 'pokedex'}
 
 function pokedex:init()
     pokedex.command = 'pokedex <query>'
