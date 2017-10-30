@@ -11,7 +11,7 @@
 
 local drua = require('otouto.drua-tg')
 
-local druasay = {}
+local druasay = {name = 'druasay'}
 
 function druasay:init()
     druasay.triggers = {}

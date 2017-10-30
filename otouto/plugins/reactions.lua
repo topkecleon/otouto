@@ -9,7 +9,7 @@
 
 local utilities = require('otouto.utilities')
 
-local reactions = {}
+local reactions = {name = 'reactions'}
 
 function reactions:init()
     reactions.command = 'reactions'

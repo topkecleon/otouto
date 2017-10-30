@@ -9,7 +9,7 @@
 
 local utilities = require('otouto.utilities')
 
-local nick = {}
+local nick = {name = 'nick'}
 
 function nick:init()
     nick.command = 'nick <nickname>'

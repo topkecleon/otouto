@@ -11,7 +11,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local urbandictionary = {}
+local urbandictionary = {name = 'urbandictionary'}
 
 function urbandictionary:init()
     urbandictionary.command = 'urbandictionary <query>'

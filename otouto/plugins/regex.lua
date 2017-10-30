@@ -7,7 +7,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local regex = {}
+local regex = {name = 'regex'}
 
 local utilities = require('otouto.utilities')
 

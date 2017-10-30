@@ -10,7 +10,7 @@ local HTTP = require('socket.http')
 local URL = require('socket.url')
 local utilities = require('otouto.utilities')
 
-local bible = {}
+local bible = {name = 'bible'}
 
 function bible:init()
     assert(

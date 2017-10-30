@@ -11,7 +11,7 @@ local utilities = require('otouto.utilities')
 local URL = require('socket.url')
 local JSON, serpent
 
-local luarun = {}
+local luarun = {name = 'luarun'}
 
 function luarun:init()
     luarun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('lua', true):t('return', true).table

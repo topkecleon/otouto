@@ -9,7 +9,7 @@
 local utilities = require('otouto.utilities')
 local bot = require('otouto.bot')
 
-local wait = {}
+local wait = {name = 'wait'}
 
 function wait:init()
     self.database.wait = self.database.wait or {}

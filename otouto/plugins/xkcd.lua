@@ -10,7 +10,7 @@ local HTTPS = require('ssl.https')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local xkcd = {}
+local xkcd = {name = 'xkcd'}
 
 function xkcd:init()
     xkcd.command = 'xkcd [i]'

@@ -10,7 +10,6 @@ local bindings = require('otouto.bindings')
 local http = require('socket.http')
 local https = require('ssl.https')
 local json = require('dkjson')
-local lpeg = require('lpeg')
 local ltn12 = require('ltn12')
 local url = require('socket.url')
  -- Lua 5.2 compatibility.
@@ -79,7 +78,9 @@ function utilities.input(s)
 end
 
 function utilities.input_from_msg(msg)
-    return msg.text:match('%s+(.+)') or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
+    return msg.text:match('%s+(.+)')
+        or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text)
+        or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters

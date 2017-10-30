@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local pun = {}
+local pun = {name = 'pun'}
 
 function pun:init()
     pun.command = 'pun'

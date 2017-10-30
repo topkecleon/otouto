@@ -11,7 +11,7 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local HTTPS = require('ssl.https')
 
-local reddit = {}
+local reddit = {name = 'reddit'}
 
 function reddit:init()
     reddit.command = 'reddit [r/subreddit | query]'

@@ -9,7 +9,7 @@
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local channel = {}
+local channel = {name = 'channel'}
 
 function channel:init()
     channel.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ch', true).table

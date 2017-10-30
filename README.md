@@ -354,6 +354,7 @@ A list of standard plugin components:
 
 | Component   | Description                                                    |
 |:------------|:---------------------------------------------------------------|
+| `name`      | Name of the plugin. Matches filename.                          |
 | `action`    | Main function. Expects `msg` table as an argument.             |
 | `triggers`  | Table of triggers for the plugin. Uses Lua patterns.           |
 | `init`      | Optional function run when the plugin is loaded.               |
