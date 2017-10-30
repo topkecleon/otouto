@@ -88,7 +88,7 @@ function disable_plugins:action(msg)
         local enable = (msg.text_lower:match('^'..self.config.cmd_pat..'enable') and true) or false
         local disabled, enabled, not_found, blacklisted =
             toggle_ps(disabled_plugins, self.named_plugins, enable, input)
-        if #disabled_plugins == 0 then
+        if next(disabled_plugins) == nil then
             self.database.disabled_plugins[tostring(chat_id)] = nil
         end
         local output = {}
