@@ -26,7 +26,7 @@ function shout:action(msg)
     end
 
     input = utilities.trim(input)
-    input = input:upper()
+    input = input:upper():gsub("\n", " ")
 
     local output = ''
     local inc = 0
