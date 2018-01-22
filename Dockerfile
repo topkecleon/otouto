@@ -5,16 +5,14 @@ FROM alpine:3.7
 
 RUN apk --no-cache add \
     curl gcc libc-dev pcre-dev libressl-dev \
-    lua5.3 lua5.3-dev luarocks5.3
-
-RUN luarocks-5.3 install dkjson && \
+    lua5.3 lua5.3-dev luarocks5.3 && \
+    luarocks-5.3 install dkjson && \
     luarocks-5.3 install lpeg && \
     luarocks-5.3 install lrexlib-pcre && \
     luarocks-5.3 install luasec && \
     luarocks-5.3 install luasocket && \
-    luarocks-5.3 install multipart-post
-
-RUN apk del curl gcc libc-dev pcre-dev libressl-dev lua5.3-dev
+    luarocks-5.3 install multipart-post && \
+    apk del curl gcc libc-dev pcre-dev libressl-dev lua5.3-dev
 
 COPY . /otouto
 WORKDIR /otouto
