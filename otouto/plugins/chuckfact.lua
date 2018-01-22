@@ -12,7 +12,7 @@ local JSON = require('dkjson')
 local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 
-local chuck = {}
+local chuck = {name = 'chuck'}
 
 function chuck:init()
     chuck.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)

@@ -17,7 +17,7 @@ local drua = require('otouto.drua-tg')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local administration = {}
+local administration = {name = 'administration'}
 
 function administration:init()
     assert(

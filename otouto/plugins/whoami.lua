@@ -9,7 +9,7 @@
 
 local utilities = require('otouto.utilities')
 
-local who = {}
+local who = {name = 'who'}
 
 function who:init()
     who.command = 'who'

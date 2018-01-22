@@ -333,7 +333,7 @@ three by default.
 | `reactions.lua`       | /reactions                    | Returns a list of emoticons which can be posted by the bot.         |
 | `apod.lua`            | /apod [date]                  | Returns the NASA Astronomy Picture of the Day.                      |
 | `dilbert.lua`         | /dilbert [date]               | Returns a Dilbert strip.                                            |
-| `patterns.lua`        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                              |
+| `regex.lua`           | /s/‹from›/‹to›/               | Search-and-replace using PCRE regexes.                              |
 | `remind.lua`          | /remind ‹duration› ‹message›  | Reminds a user of something after a duration of minutes.            |
 | `channel.lua`         | /ch ‹channel› \n ‹message›    | Sends a markdown-enabled message to a channel.                      |
 | `isup.lua`            | /isup ‹url›                   | Returns the status of a website.                                    |
@@ -354,6 +354,7 @@ A list of standard plugin components:
 
 | Component   | Description                                                    |
 |:------------|:---------------------------------------------------------------|
+| `name`      | Name of the plugin. Matches filename.                          |
 | `action`    | Main function. Expects `msg` table as an argument.             |
 | `triggers`  | Table of triggers for the plugin. Uses Lua patterns.           |
 | `init`      | Optional function run when the plugin is loaded.               |

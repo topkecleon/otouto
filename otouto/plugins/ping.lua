@@ -13,7 +13,7 @@ local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local socket = require('socket')
 
-local ping = {}
+local ping = {name = 'ping'}
 
 function ping:init()
     ping.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('ping'):t('marco'):t('annyong').table

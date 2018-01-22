@@ -2,9 +2,9 @@
 return {
 
     -- Your authorization token from the botfather. (string, put quotes)
-    bot_api_key = nil,
+    bot_api_key = os.getenv('OTOUTO_BOT_API_KEY'),
     -- Your Telegram ID (number).
-    admin = nil,
+    admin = os.getenv('ADMIN_ID'),
     -- Two-letter language code.
     -- Fetches it from the system if available, or defaults to English.
     lang = os.getenv('LANG') and os.getenv('LANG'):sub(1,2) or 'en',
@@ -165,6 +165,7 @@ Send /help to get started.
         'users',
         'end_forwards',
         'blacklist',
+        'disable_plugins',
         'about',
         'calc',
         'cats',

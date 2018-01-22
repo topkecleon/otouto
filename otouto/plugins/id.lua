@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local id = {}
+local id = {name = 'id'}
 
 function id:init()
     assert(

@@ -15,7 +15,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local youtube = {}
+local youtube = {name = 'youtube'}
 
 function youtube:init()
     assert(

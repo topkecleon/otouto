@@ -12,7 +12,7 @@ local HTTP = require('socket.http')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local weather = {}
+local weather = {name = 'weather'}
 
 function weather:init()
     assert(

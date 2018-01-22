@@ -9,8 +9,9 @@
 ]]--
 
 return {
+    name = 'end_forwards',
     triggers = { '' },
-    action = function(self, msg)
+    action = function(_, msg)
         if not msg.forward_from then return true end
     end
 }

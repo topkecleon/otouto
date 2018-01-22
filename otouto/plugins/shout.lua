@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local shout = {}
+local shout = {name = 'shout'}
 
 local utf8_char = '('..utilities.char.utf_8..'*)'
 
@@ -26,7 +26,7 @@ function shout:action(msg)
     end
 
     input = utilities.trim(input)
-    input = input:upper()
+    input = input:upper():gsub("\n", " ")
 
     local output = ''
     local inc = 0

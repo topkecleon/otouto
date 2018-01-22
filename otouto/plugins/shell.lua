@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local shell = {}
+local shell = {name = 'shell'}
 
 function shell:init()
     shell.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('run', true).table
