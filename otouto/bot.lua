@@ -105,7 +105,7 @@ function bot:on_message(msg)
                         elseif plugin.error == nil then
                             utilities.send_reply(msg, self.config.errors.generic)
                         end
-                        utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text,
+                        utilities.log_error(result .. '\n' .. msg.text,
                             self.config.log_chat)
                         return
                     -- Continue if the return value is true.
