@@ -202,11 +202,9 @@ function bot:run()
         if self.last_cron ~= now then
             for i,v in ipairs(self.plugins) do
                 if v.cron then -- Call each plugin's cron function, if it has one.
-                    local success, result = pcall(
-                        function() v.cron(self, now) end
-                    )
-                    if not success then
-                        utilities.log_error(result, self.config.log_chat)
+                    local suc, err = pcall(function() v.cron(self, now) end)
+                    if not suc then
+                        utilities.log_error(err, self.config.log_chat)
                     end
                 end
             end
