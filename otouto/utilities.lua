@@ -6,12 +6,12 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local HTTP = require('socket.http')
-local ltn12 = require('ltn12')
-local HTTPS = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
+local http = require('socket.http')
+local https = require('ssl.https')
+local json = require('dkjson')
+local ltn12 = require('ltn12')
+local url = require('socket.url')
  -- Lua 5.2 compatibility.
  -- If no built-in utf8 is available, load the library.
 local utf8 = utf8 or require('lua-utf8')
@@ -78,7 +78,9 @@ function utilities.input(s)
 end
 
 function utilities.input_from_msg(msg)
-    return msg.text:match('%s+(.+)') or (msg.reply_to_message and (msg.reply_to_message.caption or (#msg.reply_to_message.text > 0 and msg.reply_to_message.text))) or false
+    return msg.text:match('%s+(.+)')
+        or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text)
+        or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters
@@ -99,21 +101,21 @@ function utilities.trim(str)
     return s
 end
 
- -- Loads a JSON file as a table.
+ -- Loads a json file as a table.
 function utilities.load_data(filename)
     local f = io.open(filename)
     if f then
         local s = f:read('*all')
         f:close()
-        return JSON.decode(s)
+        return json.decode(s)
     else
         return {}
     end
 end
 
- -- Saves a table to a JSON file.
+ -- Saves a table to a json file.
 function utilities.save_data(filename, data)
-    local s = JSON.encode(data)
+    local s = json.encode(data)
     local f = io.open(filename, 'w')
     f:write(s)
     f:close()
@@ -122,12 +124,12 @@ end
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
  -- Returns nil for a connection error and false for zero results.
 function utilities.get_coords(input)
-    local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
-    local jstr, res = HTTP.request(url)
+    local call_url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. url.escape(input)
+    local jstr, res = http.request(call_url)
     if res ~= 200 then
         return
     end
-    local jdat = JSON.decode(jstr)
+    local jdat = json.decode(jstr)
     if not jdat then
         return
     elseif jdat.status == 'ZERO_RESULTS' or not jdat.results[1] then
@@ -195,19 +197,19 @@ function utilities.log_error(text, log_chat)
     end
 end
 
-function utilities.download_file(url, filename)
+function utilities.download_file(file_url, filename)
     if not filename then
         filename = os.tmpname()
     end
     local body = {}
-    local doer = HTTP
+    local doer = http
     local do_redir = true
-    if url:match('^https') then
-        doer = HTTPS
+    if file_url:match('^https') then
+        doer = https
         do_redir = false
     end
     local _, res = doer.request{
-        url = url,
+        url = file_url,
         sink = ltn12.sink.table(body),
         redirect = do_redir
     }
@@ -306,7 +308,7 @@ function utilities.set_meta:__len()
 end
 
  -- Converts a gross string back into proper UTF-8.
- -- Useful for fixing improper encoding caused by bad JSON escaping.
+ -- Useful for fixing improper encoding caused by bad json escaping.
 function utilities.fix_utf8(str)
     return string.char(utf8.codepoint(str, 1, -1))
 end
