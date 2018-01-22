@@ -7,8 +7,8 @@
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
-local HTTP = require('socket.http')
-local HTTPS = require('ssl.https')
+local http = require('socket.http')
+local https = require('ssl.https')
 local utilities = require('otouto.utilities')
 
 local isup = {}
@@ -29,14 +29,11 @@ function isup:action(msg)
         return
     end
 
-    local protocol = HTTP
-    local url_lower = input:lower()
-    if url_lower:match('^https') then
-        protocol = HTTPS
-    elseif not url_lower:match('^http') then
-        input = 'http://' .. input
-    end
+    local protocol = input:lower():match('^https://') and https or http
+    local old_timeout = protocol.TIMEOUT
+    protocol.TIMEOUT = 2
     local _, code = protocol.request(input)
+    protocol.TIMEOUT = old_timeout
     code = tonumber(code)
     local output
     if not code or code > 399 then
