@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local bandersnatch = {name = 'bandersnatch'}
+local bandersnatch = {}
 
 function bandersnatch:init()
     bandersnatch.command = 'bandersnatch'

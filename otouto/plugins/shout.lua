@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local shout = {name = 'shout'}
+local shout = {}
 
 local utf8_char = '('..utilities.char.utf_8..'*)'
 

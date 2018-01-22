@@ -7,7 +7,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local patterns = {name = 'patterns'}
+local patterns = {}
 
 local utilities = require('otouto.utilities')
 

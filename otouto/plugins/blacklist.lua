@@ -11,7 +11,7 @@
 local utilities = require('otouto.utilities')
 local drua = require('otouto.drua-tg')
 
-local blacklist = {name = 'blacklist'}
+local blacklist = {}
 
 function blacklist:init()
     blacklist.triggers = { '' }

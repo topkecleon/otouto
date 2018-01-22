@@ -19,7 +19,7 @@
 local bot = require('otouto.bot')
 local utilities = require('otouto.utilities')
 
-local control = {name = 'control'}
+local control = {}
 
 local cmd_pat -- Prevents the command from being uncallable.
 
@@ -88,4 +88,3 @@ function control:action(msg)
 end
 
 return control
-

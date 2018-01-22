@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local greetings = {name = 'greetings'}
+local greetings = {}
 
 function greetings:init()
     greetings.triggers = {}

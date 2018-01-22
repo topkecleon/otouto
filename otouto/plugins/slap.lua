@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local slap = {name = 'slap'}
+local slap = {}
 
 function slap:init()
     slap.command = 'slap [target]'

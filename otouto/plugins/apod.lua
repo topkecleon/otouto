@@ -13,7 +13,7 @@ local JSON = require('dkjson')
 local URL = require('socket.url')
 local utilities = require('otouto.utilities')
 
-local apod = {name = 'apod'}
+local apod = {}
 
 function apod:init()
     apod.command = 'apod [date]'

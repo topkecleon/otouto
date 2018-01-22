@@ -9,7 +9,7 @@
 local bot = require('otouto.bot')
 local utilities = require('otouto.utilities')
 
-local maybe = {name = 'maybe'}
+local maybe = {}
 
 function maybe:init()
     maybe.command = 'maybe <text>'

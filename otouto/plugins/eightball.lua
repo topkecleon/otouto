@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local eightball = {name = 'eightball'}
+local eightball = {}
 
 function eightball:init()
     eightball.command = '8ball'

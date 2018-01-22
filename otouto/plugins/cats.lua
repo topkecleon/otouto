@@ -10,7 +10,7 @@ local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-local cats = {name = 'cats'}
+local cats = {}
 
 function cats:init()
     if not self.config.thecatapi_key then

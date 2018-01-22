@@ -12,7 +12,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local lastfm = {name = 'lastfm'}
+local lastfm = {}
 
 function lastfm:init()
     assert(

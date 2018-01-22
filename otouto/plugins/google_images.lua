@@ -17,7 +17,7 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-local gImages = {name = 'gImages'}
+local gImages = {}
 
 function gImages:init()
     assert(

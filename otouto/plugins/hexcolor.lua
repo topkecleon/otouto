@@ -25,7 +25,7 @@
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local hexcolor = {name = 'hexcolor'}
+local hexcolor = {}
 
 function hexcolor:init()
     hexcolor.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)

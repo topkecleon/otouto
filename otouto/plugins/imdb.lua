@@ -11,7 +11,7 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-local imdb = {name = 'imdb'}
+local imdb = {}
 
 function imdb:init()
     imdb.command = 'imdb <query>'

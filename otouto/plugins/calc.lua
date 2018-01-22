@@ -10,7 +10,7 @@ local URL = require('socket.url')
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-local calc = {name = 'calc'}
+local calc = {}
 
 function calc:init()
     calc.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('calc', true).table

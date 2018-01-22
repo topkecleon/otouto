@@ -9,7 +9,7 @@
 
 local utilities = require('otouto.utilities')
 
-local me = {name = 'me'}
+local me = {}
 
 function me:init()
     me.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('me', true).table

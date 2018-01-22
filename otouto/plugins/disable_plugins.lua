@@ -10,7 +10,7 @@
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local disable_plugins = {name = 'disable_plugins'}
+local disable_plugins = {}
 
 function disable_plugins:init()
     disable_plugins.command = 'disable <plugin>…'

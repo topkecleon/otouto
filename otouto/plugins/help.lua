@@ -10,7 +10,7 @@
 
 local utilities = require('otouto.utilities')
 
-local help = {name = 'help'}
+local help = {}
 
 function help:init()
     help.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('help', true):t('h', true).table

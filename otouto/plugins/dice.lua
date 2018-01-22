@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local dice = {name = 'dice'}
+local dice = {}
 
 function dice:init()
     dice.command = 'roll <nDr>'

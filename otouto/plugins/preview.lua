@@ -9,7 +9,7 @@
 local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 
-local preview = {name = 'preview'}
+local preview = {}
 
 function preview:init()
     preview.command = 'preview <link>'

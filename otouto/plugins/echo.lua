@@ -8,7 +8,7 @@
 
 local utilities = require('otouto.utilities')
 
-local echo = {name = 'echo'}
+local echo = {}
 
 function echo:init()
     echo.command = 'echo <text>'

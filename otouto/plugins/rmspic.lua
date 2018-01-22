@@ -12,7 +12,7 @@ local https = require('ssl.https')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-local rms = {name = 'rms'}
+local rms = {}
 
 function rms:init()
     rms.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('rms').table

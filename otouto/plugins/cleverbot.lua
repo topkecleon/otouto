@@ -4,7 +4,7 @@ local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
-local cleverbot = {name = 'cleverbot'}
+local cleverbot = {}
 
 function cleverbot:init()
     cleverbot.name = '^' .. self.info.first_name:lower() .. ', '

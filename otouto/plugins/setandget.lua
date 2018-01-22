@@ -10,7 +10,7 @@
 
 local utilities = require('otouto.utilities')
 
-local setandget = {name = 'setandget'}
+local setandget = {}
 
 function setandget:init()
     self.database.setandget = self.database.setandget or {}

@@ -13,7 +13,7 @@ local JSON = require('dkjson')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
-local starwars = {name = 'starwars'}
+local starwars = {}
 
 function starwars:init()
     starwars.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)

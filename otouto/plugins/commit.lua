@@ -10,7 +10,7 @@ local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 local http = require('socket.http')
 
-local commit = {name = 'commit'}
+local commit = {}
 
 function commit:init()
     commit.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('commit').table

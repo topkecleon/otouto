@@ -16,7 +16,7 @@ local utilities = require('otouto.utilities')
 local https = require('ssl.https')
 local feedparser = require('feedparser')
 
-local hn = {name = 'hn'}
+local hn = {}
 
 function hn:init()
     assert(not self.named_plugins.hackernews)
