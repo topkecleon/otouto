@@ -28,19 +28,19 @@ function P:action(msg)
     -- which are not in the "Basic Latin" set will be ignored.
     -- I think I'll need error handling to check whether or not a given
     -- character is in the basic latin set.
-    local output = ''
+    local output = {}
 
     for char in input:gmatch('.') do
         local succ, code = pcall(function() return utf8.codepoint(char) end)
         -- Full-width codepoints are 65248 higher than their basic counterparts.
         if succ and code >= 33 and code <= 126 then
-            output = output .. utf8.char(code+65248)
+            table.insert(output, utf8.char(code+65248))
         else
-            output = output .. char
+            table.insert(output, char)
         end
     end
 
-    utilities.send_reply(msg, output)
+    utilities.send_reply(msg, table.concat(output))
 end
 
 return P
