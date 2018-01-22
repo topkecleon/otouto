@@ -34,9 +34,6 @@ Based on otouto by topkecleon.
         specify_targets = 'Specify a target or targets by reply, username, or ID.',
         specify_target  = 'Specify a target by reply, username, or ID.'
     },
-    
-    -- Whether luarun should use serpent instead of dkjson for serialization.
-    luarun_serpent = false,
 
     administration = {
         -- Conversation, group, or channel for kick/ban notifications.
