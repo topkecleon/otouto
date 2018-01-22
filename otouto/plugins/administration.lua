@@ -38,12 +38,6 @@ function administration:init()
         }
     end
 
-    -- Migration Code 1.15 -> 1.15.1
-    for _, group in pairs(self.database.administration.groups) do
-        group.filter = group.filter or {}
-    end
-    -- End Migration Code
-
     administration.temp = {
         help = {},
         flood = {}
@@ -358,7 +352,7 @@ function administration:kick_user(chat, target, reason, s)
     local group = self.database.administration.groups[tostring(chat)]
     local log_chat = group.flags[7] and self.config.log_chat or self.config.administration.log_chat
     local group_name = group.name .. ' [' .. math.abs(chat) .. ']'
-    utilities.handle_exception(self, victim..' kicked from '..group_name, reason, log_chat)
+    utilities.log_error(victim..' kicked from '..group_name..'\n'..reason, log_chat)
 end
 
 
@@ -444,29 +438,35 @@ function administration.init_command(self_)
                         if not administration.temp.flood[chat_id_str][from_id_str] then
                             administration.temp.flood[chat_id_str][from_id_str] = 0
                         end
+
+                        local points
                         if msg.sticker then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.sticker
+                            points = group.antiflood.sticker
                         elseif msg.photo then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
+                            points = group.antiflood.photo
                         elseif msg.audio then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.audio
+                            points = group.antiflood.audio
                         elseif msg.contact then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.contact
+                            points = group.antiflood.contact
                         elseif msg.location then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.location
+                            points = group.antiflood.location
                         elseif msg.voice then
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.voice
+                            points = group.antiflood.voice
                         elseif msg.document then
                             if msg.document.mime_type and msg.document.mime_type:match('^image') then
-                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.photo
+                                points = group.antiflood.photo
                             elseif msg.document.mime_type and msg.document.mime_type:match('^video') then
-                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.video
+                                points = group.antiflood.video
                             else
-                                administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.document
+                                points = group.antiflood.document
                             end
                         else
-                            administration.temp.flood[chat_id_str][from_id_str] = administration.temp.flood[chat_id_str][from_id_str] + group.antiflood.text
+                            points = group.antiflood.text
                         end
+                        administration.temp.flood[chat_id_str][from_id_str] =
+                            administration.temp.flood[chat_id_str][from_id_str]+
+                            points
+
                         if administration.temp.flood[chat_id_str][from_id_str] > 99 then
                             user.do_kick = true
                             user.reason = 'antiflood (' .. administration.temp.flood[chat_id_str][from_id_str] .. ')'
@@ -487,14 +487,11 @@ function administration.init_command(self_)
                     end
 
                     -- filter
-                    if not ( -- Someone got autorekt for forwarding a kick log.
-                        msg.forward_from
-                        and (
-                            msg.forward_from.id == self.info.id
-                            or msg.forward_from.id == self.config.administration.log_chat
-                            or msg.forward_from.id == self.config.log_chat
-                        )
-                    ) then
+                    if not (msg.forward_from and (
+                        msg.forward_from.id == self.info.id
+                        or msg.forward_from.id == self.config.administration.log_chat
+                        or msg.forward_from.id == self.config.log_chat
+                    )) then
                         for i = 1, #group.filter do
                             if msg.text_lower:match(group.filter[i]) then
                                 user.do_kick = true
@@ -606,6 +603,7 @@ function administration.init_command(self_)
                 end
 
                 if user.do_kick then
+                    bindings.deleteMessage{ chat_id = msg.chat.id, message_id = msg.message_id }
                     administration.kick_user(self, msg.chat.id, msg.from.id, user.reason)
                     if user.output then
                         utilities.send_message(msg.from.id, user.output)
@@ -665,7 +663,7 @@ function administration.init_command(self_)
 
         { -- /ahelp
             triggers = utilities.triggers(self_.info.username, self_.config.cmd_pat)
-                :t('ahelp', true):t('ahelp_%-%d+_%d+').table,
+                :t('ahelp', true):t('ahelp_%-%d+').table,
 
             command = 'ahelp \\[command]',
             privilege = 1,
@@ -691,9 +689,8 @@ function administration.init_command(self_)
                         utilities.send_reply(msg, output)
                     end
                 else
-                    local chat_id, user_id = msg.text_lower:match('^'..self.config.cmd_pat..'ahelp_(%-%d+)_(%d+)$')
-                    chat_id, user_id = chat_id or msg.chat.id, user_id or msg.from.id
-                    local rank = administration.get_rank(self, user_id, chat_id)
+                    local chat_id = msg.text_lower:match('^'..self.config.cmd_pat..'ahelp_(%-%d+)$')
+                    local rank = administration.get_rank(self, msg.from.id, chat_id)
                     local output = '*Commands for ' .. administration.ranks[rank] .. ':*\n'
                     for i = 1, rank do
                         for _, val in ipairs(administration.temp.help[i]) do
@@ -1258,12 +1255,10 @@ function administration.init_command(self_)
                             output = output .. '*'..k..':* `'..v..'`\n'
                         end
                         output = string.format(
-                            [[
-usage: `%santiflood <type> <i>`
+                            [[usage: `%santiflood <type> <i>`
 example: `%santiflood text 5`
 Use this command to configure the point values for each message type. When a user reaches 100 points, he is kicked. The points are reset each minute. The current values are:
-%sUsers are automatically banned after *%s* automatic kick%s. Use the the *autoban* keyword to configure this.
-                            ]],
+%sUsers are automatically banned after *%s* automatic kick%s. Use the the *autoban* keyword to configure this.]],
                             self.config.cmd_pat,
                             self.config.cmd_pat,
                             output,
@@ -1682,14 +1677,9 @@ This would add a group and enable the unlisted flag, antibot, and antiflood.
     }
 
     if not self_.named_plugins.users then
-        self_.database.users = self_.database.users or {}
-        self_.database.users[tostring(self_.info.id)] = self_.info
-        table.insert(administration.commands, 1, {
-            triggers = {''},
-            interior = true,
-            privilege = 0,
-            action = require('otouto.plugins.users').action
-        })
+        local users = require('otouto.plugin.users')
+        users.init(self_)
+        table.insert(administration.commands, 1, users)
     end
 
     administration.triggers = {''}
