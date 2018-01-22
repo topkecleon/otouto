@@ -53,8 +53,6 @@ Send /help to get started.
     nasa_api_key = nil,
     -- http://tech.yandex.com/keys/get
     yandex_key = nil,
-    -- Whether luarun should use serpent instead of dkjson for serialization.
-    luarun_serpent = false,
 
     hackernews = {
         -- Interval (in minutes) for hackernews.lua to fetch new posts.

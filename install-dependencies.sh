@@ -3,7 +3,7 @@
 
 #!/bin/sh
 
-rocklist="dkjson lpeg lrexlib-pcre luasec luasocket multipart-post"
+rocklist="dkjson lpeg lrexlib-pcre luasec luasocket multipart-post serpent"
 if [ $(lsb_release -r | cut -f 2) == "16.04" ]; then
     luaver="5.3"
 else

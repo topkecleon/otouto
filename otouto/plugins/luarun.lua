@@ -9,23 +9,12 @@
 
 local utilities = require('otouto.utilities')
 local URL = require('socket.url')
-local JSON, serpent
+local serpent = require('serpent')
 
 local luarun = {name = 'luarun'}
 
 function luarun:init()
     luarun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('lua', true):t('return', true).table
-    if self.config.luarun_serpent then
-        serpent = require('serpent')
-        luarun.serialize = function(t)
-            return serpent.block(t, {comment=false})
-        end
-    else
-        JSON = require('dkjson')
-        luarun.serialize = function(t)
-            return JSON.encode(t, {indent=true})
-        end
-    end
     -- Lua 5.2 compatibility.
     luarun.err_msg = function(x)
         return 'Error:\n' .. tostring(x)
@@ -53,10 +42,11 @@ function luarun:action(msg)
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
         local drua = require('otouto.drua-tg')\n\z
-        local JSON = require('dkjson')\n\z
-        local URL = require('socket.url')\n\z
-        local HTTP = require('socket.http')\n\z
-        local HTTPS = require('ssl.https')\n\z
+        local json = require('dkjson')\n\z
+        local url = require('socket.url')\n\z
+        local http = require('socket.http')\n\z
+        local https = require('ssl.https')\n\z
+        local serpent = require('serpent')\n\z
         return function (self, msg)\n" .. input .. "\nend"
     )
 
@@ -70,7 +60,7 @@ function luarun:action(msg)
         output = 'Done!'
     else
         if type(output) == 'table' then
-            local s = luarun.serialize(output)
+            local s = serpent.block(output, {comment=false})
             if URL.escape(s):len() < 4000 then
                 output = s
             end
@@ -82,4 +72,3 @@ function luarun:action(msg)
 end
 
 return luarun
-
