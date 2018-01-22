@@ -10,7 +10,7 @@
 
 local utilities = require('otouto.utilities')
 
-local help = {name = 'help'}
+local help = {}
 
 function help:init()
     help.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('help', true):t('h', true).table
@@ -26,8 +26,7 @@ function help:init()
         end
     end
     table.sort(commandlist)
-    local comlist = '\n• ' .. self.config.cmd_pat
-        .. table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\nArguments: <required> [optional]'
+    local comlist = '\n• ' .. self.config.cmd_pat .. table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\nArguments: <required> [optional]\n* Targets may be specified via reply, username, or ID.'
     help.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 
@@ -47,10 +46,7 @@ function help:action(msg)
         -- If msg is from a group, tell the group whether the PM was successful.
         local res = utilities.send_message(msg.from.id, help.text, true, nil, 'html')
         if not res then
-            utilities.send_reply(msg,
-                'Please <a href="http://t.me/' .. self.info.username
-                .. '?start=help">message me privately</a> for a list of commands.',
-                'html')
+            utilities.send_reply(msg, 'Please <a href="http://t.me/' .. self.info.username .. '?start=help">message me privately</a> for a list of commands.', 'html')
         elseif msg.chat.type ~= 'private' then
             utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
         end

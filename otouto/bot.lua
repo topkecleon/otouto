@@ -9,6 +9,7 @@
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
+local autils -- Administration-related functions.
 
 bot.version = '3.15.4'
 
@@ -19,6 +20,7 @@ function bot:init()
 
     bindings = require('otouto.bindings').init(self.config.bot_api_key)
     utilities = require('otouto.utilities')
+    autils = require('otouto.administration')
 
     -- Fetch bot information. Try until it succeeds.
     repeat
@@ -39,8 +41,13 @@ function bot:init()
     -- Database table to store user-specific information, such as nicknames or
     -- API usernames.
     self.database.userdata = self.database.userdata or {}
-    -- Database table to store disabled plugins for chats.
-    self.database.disabled_plugins = self.database.disabled_plugins or {}
+
+    -- administration
+    self.database.administration = self.database.administration or {
+        groups = {},
+        administrators = {},
+        hammers = {}
+    }
 
     self.plugins = {}
     self.named_plugins = {}
@@ -48,6 +55,7 @@ function bot:init()
         local plugin = require('otouto.plugins.'..pname)
         table.insert(self.plugins, plugin)
         self.named_plugins[pname] = plugin
+        plugin.name = pname
         if plugin.init then plugin.init(self) end
         if plugin.doc then
             plugin.doc = '<pre>'..utilities.html_escape(plugin.doc)..'</pre>'
@@ -85,17 +93,25 @@ function bot:on_message(msg)
 
     msg.text_lower = msg.text:lower()
 
-    local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
+    local user = {
+        id_str = tostring(msg.from.id),
+        rank = autils.rank(self, msg.from.id, msg.chat.id),
+        name = utilities.build_name(msg.from.first_name, msg.from.last_name)
+    }
+
+    local group = self.database.administration and
+        self.database.administration.groups[tostring(msg.chat.id)]
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        if not (disabled_plugins and disabled_plugins[plugin.name]) then
+        if (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
+                    
                     local success, result = pcall(function()
-                        return plugin.action(self, msg)
+                        return plugin.action(self, msg, group, user)
                     end)
-
+    
                     if not success then
                         -- If the plugin has an error message, send it. If it does
                         -- not, use the generic one specified in config. If it's set
@@ -105,8 +121,47 @@ function bot:on_message(msg)
                         elseif plugin.error == nil then
                             utilities.send_reply(msg, self.config.errors.generic)
                         end
-                        utilities.log_error(result .. '\n' .. msg.text,
-                            self.config.log_chat)
+                        -- The message contents are included for debugging purposes.
+                        utilities.log_error(result..'\n'..msg.text, self.config.log_chat)
+                        return
+                    -- Continue if the return value is true.
+                    elseif result ~= true then
+                        return
+                    end
+                end
+            end
+        end
+    end
+end
+
+function bot:on_edit(msg)
+    msg.text = msg.text or msg.caption or ''
+    if msg.reply_to_message then
+        msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
+    end
+    msg.text_lower = msg.text:lower()
+    
+    local user = {
+        id_str = tostring(msg.from.id),
+        rank = autils.rank(self, msg.from.id, msg.chat.id),
+        name = utilities.build_name(msg.from.first_name, msg.from.last_name)
+    }
+
+    local group = self.database.administration and
+        self.database.administration.groups[tostring(msg.chat.id)]
+
+    for _, plugin in ipairs(self.plugins) do
+        if plugin.edit_action and (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
+            for _, trigger in ipairs(plugin.triggers) do
+                if string.match(msg.text_lower, trigger) then
+                    
+                    local success, result = pcall(function()
+                        return plugin.edit_action(self, msg, group, user)
+                    end)
+    
+                    if not success then
+                        -- The message contents are included for debugging purposes.
+                        utilities.log_error(result..'\n'..msg.text, self.config.log_chat)
                         return
                     -- Continue if the return value is true.
                     elseif result ~= true then
@@ -126,13 +181,17 @@ function bot:run()
         local res = bindings.getUpdates{
             timeout = 5,
             offset = self.last_update + 1,
-            allowed_updates = '["message"]'
+            allowed_updates = '["message","edited_message"]'
         }
         if res then
             -- Iterate over every new message.
             for _,v in ipairs(res.result) do
                 self.last_update = v.update_id
-                bot.on_message(self, v.message)
+                if v.message then
+                    bot.on_message(self, v.message)
+                elseif v.edited_message then
+                    bot.on_edit(self, v.edited_message)
+                end
             end
         else
             print('[' .. os.date('%F %T') .. '] Connection error while fetching updates.')
@@ -143,9 +202,11 @@ function bot:run()
         if self.last_cron ~= now then
             for i,v in ipairs(self.plugins) do
                 if v.cron then -- Call each plugin's cron function, if it has one.
-                    local suc, err = pcall(function() v.cron(self, now) end)
-                    if not suc then
-                        utilities.log_error(err, self.config.log_chat)
+                    local success, result = pcall(
+                        function() v.cron(self, now) end
+                    )
+                    if not success then
+                        utilities.log_error(result, self.config.log_chat)
                     end
                 end
             end

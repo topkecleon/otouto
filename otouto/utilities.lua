@@ -6,12 +6,12 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local bindings = require('otouto.bindings')
-local http = require('socket.http')
-local https = require('ssl.https')
-local json = require('dkjson')
+local HTTP = require('socket.http')
 local ltn12 = require('ltn12')
-local url = require('socket.url')
+local HTTPS = require('ssl.https')
+local URL = require('socket.url')
+local JSON = require('dkjson')
+local bindings = require('otouto.bindings')
  -- Lua 5.2 compatibility.
  -- If no built-in utf8 is available, load the library.
 local utf8 = utf8 or require('lua-utf8')
@@ -78,9 +78,7 @@ function utilities.input(s)
 end
 
 function utilities.input_from_msg(msg)
-    return msg.text:match('%s+(.+)')
-        or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text)
-        or false
+    return msg.text:match('%s+(.+)') or (msg.reply_to_message and (msg.reply_to_message.caption or (#msg.reply_to_message.text > 0 and msg.reply_to_message.text))) or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters
@@ -101,21 +99,21 @@ function utilities.trim(str)
     return s
 end
 
- -- Loads a json file as a table.
+ -- Loads a JSON file as a table.
 function utilities.load_data(filename)
     local f = io.open(filename)
     if f then
         local s = f:read('*all')
         f:close()
-        return json.decode(s)
+        return JSON.decode(s)
     else
         return {}
     end
 end
 
- -- Saves a table to a json file.
+ -- Saves a table to a JSON file.
 function utilities.save_data(filename, data)
-    local s = json.encode(data)
+    local s = JSON.encode(data)
     local f = io.open(filename, 'w')
     f:write(s)
     f:close()
@@ -124,12 +122,12 @@ end
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
  -- Returns nil for a connection error and false for zero results.
 function utilities.get_coords(input)
-    local call_url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. url.escape(input)
-    local jstr, res = http.request(call_url)
+    local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
+    local jstr, res = HTTP.request(url)
     if res ~= 200 then
         return
     end
-    local jdat = json.decode(jstr)
+    local jdat = JSON.decode(jstr)
     if not jdat then
         return
     elseif jdat.status == 'ZERO_RESULTS' or not jdat.results[1] then
@@ -146,6 +144,13 @@ function utilities.table_size(tab)
         i = i + 1
     end
     return i
+end
+
+ -- Returns a copy of $tab.
+function utilities.clone_table(tab)
+    local t = {}
+    for k, v in pairs(tab) do t[k] = v end
+    return t
 end
 
  -- Just an easy way to get a user's full name.
@@ -190,19 +195,19 @@ function utilities.log_error(text, log_chat)
     end
 end
 
-function utilities.download_file(file_url, filename)
+function utilities.download_file(url, filename)
     if not filename then
         filename = os.tmpname()
     end
     local body = {}
-    local doer = http
+    local doer = HTTP
     local do_redir = true
-    if file_url:match('^https') then
-        doer = https
+    if url:match('^https') then
+        doer = HTTPS
         do_redir = false
     end
     local _, res = doer.request{
-        url = file_url,
+        url = url,
         sink = ltn12.sink.table(body),
         redirect = do_redir
     }
@@ -301,7 +306,7 @@ function utilities.set_meta:__len()
 end
 
  -- Converts a gross string back into proper UTF-8.
- -- Useful for fixing improper encoding caused by bad json escaping.
+ -- Useful for fixing improper encoding caused by bad JSON escaping.
 function utilities.fix_utf8(str)
     return string.char(utf8.codepoint(str, 1, -1))
 end
@@ -314,6 +319,25 @@ end
 function utilities.normalize_id(id)
     local out = math.abs(tonumber(id))
     return out > 1000000000000 and out - 1000000000000 or out
+end
+
+ -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
+ -- I wrote this for administration but it could be useful elsewhere.
+function utilities.format_name(self, id)
+    local user = self.database.users[tostring(id)] or { first_name = 'Unknown' }
+    local s = string.format(
+        '%s <code>[%s]</code>',
+        utilities.html_escape(
+            utilities.build_name(user.first_name, user.last_name)
+                :gsub(utilities.char.rtl_override, '')
+                :gsub(utilities.char.rtl_mark, '')
+        ),
+        id
+    )
+    if user.username then
+        s = s .. ' <i>@' .. utilities.html_escape(user.username) .. '</i>'
+    end
+    return s
 end
 
 return utilities

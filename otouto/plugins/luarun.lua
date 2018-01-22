@@ -11,7 +11,7 @@ local utilities = require('otouto.utilities')
 local URL = require('socket.url')
 local JSON, serpent
 
-local luarun = {name = 'luarun'}
+local luarun = {}
 
 function luarun:init()
     luarun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('lua', true):t('return', true).table
@@ -32,7 +32,7 @@ function luarun:init()
     end
 end
 
-function luarun:action(msg)
+function luarun:action(msg, group, user)
 
     if msg.from.id ~= self.config.admin then
         return true
@@ -52,18 +52,19 @@ function luarun:action(msg)
         "local bot = require('otouto.bot')\n\z
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
+        local autils = require('otouto.administration')\n\z
         local drua = require('otouto.drua-tg')\n\z
         local JSON = require('dkjson')\n\z
         local URL = require('socket.url')\n\z
         local HTTP = require('socket.http')\n\z
         local HTTPS = require('ssl.https')\n\z
-        return function (self, msg)\n" .. input .. "\nend"
+        return function (self, msg, group, user)\n" .. input .. "\nend"
     )
 
     if output == nil then
         output = success
     else
-        success, output = xpcall(output(), luarun.err_msg, self, msg)
+        success, output = xpcall(output(), luarun.err_msg, self, msg, group, user)
     end
 
     if output == nil then
@@ -82,4 +83,3 @@ function luarun:action(msg)
 end
 
 return luarun
-
