@@ -48,6 +48,7 @@ function bot:init()
         local plugin = require('otouto.plugins.'..pname)
         table.insert(self.plugins, plugin)
         self.named_plugins[pname] = plugin
+        plugin.name = pname
         if plugin.init then plugin.init(self) end
         if plugin.doc then
             plugin.doc = '<pre>'..utilities.html_escape(plugin.doc)..'</pre>'
