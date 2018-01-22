@@ -179,6 +179,7 @@ end
 function drua.channel_set_admin(chat, user, rank, s)
     chat = format_target(chat)
     user = format_target(user)
+    rank = rank or 2
     local command = 'channel_set_admin %s %s %s'
     command = command:format(chat, user, rank)
     return drua.send(command, nil, s)
@@ -198,6 +199,15 @@ end
 
 function drua.unblock(user, s)
     return drua.send('unblock_user user#' .. user, nil, s)
+end
+
+function drua.get_self(s)
+    return drua.send('get_self', true, s)
+end
+
+function drua.resolve_username(username, s)
+    username = username:gsub('^@', '')
+    return drua.send('resolve_username ' .. username, true, s)
 end
 
 return drua
