@@ -124,7 +124,7 @@ function bot:run()
     while self.is_started do
         -- Update loop.
         local res = bindings.getUpdates{
-            timeout = 20,
+            timeout = 5,
             offset = self.last_update + 1,
             allowed_updates = '["message"]'
         }
