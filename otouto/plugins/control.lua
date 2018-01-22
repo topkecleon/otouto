@@ -19,7 +19,7 @@
 local bot = require('otouto.bot')
 local utilities = require('otouto.utilities')
 
-local control = {name = 'control'}
+local control = {}
 
 local cmd_pat -- Prevents the command from being uncallable.
 
@@ -53,6 +53,7 @@ function control:action(msg)
         package.loaded['otouto.bindings'] = nil
         package.loaded['otouto.utilities'] = nil
         package.loaded['otouto.drua-tg'] = nil
+        package.loaded['otouto.administration'] = nil
         package.loaded['config'] = nil
         if not msg.text_lower:match('%-config') then
             for k, v in pairs(require('config')) do
@@ -88,4 +89,3 @@ function control:action(msg)
 end
 
 return control
-

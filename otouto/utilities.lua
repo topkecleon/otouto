@@ -148,6 +148,13 @@ function utilities.table_size(tab)
     return i
 end
 
+ -- Returns a copy of $tab.
+function utilities.clone_table(tab)
+    local t = {}
+    for k, v in pairs(tab) do t[k] = v end
+    return t
+end
+
  -- Just an easy way to get a user's full name.
  -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
@@ -314,6 +321,25 @@ end
 function utilities.normalize_id(id)
     local out = math.abs(tonumber(id))
     return out > 1000000000000 and out - 1000000000000 or out
+end
+
+ -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
+ -- I wrote this for administration but it could be useful elsewhere.
+function utilities.format_name(self, id)
+    local user = self.database.users[tostring(id)] or { first_name = 'Unknown' }
+    local s = string.format(
+        '%s <code>[%s]</code>',
+        utilities.html_escape(
+            utilities.build_name(user.first_name, user.last_name)
+                :gsub(utilities.char.rtl_override, '')
+                :gsub(utilities.char.rtl_mark, '')
+        ),
+        id
+    )
+    if user.username then
+        s = s .. ' <i>@' .. utilities.html_escape(user.username) .. '</i>'
+    end
+    return s
 end
 
 return utilities
