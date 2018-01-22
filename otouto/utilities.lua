@@ -200,7 +200,7 @@ function utilities.download_file(file_url, filename)
         do_redir = false
     end
     local _, res = doer.request{
-        file_url = file_url,
+        url = file_url,
         sink = ltn12.sink.table(body),
         redirect = do_redir
     }
