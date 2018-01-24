@@ -556,7 +556,7 @@ found [here](http://github.com/topkecleon/otouto/graphs/contributors).
 
 If code or ideas aren't your thing, the project does accept monetary
 contributions. Bitcoin donations are accepted at the following address:
-`1BxegZJ73hPu218UrtiY8druC7LwLr82gS`.
+`1GJGke82JthhcEcpgnC9qNp7B4sfsGsQSN`.
 
 Here's a list of donors:
 
