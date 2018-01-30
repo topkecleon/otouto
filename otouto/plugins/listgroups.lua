@@ -12,7 +12,7 @@ function P:init()
 Returns a list of all public, administrated groups, or the results of a query.]]
 end
 
-function P:action(msg)
+function P:action(msg, group)
     local input = utilities.input_from_msg(msg)
 
     -- Output will be a list of results, a list of all groups, or an explanation
@@ -34,20 +34,30 @@ function P:action(msg)
         end
     end
 
-    local output
-
-    -- If $results is populated, then there was a query; we return results.
-    if #results > 0 then
-        output = string.format('<b>Groups matching</b> <i>%s</i><b>:</b>\n• %s',
-            utilities.html_escape(input),
-            table.concat(results, '\n• ')
-        )
-
-    elseif #listed_groups > 0 then
-        output = '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
-
+    if input then
+        if #results == 0 then
+            output = self.config.errors.results
+        else
+            output = string.format(
+                '<b>Groups matching</b> <i>%s</i><b>:</b>\n• %s',
+                utilities.html_escape(input),
+                table.concat(results, '\n• ')
+            )
+        end
     else
-        output = 'There are no listed groups.'
+        local group_list =
+            '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
+        if #listed_groups == 0 then
+            output = 'There are no listed groups.'
+        elseif group then
+            if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
+                output = 'I have sent you the requested information in a private message.'
+            else
+                output = string.format('Please <a href="https://t.me/%s?start=groups">message me privately</a> for a list of groups.', self.info.username)
+            end
+        else
+            output = group_list
+        end
     end
 
     utilities.send_reply(msg, output, 'html')
