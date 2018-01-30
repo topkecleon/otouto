@@ -46,8 +46,6 @@ Based on otouto by topkecleon.
         autoban = 3,
         -- Default flag settings.
         flags = {
-            private = true,
-            antisquig = true,
             antibot = true,
             antilink = true
         }
