@@ -36,7 +36,7 @@ function autils:rank(user_id, chat_id)
             return 0 -- Hammered
         end
     end
-    
+
     return 1
 end
 
@@ -96,7 +96,7 @@ function autils:strike(msg, source)
         chat_id = msg.chat.id,
         message_id = msg.message_id
     }
-    
+
     self.database.administration.automoderation[tostring(msg.chat.id)] =
         self.database.administration.automoderation[tostring(msg.chat.id)] or {}
     local chat =
@@ -115,7 +115,7 @@ function autils:strike(msg, source)
             '. The next automoderation trigger will result in a five-minute tempban.'
         if self.config.administration.log_chat_username then
             warning = warning .. '\n<b>View the logs:</b> ' ..
-                self.config.administration.log_chat_link .. '.'
+                self.config.administration.log_chat_username .. '.'
         end
         utilities.send_message(msg.chat.id, warning, true, nil, 'html')
 
@@ -159,7 +159,7 @@ function autils:log(chat_title, targets, action_taken, source, etc)
             table.insert(target_names, utilities.format_name(self, id))
         end
     end
-    
+
     local output = string.format(
         '<b>%s</b>\n%s\n%s\n<b>by</b> %s',
         utilities.html_escape(chat_title),

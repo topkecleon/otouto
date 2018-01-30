@@ -40,7 +40,7 @@ Based on otouto by topkecleon.
         -- Defaults to config.log_chat if left empty.
         log_chat = nil,
         -- link or username
-        log_chat_link = nil,
+        log_chat_username = nil,
         -- Default autoban setting.
         -- A user is banned after being autokicked this many times in a day.
         autoban = 3,
