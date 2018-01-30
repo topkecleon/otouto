@@ -8,8 +8,9 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('deadmin', true).table
     P.privilege = 5
-    P.command = 'deadmin*'
+    P.command = 'deadmin'
     P.doc = 'Demotes an administrator or administrators.'
+    P.targeting = true
 end
 
 function P:action(msg, group, user)

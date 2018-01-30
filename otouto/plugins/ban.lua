@@ -7,9 +7,10 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('ban', true).table
-    P.command = 'ban*'
+    P.command = 'ban'
     P.privilege = 2
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group)
@@ -41,7 +42,7 @@ function P:action(msg, group)
     else
         table.insert(output, self.config.errors.specify_targets)
     end
-    
+
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #banned_users > 0 then
         autils.log(self, msg.chat.title, banned_users, 'Banned.',

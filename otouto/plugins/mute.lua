@@ -7,7 +7,7 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('mute', true).table
-    P.command = 'mute*'
+    P.command = 'mute'
     P.doc = [[Mute a user or users indefinitely or for the time specified in minutes. A single target can be specified by replying to one of his messages. Multiple targets can be specified via ID and username. In reply commands, the duration is specified after the command. Otherwise, the duration is specified on a new line after the targets. This behavior is consistent with ban reasons.
 Examples:
     /mute @foo @bar 8675309
@@ -16,6 +16,7 @@ Examples:
     [in reply] /mute 240]]
     P.privilege = 2
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group)
@@ -36,7 +37,7 @@ function P:action(msg, group)
         out_str = ' has been muted.'
         log_str = 'Muted.'
     end
-        
+
     local output = {}
     local muted_users = {} -- Passed to the log function at the end.
 
@@ -44,7 +45,7 @@ function P:action(msg, group)
         for _, id in ipairs(targets) do
             if not tonumber(id) then
                 table.insert(output, id)
-                
+
             else
                 local name = utilities.format_name(self, id)
 
@@ -55,7 +56,7 @@ function P:action(msg, group)
                         chat_id = msg.chat.id,
                         user_id = id,
                         until_date = duration and msg.date + (duration * 60),
-                        can_send_messages = false 
+                        can_send_messages = false
                     }
                     if not a then
                         table.insert(output, b.description .. ' (' .. id .. ')')
@@ -66,11 +67,11 @@ function P:action(msg, group)
                 end
             end
         end
-        
+
     else
         table.insert(output, self.config.errors.specify_targets)
     end
-    
+
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
         autils.log(self, msg.chat.title, muted_users, log_str,

@@ -7,10 +7,11 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('mod', true):t('addmod', true):t('op', true).table
-    P.command = 'addmod*'
+    P.command = 'addmod'
     P.doc = 'Promotes a user to a moderator.'
     P.privilege = 3
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group)

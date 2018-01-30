@@ -7,10 +7,11 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('kick', true).table
-    P.command = 'kick*'
+    P.command = 'kick'
     P.doc = 'Removes a user or users from the group. Targets will be unable to rejoin for one minute.'
     P.privilege = 2
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group, user)
@@ -40,7 +41,7 @@ function P:action(msg, group, user)
     else
         table.insert(output, self.config.errors.specify_targets)
     end
-    
+
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
         autils.log(self, msg.chat.title, kicked_users,

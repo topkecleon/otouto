@@ -7,10 +7,11 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('demod', true).table
-    P.command = 'demod*'
+    P.command = 'demod'
     P.doc = 'Demotes a moderator.'
     P.privilege = 3
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group)

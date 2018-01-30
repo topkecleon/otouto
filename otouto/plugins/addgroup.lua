@@ -55,9 +55,7 @@ function P:action(msg, group)
                 strikes = {},
                 moderators = {},
                 bans = {},
-                flags = utilities.clone_table(self.config.administration.flags),
-                antiflood =
-                    utilities.clone_table(self.config.administration.antiflood)
+                flags = utilities.clone_table(self.config.administration.flags)
             }
 
             bindings.setChatDescription{

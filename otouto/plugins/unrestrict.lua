@@ -7,11 +7,12 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('unrestrict', true):t('unmute', true):t('unban', true).table
-    P.command = 'unrestrict*'
+    P.command = 'unrestrict'
     P.doc = 'Unrestrict a user.\nAliases: ' .. self.config.cmd_pat .. 'unmute, '
         .. self.config.cmd_pat .. 'unban'
     P.privilege = 2
     P.internal = true
+    P.targeting = true
 end
 
 function P:action(msg, group)

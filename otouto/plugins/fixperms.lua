@@ -7,9 +7,10 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('fixperms', true).table
-    P.command = 'fixperms*'
+    P.command = 'fixperms'
     P.doc = 'Fixes local permissions for the user or specified target.'
     P.privilege = 1
+    P.targeting = true
 end
 
 function P:action(msg, group, user)

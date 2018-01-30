@@ -7,8 +7,9 @@ local P = {}
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('hammer', true).table
-    P.command = 'hammer*'
+    P.command = 'hammer'
     P.privilege = 4
+    P.targeting = true
 end
 
 function P:action(msg, group)
@@ -38,7 +39,7 @@ function P:action(msg, group)
     else
         table.insert(output, self.config.errors.specify_targets)
     end
-    
+
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
         autils.log(self, msg.chat.title, hammered_users, 'Globally banned.',

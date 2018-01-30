@@ -8,14 +8,15 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('admin', true):t('addadmin', true).table
     P.privilege = 5
-    P.command = 'admin*'
+    P.command = 'admin'
     P.doc = 'Promotes a user or users to administrator(s).'
+    P.targeting = true
 end
 
 function P:action(msg, group, user)
     local targets = autils.targets(self, msg)
     local output = {}
-    
+
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then

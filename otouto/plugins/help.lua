@@ -19,7 +19,11 @@ function help:init()
     local commandlist = {}
     for _, plugin in pairs(self.plugins) do
         if plugin.command then
-            table.insert(commandlist, plugin.command)
+            if plugin.targeting then
+                table.insert(commandlist, plugin.command..'*')
+            else
+                table.insert(commandlist, plugin.command)
+            end
             if plugin.doc and not plugin.help_word then
                 plugin.help_word = utilities.get_word(plugin.command, 1)
             end
