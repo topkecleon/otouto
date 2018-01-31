@@ -21,7 +21,7 @@ function luarun:init()
     end
 end
 
-function luarun:action(msg)
+function luarun:action(msg, group)
 
     if msg.from.id ~= self.config.admin then
         return true
@@ -47,13 +47,13 @@ function luarun:action(msg)
         local http = require('socket.http')\n\z
         local https = require('ssl.https')\n\z
         local serpent = require('serpent')\n\z
-        return function (self, msg)\n" .. input .. "\nend"
+        return function (self, msg, group)\n" .. input .. "\nend"
     )
 
     if output == nil then
         output = success
     else
-        success, output = xpcall(output(), luarun.err_msg, self, msg)
+        success, output = xpcall(output(), luarun.err_msg, self, msg, group)
     end
 
     if output == nil then
