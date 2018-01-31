@@ -51,7 +51,6 @@ function P:action(msg, group)
                 rules = {},
                 filter = {},
                 antihammer = {},
-                antibot_whitelist = {},
                 strikes = {},
                 moderators = {},
                 bans = {},
