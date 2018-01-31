@@ -9,6 +9,8 @@
 local bindings = require('otouto.bindings')
 local http = require('socket.http')
 local https = require('ssl.https')
+ -- Global http/s timeout.
+http.TIMEOUT = 10
 local json = require('dkjson')
 local ltn12 = require('ltn12')
 local url = require('socket.url')

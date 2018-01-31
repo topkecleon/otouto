@@ -10,7 +10,7 @@ local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
 
-bot.version = '3.15.4'
+bot.version = '3.15.5'
 
  -- Function to be run on start and reload.
 function bot:init()
@@ -125,7 +125,7 @@ function bot:run()
     while self.is_started do
         -- Update loop.
         local res = bindings.getUpdates{
-            timeout = 5,
+            timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
             allowed_updates = '["message"]'
         }
