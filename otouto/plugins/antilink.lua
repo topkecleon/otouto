@@ -7,8 +7,8 @@ local antilink = {}
 function antilink:init()
     assert(self.named_plugins.flags, antilink.name .. ' requires flags')
     self.named_plugins.flags.flags[antilink.name] =
-        'Posting links to foreign Telegram groups is not allowed.'
-        
+        'Posting links to other groups is not allowed.'
+
     -- Build the antilink patterns. Additional future domains can be added to
     -- this list to keep it up to date.
     antilink.patterns = {}
