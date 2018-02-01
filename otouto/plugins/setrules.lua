@@ -24,6 +24,22 @@ del [i]
     Deletes a rule. If $i is unspecified, all rules will be deleted.
     Alias: /delrule
 
+Examples:
+• Set all the rules for a group.
+    /changerules
+    First rule.
+    Second rule.
+    ...
+
+• Change rule 4.
+    /changerule 4
+    Changed fourth rule.
+    [Changed fifth rule.]
+
+• Add a rule or rules between 2 and 3.
+    /addrule 3
+    New third rule.
+    [New fourth rule.]
     ]]
 
     P.privilege = 3

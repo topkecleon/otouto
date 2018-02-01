@@ -8,7 +8,9 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('kick', true).table
     P.command = 'kick'
-    P.doc = 'Removes a user or users from the group. Targets will be unable to rejoin for one minute.'
+    P.doc = [[Removes a user or users from the group. Targets will be unable to rejoin for one minute. A reason can be given on a new line. Example:
+    /kick @examplus 5554321
+    Bad jokes.]]
     P.privilege = 2
     P.internal = true
     P.targeting = true
