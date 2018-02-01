@@ -34,6 +34,8 @@ function P:action(msg, group)
         end
     end
 
+    local output
+
     if input then
         if #results == 0 then
             output = self.config.errors.results
