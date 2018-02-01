@@ -11,7 +11,7 @@ local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
 local autils -- Administration-related functions.
 
-bot.version = '3.15.4'
+bot.version = '3.15.5 admin'
 
  -- Function to be run on start and reload.
 function bot:init()
@@ -107,11 +107,11 @@ function bot:on_message(msg)
         if (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
-                    
+
                     local success, result = pcall(function()
                         return plugin.action(self, msg, group, user)
                     end)
-    
+
                     if not success then
                         -- If the plugin has an error message, send it. If it does
                         -- not, use the generic one specified in config. If it's set
@@ -140,7 +140,7 @@ function bot:on_edit(msg)
         msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
     end
     msg.text_lower = msg.text:lower()
-    
+
     local user = {
         id_str = tostring(msg.from.id),
         rank = autils.rank(self, msg.from.id, msg.chat.id),
@@ -154,11 +154,11 @@ function bot:on_edit(msg)
         if plugin.edit_action and (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
-                    
+
                     local success, result = pcall(function()
                         return plugin.edit_action(self, msg, group, user)
                     end)
-    
+
                     if not success then
                         -- The message contents are included for debugging purposes.
                         utilities.log_error(result..'\n'..msg.text, self.config.log_chat)
@@ -179,7 +179,7 @@ function bot:run()
     while self.is_started do
         -- Update loop.
         local res = bindings.getUpdates{
-            timeout = 5,
+            timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
             allowed_updates = '["message","edited_message"]'
         }
