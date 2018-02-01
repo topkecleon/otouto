@@ -8,6 +8,8 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('ban', true).table
     P.command = 'ban'
+    P.doc = 'Bans a user or users from the group. Targets can be unbanned with '
+        .. self.config.cmd_pat .. 'unban.'
     P.privilege = 2
     P.internal = true
     P.targeting = true
