@@ -28,7 +28,7 @@ function P:action(msg, group)
         if next(group.flags) ~= nil then
             output = output .. '\n\n<b>Flags:</b>'
             for flag in pairs(group.flags) do
-                output = output .. '\n<b>' .. flag .. ':</b> ' ..
+                output = output .. '\n• ' .. flag .. ': ' ..
                     self.named_plugins.flags.flags[flag]
             end
         end
