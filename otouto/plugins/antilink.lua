@@ -120,7 +120,7 @@ end
 function antilink.is_username_external(self, username)
     local res = bindings.getChat{chat_id = '@' .. username}
     -- If the username is an external supergroup or channel, return true.
-    if res and res.result.type =='supergroup' or res.result.type =='channel' and
+    if res and (res.result.type=='supergroup' or res.result.type=='channel') and
         not self.database.administration.groups[tostring(res.result.id)] then
             return true
     end
