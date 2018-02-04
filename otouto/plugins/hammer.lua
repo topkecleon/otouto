@@ -16,7 +16,7 @@ function P:init()
 end
 
 function P:action(msg, group)
-    local targets, reason = autils.target(self, msg)
+    local targets, reason = autils.targets(self, msg)
     local output = {}
     local hammered_users = {}
 
