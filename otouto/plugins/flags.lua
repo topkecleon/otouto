@@ -13,8 +13,8 @@ function P:init()
         :t('flags?', true).table
     P.command = 'flags [flag]'
     P.doc = 'Returns a list of flags, or toggles the specified flag.'
-    internal = true
-    privilege = 3
+    P.internal = true
+    P.privilege = 3
 end
 
 function P:action(msg, group)
