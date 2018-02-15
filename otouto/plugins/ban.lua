@@ -50,7 +50,7 @@ function P:action(msg, group)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #banned_users > 0 then
         autils.log(self, msg.chat.title, banned_users, 'Banned.',
-            utilities.format_name(self, msg.from.id))
+            utilities.format_name(self, msg.from.id), reason)
     end
 end
 

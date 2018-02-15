@@ -8,7 +8,7 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('hammer', true).table
     P.command = 'hammer'
-    P.doc = [[Globally ban a user or users. Targets can be unbanned with /unhammer. A reason can be given on a new line. Example:
+    P.doc = [[Globally bans a user or users. Targets can be unbanned with /unhammer. A reason can be given on a new line. Example:
     /hammer @examplus 5556789
     Really bad jokes.]]
     P.privilege = 4
@@ -31,6 +31,10 @@ function P:action(msg, group)
                 elseif self.database.administration.hammers[id_str] then
                     table.insert(output, name .. ' is already globally banned.')
                 else
+                    bindings.kickChatMember{
+                        chat_id = msg.chat.id,
+                        user_id = id
+                    }
                     self.database.administration.hammers[id_str] = true
                     table.insert(output, name .. ' has been globally banned.')
                     table.insert(hammered_users, id)
@@ -46,7 +50,7 @@ function P:action(msg, group)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
         autils.log(self, msg.chat.title, hammered_users, 'Globally banned.',
-            utilities.format_name(self, msg.from.id))
+            utilities.format_name(self, msg.from.id), reason)
     end
 end
 
