@@ -33,7 +33,15 @@ function antilink:init()
         end
         table.insert(antilink.patterns, s)
     end
-    antilink.triggers = antilink.patterns
+    antilink.triggers = utilities.clone_table(antilink.patterns)
+    table.insert(antilink.triggers, '@[%w_]+')
+
+    -- Infractions are stored, and users are globally banned after three.
+    if not self.database.administration.antilink then
+        self.database.administration.antilink = {}
+    end
+    antilink.store = self.database.administration.antilink
+
     antilink.internal = true
 end
 
@@ -48,9 +56,41 @@ function antilink:action(msg, group, user)
         return true
     end
     if antilink.check(self, msg) then
-        autils.strike(self, msg, antilink.name)
+        antilink.store[user.id_str] = antilink.store[user.id_str] or {
+            count = 0,
+            groups = {},
+        }
+        antilink.store[user.id_str].count = antilink.store[user.id_str].count +1
+        antilink.store[user.id_str].groups[tostring(msg.chat.id)] = true
+        antilink.store[user.id_str].latest = os.time()
+
+        if antilink.store[user.id_str].count == 3 then
+            self.database.administration.hammers[user.id_str] = true
+            autils.log(self, msg.chat.title, msg.from.id, 'Globally banned',
+                'antilink', 'Three illegal links within a day.')
+            for chat_id_str in pairs(antilink.store[user.id_str].groups) do
+                bindings.kickChatMember{
+                    chat_id = chat_id_str,
+                    target = msg.from.id
+                }
+            end
+            antilink.store[user.id_str] = nil
+        else
+            autils.strike(self, msg, antilink.name)
+        end
     else
         return true
+    end
+end
+
+function antilink:cron()
+    if antilink.last_clear ~= os.date('%H') then
+        for id_str, store in pairs(antilink.store) do
+            if store.latest + 86400 > os.time() then
+                antilink.store[id_str] = nil
+            end
+        end
+        antilink.last_clear = os.date('%H')
     end
 end
 
