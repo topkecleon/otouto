@@ -13,7 +13,7 @@ function P:init()
 end
 
 function P:action(msg, group)
-    local targets = autils.target(self, msg)
+    local targets = autils.targets(self, msg)
     local output = {}
 
     if targets then
