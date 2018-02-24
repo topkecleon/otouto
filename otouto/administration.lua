@@ -30,8 +30,9 @@ function autils:rank(user_id, chat_id)
         elseif group.bans[user_id_str] then
             return 0 -- Banned
         end
+    end
 
-    elseif self.database.administration.hammers[user_id_str] then
+    if self.database.administration.hammers[user_id_str] then
         if not group or not group.antihammer[user_id_str] then
             return 0 -- Hammered
         end

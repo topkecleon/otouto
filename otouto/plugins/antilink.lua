@@ -66,12 +66,14 @@ function antilink:action(msg, group, user)
 
         if antilink.store[user.id_str].count == 3 then
             self.database.administration.hammers[user.id_str] = true
+            bindings.deleteMessage{ chat_id = msg.chat.id,
+                message_id = msg.message_id }
             autils.log(self, msg.chat.title, msg.from.id, 'Globally banned',
                 'antilink', 'Three illegal links within a day.')
             for chat_id_str in pairs(antilink.store[user.id_str].groups) do
                 bindings.kickChatMember{
                     chat_id = chat_id_str,
-                    target = msg.from.id
+                    user_id = msg.from.id
                 }
             end
             antilink.store[user.id_str] = nil
