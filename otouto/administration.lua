@@ -118,7 +118,17 @@ function autils:strike(msg, source)
             warning = warning .. '\n<b>View the logs:</b> ' ..
                 self.config.administration.log_chat_username .. '.'
         end
-        utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+
+        -- Successfully-sent warnings get their IDs stored to be deleted about
+        -- five minutes later by automoderation.lua.
+        local m =utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+        if m then
+            table.insert(self.named_plugins.automoderation.store, {
+                message_id = m.result.message_id,
+                chat_id = m.result.msg.chat.id,
+                date = m.result.date
+            })
+        end
 
     elseif chat[user_id_str] == 2 then
         local a, b = bindings.kickChatMember{

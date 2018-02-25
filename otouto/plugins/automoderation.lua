@@ -18,12 +18,31 @@ function automod:init()
         self.database.administration.automoderation or {}
     self.database.administration.automod_timer =
         self.database.administration.automod_timer or os.date('%d')
+
+    -- Store the IDs of warning messages to delete them after five minutes.
+    automod.store = {}
 end
 
 function automod:cron()
     if self.database.administration.automod_timer ~= os.date('%d') then
         self.database.administration.automoderation = {}
         self.database.administration.automod_timer = os.date('%d')
+    end
+
+    -- Delete old first-strike warnings after five minutes.
+    if #automod.store > 0 then
+        local new_store = {}
+        for _, m in ipairs(automod.store) do
+            if os.time() > m.date + 300 then
+                bindings.deleteMessage{
+                    message_id = m.message_id,
+                    chat_id = m.chat_id
+                }
+            else
+                table_insert(new_store, m)
+            end
+        end
+        automod.store = new_store
     end
 end
 
