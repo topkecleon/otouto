@@ -36,7 +36,8 @@ function antilink:init()
     antilink.triggers = utilities.clone_table(antilink.patterns)
     table.insert(antilink.triggers, '@[%w_]+')
 
-    -- Infractions are stored, and users are globally banned after three.
+    -- Infractions are stored, and users are globally banned after three within
+    -- one day of each other.
     if not self.database.administration.antilink then
         self.database.administration.antilink = {}
     end
@@ -87,8 +88,8 @@ end
 
 function antilink:cron()
     if antilink.last_clear ~= os.date('%H') then
-        for id_str, store in pairs(antilink.store) do
-            if store.latest + 86400 > os.time() then
+        for id_str, u in pairs(antilink.store) do
+            if os.time() > u.latest + 86400 then
                 antilink.store[id_str] = nil
             end
         end
