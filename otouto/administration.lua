@@ -125,7 +125,7 @@ function autils:strike(msg, source)
         if m then
             table.insert(self.named_plugins.automoderation.store, {
                 message_id = m.result.message_id,
-                chat_id = m.result.msg.chat.id,
+                chat_id = m.result.chat.id,
                 date = m.result.date
             })
         end
