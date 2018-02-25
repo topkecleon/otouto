@@ -145,13 +145,15 @@ function autils:strike(msg, source)
         chat[user_id_str] = 0
     end
 
-    autils.log(self, msg.chat.title, msg.from.id, action_taken, source,
+    autils.log(self, msg.chat.id, msg.from.id, action_taken, source,
         self.named_plugins.flags.flags[source])
 
     return rv
 end
 
-function autils:log(chat_title, targets, action_taken, source, etc)
+function autils:log(chat_id, targets, action_taken, source, etc)
+    local group = self.database.administration.groups[tostring(chat_id)]
+
     local target_names = {}
     if tonumber(targets) then
         table.insert(target_names, utilities.format_name(self, targets))
@@ -163,7 +165,7 @@ function autils:log(chat_title, targets, action_taken, source, etc)
 
     local output = string.format(
         '<b>%s</b>\n%s\n%s\n<b>by</b> %s',
-        utilities.html_escape(chat_title),
+        utilities.html_escape(group.name),
         table.concat(target_names, '\n'),
         action_taken,
         source
@@ -171,8 +173,13 @@ function autils:log(chat_title, targets, action_taken, source, etc)
     if etc then
         output = output .. ': <i>' .. utilities.html_escape(etc) .. '</i>'
     end
-    utilities.send_message(self.config.administration.log_chat or
-        self.config.log_chat, output, true, nil, 'html')
+
+    local log_chat = self.config.log_chat
+    if not group.flags.private then
+        log_chat = self.config.administration.log_chat or log_chat
+    end
+
+    utilities.send_message(log_chat, output, true, nil, 'html')
 end
 
 -- Shortcut to promote admins. Passing true as all_perms enables the

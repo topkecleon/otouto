@@ -22,7 +22,7 @@ function P:action(msg, group, user)
             chat_id = msg.chat.id,
             user_id = msg.new_chat_member.id
         } then
-            autils.log(self, msg.chat.title, msg.new_chat_member.id,
+            autils.log(self, msg.chat.id, msg.new_chat_member.id,
                 'Bot removed.', 'antibot',
                 self.named_plugins.flags.flags.antibot)
         end

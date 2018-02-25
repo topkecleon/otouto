@@ -46,7 +46,7 @@ function P:action(msg, group, user)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
-        autils.log(self, msg.chat.title, kicked_users, 'Kicked for one minute.',
+        autils.log(self, msg.chat.id, kicked_users, 'Kicked for one minute.',
             utilities.format_name(self, msg.from.id), reason)
     end
 end

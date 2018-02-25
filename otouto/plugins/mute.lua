@@ -74,7 +74,7 @@ function P:action(msg, group)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
-        autils.log(self, msg.chat.title, muted_users, log_str,
+        autils.log(self, msg.chat.id, muted_users, log_str,
             utilities.format_name(self, msg.from.id))
     end
 end

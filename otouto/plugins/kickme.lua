@@ -22,7 +22,7 @@ function P:action(msg)
         user_id = msg.from.id,
         until_date = msg.date + 60
     } then
-        autils.log(self, msg.chat.title, msg.from.id,
+        autils.log(self, msg.chat.id, msg.from.id,
             'User kicked for one minute.', 'kickme')
     end
 end

@@ -17,7 +17,7 @@ function P:action(msg, group, user)
             message_id = msg.message_id,
             chat_id = msg.chat.id
         }
-        autils.log(self, msg.chat.title,
+        autils.log(self, msg.chat.id,
             msg.from.id, 'Sticker deleted.', P.name)
     else
         return true

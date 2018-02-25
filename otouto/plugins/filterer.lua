@@ -24,8 +24,8 @@ function P:action(msg, group, user)
                 message_id = msg.message_id,
                 chat_id = msg.chat.id
             }
-            autils.log(self, msg.chat.title,
-                msg.from.id, 'Message deleted.', 'filter')
+            autils.log(self, msg.chat.id, msg.from.id, 'Message deleted.',
+                'filter')
             return
         end
     end
