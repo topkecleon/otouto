@@ -39,7 +39,7 @@ function automod:cron()
                     chat_id = m.chat_id
                 }
             else
-                table_insert(new_store, m)
+                table.insert(new_store, m)
             end
         end
         automod.store = new_store
