@@ -42,6 +42,7 @@ function luarun:action(msg, group)
         local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
         local drua = require('otouto.drua-tg')\n\z
+        local autils = require('otouto.administration.')\n\z
         local json = require('dkjson')\n\z
         local url = require('socket.url')\n\z
         local http = require('socket.http')\n\z
