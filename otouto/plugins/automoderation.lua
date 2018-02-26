@@ -32,8 +32,9 @@ function automod:cron()
     -- Delete old first-strike warnings after five minutes.
     if #automod.store > 0 then
         local new_store = {}
+        local time = os.time() - self.config.administration.warning_expiration
         for _, m in ipairs(automod.store) do
-            if os.time() > m.date + 300 then
+            if time > m.date then
                 bindings.deleteMessage{
                     message_id = m.message_id,
                     chat_id = m.chat_id

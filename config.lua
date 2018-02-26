@@ -41,9 +41,8 @@ Based on otouto by topkecleon.
         log_chat = nil,
         -- link or username
         log_chat_username = nil,
-        -- Default autoban setting.
-        -- A user is banned after being autokicked this many times in a day.
-        autoban = 3,
+        -- First strike warnings will be deleted after this, in seconds.
+        warning_expiration = 120,
         -- Default flag settings.
         flags = {
             antibot = true,
