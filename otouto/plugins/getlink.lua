@@ -23,7 +23,7 @@ function P:action(msg, group, user)
     -- Links to private groups are mods+ and are only PM'd.
     if group.flags.private then
         if user.rank > 1 then
-            if utilities.send_message(msg.from.id, link, nil, nil, 'html') then
+            if utilities.send_message(msg.from.id, link, true, nil, 'html') then
                 output = 'I have sent you the requested information in a private message.'
             else
                 output = 'This group is private. The link must be received privately. Please message me privately and re-run the command.'
@@ -35,7 +35,7 @@ function P:action(msg, group, user)
         output = link
     end
 
-    utilities.send_message(msg.chat.id, output, nil, msg.message_id, 'html')
+    utilities.send_message(msg.chat.id, output, true, msg.message_id, 'html')
 end
 
 return P
