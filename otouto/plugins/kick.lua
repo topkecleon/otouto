@@ -31,7 +31,7 @@ function P:action(msg, group, user)
                     bindings.kickChatMember{
                         chat_id = msg.chat.id,
                         user_id = id,
-                        until_date = msg.date + 60
+                        until_date = os.time() + 35
                     }
                     table.insert(output, name .. ' has been kicked.')
                     table.insert(kicked_users, id)
