@@ -174,14 +174,18 @@ function autils:log(chat_id, targets, action_taken, source, etc)
     end
 
     local output = string.format(
-        '<b>%s</b>\n%s\n%s\n<b>by</b> %s',
+        '<code>%s</code>\n<b>%s</b> <code>[%s]</code>\n%s\n%s by %s',
+        os.date('%F %T'),
         utilities.html_escape(group.name),
+        utilities.normalize_id(chat_id),
         table.concat(target_names, '\n'),
         action_taken,
         source
     )
     if etc then
-        output = output .. ': <i>' .. utilities.html_escape(etc) .. '</i>'
+        output = output .. ':\n<i>' .. utilities.html_escape(etc) .. '</i>'
+    else
+        output = output .. '.'
     end
 
     local log_chat = self.config.log_chat
