@@ -8,7 +8,7 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('kick', true).table
     P.command = 'kick'
-    P.doc = [[Removes a user or users from the group. Targets will be unable to rejoin for one minute. A reason can be given on a new line. Example:
+    P.doc = [[Removes a user or users from the group. A reason can be given on a new line. Example:
     /kick @examplus 5554321
     Bad jokes.]]
     P.privilege = 2
@@ -25,7 +25,7 @@ function P:action(msg, group, user)
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local name = utilities.format_name(self, id)
-                if autils.rank(self, id) > 2 then
+                if autils.rank(self, id, msg.chat.id) > 2 then
                     table.insert(output, name .. ' is too privileged to be kicked.')
                 else
                     bindings.kickChatMember{
