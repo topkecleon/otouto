@@ -46,7 +46,7 @@ end
 
 function P:desc(chat_id)
     local group = self.database.administration.groups[tostring(chat_id)]
-    
+
     local output = '<b>Welcome to '
     if group.flags.private then
         output = output .. utilities.html_escape(group.name) .. '!</b>'
@@ -54,6 +54,8 @@ function P:desc(chat_id)
         output = output .. '</b><a href="' .. group.link .. '">' ..
             utilities.html_escape(group.name) .. '</a><b>!</b>'
     end
+
+    output = output ..' <code>['.. utilities.normalize_id(chat_id) .. ']</code>'
 
     if group.description then
         output = output .. '\n\n' .. group.description
