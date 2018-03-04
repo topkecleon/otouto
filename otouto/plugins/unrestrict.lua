@@ -27,7 +27,9 @@ function P:action(msg, group)
                     can_send_other_messages = true,
                     can_add_web_page_previews = true
                 }
-                self.database.administration.automoderation[tostring(msg.chat.id)][tostring(id)] = nil
+                if self.database.administration.automoderation[tostring(msg.chat.id)] then
+                    self.database.administration.automoderation[tostring(msg.chat.id)][tostring(id)] = nil
+                end
                 if group.bans[tostring(id)] then
                     group.bans[tostring(id)] = nil
                     table.insert(output, utilities.format_name(self, id) ..
