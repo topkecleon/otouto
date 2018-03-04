@@ -49,7 +49,7 @@ function P:action(msg, group)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
-        autils.log(self, msg.chat.id, hammered_users, 'Globally banned.',
+        autils.log(self, msg.chat.id, hammered_users, 'Globally banned',
             utilities.format_name(self, msg.from.id), reason)
     end
 end

@@ -108,7 +108,7 @@ function autils:strike(msg, source)
     local action_taken
 
     if chat[user_id_str] == 1 then
-        action_taken = 'Message deleted.'
+        action_taken = 'Message deleted'
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
@@ -137,7 +137,7 @@ function autils:strike(msg, source)
             until_date = msg.date + 300
         }
         if a then
-            action_taken = 'User kicked for five minutes.'
+            action_taken = 'Kicked for five minutes'
         else
             action_taken = b.description
         end
@@ -148,7 +148,7 @@ function autils:strike(msg, source)
             user_id = msg.from.id,
         }
         if a then
-            action_taken = 'User banned.'
+            action_taken = 'Banned'
         else
             action_taken = b.description
         end
