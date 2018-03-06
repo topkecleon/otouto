@@ -30,8 +30,9 @@ function greetings:action(msg)
     for response, triggers in pairs(self.config.greetings) do
         for _, trigger in pairs(triggers) do
             if string.match(msg.text_lower, trigger) then
+                local n = nick:gsub('%%','%%%%')
                 utilities.send_message(msg.chat.id,
-                    response:gsub('#NAME', nick:gsub('%%','%%%%')))
+                    response:gsub('#NAME', n))
                 return
             end
         end
