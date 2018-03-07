@@ -114,6 +114,7 @@ function autils:strike(msg, source)
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
             utilities.format_name(self, msg.from.id) ..
             '. The next automoderation trigger will result in a five-minute tempban.'
+            .. '\n<i>' .. self.named_plugins.flags.flags[source] ..'</i>'
         if self.config.administration.log_chat_username then
             warning = warning .. '\n<b>View the logs:</b> ' ..
                 self.config.administration.log_chat_username .. '.'
