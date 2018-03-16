@@ -54,35 +54,45 @@ function autils:targets(msg)
         }, input
 
     elseif input then
-        -- output
         local user_ids = {}
+        local text = msg.text
 
-        -- Iterate over entities for text mentions.
+        -- Iterate over entities for text mentions, add mentioned users to
+        -- user_ids and remove the text of the mentions from the string.
         if msg.entities then
-            for _, entity in ipairs(msg.entities) do
+            for i = #msg.entities, 1, -1 do
+                local entity = msg.entities[i]
                 if entity.type == 'text_mention' then
-                    table.insert(user_ids, entity.user.id)
+                    table.insert(user_ids, 1, entity.user.id)
+
+                    text = text:sub(1, entity.offset) ..
+                        text:sub(entity.offset + entity.length + 2)
                 end
             end
         end
 
-        -- In a non-reply command, the text following a newline is the reason.
-        local reason
-        if input:match('\n') then
-            input, reason = input:match('(.-)\n+(.+)')
-        end
+        text = utilities.input(text)
+        -- text may be empty after removing text mentions
+        if text then
+            -- The text following a newline is the reason.
+            local reason
+            if text:match('\n') then
+                text, reason = text:match('(.-)\n+(.+)')
+            end
 
-        for word in input:gmatch('%g+') do
-            if tonumber(word) then
-                table.insert(user_ids, tonumber(word))
+            for word in text:gmatch('%g+') do
+                if tonumber(word) then
+                    table.insert(user_ids, tonumber(word))
 
-            elseif word:match('^@.') then
-                local user = utilities.resolve_username(self, word)
-                table.insert(user_ids, user and user.id or
-                    'Unrecognized username (' .. word .. ').')
+                elseif word:match('^@.') then
+                    local user = utilities.resolve_username(self, word)
+                    table.insert(user_ids, user and user.id or
+                        'Unrecognized username (' .. word .. ').')
 
-            else
-                table.insert(user_ids, 'Invalid username or ID (' ..word.. ').')
+                else
+                    table.insert(user_ids,
+                        'Invalid username or ID (' .. word .. ').')
+                end
             end
         end
 
@@ -158,8 +168,6 @@ function autils:strike(msg, source)
 
     autils.log(self, msg.chat.id, msg.from.id, action_taken, source,
         self.named_plugins.flags.flags[source])
-
-    return rv
 end
 
 function autils:log(chat_id, targets, action_taken, source, etc)
