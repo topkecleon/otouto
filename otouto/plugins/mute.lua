@@ -8,7 +8,7 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('mute', true).table
     P.command = 'mute'
-    P.doc = [[Mute a user or users indefinitely or for the time specified in minutes. A single target can be specified by replying to one of his messages. Multiple targets can be specified via ID and username. In reply commands, the duration is specified after the command. Otherwise, the duration is specified on a new line after the targets. This behavior is consistent with ban reasons.
+    P.doc = [[Mute a user or users indefinitely or for the time specified in minutes. In reply commands, the duration is specified after the command. Otherwise, the duration is specified on a new line after the targets. This behavior is consistent with ban reasons.
 Examples:
     /mute @foo @bar 8675309
     120

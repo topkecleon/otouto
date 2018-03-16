@@ -30,7 +30,7 @@ function help:init()
         end
     end
     table.sort(commandlist)
-    local comlist = '\n• ' .. self.config.cmd_pat .. table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\nArguments: <required> [optional]\n* Targets may be specified via reply, username, or ID.'
+    local comlist = '\n• ' .. self.config.cmd_pat .. table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\nArguments: <required> [optional]\n* Targets may be specified via reply, username, mention, or ID.'
     help.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 
