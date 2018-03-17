@@ -86,7 +86,7 @@ Based on otouto by topkecleon.
         'ban',
         'kick',
         'filter',
-        'description',
+        'getdescription',
         'setdescription',
         'addadmin',
         'deadmin',
