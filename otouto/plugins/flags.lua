@@ -23,7 +23,7 @@ function P:action(msg, group)
 
     if input then
         for word in input:gmatch('%g+') do
-            word_lwr = word:lower()
+            local word_lwr = word:lower()
             if P.flags[word_lwr] then
                 if group.flags[word_lwr] then
                     group.flags[word_lwr] = nil
