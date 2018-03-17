@@ -1,4 +1,3 @@
-local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.administration')
 
@@ -26,7 +25,7 @@ function P:action(msg, group, user)
     ) then
         return true
     end
-    
+
     autils.strike(self, msg, P.name)
 end
 

@@ -1,6 +1,4 @@
-local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
-local autils = require('otouto.administration')
 
 local P = {}
 
@@ -14,8 +12,8 @@ function P:action(msg, group, user)
     local input = utilities.input(msg.text_lower)
     local chat_id
     if input then
-        for id_str, group in pairs(self.database.administration.groups) do
-            if not group.flags.private and group.name:lower():match(input) then
+        for id_str, chat in pairs(self.database.administration.groups) do
+            if not chat.flags.private and chat.name:lower():match(input) then
                 chat_id = id_str
                 break
             end

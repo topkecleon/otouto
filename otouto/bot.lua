@@ -200,7 +200,7 @@ function bot:run()
         -- Run cron jobs every minute.
         local now = os.date('%M')
         if self.last_cron ~= now then
-            for i,v in ipairs(self.plugins) do
+            for _, v in ipairs(self.plugins) do
                 if v.cron then -- Call each plugin's cron function, if it has one.
                     local suc, err = pcall(function() v.cron(self, now) end)
                     if not suc then
