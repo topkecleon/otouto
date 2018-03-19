@@ -344,4 +344,51 @@ function utilities.format_name(self, id)
     return s
 end
 
+function utilities.divmod(x, y)
+    local q = math.floor(x / y)
+    return q, x - y * q
+end
+
+ -- named by brayden
+utilities.tiem = {
+    order = { 'w', 'd', 'h', 'm', 's' },
+    dict = {
+        w = 604800,
+        d = 86400,
+        h = 3600,
+        m = 60,
+        s = 1
+    }
+}
+
+function utilities.tiem.format(seconds)
+    local time_str = ''
+    for _, l in ipairs(utilities.tiem.order) do
+        local v = utilities.tiem.dict[l]
+        if seconds >= v then
+            local q, r = utilities.divmod(seconds, v)
+            time_str = time_str .. q .. l
+            seconds = r
+        end
+    end
+    return time_str
+end
+
+function utilities.tiem.deformat(time_str)
+    if
+        (not time_str:match('^[%dwdhms]+$'))
+        or time_str:match('%l%l')
+        or time_str:match('^%l')
+        or time_str:match('%d$')
+    then
+        return false
+    end
+
+    local seconds = 0
+    for num, typ in time_str:lower():gmatch('(%d+)(%l)') do
+        seconds = seconds + num * utilities.tiem.dict[typ]
+    end
+    return math.floor(seconds)
+end
+
 return utilities
