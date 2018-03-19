@@ -52,7 +52,7 @@ function regex:action(msg)
 
     local input = msg.reply_to_message.text
     if msg.reply_to_message.from.id == self.info.id then
-        input = input:match('^Did you mean:\n"(.+)"$') or input
+        input = input:match('^Did you mean:\n"(.+)"%?$') or input
     end
 
     -- self.config.cmd_pat has to be one byte for this to work
@@ -95,7 +95,7 @@ function regex:action(msg)
         return
     else -- Success.
         local output = utilities.trim(result:sub(1, 4000))
-        output = '<b>Did you mean:</b>\n"' .. utilities.html_escape(output) .. '"'
+        output = '<b>Did you mean:</b>\n"' .. utilities.html_escape(output) .. '"?'
         utilities.send_reply(msg.reply_to_message, output, 'html')
     end
 end
