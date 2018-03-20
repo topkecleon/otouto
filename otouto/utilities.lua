@@ -351,9 +351,10 @@ end
 
  -- named by brayden
 utilities.tiem = {
-    order = { 'w', 'd', 'h', 'm', 's' },
+    order = { 'y', 'w', 'd', 'h', 'm', 's' },
     dict = {
-        w = 604800,
+        y = 365.25 * 86400
+        w = 7 * 86400,
         d = 86400,
         h = 3600,
         m = 60,
@@ -376,7 +377,7 @@ end
 
 function utilities.tiem.deformat(time_str)
     if
-        (not time_str:match('^[%dwdhms]+$'))
+        (not time_str:match('^[%dywdhms]+$'))
         or time_str:match('%l%l')
         or time_str:match('^%l')
         or time_str:match('%d$')
