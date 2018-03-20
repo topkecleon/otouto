@@ -34,8 +34,8 @@ function help:init()
     end
     table.sort(commandlist)
     local comlist = '\n• ' .. self.config.cmd_pat ..
-        table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. [[
-Arguments: <required> [optional]
+        table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\n' ..
+[[Arguments: <required> [optional]
 * Targets may be specified via reply, username, mention, or ID. In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.
 † A duration may be specified before the reason, in minutes or in the format 5d12h30m15s.]]
     help.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
