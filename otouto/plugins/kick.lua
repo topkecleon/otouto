@@ -26,7 +26,7 @@ function P:action(msg, group, user)
     local out_str, log_str
     if duration then
         out_str = ' has been banned for ' ..utilities.tiem.format(duration)..'.'
-        log_str = 'Muted for ' .. utilities.tiem.format(duration)
+        log_str = 'Banned for ' .. utilities.tiem.format(duration)
     else
         out_str = ' has been kicked.'
         log_str = 'Kicked'
