@@ -45,14 +45,16 @@ function autils.duration_from_reason(text)
     local reason = text
     local duration
     local first = utilities.get_word(text, 1)
-    if tonumber(first) then
-        duration = first * 60
-        reason = utilities.input(text)
-    elseif first:match('^%d[%dywdhms]*%l$') then
-        local n = utilities.tiem.deformat(first)
-        if n then
-            duration = n
+    if first then
+        if tonumber(first) then
+            duration = first * 60
             reason = utilities.input(text)
+        elseif first:match('^%d[%dywdhms]*%l$') then
+            local n = utilities.tiem.deformat(first)
+            if n then
+                duration = n
+                reason = utilities.input(text)
+            end
         end
     end
     return reason, duration
