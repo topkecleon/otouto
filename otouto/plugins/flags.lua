@@ -3,7 +3,7 @@ local utilities = require('otouto.utilities')
 local P = {}
 
 P.flags = {
-    private = 'The group is not publicly listed.'
+    private = 'Removes the link from the public group list.'
 }
 
 function P:init()
