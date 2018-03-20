@@ -9,6 +9,7 @@
 ]]--
 
 local utilities = require('otouto.utilities')
+local autils = require('otouto.administration')
 
 local help = {}
 
@@ -44,9 +45,20 @@ end
 function help:action(msg)
     local input = utilities.input(msg.text_lower)
     if input then
+        input = input:lower():gsub('^' .. self.config.cmd_pat, '')
         for _,plugin in ipairs(self.plugins) do
-            if plugin.help_word == input:gsub('^'..self.config.cmd_pat, '') then
-                local output = '<b>Help for</b> <i>' .. plugin.help_word .. '</i><b>:</b>\n' .. plugin.doc
+            if input:match(plugin.help_word then
+                local output = '<b>Help for</b> <i>' .. plugin.help_word ..
+                    '</i><b>:</b>\n' .. plugin.doc
+                utilities.send_message(msg.chat.id, output, true, nil, 'html')
+                return
+            end
+        end
+        -- If there are no plugin matches, check the autils glossary.
+        for name, entry in pairs(autils.glossary) do
+            if input:match(name) do
+                local output = '<b>Glossary for</b> <i>' .. name ..
+                    '</i><b>:</b>\n' .. entry
                 utilities.send_message(msg.chat.id, output, true, nil, 'html')
                 return
             end

@@ -9,6 +9,15 @@ function antilink:init()
     self.named_plugins.flags.flags[antilink.name] =
         'Posting links to other groups is not allowed.'
 
+    antilink.help_word = 'antilink'
+    antilink.doc = "\z
+antilink checks links and usernames posted by non-moderators. If a message \z
+references a group or channel outside the realm, an automoderation strike is \z
+issued (see /help automoderation) and the user's global antilink counter is \z
+incremented. When his counter reaches 3, he is globally banned and \z
+immediately removed from all groups where antilink was triggered. \
+antilink can be enabled with /flag antilink (see /help flags)."
+
     -- Build the antilink patterns. Additional future domains can be added to
     -- this list to keep it up to date.
     antilink.patterns = {}

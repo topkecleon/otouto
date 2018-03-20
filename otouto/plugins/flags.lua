@@ -10,7 +10,20 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('flags?', true).table
     P.command = 'flags [flag]'
-    P.doc = 'Returns a list of flags, or toggles the specified flag.'
+    P.help_word = 'flags?'
+    local default_flags = {}
+    for flag in pairs(self.config.administration.flags) do
+        table.insert(default_flags, flag)
+    end
+    P.doc = "\z
+Usage: " .. self.config.cmd_pat .. "flags [flag] \
+Returns a list of flags, or toggles the specified flag. \
+Flags are administrative policies at the disposal of the governor. Most \z
+provide optional automoderation (see /help antilink). The private flag \z
+removes a group's link from the public list and makes it only available to \z
+moderators and greater. \z
+The following flags are enabled by default:\n" ..
+table.concat(default_flags, '\n•')
     P.internal = true
     P.privilege = 3
 end

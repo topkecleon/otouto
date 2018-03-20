@@ -171,7 +171,7 @@ function autils:strike(msg, source)
             until_date = msg.date + 300
         }
         if a then
-            action_taken = 'Kicked for five minutes'
+            action_taken = 'Banned for five minutes'
         else
             action_taken = b.description
         end
@@ -255,5 +255,37 @@ function autils.demote_admin(chat_id, user_id)
         can_promote_members = false
     }
 end
+
+ -- Command non-specific information, such as on the syntax of targetting and
+ -- the formatting of intervals.
+autils.glossary = {}
+
+autils.glossary.targets = "\z
+Targets are specified in a list of usernames, text mentions, and/or user IDs. \z
+Most commands accept multiple targets. In a reply command, the sender of the \z
+replied-to message is the target. \
+A reason can usually be specified. In reply commands, the reason is the text \z
+after the command. In normal commands, the reason is specified on a new line. \
+Some commands accept an optional duration, specified at the beginning of the \z
+reason. The duration can be a number of minutes, or a time interval in the \z
+format 1y12w28d12h45m30s. Read more on time formatting with /help tiem."
+
+autils.glossary.tiem = "\z
+Some commands, such as /mute and /tempban, accept an optional duration. The \z
+duration can be specified before or in place of the reason. If a number is \z
+given, the interval will be that number of minutes. An interval can also be \z
+a tiem string, eg 3d12h30m. \
+The tiem format handles intervals in the following units: \
+• year (y): 365.25 days or 31557600 seconds. \
+• week (w): 10080 minutes or 604800 seconds. \
+• day (d): 1440 minutes or 86400 seconds. \
+• hour (h) \
+• minute (m) \
+• seconds (s) \
+Units can be repeated and do not need to be in order of size. Their amounts \z
+can exceed the size of a larger unit. Invalid tiem strings are overlooked and \z
+included in the reason. \
+Be aware that most (or all) Telegram bot API calls limit intervals to one year."
+
 
 return autils
