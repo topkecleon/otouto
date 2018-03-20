@@ -47,7 +47,7 @@ function help:action(msg)
     if input then
         input = input:lower():gsub('^' .. self.config.cmd_pat, '')
         for _,plugin in ipairs(self.plugins) do
-            if input:match(plugin.help_word then
+            if input:match(plugin.help_word) then
                 local output = '<b>Help for</b> <i>' .. plugin.help_word ..
                     '</i><b>:</b>\n' .. plugin.doc
                 utilities.send_message(msg.chat.id, output, true, nil, 'html')
@@ -56,7 +56,7 @@ function help:action(msg)
         end
         -- If there are no plugin matches, check the autils glossary.
         for name, entry in pairs(autils.glossary) do
-            if input:match(name) do
+            if input:match(name) then
                 local output = '<b>Glossary for</b> <i>' .. name ..
                     '</i><b>:</b>\n' .. entry
                 utilities.send_message(msg.chat.id, output, true, nil, 'html')
