@@ -6,7 +6,7 @@ local P = {}
 
 function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
-        :t('kick', true).table
+        :t('kick', true):t('tempban', true).table
     P.command = 'kick'
     P.doc = [[Removes a user or users from the group. A reason can be given on a new line. Example:
     /kick @examplus 5554321
@@ -14,10 +14,24 @@ function P:init()
     P.privilege = 2
     P.internal = true
     P.targeting = true
+    P.duration = true
 end
 
 function P:action(msg, group, user)
-    local targets, reason = autils.targets(self, msg)
+    local targets, reason, duration = autils.targets(self, msg)
+    if duration and (duration > 366*24*60*60 or duration < 30) then
+        duration = nil
+    end
+
+    local out_str, log_str
+    if duration then
+        out_str = ' has been banned for ' utilities.tiem.format(duration) .. '.'
+        log_str = 'Muted for ' .. utilities.tiem.format(duration)
+    else
+        out_str = ' has been kicked.'
+        log_str = 'Kicked'
+    end
+
     local output = {}
     local kicked_users = {}
 
@@ -31,7 +45,7 @@ function P:action(msg, group, user)
                     bindings.kickChatMember{
                         chat_id = msg.chat.id,
                         user_id = id,
-                        until_date = os.time() + 35
+                        until_date = duration and duration + os.time() or 35
                     }
                     table.insert(output, name .. ' has been kicked.')
                     table.insert(kicked_users, id)
@@ -46,7 +60,7 @@ function P:action(msg, group, user)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
-        autils.log(self, msg.chat.id, kicked_users, 'Kicked',
+        autils.log(self, msg.chat.id, kicked_users, log_str,
             utilities.format_name(self, msg.from.id), reason)
     end
 end

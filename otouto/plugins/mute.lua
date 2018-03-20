@@ -8,34 +8,34 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('mute', true).table
     P.command = 'mute'
-    P.doc = [[Mute a user or users indefinitely or for the time specified in minutes. In reply commands, the duration is specified after the command. Otherwise, the duration is specified on a new line after the targets. This behavior is consistent with ban reasons.
+    P.doc = [[Mute a user or users indefinitely or for the time specified. The duration can be specified before the reason.
 Examples:
     /mute @foo @bar 8675309
-    120
+    2h30m No cursing on my Christian server.
 
     [in reply] /mute 240]]
     P.privilege = 2
     P.internal = true
     P.targeting = true
+    P.duration = true
 end
 
 function P:action(msg, group)
-    local targets, duration = autils.targets(self, msg)
-    duration = tonumber(duration)
+    local targets, reason, duration = autils.targets(self, msg)
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.
-    if duration and (duration > (366*24*60) or duration < 1) then
+    if duration and (duration > (366*24*60*60) or duration < 30) then
         duration = nil
     end
 
     local out_str, log_str
     if duration then
-        out_str = ' has been muted for ' .. duration .. ' minutes.'
-        log_str = 'Muted for ' .. duration .. ' minutes.'
+        out_str = ' has been muted for '.. utilities.tiem.format(duration) ..'.'
+        log_str = 'Muted for ' .. utilities.tiem.format(duration)
     else
         out_str = ' has been muted.'
-        log_str = 'Muted.'
+        log_str = 'Muted'
     end
 
     local output = {}
@@ -43,10 +43,7 @@ function P:action(msg, group)
 
     if targets then
         for _, id in ipairs(targets) do
-            if not tonumber(id) then
-                table.insert(output, id)
-
-            else
+            if tonumber(id) then
                 local name = utilities.format_name(self, id)
 
                 if autils.rank(self, id, msg.chat.id) > 1 then
@@ -55,7 +52,7 @@ function P:action(msg, group)
                     local a, b = bindings.restrictChatMember{
                         chat_id = msg.chat.id,
                         user_id = id,
-                        until_date = duration and msg.date + (duration * 60),
+                        until_date = duration and os.time() + duration,
                         can_send_messages = false
                     }
                     if not a then
@@ -65,6 +62,9 @@ function P:action(msg, group)
                         table.insert(muted_users, id)
                     end
                 end
+
+            else
+                table.insert(output, id)
             end
         end
 
@@ -75,7 +75,7 @@ function P:action(msg, group)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
         autils.log(self, msg.chat.id, muted_users, log_str,
-            utilities.format_name(self, msg.from.id))
+            utilities.format_name(self, msg.from.id), reason)
     end
 end
 

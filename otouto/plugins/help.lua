@@ -19,18 +19,25 @@ function help:init()
     local commandlist = {}
     for _, plugin in pairs(self.plugins) do
         if plugin.command then
+            local s = plugin.command
             if plugin.targeting then
-                table.insert(commandlist, plugin.command..'*')
-            else
-                table.insert(commandlist, plugin.command)
+                s = s .. '*'
+                if plugin.duration then
+                    s = s .. '†'
+                end
             end
+            table.insert(commandlist, s)
             if plugin.doc and not plugin.help_word then
                 plugin.help_word = utilities.get_word(plugin.command, 1)
             end
         end
     end
     table.sort(commandlist)
-    local comlist = '\n• ' .. self.config.cmd_pat .. table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\nArguments: <required> [optional]\n* Targets may be specified via reply, username, mention, or ID.'
+    local comlist = '\n• ' .. self.config.cmd_pat ..
+        table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. [[
+Arguments: <required> [optional]
+* Targets may be specified via reply, username, mention, or ID. In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.
+† A duration may be specified before the reason, in minutes or in the format 5d12h30m15s.]]
     help.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 

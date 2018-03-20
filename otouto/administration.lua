@@ -41,6 +41,23 @@ function autils:rank(user_id, chat_id)
     return 1
 end
 
+function autils.duration_from_reason(text)
+    local reason = text
+    local duration
+    local first = utilities.get_word(text, 1)
+    if tonumber(first) then
+        duration = first * 60
+        reason = utilities.input(text)
+    elseif first:match('^%d[%dywdhms]*%l$') then
+        local n = utilities.tiem.deformat(first)
+        if n then
+            duration = n
+            reason = utilities.input(text)
+        end
+    end
+    return reason, duration
+end
+
 function autils:targets(msg)
     local input = utilities.input(msg.text)
 
@@ -51,11 +68,21 @@ function autils:targets(msg)
             (msg.reply_to_message.new_chat_member
             or msg.reply_to_message.left_chat_member
             or msg.reply_to_message.from).id
-        }, input
+        }, autils.duration_from_reason(input)
 
     elseif input then
         local user_ids = {}
+        local reason, duration
         local text = msg.text
+
+         -- The text following a newline is the reason. If the first word is a
+         -- number or time string (eg 6h45m30s), it will be the duration.
+        if text:match('\n') then
+            text, reason = text:match('^(.-)\n+(.+)$')
+            if reason then
+                reason, duration = autils.duration_from_reason(reason)
+            end
+        end
 
         -- Iterate over entities for text mentions, add mentioned users to
         -- user_ids and remove the text of the mentions from the string.
@@ -74,16 +101,12 @@ function autils:targets(msg)
         text = utilities.input(text)
         -- text may be empty after removing text mentions
         if text then
-            -- The text following a newline is the reason.
-            local reason
-            if text:match('\n') then
-                text, reason = text:match('(.-)\n+(.+)')
-            end
-
             for word in text:gmatch('%g+') do
+                -- User IDs.
                 if tonumber(word) then
                     table.insert(user_ids, tonumber(word))
 
+                -- Usernames.
                 elseif word:match('^@.') then
                     local user = utilities.resolve_username(self, word)
                     table.insert(user_ids, user and user.id or
@@ -96,7 +119,7 @@ function autils:targets(msg)
             end
         end
 
-        return user_ids, reason
+        return user_ids, reason, duration
     end
 end
 
