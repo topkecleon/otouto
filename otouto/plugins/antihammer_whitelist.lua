@@ -7,7 +7,8 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('antihammer', true).table
     P.command = 'antihammer'
-    P.doc = 'Returns a list of users whoo are antihammered (unaffected by a hammer inside this group), or toggles the whitelist status of the specified users.'
+    P.doc = 'Returns a list of users whoo are antihammered (unaffected by a \z
+hammer inside this group), or toggles the whitelist status of the specified users.'
     P.privilege = 3
     P.internal = true
     P.targeting = true

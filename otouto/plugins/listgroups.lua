@@ -18,15 +18,15 @@ function P:action(msg, group)
     local results = {}
     local listed_groups = {}
 
-    for _, group in pairs(self.database.administration.groups) do
-        if not group.flags.private then
+    for _, chat in pairs(self.database.administration.groups) do
+        if not chat.flags.private then
             local link = string.format('<a href="%s">%s</a>',
-                group.link,
-                utilities.html_escape(group.name)
+                chat.link,
+                utilities.html_escape(chat.name)
             )
             table.insert(listed_groups, link)
 
-            if input and group.name:lower():match(input) then
+            if input and chat.name:lower():match(input) then
                 table.insert(results, link)
             end
         end

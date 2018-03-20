@@ -1,4 +1,3 @@
-local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.administration')
 
