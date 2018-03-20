@@ -46,8 +46,8 @@ function help:action(msg)
     local input = utilities.input(msg.text_lower)
     if input then
         input = input:lower():gsub('^' .. self.config.cmd_pat, '')
-        for _,plugin in ipairs(self.plugins) do
-            if input:match(plugin.help_word) then
+        for _, plugin in ipairs(self.plugins) do
+            if plugin.help_word and input:match(plugin.help_word) then
                 local output = '<b>Help for</b> <i>' .. plugin.help_word ..
                     '</i><b>:</b>\n' .. plugin.doc
                 utilities.send_message(msg.chat.id, output, true, nil, 'html')
