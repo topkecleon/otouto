@@ -57,9 +57,6 @@ function bot:init()
         self.named_plugins[pname] = plugin
         plugin.name = pname
         if plugin.init then plugin.init(self) end
-        if plugin.doc then
-            plugin.doc = '<pre>'..utilities.html_escape(plugin.doc)..'</pre>'
-        end
         if not plugin.triggers then plugin.triggers = {} end
     end
 
