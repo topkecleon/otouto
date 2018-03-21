@@ -8,7 +8,8 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('mute', true).table
     P.command = 'mute'
-    P.doc = [[Mute a user or users indefinitely or for the time specified. The duration can be specified before the reason.
+    P.doc = [[Mute a user or users indefinitely or for the time specified. \z
+The duration can be specified before the reason.
 Examples:
     /mute @foo @bar 8675309
     2h30m No cursing on my Christian server.

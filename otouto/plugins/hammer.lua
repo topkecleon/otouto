@@ -8,7 +8,8 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('hammer', true).table
     P.command = 'hammer'
-    P.doc = [[Globally bans a user or users. Targets can be unbanned with /unhammer. A reason can be given on a new line. Example:
+    P.doc = [[Globally bans a user or users. Targets can be unbanned with \z
+/unhammer. A reason can be given on a new line. Example:
     /hammer @examplus 5556789
     Really bad jokes.]]
     P.privilege = 4

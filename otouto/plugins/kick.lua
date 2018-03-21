@@ -8,7 +8,8 @@ function P:init()
     P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
         :t('kick', true):t('tempban', true).table
     P.command = 'kick'
-    P.doc = [[Removes a user or users from the group. A reason can be given on a new line. Example:
+    P.doc = [[Removes a user or users from the group. A reason can be given \z
+on a new line. Example:
     /kick @examplus 5554321
     Bad jokes.]]
     P.privilege = 2
