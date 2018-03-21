@@ -249,8 +249,8 @@ function autils:log(params)
         '%s\n%s by %s',
         output,
         params.action,
-        (params.source_id and utilities.format_name(self, params.source_id)
-            or params.source)
+        params.source_id and utilities.format_name(self, params.source_id)
+            or params.source or utilities.format_name(self, 0)
     )
 
     if params.reason then
