@@ -1,5 +1,6 @@
 local bindings = require('otouto.bindings')
 local autils = require('otouto.administration')
+local utilities = require('otouto.utilities')
 local rot13 = require('otouto.rot13')
 
 local P = {}
