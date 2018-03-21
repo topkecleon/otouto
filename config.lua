@@ -57,6 +57,7 @@ Based on otouto by topkecleon.
         'banremover',
         'autopromoter',
         'filterer',
+        'groupinfo',
         'flags',
         'antilink',
         'antisquig',
