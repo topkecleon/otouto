@@ -16,7 +16,7 @@ function P:action(msg, group)
     if msg.chat.title ~= group.name then
         autils.log(self, {
             chat_id = msg.chat.id,
-            action = 'Group name changed',
+            action = 'Title changed',
             reason = msg.chat.title,
             -- If this message isn't the message that changed it (the bot didn't
             -- notice the name change), the source will be unknown.
