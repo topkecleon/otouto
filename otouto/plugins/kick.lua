@@ -60,8 +60,13 @@ function P:action(msg, group, user)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
-        autils.log(self, msg.chat.id, kicked_users, log_str,
-            utilities.format_name(self, msg.from.id), reason)
+        autils.log(self, {
+            chat_id = msg.chat.id,
+            targets = kicked_users,
+            action = log_str,
+            source_id = msg.from.id,
+            reason = reason
+        })
     end
 end
 

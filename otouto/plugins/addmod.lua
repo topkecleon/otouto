@@ -19,10 +19,7 @@ function P:action(msg, group)
 
     if targets then
         for _, id in ipairs(targets) do
-            if not tonumber(id) then
-                table.insert(output, id)
-
-            else
+            if tonumber(id) then
                 local id_str = tostring(id)
                 local name = utilities.format_name(self, id)
                 local rank = autils.rank(self, id, msg.chat.id)
@@ -41,6 +38,8 @@ function P:action(msg, group)
                         table.insert(output, name .. ' is now a moderator.')
                     end
                 end
+            else
+                table.insert(output, id)
             end
         end
     else

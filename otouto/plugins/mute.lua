@@ -74,8 +74,13 @@ function P:action(msg, group)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
-        autils.log(self, msg.chat.id, muted_users, log_str,
-            utilities.format_name(self, msg.from.id), reason)
+        autils.log(self, {
+            chat_id = msg.chat.id,
+            targets = muted_users,
+            action = log_str,
+            source_id = msg.from.id,
+            reason = reason
+        })
     end
 end
 

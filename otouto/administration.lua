@@ -140,10 +140,15 @@ function autils:strike(msg, source)
     local user_id_str = tostring(msg.from.id)
     chat[user_id_str] = (chat[user_id_str] or 0) + 1
 
-    local action_taken
+    local logstuff = {
+        source = source,
+        reason = self.named_plugins.flags.flags[source],
+        target = msg.from.id,
+        chat_id = msg.chat.id
+    }
 
     if chat[user_id_str] == 1 then
-        action_taken = 'Message deleted'
+        logstuff.action = 'Message deleted'
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
@@ -173,9 +178,9 @@ function autils:strike(msg, source)
             until_date = msg.date + 300
         }
         if a then
-            action_taken = 'Banned for five minutes'
+            logstuff.action = 'Banned for five minutes'
         else
-            action_taken = b.description
+            logstuff.action = b.description
         end
 
     elseif chat[user_id_str] == 3 then
@@ -184,47 +189,72 @@ function autils:strike(msg, source)
             user_id = msg.from.id,
         }
         if a then
-            action_taken = 'Banned'
+            logstuff.action = 'Banned'
         else
-            action_taken = b.description
+            logstuff.action = b.description
         end
         chat[user_id_str] = 0
     end
 
-    autils.log(self, msg.chat.id, msg.from.id, action_taken, source,
-        self.named_plugins.flags.flags[source])
+    autils.log(self, logstuff)
 end
 
-function autils:log(chat_id, targets, action_taken, source, etc)
-    local group = self.database.administration.groups[tostring(chat_id)]
+--[[
+    params = {
+        target = 55994550, -- OR
+        targets = {
+            55994550,
+            117099167
+        },
+        chat_id = -100987654321,
+        action = "Kicked",
+        source = "antisquig" -- OR
+        source_id = 151278060,
+        reason = "Spamming pony stickers", -- could be a flag desc
+    }
+]]
+function autils:log(params)
+    local output = '<code>' .. os.date('%F %T') .. '</code>\n'
 
-    local target_names = {}
-    if tonumber(targets) then
-        table.insert(target_names, utilities.format_name(self, targets))
-    else
-        for _, id in ipairs(targets) do
-            table.insert(target_names, utilities.format_name(self, id))
+    local log_chat = self.config.administration.log_chat or self.config.log_chat
+    if params.chat_id then
+        local group =
+            self.database.administration.groups[tostring(params.chat_id)]
+        output = output .. string.format(
+            '<b>%s</b> <code>[%s]</code> <i>%s</i>\n',
+            utilities.html_escape(group.name),
+            utilities.normalize_id(params.chat_id),
+            group.username and '@' .. group.username or ''
+        )
+
+        if group.flags.private then
+            log_chat = self.config.log_chat
         end
     end
 
-    local output = string.format(
-        '<code>%s</code>\n<b>%s</b> <code>[%s]</code>\n%s\n%s by %s',
-        os.date('%F %T'),
-        utilities.html_escape(group.name),
-        utilities.normalize_id(chat_id),
-        table.concat(target_names, '\n'),
-        action_taken,
-        source
-    )
-    if etc then
-        output = output .. ':\n<i>' .. utilities.html_escape(etc) .. '</i>'
-    else
-        output = output .. '.'
+    local target_names = {}
+    if params.targets then
+        for _, id in ipairs(params.targets) do
+            table.insert(target_names, utilities.format_name(self, id))
+        end
+    elseif params.target then
+        table.insert(target_names, utilities.format_name(self, params.target))
     end
 
-    local log_chat = self.config.log_chat
-    if not group.flags.private then
-        log_chat = self.config.administration.log_chat or log_chat
+    if #target_names > 0 then
+        output = output .. table.concat(target_names, '\n')
+    end
+
+    output = string.format(
+        '%s\n%s by %s',
+        output,
+        params.action,
+        (params.source_id and utilities.format_name(self, params.source_id)
+            or params.source)
+    )
+
+    if params.reason then
+        output = output ..':\n<i>'..utilities.html_escape(params.reason)..'</i>'
     end
 
     utilities.send_message(log_chat, output, true, nil, 'html')

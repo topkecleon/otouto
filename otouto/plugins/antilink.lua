@@ -6,8 +6,8 @@ local antilink = {}
 
 function antilink:init()
     assert(self.named_plugins.flags, antilink.name .. ' requires flags')
-    self.named_plugins.flags.flags[antilink.name] =
-        'Posting links to other groups is not allowed.'
+    antilink.flag_desc = 'Posting links to other groups is not allowed.'
+    self.named_plugins.flags.flags[antilink.name] = antilink.flag_desc
 
     antilink.help_word = 'antilink'
     antilink.doc = "\z
@@ -78,8 +78,13 @@ function antilink:action(msg, group, user)
             self.database.administration.hammers[user.id_str] = true
             bindings.deleteMessage{ chat_id = msg.chat.id,
                 message_id = msg.message_id }
-            autils.log(self, msg.chat.id, msg.from.id, 'Globally banned',
-                'antilink', 'Three illegal links within a day.')
+            autils.log(self, {
+                chat_id = not group.flags.private and msg.chat.id,
+                target = msg.from.id,
+                action = 'Globally banned',
+                source = antilink.name, -- lol
+                reason = antilink.flag_desc
+            })
             for chat_id_str in pairs(antilink.store[user.id_str].groups) do
                 bindings.kickChatMember{
                     chat_id = chat_id_str,

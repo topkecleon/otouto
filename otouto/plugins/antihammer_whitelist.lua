@@ -20,10 +20,7 @@ function P:action(msg, group)
 
     if targets then
         for _, id in ipairs(targets) do
-            if not tonumber(id) then
-                table.insert(output, id)
-
-            else
+            if tonumber(id) then
                 local id_str = tostring(id)
                 local name = utilities.format_name(self, id)
                 if group.antihammer[id_str] then
@@ -35,6 +32,8 @@ function P:action(msg, group)
                     table.insert(output, name ..
                         ' has been added to the antihammer whitelist.')
                 end
+            else
+                table.insert(output, id)
             end
         end
 

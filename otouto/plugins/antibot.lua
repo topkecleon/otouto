@@ -5,7 +5,8 @@ local P = {}
 
 function P:init()
     assert(self.named_plugins.flags, P.name .. ' requires flags')
-    self.named_plugins.flags.flags[P.name] = 'Only moderators may add bots.'
+    P.flag_desc = 'Only moderators may add bots.'
+    self.named_plugins.flags.flags[P.name] = P.flag_desc
     P.triggers = { '' }
     P.internal = true
 end
@@ -21,9 +22,13 @@ function P:action(msg, group, user)
             chat_id = msg.chat.id,
             user_id = msg.new_chat_member.id
         } then
-            autils.log(self, msg.chat.id, msg.new_chat_member.id,
-                'Bot removed.', 'antibot',
-                self.named_plugins.flags.flags.antibot)
+            autils.log(self, {
+                chat_id = msg.chat.id,
+                target = msg.new_chat_member.id,
+                action = 'Bot removed',
+                source = P.name,
+                reason = P.flag_desc
+            })
         end
     else
         return true

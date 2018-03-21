@@ -5,7 +5,8 @@ local P = {}
 
 function P:init()
     assert(self.named_plugins.flags, P.name .. ' requires flags')
-    self.named_plugins.flags.flags[P.name] = 'Stickers are filtered.'
+    P.flag_desc = 'Stickers are filtered.'
+    self.named_plugins.flags.flags[P.name] = P.flag_desc
     P.triggers = {''}
     P.internal = true
 end
@@ -16,8 +17,13 @@ function P:action(msg, group, user)
             message_id = msg.message_id,
             chat_id = msg.chat.id
         }
-        autils.log(self, msg.chat.id,
-            msg.from.id, 'Sticker deleted.', P.name)
+        autils.log(self, {
+            chat_id = msg.chat.id,
+            target = msg.from.id,
+            action = 'Sticker deleted',
+            source = P.name,
+            reason = P.flag_desc
+        })
     else
         return true
     end

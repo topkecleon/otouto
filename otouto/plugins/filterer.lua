@@ -1,5 +1,6 @@
 local bindings = require('otouto.bindings')
 local autils = require('otouto.administration')
+local rot13 = require('otouto.rot13')
 
 local P = {}
 
@@ -23,8 +24,13 @@ function P:action(msg, group, user)
                 message_id = msg.message_id,
                 chat_id = msg.chat.id
             }
-            autils.log(self, msg.chat.id, msg.from.id, 'Message deleted.',
-                'filter')
+            autils.log(self, {
+                chat_id = msg.chat.id,
+                target = msg.from.id,
+                action = 'Message deleted',
+                source = P.name,
+                reason = utilities.html_escape(rot13.cipher(group.filter[i]))
+            })
             return
         end
     end
