@@ -49,7 +49,7 @@ function P:action(msg, group)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
-        autils.logs(self, {
+        autils.log(self, {
             -- Do not send the chat ID from PMs or private groups.
             chat_id = group and (not group.flags.private) and msg.chat.id,
             targets = hammered_users,
