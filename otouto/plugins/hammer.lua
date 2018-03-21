@@ -51,7 +51,7 @@ function P:action(msg, group)
     if #hammered_users > 0 then
         autils.logs(self, {
             -- Do not send the chat ID from PMs or private groups.
-            chat_id = group and (not group.flags.private) and msg.chat.id
+            chat_id = group and (not group.flags.private) and msg.chat.id,
             targets = hammered_users,
             action = 'Globally banned',
             source_id = msg.from.id,
