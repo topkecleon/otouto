@@ -12,6 +12,7 @@ function P:init()
 end
 
 function P:action(msg, group)
+    group.username = msg.chat.username
     -- Log when the chat title has been changed.
     if msg.chat.title ~= group.name then
         autils.log(self, {
@@ -24,9 +25,6 @@ function P:action(msg, group)
         })
         group.name = msg.chat.title
     end
-
-    group.username = msg.chat.username
-
     return true
 end
 
