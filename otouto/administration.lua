@@ -242,11 +242,11 @@ function autils:log(params)
     end
 
     if #target_names > 0 then
-        output = output .. table.concat(target_names, '\n')
+        output = output .. table.concat(target_names, '\n') .. '\n'
     end
 
     output = string.format(
-        '%s\n%s by %s',
+        '%s%s by %s',
         output,
         params.action,
         params.source_id and utilities.format_name(self, params.source_id)
