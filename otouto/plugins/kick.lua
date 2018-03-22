@@ -48,7 +48,7 @@ function P:action(msg, group, user)
                         user_id = id,
                         until_date = duration and duration + os.time() or 35
                     }
-                    table.insert(output, out_str)
+                    table.insert(output, name .. out_str)
                     table.insert(kicked_users, id)
                 end
             else
