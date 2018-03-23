@@ -101,7 +101,7 @@ function bot:on_message(msg)
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        if (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
+        if (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
@@ -148,7 +148,7 @@ function bot:on_edit(msg)
         self.database.administration.groups[tostring(msg.chat.id)]
 
     for _, plugin in ipairs(self.plugins) do
-        if plugin.edit_action and (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
+        if plugin.edit_action and (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 

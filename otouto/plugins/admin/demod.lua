@@ -9,7 +9,7 @@ function P:init()
     P.command = 'demod'
     P.doc = 'Demotes a moderator.'
     P.privilege = 3
-    P.internal = true
+    P.administration = true
     P.targeting = true
 end
 

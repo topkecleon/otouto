@@ -9,7 +9,7 @@ function P:init()
     P.doc = "Adds or removes a filter, or lists all filters. Messages containing filtered terms are deleted. \z
         Filters use Lua patterns."
     P.privilege = 3
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, _user) -- luacheck: ignore self

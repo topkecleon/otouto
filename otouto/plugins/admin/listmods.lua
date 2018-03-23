@@ -7,7 +7,7 @@ function P:init()
         :t('mods'):t('ops').table
     P.command = 'mods'
     P.doc = 'Returns a list of group moderators.'
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group)

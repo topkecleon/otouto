@@ -16,7 +16,7 @@ Examples:\
 \
     [in reply] /mute 240"
     P.privilege = 2
-    P.internal = true
+    P.administration = true
     P.targeting = true
     P.duration = true
 end

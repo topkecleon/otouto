@@ -13,7 +13,7 @@ on a new line. Example:\
     /kick @examplus 5554321\
     Bad jokes."
     P.privilege = 2
-    P.internal = true
+    P.administration = true
     P.targeting = true
     P.duration = true
 end

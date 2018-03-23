@@ -7,7 +7,7 @@ function P:init()
         :t('rules?', true).table
     P.command = 'rules [i]'
     P.doc = 'Returns the list of rules, or the specified rule.'
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group)

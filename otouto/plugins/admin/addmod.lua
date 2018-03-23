@@ -9,7 +9,7 @@ function P:init()
     P.command = 'addmod'
     P.doc = 'Promotes a user to a moderator.'
     P.privilege = 3
-    P.internal = true
+    P.administration = true
     P.targeting = true
 end
 

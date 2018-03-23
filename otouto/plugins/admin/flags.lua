@@ -24,7 +24,7 @@ removes a group's link from the public list and makes it only available to \z
 moderators and greater. \z
 The following flags are enabled by default:\n" ..
 table.concat(default_flags, '\n•')
-    P.internal = true
+    P.administration = true
     P.privilege = 3
 end
 

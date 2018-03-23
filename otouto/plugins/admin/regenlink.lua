@@ -8,7 +8,7 @@ function P:init()
         :t('regenlink').table
     P.command = 'regenlink'
     P.doc = 'Regenerates the group link.'
-    P.internal = true
+    P.administration = true
     P.privilege = 2
 end
 

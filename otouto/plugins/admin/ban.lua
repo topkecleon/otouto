@@ -14,7 +14,7 @@ with /unban. A reason can be given on a new line. Example:\
     Bad jokes."
 
     P.privilege = 2
-    P.internal = true
+    P.administration = true
     P.targeting = true
 end
 

@@ -7,7 +7,7 @@ local P = {}
 
 function P:init() -- luacheck: ignore self
     P.triggers = {''}
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, user)

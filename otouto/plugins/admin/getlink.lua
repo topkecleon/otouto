@@ -8,7 +8,7 @@ function P:init()
     P.command = 'link'
     P.doc = "Returns the group link. If the group is private, \z
         only moderators may use this command and responses will be sent in private."
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, user) -- luacheck: ignore self

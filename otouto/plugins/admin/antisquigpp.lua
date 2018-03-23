@@ -8,7 +8,7 @@ function P:init()
     self.named_plugins.flags.flags[P.name] =
         'Arabic script is not allowed in names.'
     P.triggers = {''}
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, user)

@@ -9,7 +9,7 @@ function P:init()
     P.command = 'governor <user>'
     P.doc = 'Set the group\'s governor.'
     P.privilege = 3
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group)

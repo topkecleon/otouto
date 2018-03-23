@@ -8,7 +8,7 @@ function P:init()
     P.flag_desc = 'Only moderators may add bots.'
     self.named_plugins.flags.flags[P.name] = P.flag_desc
     P.triggers = { '' }
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, user)

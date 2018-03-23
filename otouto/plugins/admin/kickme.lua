@@ -9,7 +9,7 @@ function P:init()
         :t('kickme').table
     P.command = 'kickme'
     P.doc = 'Removes the user from the group.'
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg)

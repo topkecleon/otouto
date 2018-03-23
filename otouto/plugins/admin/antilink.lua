@@ -52,7 +52,7 @@ antilink can be enabled with /flag antilink (see /help flags)."
     end
     antilink.store = self.database.administration.antilink
 
-    antilink.internal = true
+    antilink.administration = true
 end
 
 function antilink:action(msg, group, user)

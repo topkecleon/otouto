@@ -12,7 +12,7 @@ function P:init()
         utilities.char.rtl_override,
         utilities.char.rtl_mark
     }
-    P.internal = true
+    P.administration = true
 end
 
 function P:action(msg, group, user)

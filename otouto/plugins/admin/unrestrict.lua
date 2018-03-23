@@ -11,7 +11,7 @@ function P:init()
     P.doc = 'Unrestrict a user.\nAliases: ' .. self.config.cmd_pat .. 'unmute, '
         .. self.config.cmd_pat .. 'unban'
     P.privilege = 2
-    P.internal = true
+    P.administration = true
     P.targeting = true
 end
 
