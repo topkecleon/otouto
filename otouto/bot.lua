@@ -20,7 +20,7 @@ function bot:init()
 
     bindings = require('otouto.bindings').init(self.config.bot_api_key)
     utilities = require('otouto.utilities')
-    autils = require('otouto.administration')
+    autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.
     repeat
