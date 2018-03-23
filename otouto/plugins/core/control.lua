@@ -16,6 +16,8 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
+local lume = require('lume')
+
 local bot = require('otouto.bot')
 local utilities = require('otouto.utilities')
 
@@ -44,7 +46,20 @@ function control:action(msg)
 
     if msg.date < os.time() - 2 then return end
 
-    if msg.text_lower:match('^'..cmd_pat..'reload') then
+    if msg.text_lower:match('^'..cmd_pat..'hotswap') then
+        local errs = {}
+        for _, modname in ipairs(lume.split(utilities.input(msg.text))) do
+            local _, err = lume.hotswap(modname)
+            if err ~= nil then
+                errs:insert(err)
+            end
+        end
+        local reply = "Modules reloaded!"
+        if #errs ~= 0 then
+            reply = reply .. '\nErrors:' .. errs:concat('\n')
+        end
+        utilities.send_reply(msg, reply)
+    elseif msg.text_lower:match('^'..cmd_pat..'reload') then
         for pac, _ in pairs(package.loaded) do
             if pac:match('^otouto%.plugins%.') then
                 package.loaded[pac] = nil
@@ -80,7 +95,7 @@ function control:action(msg)
         end
         input = input .. '\n'
         for command in input:gmatch('(.-)\n') do
-            command = utilities.trim(command)
+            command = lume.trim(command)
             msg.text = command
             bot.on_message(self, msg)
         end

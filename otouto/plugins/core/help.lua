@@ -20,7 +20,7 @@ function help:init()
 
     help.glossaries = {}
     for name, glossary in pairs({
-        autils = autils and autils.glossaries,
+        autils = autils and autils.glossary,
     }) do
         if glossary then help.glossaries[name] = glossary end
     end
