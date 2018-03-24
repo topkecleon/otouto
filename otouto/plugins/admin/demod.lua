@@ -3,18 +3,18 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('demod', true).table
-    P.command = 'demod'
-    P.doc = 'Demotes a moderator.'
-    P.privilege = 3
-    P.administration = true
-    P.targeting = true
+    self.command = 'demod'
+    self.doc = 'Demotes a moderator.'
+    self.privilege = 3
+    self.administration = true
+    self.targeting = true
 end
 
-function P:action(msg, group)
-    local targets = autils.targets(self, msg)
+function P:action(bot, msg, group)
+    local targets = autils.targets(bot, msg)
     local output = {}
 
     if targets then
@@ -24,8 +24,8 @@ function P:action(msg, group)
 
             else
                 local id_str = tostring(id)
-                local name = utilities.format_name(self, id)
-                if autils.rank(self, id, msg.chat.id) < 3 then
+                local name = utilities.format_name(bot, id)
+                if autils.rank(bot, id, msg.chat.id) < 3 then
                     autils.demote_admin(msg.chat.id, id)
                 end
                 if group.moderators[id_str] then
@@ -37,7 +37,7 @@ function P:action(msg, group)
             end
         end
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end

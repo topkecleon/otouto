@@ -1,7 +1,7 @@
 local bot = require('otouto.bot')
 
-local instance = {
+local instance = setmetatable({
     config = require('config')
-}
+}, {__index = bot})
 
-return bot.run(instance)
+return instance:run()

@@ -3,26 +3,26 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('mod', true):t('addmod', true):t('op', true).table
-    P.command = 'addmod'
-    P.doc = 'Promotes a user to a moderator.'
-    P.privilege = 3
-    P.administration = true
-    P.targeting = true
+    self.command = 'addmod'
+    self.doc = 'Promotes a user to a moderator.'
+    self.privilege = 3
+    self.administration = true
+    self.targeting = true
 end
 
-function P:action(msg, group)
-    local targets = autils.targets(self, msg)
+function P:action(bot, msg, group)
+    local targets = autils.targets(bot, msg)
     local output = {}
 
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local id_str = tostring(id)
-                local name = utilities.format_name(self, id)
-                local rank = autils.rank(self, id, msg.chat.id)
+                local name = utilities.format_name(bot, id)
+                local rank = autils.rank(bot, id, msg.chat.id)
 
                 if rank > 2 then
                     autils.promote_admin(msg.chat.id, id, true)
@@ -43,7 +43,7 @@ function P:action(msg, group)
             end
         end
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end

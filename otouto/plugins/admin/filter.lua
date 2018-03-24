@@ -2,17 +2,17 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('filter', true).table
-    P.command = 'filter [term]'
-    P.doc = "Adds or removes a filter, or lists all filters. Messages containing filtered terms are deleted. \z
+    self.command = 'filter [term]'
+    self.doc = "Adds or removes a filter, or lists all filters. Messages containing filtered terms are deleted. \z
         Filters use Lua patterns."
-    P.privilege = 3
-    P.administration = true
+    self.privilege = 3
+    self.administration = true
 end
 
-function P:action(msg, group, _user) -- luacheck: ignore self
+function P:action(_bot, msg, group, _user)
     local input = utilities.input(msg.text_lower)
     local output
     if input then

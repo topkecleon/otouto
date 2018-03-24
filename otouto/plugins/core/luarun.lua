@@ -13,17 +13,16 @@ local serpent = require('serpent')
 
 local luarun = {name = 'luarun'}
 
-function luarun:init()
-    luarun.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('lua', true):t('return', true).table
+function luarun:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat):t('lua', true):t('return', true).table
     -- Lua 5.2 compatibility.
-    luarun.err_msg = function(x)
+    self.err_msg = function(x)
         return 'Error:\n' .. tostring(x)
     end
 end
 
-function luarun:action(msg, group)
-
-    if msg.from.id ~= self.config.admin then
+function luarun:action(bot, msg, group)
+    if msg.from.id ~= bot.config.admin then
         return true
     end
 
@@ -33,28 +32,26 @@ function luarun:action(msg, group)
         return
     end
 
-    if msg.text_lower:match('^'..self.config.cmd_pat..'return') then
+    if msg.text_lower:match('^'..bot.config.cmd_pat..'return') then
         input = 'return ' .. input
     end
 
     local output, success = load(
-        "local bot = require('otouto.bot')\n\z
-        local bindings = require('otouto.bindings')\n\z
+        "local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
-        local drua = require('otouto.drua-tg')\n\z
         local autils = require('otouto.autils')\n\z
         local json = require('dkjson')\n\z
         local url = require('socket.url')\n\z
         local http = require('socket.http')\n\z
         local https = require('ssl.https')\n\z
         local serpent = require('serpent')\n\z
-        return function (self, msg, group)\n" .. input .. "\nend"
+        return function (bot, msg, group)\n" .. input .. "\nend"
     )
 
     if output == nil then
         output = success
     else
-        _, output = xpcall(output(), luarun.err_msg, self, msg, group)
+        _, output = xpcall(output(), self.err_msg, bot, msg, group)
     end
 
     if output == nil then
@@ -69,7 +66,6 @@ function luarun:action(msg, group)
         output = '<code>' .. utilities.html_escape(tostring(output)) .. '</code>'
     end
     utilities.send_message(msg.chat.id, output, true, msg.message_id, 'html')
-
 end
 
 return luarun

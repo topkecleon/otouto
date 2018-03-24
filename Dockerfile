@@ -1,6 +1,6 @@
 # Set OTOUTO_BOT_API_KEY to your telegram bot api key
-# Set ADMIN_ID to your telegram id
-# Example: docker run -e OTOUTO_BOT_API_KEY="apikeyhere" -e ADMIN_ID="idhere" jacobamason/otouto
+# Set OTOUTO_ADMIN_ID to your telegram id
+# Example: docker run -e OTOUTO_BOT_API_KEY="apikeyhere" -e OTOUTO_ADMIN_ID="idhere" jacobamason/otouto
 FROM alpine:3.7
 
 RUN apk --no-cache add --virtual build-deps \
@@ -12,6 +12,7 @@ RUN apk --no-cache add --virtual build-deps \
     luarocks-5.3 install luasec && \
     luarocks-5.3 install luasocket && \
     luarocks-5.3 install multipart-post && \
+    luarocks-5.3 install serpent && \
     apk del build-deps
 
 COPY . /otouto

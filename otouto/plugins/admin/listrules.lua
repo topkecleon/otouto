@@ -2,15 +2,15 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('rules?', true).table
-    P.command = 'rules [i]'
-    P.doc = 'Returns the list of rules, or the specified rule.'
-    P.administration = true
+    self.command = 'rules [i]'
+    self.doc = 'Returns the list of rules, or the specified rule.'
+    self.administration = true
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     local input = tonumber(utilities.get_word(msg.text, 2))
     local output
     if #group.rules == 0 then
@@ -27,7 +27,7 @@ function P:action(msg, group)
             output = output .. '\n\n<b>Flags:</b>'
             for flag in pairs(group.flags) do
                 output = output .. '\n• ' .. flag .. ': ' ..
-                    self.named_plugins.flags.flags[flag]
+                    bot.named_plugins['admin.flags'].flags[flag]
             end
         end
     end

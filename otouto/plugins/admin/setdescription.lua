@@ -2,15 +2,15 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('setdescription', true):t('setdesc', true).table
-    P.command = 'setdesc <text>'
-    P.doc = 'Set a group description. Passing "--" will delete the current one.'
-    P.privilege = 3
+    self.command = 'setdesc <text>'
+    self.doc = 'Set a group description. Passing "--" will delete the current one.'
+    self.privilege = 3
 end
 
-function P:action(msg, group) -- luacheck: ignore self
+function P:action(_bot, msg, group)
     local input = utilities.input_from_msg(msg)
     if not input then
         if group.description then

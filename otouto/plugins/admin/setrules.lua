@@ -3,13 +3,13 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('setrules?', true):t('changerules?', true)
         :t('addrules?', true):t('delrules?', true).table
-    P.command = 'setrules <subcommand>'
+    self.command = 'setrules <subcommand>'
     -- luacheck: push no max string line length
-    P.doc = [[
+    self.doc = [[
 change [i]
     Changes an existing rule or rules, starting at $i. If $i is unspecified, all rules will be overwritten.
     Alias: /changerule
@@ -41,15 +41,15 @@ Examples:
     ]]
     -- luacheck: pop
 
-    P.privilege = 3
-    P.interior = true
+    self.privilege = 3
+    self.interior = true
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     local subc, idx
 
     -- "/changerule ..." -> "/setrules change ..."
-    local c = '^' .. self.config.cmd_pat
+    local c = '^' .. bot.config.cmd_pat
     if msg.text_lower:match(c..'changerule') then
         subc = 'change'
         idx = msg.text_lower:match(c..'changerules?%s+(%d+)')
@@ -75,8 +75,8 @@ function P:action(msg, group)
     end
 
     local output
-    if P.subcommands[subc] then
-        output = P.subcommands[subc](group, new_rules, tonumber(idx))
+    if self.subcommands[subc] then
+        output = self.subcommands[subc](self, group, new_rules, tonumber(idx))
     else
         output = 'Invalid subcommand. See /help setrules.'
     end
@@ -84,74 +84,74 @@ function P:action(msg, group)
     utilities.send_reply(msg, output, 'html')
 end
 
-P.subcommands = {}
+P.subcommands = {
+    change = function (super, group, new_rules, idx)
+        if #new_rules == 0 then
+            return 'Please specify the new rule or rules.'
 
-function P.subcommands.change(group, new_rules, idx)
-    if #new_rules == 0 then
-        return 'Please specify the new rule or rules.'
+        elseif not idx then -- /setrules
+            group.rules = new_rules
+            local output = '<b>Rules for ' .. utilities.html_escape(group.name) ..
+                ':</b>'
+            for i, rule in ipairs(group.rules) do
+                output = output .. '\n<b>' .. i .. '.</b> ' .. rule
+            end
+            return output
 
-    elseif not idx then -- /setrules
-        group.rules = new_rules
-        local output = '<b>Rules for ' .. utilities.html_escape(group.name) ..
-            ':</b>'
-        for i, rule in ipairs(group.rules) do
-            output = output .. '\n<b>' .. i .. '.</b> ' .. rule
+        elseif idx < 1 then
+            return 'Invalid index.'
+
+        elseif idx > #group.rules then
+            return super.subcommands.add(group, new_rules, idx)
+
+        else -- /changerule i
+            local output = ''
+            for i = 1, #new_rules do
+                group.rules[idx+i-1] = new_rules[i]
+                output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
+            end
+            return output
         end
-        return output
+    end,
 
-    elseif idx < 1 then
-        return 'Invalid index.'
+    add = function (_super, group, new_rules, idx)
+        if #new_rules == 0 then
+            return 'Please specify the new rule or rules.'
 
-    elseif idx > #group.rules then
-        return P.subcommands.add(group, new_rules, idx)
+        elseif not idx or idx > #group.rules then -- /addrule
+            local output = ''
+            for i = 1, #new_rules do
+                table.insert(group.rules, new_rules[i])
+                output = output .. '\n<b>' .. #group.rules .. '.</b> ' .. new_rules[i]
+            end
+            return output
 
-    else -- /changerule i
-        local output = ''
-        for i = 1, #new_rules do
-            group.rules[idx+i-1] = new_rules[i]
-            output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
+        elseif idx < 1 then
+            return 'Invalid index.'
+
+        else -- /addrule i
+            local output = ''
+            for i = 1, #new_rules do
+                table.insert(group.rules, idx+i-1, new_rules[i])
+                output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
+            end
+            return output
         end
-        return output
-    end
-end
+    end,
 
-function P.subcommands.add(group, new_rules, idx)
-    if #new_rules == 0 then
-        return 'Please specify the new rule or rules.'
+    del = function (_super, group, _new_rules, idx)
+        if not idx then -- /setrules --
+            group.rules = {}
+            return 'The rules have been deleted.'
 
-    elseif not idx or idx > #group.rules then -- /addrule
-        local output = ''
-        for i = 1, #new_rules do
-            table.insert(group.rules, new_rules[i])
-            output = output .. '\n<b>' .. #group.rules .. '.</b> ' .. new_rules[i]
+        elseif idx > #group.rules or idx < 0 then
+            return 'Invalid index.'
+
+        else -- /changerule i --
+            table.remove(group.rules, idx)
+            return 'Rule ' .. idx .. ' has been deleted.'
         end
-        return output
-
-    elseif idx < 1 then
-        return 'Invalid index.'
-
-    else -- /addrule i
-        local output = ''
-        for i = 1, #new_rules do
-            table.insert(group.rules, idx+i-1, new_rules[i])
-            output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
-        end
-        return output
-    end
-end
-
-function P.subcommands.del(group, _, idx)
-    if not idx then -- /setrules --
-        group.rules = {}
-        return 'The rules have been deleted.'
-
-    elseif idx > #group.rules or idx < 0 then
-        return 'Invalid index.'
-
-    else -- /changerule i --
-        table.remove(group.rules, idx)
-        return 'Rule ' .. idx .. ' has been deleted.'
-    end
-end
+    end,
+}
 
 return P

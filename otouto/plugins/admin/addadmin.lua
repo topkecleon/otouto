@@ -3,29 +3,29 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('admin', true):t('addadmin', true).table
-    P.privilege = 5
-    P.command = 'admin'
-    P.doc = 'Promotes a user or users to administrator(s).'
-    P.targeting = true
+    self.privilege = 5
+    self.command = 'admin'
+    self.doc = 'Promotes a user or users to administrator(s).'
+    self.targeting = true
 end
 
-function P:action(msg, _group, _user)
-    local targets = autils.targets(self, msg)
+function P:action(bot, msg, _group, _user)
+    local targets = autils.targets(bot, msg)
     local output = {}
 
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                if autils.rank(self, id) > 3 then
-                    table.insert(output, utilities.format_name(self, id) ..
+                if autils.rank(bot, id) > 3 then
+                    table.insert(output, utilities.format_name(bot, id) ..
                         ' is already an administrator.')
                 else
-                    self.database.administration.administrators[tostring(id)] =
+                    bot.database.administration.administrators[tostring(id)] =
                         true
-                    table.insert(output, utilities.format_name(self, id) ..
+                    table.insert(output, utilities.format_name(bot, id) ..
                         ' is now an administrator.')
                 end
             else
@@ -33,7 +33,7 @@ function P:action(msg, _group, _user)
             end
         end
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end

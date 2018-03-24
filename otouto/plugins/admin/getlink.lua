@@ -2,16 +2,16 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('link').table
-    P.command = 'link'
-    P.doc = "Returns the group link. If the group is private, \z
+    self.command = 'link'
+    self.doc = "Returns the group link. If the group is private, \z
         only moderators may use this command and responses will be sent in private."
-    P.administration = true
+    self.administration = true
 end
 
-function P:action(msg, group, user) -- luacheck: ignore self
+function P:action(_bot, msg, group, user)
     local output
     local link = string.format(
         '<a href="%s">%s</a>',

@@ -3,26 +3,26 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('antihammer', true).table
-    P.command = 'antihammer'
-    P.doc = 'Returns a list of users whoo are antihammered (unaffected by a \z
+    self.command = 'antihammer'
+    self.doc = 'Returns a list of users whoo are antihammered (unaffected by a \z
 hammer inside this group), or toggles the whitelist status of the specified users.'
-    P.privilege = 3
-    P.administration = true
-    P.targeting = true
+    self.privilege = 3
+    self.administration = true
+    self.targeting = true
 end
 
-function P:action(msg, group)
-    local targets = autils.targets(self, msg)
+function P:action(bot, msg, group)
+    local targets = autils.targets(bot, msg)
     local output = {}
 
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local id_str = tostring(id)
-                local name = utilities.format_name(self, id)
+                local name = utilities.format_name(bot, id)
                 if group.antihammer[id_str] then
                     group.antihammer[id_str] = nil
                     table.insert(output, name ..
@@ -40,7 +40,7 @@ function P:action(msg, group)
     elseif next(group.antihammer) ~= nil then
         table.insert(output, '<b>Antihammered users:</b>')
         for id in pairs(group.antihammer) do
-            table.insert(output, '• ' .. utilities.format_name(self, id))
+            table.insert(output, '• ' .. utilities.format_name(bot, id))
         end
 
     else

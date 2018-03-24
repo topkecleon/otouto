@@ -3,18 +3,18 @@ local utilities = require('otouto.utilities')
 
 local autils = {}
 
-function autils:rank(user_id, chat_id)
+function autils.rank(bot, user_id, chat_id)
     local user_id_str = tostring(user_id)
     user_id = tonumber(user_id)
-    local group = self.database.administration.groups[tostring(chat_id)]
+    local group = bot.database.administration.groups[tostring(chat_id)]
 
-    if user_id == self.config.admin then
+    if user_id == bot.config.admin then
         return 5 -- Owner
 
-    elseif user_id == self.info.id then
+    elseif user_id == bot.info.id then
         return 5 -- Bot
 
-    elseif self.database.administration.administrators[user_id_str] then
+    elseif bot.database.administration.administrators[user_id_str] then
         return 4 -- Administrator
 
     elseif group then
@@ -32,7 +32,7 @@ function autils:rank(user_id, chat_id)
         end
     end
 
-    if self.database.administration.hammers[user_id_str] then
+    if bot.database.administration.hammers[user_id_str] then
         if not group or not group.antihammer[user_id_str] then
             return 0 -- Hammered
         end
@@ -60,7 +60,7 @@ function autils.duration_from_reason(text)
     return reason, duration
 end
 
-function autils:targets(msg)
+function autils.targets(bot, msg)
     local input = utilities.input(msg.text)
 
     -- Reply messages target the replied-to message's sender, or the added/
@@ -110,7 +110,7 @@ function autils:targets(msg)
 
                 -- Usernames.
                 elseif word:match('^@.') then
-                    local user = utilities.resolve_username(self, word)
+                    local user = utilities.resolve_username(bot, word)
                     table.insert(user_ids, user and user.id or
                         'Unrecognized username (' .. word .. ').')
 
@@ -127,22 +127,25 @@ end
 
  -- source eg "antisquig", "filter", etc
  -- Returns true if action was taken.
-function autils:strike(msg, source)
+function autils.strike(bot, msg, source)
     bindings.deleteMessage{
         chat_id = msg.chat.id,
         message_id = msg.message_id
     }
 
-    self.database.administration.automoderation[tostring(msg.chat.id)] =
-        self.database.administration.automoderation[tostring(msg.chat.id)] or {}
+    bot.database.administration.automoderation[tostring(msg.chat.id)] =
+        bot.database.administration.automoderation[tostring(msg.chat.id)] or {}
     local chat =
-        self.database.administration.automoderation[tostring(msg.chat.id)]
+        bot.database.administration.automoderation[tostring(msg.chat.id)]
     local user_id_str = tostring(msg.from.id)
     chat[user_id_str] = (chat[user_id_str] or 0) + 1
 
+    local flags_plugin = bot.named_plugins['admin.flags']
+    assert(flags_plugin, 'autils.strike requires flags')
+
     local logstuff = {
         source = source,
-        reason = self.named_plugins.flags.flags[source],
+        reason = flags_plugin.flags[source],
         target = msg.from.id,
         chat_id = msg.chat.id
     }
@@ -152,19 +155,22 @@ function autils:strike(msg, source)
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.format_name(self, msg.from.id) ..
+            utilities.format_name(bot, msg.from.id) ..
             '. The next automoderation trigger will result in a five-minute tempban.'
-            .. '\n<i>' .. self.named_plugins.flags.flags[source] ..'</i>'
-        if self.config.administration.log_chat_username then
+            .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
+        if bot.config.administration.log_chat_username then
             warning = warning .. '\n<b>View the logs:</b> ' ..
-                self.config.administration.log_chat_username .. '.'
+                bot.config.administration.log_chat_username .. '.'
         end
 
         -- Successfully-sent warnings get their IDs stored to be deleted about
         -- five minutes later by automoderation.lua.
-        local m =utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+        local m = utilities.send_message(msg.chat.id, warning, true, nil, 'html')
         if m then
-            table.insert(self.named_plugins.automoderation.store, {
+            local automoderation_plugin = bot.named_plugins['admin.automoderation']
+            assert(automoderation_plugin, 'autils.strike requires automoderation')
+
+            table.insert(automoderation_plugin.store, {
                 message_id = m.result.message_id,
                 chat_id = m.result.chat.id,
                 date = m.result.date
@@ -196,7 +202,7 @@ function autils:strike(msg, source)
         chat[user_id_str] = 0
     end
 
-    autils.log(self, logstuff)
+    autils.log(bot, logstuff)
 end
 
 --[[
@@ -213,13 +219,13 @@ end
         reason = "Spamming pony stickers", -- could be a flag desc
     }
 ]]
-function autils:log(params)
+function autils.log(bot, params)
     local output = '<code>' .. os.date('%F %T') .. '</code>\n'
 
-    local log_chat = self.config.administration.log_chat or self.config.log_chat
+    local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
         local group =
-            self.database.administration.groups[tostring(params.chat_id)]
+            bot.database.administration.groups[tostring(params.chat_id)]
         output = output .. string.format(
             '<b>%s</b> <code>[%s]</code> <i>%s</i>\n',
             utilities.html_escape(group.name),
@@ -228,17 +234,17 @@ function autils:log(params)
         )
 
         if group.flags.private then
-            log_chat = self.config.log_chat
+            log_chat = bot.config.log_chat
         end
     end
 
     local target_names = {}
     if params.targets then
         for _, id in ipairs(params.targets) do
-            table.insert(target_names, utilities.format_name(self, id))
+            table.insert(target_names, utilities.format_name(bot, id))
         end
     elseif params.target then
-        table.insert(target_names, utilities.format_name(self, params.target))
+        table.insert(target_names, utilities.format_name(bot, params.target))
     end
 
     if #target_names > 0 then
@@ -249,8 +255,8 @@ function autils:log(params)
         '%s%s by %s',
         output,
         params.action,
-        params.source_id and utilities.format_name(self, params.source_id)
-            or params.source or utilities.format_name(self, 0)
+        params.source_id and utilities.format_name(bot, params.source_id)
+            or params.source or utilities.format_name(bot, 0)
     )
 
     if params.reason then

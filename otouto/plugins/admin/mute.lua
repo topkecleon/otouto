@@ -4,25 +4,25 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('mute', true).table
-    P.command = 'mute'
-    P.doc = "Mute a user or users indefinitely or for the time specified. \z
+    self.command = 'mute'
+    self.doc = "Mute a user or users indefinitely or for the time specified. \z
 The duration can be specified before the reason.\
 Examples:\
     /mute @foo @bar 8675309\
     2h30m No cursing on my Christian server.\
 \
     [in reply] /mute 240"
-    P.privilege = 2
-    P.administration = true
-    P.targeting = true
-    P.duration = true
+    self.privilege = 2
+    self.administration = true
+    self.targeting = true
+    self.duration = true
 end
 
-function P:action(msg, _group, _user)
-    local targets, reason, duration = autils.targets(self, msg)
+function P:action(bot, msg, _group, _user)
+    local targets, reason, duration = autils.targets(bot, msg)
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.
@@ -45,9 +45,9 @@ function P:action(msg, _group, _user)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(self, id)
+                local name = utilities.format_name(bot, id)
 
-                if autils.rank(self, id, msg.chat.id) > 1 then
+                if autils.rank(bot, id, msg.chat.id) > 1 then
                     table.insert(output,name..' is too privileged to be muted.')
                 else
                     local a, b = bindings.restrictChatMember{
@@ -70,12 +70,12 @@ function P:action(msg, _group, _user)
         end
 
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
-        autils.log(self, {
+        autils.log(bot, {
             chat_id = msg.chat.id,
             targets = muted_users,
             action = log_str,

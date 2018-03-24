@@ -4,20 +4,15 @@ return {
     -- Your authorization token from the botfather. (string, put quotes)
     bot_api_key = os.getenv('OTOUTO_BOT_API_KEY'),
     -- Your Telegram ID (number).
-    admin = os.getenv('ADMIN_ID'),
+    admin = math.floor(os.getenv('OTOUTO_ADMIN_ID')),
     -- Two-letter language code.
     -- Fetches it from the system if available, or defaults to English.
     lang = os.getenv('LANG') and os.getenv('LANG'):sub(1,2) or 'en',
     -- The channel, group, or user to send error reports to.
     -- If this is not set, errors will be printed to the console.
-    log_chat = nil,
-    -- The port used to communicate with tg for administration.lua.
-    -- If you change this, make sure you also modify launch-tg.sh.
-    cli_port = 4567,
+    log_chat = math.floor(os.getenv('OTOUTO_LOG_ID')),
     -- The symbol that starts a command. Usually noted as '/' in documentation.
     cmd_pat = '/',
-    -- If drua is used, should a user be blocked when he's blacklisted?
-    drua_block_on_blacklist = false,
     -- The filename of the database. If left nil, defaults to $username.db.
     database_name = nil,
     -- The block of text returned by /start and /about..

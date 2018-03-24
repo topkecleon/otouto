@@ -5,17 +5,17 @@ local rot13 = require('otouto.rot13')
 
 local P = {}
 
-function P:init() -- luacheck: ignore self
-    P.triggers = {''}
-    P.administration = true
+function P:init(_bot)
+    self.triggers = {''}
+    self.administration = true
 end
 
-function P:action(msg, group, user)
+function P:action(bot, msg, group, user)
     if user.rank > 1 then return true end
     if msg.forward_from and (
-        (msg.forward_from.id == self.info.id) or
-        (msg.forward_from.id == self.config.log_chat) or
-        (msg.forward_from.id == self.config.administration.log_chat)
+        (msg.forward_from.id == bot.info.id) or
+        (msg.forward_from.id == bot.config.log_chat) or
+        (msg.forward_from.id == bot.config.administration.log_chat)
     ) then
         return true
     end
@@ -25,11 +25,11 @@ function P:action(msg, group, user)
                 message_id = msg.message_id,
                 chat_id = msg.chat.id
             }
-            autils.log(self, {
+            autils.log(bot, {
                 chat_id = msg.chat.id,
                 target = msg.from.id,
                 action = 'Message deleted',
-                source = P.name,
+                source = self.name,
                 reason = utilities.html_escape(rot13.cipher(group.filter[i]))
             })
             return

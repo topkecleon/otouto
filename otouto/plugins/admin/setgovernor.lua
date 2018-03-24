@@ -3,27 +3,27 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('governor', true):t('gov', true).table
-    P.command = 'governor <user>'
-    P.doc = 'Set the group\'s governor.'
-    P.privilege = 3
-    P.administration = true
+    self.command = 'governor <user>'
+    self.doc = 'Set the group\'s governor.'
+    self.privilege = 3
+    self.administration = true
 end
 
-function P:action(msg, group)
-    local targets = autils.targets(self, msg)
+function P:action(bot, msg, group)
+    local targets = autils.targets(bot, msg)
     local target = targets and targets[1]
     local output
     if tonumber(target) then
-        local name = utilities.format_name(self, target)
+        local name = utilities.format_name(bot, target)
         autils.promote_admin(msg.chat.id, target, true)
         if target == group.governor then
             output = name .. ' is already governor.'
         else
             -- Demote the old governor if he's not an admin.
-            if autils.rank(self, group.governor, msg.chat.id) < 4 then
+            if autils.rank(bot, group.governor, msg.chat.id) < 4 then
                 autils.demote_admin(msg.chat.id, group.governor)
             end
 
@@ -33,7 +33,7 @@ function P:action(msg, group)
             output = name .. ' is now governor.'
         end
     elseif not target then
-        output = self.config.errors.specify_target
+        output = bot.config.errors.specify_target
     else
         output = target
     end

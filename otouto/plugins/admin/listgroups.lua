@@ -2,15 +2,15 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('groups', true):t('listgroups', true).table
-    P.command = 'groups [query]'
-    P.doc = "/groups [query]\
+    self.command = 'groups [query]'
+    self.doc = "/groups [query]\
 Returns a list of all public, administrated groups, or the results of a query."
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     local input = utilities.input_from_msg(msg)
 
     -- Output will be a list of results, a list of all groups, or an explanation
@@ -18,7 +18,7 @@ function P:action(msg, group)
     local results = {}
     local listed_groups = {}
 
-    for _, chat in pairs(self.database.administration.groups) do
+    for _, chat in pairs(bot.database.administration.groups) do
         if not chat.flags.private then
             local link = string.format('<a href="%s">%s</a>',
                 chat.link,
@@ -36,7 +36,7 @@ function P:action(msg, group)
 
     if input then
         if #results == 0 then
-            output = self.config.errors.results
+            output = bot.config.errors.results
         else
             output = string.format(
                 '<b>Groups matching</b> <i>%s</i><b>:</b>\n• %s',
@@ -55,7 +55,7 @@ function P:action(msg, group)
             else
                 output = string.format(
                     'Please <a href="https://t.me/%s?start=groups">message me privately</a> for a list of groups.',
-                    self.info.username
+                    bot.info.username
                 )
             end
         else

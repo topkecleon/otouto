@@ -13,20 +13,20 @@ local autils = require('otouto.autils')
 
 local help = {}
 
-function help:init()
-    help.triggers = utilities.triggers(self.info.username, self.config.cmd_pat):t('help', true):t('h', true).table
-    help.command = 'help [command]'
-    help.doc = self.config.cmd_pat .. 'help [command] \nReturns usage information for a given command.'
+function help:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat):t('help', true):t('h', true).table
+    self.command = 'help [command]'
+    self.doc = bot.config.cmd_pat .. 'help [command] \nReturns usage information for a given command.'
 
-    help.glossaries = {}
+    self.glossaries = {}
     for name, glossary in pairs({
         autils = autils and autils.glossary,
     }) do
-        if glossary then help.glossaries[name] = glossary end
+        if glossary then self.glossaries[name] = glossary end
     end
 
     local commandlist = {}
-    for _, plugin in pairs(self.plugins) do
+    for _, plugin in pairs(bot.plugins) do
         if plugin.command then
             local s = plugin.command
             if plugin.targeting then
@@ -42,20 +42,20 @@ function help:init()
         end
     end
     table.sort(commandlist)
-    local comlist = '\n• ' .. self.config.cmd_pat ..
-        table.concat(commandlist, '\n• ' .. self.config.cmd_pat) .. '\n' ..
+    local comlist = '\n• ' .. bot.config.cmd_pat ..
+        table.concat(commandlist, '\n• ' .. bot.config.cmd_pat) .. '\n' ..
 "Arguments: <required> [optional]\
 * Targets may be specified via reply, username, mention, or ID. \z
   In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.\
 † A duration may be specified before the reason, in minutes or in the format 5d12h30m15s."
-    help.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
+    self.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 
-function help:action(msg)
+function help:action(bot, msg)
     local input = utilities.input(msg.text_lower)
     if input then
-        input = input:lower():gsub('^' .. self.config.cmd_pat, '')
-        for _, plugin in ipairs(self.plugins) do
+        input = input:lower():gsub('^' .. bot.config.cmd_pat, '')
+        for _, plugin in ipairs(bot.plugins) do
             if plugin.help_word and input:match(plugin.help_word) then
                 utilities.send_message(msg.chat.id, string.format(
                     '<b>Help for</b> <i>%s</i><b>:</b>\n%s',
@@ -66,7 +66,7 @@ function help:action(msg)
             end
         end
         -- If there are no plugin matches, check the glossaries.
-        for _glossary_name, glossary in pairs(help.glossaries) do
+        for _glossary_name, glossary in pairs(self.glossaries) do
             for name, entry in pairs(glossary) do
                 if input:match(name) then
                     utilities.send_message(msg.chat.id, string.format(
@@ -82,11 +82,11 @@ function help:action(msg)
     else
         -- Attempt to send the help message via PM.
         -- If msg is from a group, tell the group whether the PM was successful.
-        local res = utilities.send_message(msg.from.id, help.text, true, nil, 'html')
+        local res = utilities.send_message(msg.from.id, self.text, true, nil, 'html')
         if not res then
             utilities.send_reply(
                 msg,
-                'Please <a href="http://t.me/' .. self.info.username ..
+                'Please <a href="http://t.me/' .. bot.info.username ..
                     '?start=help">message me privately</a> for a list of commands.',
                 'html'
             )

@@ -2,17 +2,17 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('description', true):t('desc', true).table
-    P.command = 'description [chat]'
+    self.command = 'description [chat]'
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     local input = utilities.input(msg.text_lower)
     local chat_id
     if input then
-        for id_str, chat in pairs(self.database.administration.groups) do
+        for id_str, chat in pairs(bot.database.administration.groups) do
             if not chat.flags.private and chat.name:lower():match(input) then
                 chat_id = id_str
                 break
@@ -29,7 +29,7 @@ function P:action(msg, group)
         return
     end
 
-    local description = P.desc(self, chat_id)
+    local description = self:desc(bot, chat_id)
 
     if msg.chat.id == msg.from.id then
         utilities.send_reply(msg, description, 'html')
@@ -42,8 +42,8 @@ function P:action(msg, group)
     end
 end
 
-function P:desc(chat_id)
-    local group = self.database.administration.groups[tostring(chat_id)]
+function P:desc(bot, chat_id)
+    local group = bot.database.administration.groups[tostring(chat_id)]
 
     local output = '<b>Welcome to '
     if group.flags.private then
@@ -69,17 +69,17 @@ function P:desc(chat_id)
     if next(group.flags) ~= nil then
         output = output .. '\n\n<b>Flags:</b>'
         for flag in pairs(group.flags) do
-            output = output .. '\n• ' .. self.named_plugins.flags.flags[flag]
+            output = output .. '\n• ' .. bot.named_plugins['admin.flags'].flags[flag]
         end
     end
 
     output = output .. '\n\n<b>Governor:</b> ' ..
-        utilities.format_name(self, group.governor)
+        utilities.format_name(bot, group.governor)
 
     if next(group.moderators) ~= nil then
         output = output .. '\n\n<b>Moderators:</b>'
         for id in pairs(group.moderators) do
-            output = output .. '\n• ' .. utilities.format_name(self, id)
+            output = output .. '\n• ' .. utilities.format_name(bot, id)
         end
     end
 

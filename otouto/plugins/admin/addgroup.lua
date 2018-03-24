@@ -5,16 +5,16 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('addgroup').table
-    P.command = 'addgroup'
-    P.doc = 'Adds the current supergroup to the administrative system.'
+    self.command = 'addgroup'
+    self.doc = 'Adds the current supergroup to the administrative system.'
 
-    P.privilege = 4
+    self.privilege = 4
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     local output
 
     if msg.chat.type ~= 'supergroup' then
@@ -24,7 +24,7 @@ function P:action(msg, group)
         local perms, group_owner
         local result = bindings.getChatAdministrators{ chat_id = msg.chat.id }
         for _, administrator in pairs(result.result) do
-            if administrator.user.id == self.info.id then
+            if administrator.user.id == bot.info.id then
                 perms = administrator
             elseif administrator.status == 'creator' then
                 group_owner = administrator.user.id
@@ -43,7 +43,7 @@ function P:action(msg, group)
             output = 'I am already administrating this group.'
         else
             local chat_id_str = tostring(msg.chat.id)
-            self.database.administration.groups[chat_id_str] = {
+            bot.database.administration.groups[chat_id_str] = {
                 name = msg.chat.title,
                 link =
                     bindings.exportChatInviteLink{chat_id = msg.chat.id}.result,
@@ -55,14 +55,14 @@ function P:action(msg, group)
                 strikes = {},
                 moderators = {},
                 bans = {},
-                flags = lume.clone(self.config.administration.flags)
+                flags = lume.clone(bot.config.administration.flags)
             }
 
             bindings.setChatDescription{
                 chat_id = msg.chat.id,
                 description = 'Welcome! Please review the rules and other group info with '
-                    .. self.config.cmd_pat .. 'description@' ..
-                    self.info.username .. '.'
+                    .. bot.config.cmd_pat .. 'description@' ..
+                    bot.info.username .. '.'
             }
 
             output = 'I am now administrating this group.'

@@ -2,20 +2,20 @@ local utilities = require('otouto.utilities')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('admins').table
-    P.command = 'admins'
-    P.doc = 'Returns a list of global administrators.'
-    P.privilege = 2
+    self.command = 'admins'
+    self.doc = 'Returns a list of global administrators.'
+    self.privilege = 2
 end
 
-function P:action(msg, _group, _user)
+function P:action(bot, msg, _group, _user)
     local admin_list = {
-        utilities.format_name(self, self.config.admin) .. ' ★'
+        utilities.format_name(bot, bot.config.admin) .. ' ★'
     }
-    for id_str in pairs(self.database.administration.administrators) do
-        table.insert(admin_list, utilities.format_name(self, id_str))
+    for id_str in pairs(bot.database.administration.administrators) do
+        table.insert(admin_list, utilities.format_name(bot, id_str))
     end
     local output = '<b>Global administrators:</b>\n• ' ..
         table.concat(admin_list, '\n• ')

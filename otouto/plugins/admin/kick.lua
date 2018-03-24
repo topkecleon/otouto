@@ -4,22 +4,22 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('kick', true):t('tempban', true).table
-    P.command = 'kick'
-    P.doc = "Removes a user or users from the group. A reason can be given \z
+    self.command = 'kick'
+    self.doc = "Removes a user or users from the group. A reason can be given \z
 on a new line. Example:\
     /kick @examplus 5554321\
     Bad jokes."
-    P.privilege = 2
-    P.administration = true
-    P.targeting = true
-    P.duration = true
+    self.privilege = 2
+    self.administration = true
+    self.targeting = true
+    self.duration = true
 end
 
-function P:action(msg, _group, _user)
-    local targets, reason, duration = autils.targets(self, msg)
+function P:action(bot, msg, _group, _user)
+    local targets, reason, duration = autils.targets(bot, msg)
     if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
     end
@@ -39,8 +39,8 @@ function P:action(msg, _group, _user)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(self, id)
-                if autils.rank(self, id, msg.chat.id) > 2 then
+                local name = utilities.format_name(bot, id)
+                if autils.rank(bot, id, msg.chat.id) > 2 then
                     table.insert(output, name .. ' is too privileged to be kicked.')
                 else
                     bindings.kickChatMember{
@@ -56,12 +56,12 @@ function P:action(msg, _group, _user)
             end
         end
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
-        autils.log(self, {
+        autils.log(bot, {
             chat_id = msg.chat.id,
             targets = kicked_users,
             action = log_str,

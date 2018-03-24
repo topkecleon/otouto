@@ -4,30 +4,30 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('ban', true).table
-    P.command = 'ban'
-    P.doc = "Bans a user or users from the group. Targets can be unbanned \z
+    self.command = 'ban'
+    self.doc = "Bans a user or users from the group. Targets can be unbanned \z
 with /unban. A reason can be given on a new line. Example:\
     /ban @examplus 5551234\
     Bad jokes."
 
-    P.privilege = 2
-    P.administration = true
-    P.targeting = true
+    self.privilege = 2
+    self.administration = true
+    self.targeting = true
 end
 
-function P:action(msg, group)
-    local targets, reason = autils.targets(self, msg)
+function P:action(bot, msg, group)
+    local targets, reason = autils.targets(bot, msg)
     local output = {}
     local banned_users = {}
 
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(self, id)
-                if autils.rank(self, id, msg.chat.id) > 2 then
+                local name = utilities.format_name(bot, id)
+                if autils.rank(bot, id, msg.chat.id) > 2 then
                     table.insert(output, name .. ' is too privileged to be banned.')
                 elseif group.bans[tostring(id)] then
                     table.insert(output, name .. ' is already banned.')
@@ -45,12 +45,12 @@ function P:action(msg, group)
             end
         end
     else
-        table.insert(output, self.config.errors.specify_targets)
+        table.insert(output, bot.config.errors.specify_targets)
     end
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #banned_users > 0 then
-        autils.log(self, {
+        autils.log(bot, {
             chat_id = msg.chat.id,
             targets = banned_users,
             action = 'Banned',

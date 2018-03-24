@@ -3,17 +3,19 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init()
-    assert(self.named_plugins.flags, P.name .. ' requires flags')
-    P.flag_desc = 'Only moderators may add bots.'
-    self.named_plugins.flags.flags[P.name] = P.flag_desc
-    P.triggers = { '' }
-    P.administration = true
+function P:init(bot)
+    local flags_plugin = bot.named_plugins['admin.flags']
+    assert(flags_plugin, self.name .. ' requires flags')
+    self.flag = 'antibot'
+    self.flag_desc = 'Only moderators may add bots.'
+    flags_plugin.flags[self.flag] = self.flag_desc
+    self.triggers = { '' }
+    self.administration = true
 end
 
-function P:action(msg, group, user)
+function P:action(bot, msg, group, user)
     if
-        group.flags.antibot and
+        group.flags[self.flag] and
         msg.new_chat_member and
         msg.new_chat_member.is_bot and
         user.rank < 2
@@ -22,12 +24,12 @@ function P:action(msg, group, user)
             chat_id = msg.chat.id,
             user_id = msg.new_chat_member.id
         } then
-            autils.log(self, {
+            autils.log(bot, {
                 chat_id = msg.chat.id,
                 target = msg.new_chat_member.id,
                 action = 'Bot removed',
-                source = P.name,
-                reason = P.flag_desc
+                source = self.flag,
+                reason = self.flag_desc
             })
         end
     else

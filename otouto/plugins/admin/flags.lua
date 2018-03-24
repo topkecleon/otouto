@@ -6,17 +6,17 @@ P.flags = {
     private = 'Removes the link from the public group list and suppresses logs.'
 }
 
-function P:init()
-    P.triggers = utilities.triggers(self.info.username, self.config.cmd_pat)
+function P:init(bot)
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('flags?', true).table
-    P.command = 'flags [flag]'
-    P.help_word = 'flags?'
+    self.command = 'flags [flag]'
+    self.help_word = 'flags?'
     local default_flags = {}
-    for flag in pairs(self.config.administration.flags) do
+    for flag in pairs(bot.config.administration.flags) do
         table.insert(default_flags, flag)
     end
-    P.doc = "\z
-Usage: " .. self.config.cmd_pat .. "flags [flag] \
+    self.doc = "\z
+Usage: " .. bot.config.cmd_pat .. "flags [flag] \
 Returns a list of flags, or toggles the specified flag. \
 Flags are administrative policies at the disposal of the governor. Most \z
 provide optional automoderation (see /help antilink). The private flag \z
@@ -24,18 +24,18 @@ removes a group's link from the public list and makes it only available to \z
 moderators and greater. \z
 The following flags are enabled by default:\n" ..
 table.concat(default_flags, '\n•')
-    P.administration = true
-    P.privilege = 3
+    self.administration = true
+    self.privilege = 3
 end
 
-function P:action(msg, group) -- luacheck: ignore self
+function P:action(_bot, msg, group)
     local input = utilities.input_from_msg(msg)
     local output = {}
 
     if input then
         for word in input:gmatch('%g+') do
             local word_lwr = word:lower()
-            if P.flags[word_lwr] then
+            if self.flags[word_lwr] then
                 if group.flags[word_lwr] then
                     group.flags[word_lwr] = nil
                     table.insert(output, word .. ' has been disabled.')
@@ -51,7 +51,7 @@ function P:action(msg, group) -- luacheck: ignore self
 
     else
         table.insert(output, '<b>Flags:</b>')
-        for name, desc in pairs(P.flags) do
+        for name, desc in pairs(self.flags) do
             table.insert(output, string.format('%s <b>%s</b>\n%s',
                 group.flags[name] and '✔️' or '❌',
                 name,

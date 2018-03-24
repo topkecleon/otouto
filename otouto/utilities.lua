@@ -98,12 +98,6 @@ function utilities.utf8_len(s)
     return chars
 end
 
--- Trims whitespace from a string.
-function utilities.trim(str)
-    local s = str:gsub('^%s*(.-)%s*$', '%1')
-    return s
-end
-
 -- Loads a json file as a table.
 function utilities.load_data(filename)
     local f = io.open(filename)
@@ -161,10 +155,10 @@ function utilities.build_name(first, last)
     end
 end
 
-function utilities:resolve_username(input)
+function utilities.resolve_username(bot, input)
     input = input:gsub('^@', '')
-    if not self.database.users then return end
-    for _, user in pairs(self.database.users) do
+    if not bot.database.users then return end
+    for _, user in pairs(bot.database.users) do
         if user.username and user.username:lower() == input:lower() then
             local t = {}
             for key, val in pairs(user) do
@@ -230,25 +224,25 @@ function utilities.html_escape(text)
                :gsub('>', '&gt;')
 end
 
-utilities.triggers_meta = {}
-utilities.triggers_meta.__index = utilities.triggers_meta
-function utilities.triggers_meta:t(pattern, has_args)
-    local username = self.username:lower()
-    table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
-    table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
-    if has_args then
-        table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
-        table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
+utilities.triggers_meta = {
+    t = function (self, pattern, has_args)
+        local username = self.username:lower()
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
+        if has_args then
+            table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
+            table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
+        end
+        return self
     end
-    return self
-end
+}
 
 function utilities.triggers(username, cmd_pat, trigger_table)
-    local self = setmetatable({}, utilities.triggers_meta)
-    self.username = username
-    self.cmd_pat = cmd_pat
-    self.table = trigger_table or {}
-    return self
+    return setmetatable({
+        username = username,
+        cmd_pat = cmd_pat,
+        table = trigger_table or {}
+    }, {__index = utilities.triggers_meta})
 end
 
 function utilities.pretty_float(x)
@@ -272,35 +266,35 @@ utilities.char = {
     invisible_separator = utf8.char(0x2063)
 }
 
-utilities.set_meta = {}
-utilities.set_meta.__index = utilities.set_meta
+utilities.set_meta = {
+    add = function (self, x)
+        if x == "__count" then
+            return false
+        else
+            if not self[x] then
+                self[x] = true
+                self.__count = self.__count + 1
+            end
+            return true
+        end
+    end,
+    remove = function (self, x)
+        if x == "__count" then
+            return false
+        else
+            if self[x] then
+                self[x] = nil
+                self.__count = self.__count - 1
+            end
+            return true
+        end
+    end,
+    __len = function (self)
+        return self.__count
+    end
+}
 function utilities.new_set()
-    return setmetatable({__count = 0}, utilities.set_meta)
-end
-function utilities.set_meta:add(x)
-    if x == "__count" then
-        return false
-    else
-        if not self[x] then
-            self[x] = true
-            self.__count = self.__count + 1
-        end
-        return true
-    end
-end
-function utilities.set_meta:remove(x)
-    if x == "__count" then
-        return false
-    else
-        if self[x] then
-            self[x] = nil
-            self.__count = self.__count - 1
-        end
-        return true
-    end
-end
-function utilities.set_meta:__len()
-    return self.__count
+    return setmetatable({__count = 0}, {__index = utilities.set_meta})
 end
 
 -- Converts a gross string back into proper UTF-8.
@@ -354,7 +348,7 @@ utilities.tiem = {
         m = 60,
         s = 1
     },
-    function format(seconds)
+    format = function (seconds)
         local time_str = ''
         for _, l in ipairs(utilities.tiem.order) do
             local v = utilities.tiem.dict[l]
@@ -366,7 +360,7 @@ utilities.tiem = {
         end
         return time_str
     end,
-    function deformat(time_str)
+    deformat = function (time_str)
         if
             (not time_str:match('^[%dywdhms]+$'))
             or time_str:match('%l%l')

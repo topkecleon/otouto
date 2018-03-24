@@ -5,17 +5,17 @@ local autils = require('otouto.autils')
 
 local P = {}
 
-function P:init() -- luacheck: ignore self
-    P.triggers = {''}
-    P.administration = true
-    P.privilege = 2
+function P:init(_bot)
+    self.triggers = {''}
+    self.administration = true
+    self.privilege = 2
 end
 
-function P:action(msg, group)
+function P:action(bot, msg, group)
     group.username = msg.chat.username
     -- Log when the chat title has been changed.
     if msg.chat.title ~= group.name then
-        autils.log(self, {
+        autils.log(bot, {
             chat_id = msg.chat.id,
             action = 'Title changed',
             reason = msg.chat.title,
