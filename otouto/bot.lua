@@ -9,6 +9,7 @@
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
+local lume -- More utility functions.
 local autils -- Administration-related functions.
 
 bot.version = '3.15.5 admin'
@@ -21,6 +22,7 @@ function bot:init()
 
     bindings = require('otouto.bindings').init(self.config.bot_api_key)
     utilities = require('otouto.utilities')
+    lume = require('lume')
     autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.
@@ -53,12 +55,7 @@ function bot:init()
     self.plugins = {}
     self.named_plugins = {}
     for _, pname in ipairs(self.config.plugins) do
-        local plugin = require('otouto.plugins.'..pname)
-        table.insert(self.plugins, plugin)
-        self.named_plugins[pname] = plugin
-        plugin.name = pname
-        if plugin.init then plugin:init(self) end
-        if not plugin.triggers then plugin.triggers = {} end
+        self:load_plugin(pname)
     end
 
     -- Set loop variables.
@@ -69,6 +66,25 @@ function bot:init()
 
     print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')\n')
 
+end
+
+function bot:load_plugin(pname, pos)
+    local plugin = require('otouto.plugins.'..pname)
+    if pos == nil then
+        table.insert(self.plugins, plugin)
+    else
+        table.insert(self.plugins, pos, plugin)
+    end
+    self.named_plugins[pname] = plugin
+    plugin.name = pname
+    if plugin.init then plugin:init(self) end
+    if not plugin.triggers then plugin.triggers = {} end
+end
+
+function bot:unload_plugin(pname)
+    local plugin = require('otouto.plugins.'..pname)
+    lume.remove(self.plugins, plugin)
+    self.named_plugins[pname] = nil
 end
 
  -- Function to be run on each new message.

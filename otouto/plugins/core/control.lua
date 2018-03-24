@@ -74,6 +74,7 @@ function control:action(bot, msg)
         end
         package.loaded['otouto.bindings'] = nil
         package.loaded['otouto.utilities'] = nil
+        package.loaded['lume'] = nil
         package.loaded['otouto.autils'] = nil
         package.loaded['config'] = nil
         if not msg.text_lower:match('%-config') then

@@ -17,7 +17,9 @@ return {
     database_name = nil,
     -- The block of text returned by /start and /about..
     about_text = [[
-Based on otouto by topkecleon.
+I am otouto, the plugin-wielding, multipurpose Telegram bot.
+
+Send /help to get started.
     ]],
 
     errors = { -- Generic error messages.
@@ -52,6 +54,7 @@ Based on otouto by topkecleon.
         'admin.banremover',
         'admin.autopromoter',
         'admin.filterer',
+        'core.about',
         'admin.groupinfo',
         'admin.flags',
         'admin.antilink',

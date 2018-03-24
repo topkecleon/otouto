@@ -11,7 +11,7 @@ local utilities = require('otouto.utilities')
 local URL = require('socket.url')
 local serpent = require('serpent')
 
-local luarun = {name = 'luarun'}
+local luarun = {}
 
 function luarun:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat):t('lua', true):t('return', true).table
@@ -40,11 +40,12 @@ function luarun:action(bot, msg, group)
         "local bindings = require('otouto.bindings')\n\z
         local utilities = require('otouto.utilities')\n\z
         local autils = require('otouto.autils')\n\z
-        local json = require('dkjson')\n\z
-        local url = require('socket.url')\n\z
         local http = require('socket.http')\n\z
         local https = require('ssl.https')\n\z
+        local json = require('dkjson')\n\z
+        local lume = require('lume')\n\z
         local serpent = require('serpent')\n\z
+        local url = require('socket.url')\n\z
         return function (bot, msg, group)\n" .. input .. "\nend"
     )
 
