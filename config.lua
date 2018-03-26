@@ -4,25 +4,22 @@ return {
     -- Your authorization token from the botfather. (string, put quotes)
     bot_api_key = os.getenv('OTOUTO_BOT_API_KEY'),
     -- Your Telegram ID (number).
-    admin = os.getenv('ADMIN_ID'),
+    admin = math.floor(os.getenv('OTOUTO_ADMIN_ID')),
     -- Two-letter language code.
     -- Fetches it from the system if available, or defaults to English.
     lang = os.getenv('LANG') and os.getenv('LANG'):sub(1,2) or 'en',
     -- The channel, group, or user to send error reports to.
     -- If this is not set, errors will be printed to the console.
-    log_chat = nil,
-    -- The port used to communicate with tg for administration.lua.
-    -- If you change this, make sure you also modify launch-tg.sh.
-    cli_port = 4567,
+    log_chat = math.floor(os.getenv('OTOUTO_LOG_ID')),
     -- The symbol that starts a command. Usually noted as '/' in documentation.
     cmd_pat = '/',
-    -- If drua is used, should a user be blocked when he's blacklisted?
-    drua_block_on_blacklist = false,
     -- The filename of the database. If left nil, defaults to $username.db.
     database_name = nil,
     -- The block of text returned by /start and /about..
     about_text = [[
-Based on otouto by topkecleon.
+I am otouto, the plugin-wielding, multipurpose Telegram bot.
+
+Send /help to get started.
     ]],
 
     errors = { -- Generic error messages.
@@ -51,48 +48,55 @@ Based on otouto by topkecleon.
     },
 
     plugins = { -- To enable a plugin, add its name to the list.
-        'control',
-        'luarun',
-        'users',
-        'banremover',
-        'autopromoter',
-        'filterer',
-        'groupinfo',
-        'flags',
-        'antilink',
-        'antisquig',
-        'antisquigpp',
-        'antibot',
-        'nostickers',
-        'addgroup',
-        'removegroup',
-        'listgroups',
-        'listadmins',
-        'listmods',
-        'listrules',
-        'getlink',
-        'regenlink',
-        'automoderation',
-        'antihammer_whitelist',
-        'setrules',
-        'kickme',
-        'automoderation',
-        'addmod',
-        'demod',
-        'setgovernor',
-        'mute',
-        'unrestrict',
-        'hammer',
-        'unhammer',
-        'ban',
-        'kick',
-        'filter',
-        'getdescription',
-        'setdescription',
-        'addadmin',
-        'deadmin',
-        'fixperms',
-        'help'
+        'core.control',
+        'core.luarun',
+        'core.users',
+
+        'admin.banremover',
+        'admin.autopromoter',
+        'admin.filterer',
+
+        'admin.flags',
+        'admin.groupinfo',
+        'core.about',
+        'core.ping',
+
+        'admin.antisquig',
+        'admin.antisquigpp',
+        'admin.antibot',
+        'admin.antilink',
+        'admin.nostickers',
+        'admin.filter',
+
+        'admin.addadmin',
+        'admin.addgroup',
+        'admin.addmod',
+        'admin.antihammer_whitelist',
+        'admin.automoderation',
+        'admin.automoderation',
+        'admin.ban',
+        'admin.deadmin',
+        'admin.demod',
+        'admin.fixperms',
+        'admin.getdescription',
+        'admin.getlink',
+        'admin.hammer',
+        'admin.kick',
+        'admin.kickme',
+        'admin.listadmins',
+        'admin.listgroups',
+        'admin.listmods',
+        'admin.listrules',
+        'admin.mute',
+        'admin.regenlink',
+        'admin.removegroup',
+        'admin.setdescription',
+        'admin.setgovernor',
+        'admin.setrules',
+        'admin.unhammer',
+        'admin.unrestrict',
+
+        'core.help'
     }
 
 }

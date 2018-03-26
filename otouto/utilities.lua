@@ -6,24 +6,25 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local bindings = require('otouto.bindings')
 local http = require('socket.http')
 local https = require('ssl.https')
- -- Global http/s timeout.
+-- Global http/s timeout.
 http.TIMEOUT = 10
 local json = require('dkjson')
 local ltn12 = require('ltn12')
 local url = require('socket.url')
- -- Lua 5.2 compatibility.
- -- If no built-in utf8 is available, load the library.
+-- Lua 5.2 compatibility.
+-- If no built-in utf8 is available, load the library.
 local utf8 = utf8 or require('lua-utf8')
+
+local bindings = require('otouto.bindings')
 
 local utilities = {}
 
- -- For the sake of ease to new contributors and familiarity to old contributors,
- -- we'll provide a couple of aliases to real bindings here.
- -- Edit: To keep things working and allow for HTML messages, you can now pass a
- -- string for use_markdown and that will be sent as the parse mode.
+-- For the sake of ease to new contributors and familiarity to old contributors,
+-- we'll provide a couple of aliases to real bindings here.
+-- Edit: To keep things working and allow for HTML messages, you can now pass a
+-- string for use_markdown and that will be sent as the parse mode.
 function utilities.send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
     local parse_mode
     if type(use_markdown) == 'string' then
@@ -62,7 +63,7 @@ function utilities.send_reply(msg, text, use_markdown)
     )
 end
 
- -- get the indexed word in a string
+-- get the indexed word in a string
 function utilities.get_word(s, i)
     s = s or ''
     i = i or 1
@@ -74,7 +75,7 @@ function utilities.get_word(s, i)
     return false
 end
 
- -- Returns the string after the first space.
+-- Returns the string after the first space.
 function utilities.input(s)
     return s:match('%s+(.+)')
 end
@@ -97,13 +98,7 @@ function utilities.utf8_len(s)
     return chars
 end
 
- -- Trims whitespace from a string.
-function utilities.trim(str)
-    local s = str:gsub('^%s*(.-)%s*$', '%1')
-    return s
-end
-
- -- Loads a json file as a table.
+-- Loads a json file as a table.
 function utilities.load_data(filename)
     local f = io.open(filename)
     if f then
@@ -115,7 +110,7 @@ function utilities.load_data(filename)
     end
 end
 
- -- Saves a table to a json file.
+-- Saves a table to a json file.
 function utilities.save_data(filename, data)
     local s = json.encode(data)
     local f = io.open(filename, 'w')
@@ -123,8 +118,8 @@ function utilities.save_data(filename, data)
     f:close()
 end
 
- -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
- -- Returns nil for a connection error and false for zero results.
+-- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
+-- Returns nil for a connection error and false for zero results.
 function utilities.get_coords(input)
     local call_url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. url.escape(input)
     local jstr, res = http.request(call_url)
@@ -141,7 +136,7 @@ function utilities.get_coords(input)
     end
 end
 
- -- Get the number of values in a key/value table.
+-- Get the number of values in a key/value table.
 function utilities.table_size(tab)
     local i = 0
     for _ in pairs(tab) do
@@ -150,15 +145,8 @@ function utilities.table_size(tab)
     return i
 end
 
- -- Returns a copy of $tab.
-function utilities.clone_table(tab)
-    local t = {}
-    for k, v in pairs(tab) do t[k] = v end
-    return t
-end
-
- -- Just an easy way to get a user's full name.
- -- Alternatively, abuse it to concat two strings like I do.
+-- Just an easy way to get a user's full name.
+-- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
     if last then
         return first .. ' ' .. last
@@ -167,10 +155,10 @@ function utilities.build_name(first, last)
     end
 end
 
-function utilities:resolve_username(input)
+function utilities.resolve_username(bot, input)
     input = input:gsub('^@', '')
-    if not self.database.users then return end
-    for _, user in pairs(self.database.users) do
+    if not bot.database.users then return end
+    for _, user in pairs(bot.database.users) do
         if user.username and user.username:lower() == input:lower() then
             local t = {}
             for key, val in pairs(user) do
@@ -181,7 +169,7 @@ function utilities:resolve_username(input)
     end
 end
 
- -- Log an error. If log_chat is given, send it there; if not, print it.
+-- Log an error. If log_chat is given, send it there; if not, print it.
 function utilities.log_error(text, log_chat)
     local output = string.format(
         '[%s]\n%s',
@@ -236,25 +224,25 @@ function utilities.html_escape(text)
                :gsub('>', '&gt;')
 end
 
-utilities.triggers_meta = {}
-utilities.triggers_meta.__index = utilities.triggers_meta
-function utilities.triggers_meta:t(pattern, has_args)
-    local username = self.username:lower()
-    table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
-    table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
-    if has_args then
-        table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
-        table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
+utilities.triggers_meta = {
+    t = function (self, pattern, has_args)
+        local username = self.username:lower()
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'$')
+        table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'$')
+        if has_args then
+            table.insert(self.table, '^'..self.cmd_pat..pattern..'%s+[^%s]*')
+            table.insert(self.table, '^'..self.cmd_pat..pattern..'@'..username..'%s+[^%s]*')
+        end
+        return self
     end
-    return self
-end
+}
 
 function utilities.triggers(username, cmd_pat, trigger_table)
-    local self = setmetatable({}, utilities.triggers_meta)
-    self.username = username
-    self.cmd_pat = cmd_pat
-    self.table = trigger_table or {}
-    return self
+    return setmetatable({
+        username = username,
+        cmd_pat = cmd_pat,
+        table = trigger_table or {}
+    }, {__index = utilities.triggers_meta})
 end
 
 function utilities.pretty_float(x)
@@ -265,8 +253,8 @@ function utilities.pretty_float(x)
     end
 end
 
- -- This table will store unsavory characters that are not properly displayed,
- -- or are just not fun to type.
+-- This table will store unsavory characters that are not properly displayed,
+-- or are just not fun to type.
 utilities.char = {
     zwnj = utf8.char(0x200c),
     arabic = '[\216-\219][\128-\191]',
@@ -278,55 +266,55 @@ utilities.char = {
     invisible_separator = utf8.char(0x2063)
 }
 
-utilities.set_meta = {}
-utilities.set_meta.__index = utilities.set_meta
+utilities.set_meta = {
+    add = function (self, x)
+        if x == "__count" then
+            return false
+        else
+            if not self[x] then
+                self[x] = true
+                self.__count = self.__count + 1
+            end
+            return true
+        end
+    end,
+    remove = function (self, x)
+        if x == "__count" then
+            return false
+        else
+            if self[x] then
+                self[x] = nil
+                self.__count = self.__count - 1
+            end
+            return true
+        end
+    end,
+    __len = function (self)
+        return self.__count
+    end
+}
 function utilities.new_set()
-    return setmetatable({__count = 0}, utilities.set_meta)
-end
-function utilities.set_meta:add(x)
-    if x == "__count" then
-        return false
-    else
-        if not self[x] then
-            self[x] = true
-            self.__count = self.__count + 1
-        end
-        return true
-    end
-end
-function utilities.set_meta:remove(x)
-    if x == "__count" then
-        return false
-    else
-        if self[x] then
-            self[x] = nil
-            self.__count = self.__count - 1
-        end
-        return true
-    end
-end
-function utilities.set_meta:__len()
-    return self.__count
+    return setmetatable({__count = 0}, {__index = utilities.set_meta})
 end
 
- -- Converts a gross string back into proper UTF-8.
- -- Useful for fixing improper encoding caused by bad json escaping.
+-- Converts a gross string back into proper UTF-8.
+-- Useful for fixing improper encoding caused by bad json escaping.
 function utilities.fix_utf8(str)
     return string.char(utf8.codepoint(str, 1, -1))
 end
 
- -- The bot API changes all group, channel, and supergroup IDs.
- -- User: 123456789
- -- Group: -123456789
- -- Channel/supergroup: -100123456789
- -- This function takes an ID and returns the "real" ID, which is 123456789.
+-- The bot API changes all group, channel, and supergroup IDs.
+-- User: 123456789
+-- Group: -123456789
+-- Channel/supergroup: -100123456789
+-- This function takes an ID and returns the "real" ID, which is 123456789.
 function utilities.normalize_id(id)
     local out = math.abs(tonumber(id))
     return out > 1000000000000 and out - 1000000000000 or out
 end
 
- -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
- -- I wrote this for administration but it could be useful elsewhere.
+-- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
+-- I wrote this for administration but it could be useful elsewhere.
 function utilities.format_name(self, id)
     local user = self.database.users[tostring(id)] or { first_name = 'Unknown' }
     local s = string.format(
@@ -349,7 +337,7 @@ function utilities.divmod(x, y)
     return q, x - y * q
 end
 
- -- named by brayden
+-- named by brayden
 utilities.tiem = {
     order = { 'y', 'w', 'd', 'h', 'm', 's' },
     dict = {
@@ -359,37 +347,35 @@ utilities.tiem = {
         h = 3600,
         m = 60,
         s = 1
-    }
-}
-
-function utilities.tiem.format(seconds)
-    local time_str = ''
-    for _, l in ipairs(utilities.tiem.order) do
-        local v = utilities.tiem.dict[l]
-        if seconds >= v then
-            local q, r = utilities.divmod(seconds, v)
-            time_str = time_str .. q .. l
-            seconds = r
+    },
+    format = function (seconds)
+        local time_str = ''
+        for _, l in ipairs(utilities.tiem.order) do
+            local v = utilities.tiem.dict[l]
+            if seconds >= v then
+                local q, r = utilities.divmod(seconds, v)
+                time_str = time_str .. q .. l
+                seconds = r
+            end
         end
-    end
-    return time_str
-end
+        return time_str
+    end,
+    deformat = function (time_str)
+        if
+            (not time_str:match('^[%dywdhms]+$'))
+            or time_str:match('%l%l')
+            or time_str:match('^%l')
+            or time_str:match('%d$')
+        then
+            return false
+        end
 
-function utilities.tiem.deformat(time_str)
-    if
-        (not time_str:match('^[%dywdhms]+$'))
-        or time_str:match('%l%l')
-        or time_str:match('^%l')
-        or time_str:match('%d$')
-    then
-        return false
-    end
-
-    local seconds = 0
-    for num, typ in time_str:lower():gmatch('(%d+)(%l)') do
-        seconds = seconds + num * utilities.tiem.dict[typ]
-    end
-    return math.floor(seconds)
-end
+        local seconds = 0
+        for num, typ in time_str:lower():gmatch('(%d+)(%l)') do
+            seconds = seconds + num * utilities.tiem.dict[typ]
+        end
+        return math.floor(seconds)
+    end,
+}
 
 return utilities

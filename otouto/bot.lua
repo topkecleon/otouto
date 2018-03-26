@@ -9,6 +9,7 @@
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
+local lume -- More utility functions.
 local autils -- Administration-related functions.
 
 bot.version = '3.15.5 admin'
@@ -17,10 +18,12 @@ bot.version = '3.15.5 admin'
 function bot:init()
 
     assert(self.config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
+    assert(self.config.admin, 'You didn\'t set your admin ID in config.lua!')
 
     bindings = require('otouto.bindings').init(self.config.bot_api_key)
     utilities = require('otouto.utilities')
-    autils = require('otouto.administration')
+    lume = require('lume')
+    autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.
     repeat
@@ -36,7 +39,7 @@ function bot:init()
     end
 
     -- Save the bot's version in the database to make migration simpler.
-    self.database.version = bot.version
+    self.database.version = self.version
 
     -- Database table to store user-specific information, such as nicknames or
     -- API usernames.
@@ -52,12 +55,7 @@ function bot:init()
     self.plugins = {}
     self.named_plugins = {}
     for _, pname in ipairs(self.config.plugins) do
-        local plugin = require('otouto.plugins.'..pname)
-        table.insert(self.plugins, plugin)
-        self.named_plugins[pname] = plugin
-        plugin.name = pname
-        if plugin.init then plugin.init(self) end
-        if not plugin.triggers then plugin.triggers = {} end
+        self:load_plugin(pname)
     end
 
     -- Set loop variables.
@@ -68,6 +66,25 @@ function bot:init()
 
     print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')\n')
 
+end
+
+function bot:load_plugin(pname, pos)
+    local plugin = require('otouto.plugins.'..pname)
+    if pos == nil then
+        table.insert(self.plugins, plugin)
+    else
+        table.insert(self.plugins, pos, plugin)
+    end
+    self.named_plugins[pname] = plugin
+    plugin.name = pname
+    if plugin.init then plugin:init(self) end
+    if not plugin.triggers then plugin.triggers = {} end
+end
+
+function bot:unload_plugin(pname)
+    local plugin = require('otouto.plugins.'..pname)
+    lume.remove(self.plugins, plugin)
+    self.named_plugins[pname] = nil
 end
 
  -- Function to be run on each new message.
@@ -101,12 +118,12 @@ function bot:on_message(msg)
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        if (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
+        if (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
                     local success, result = pcall(function()
-                        return plugin.action(self, msg, group, user)
+                        return plugin:action(self, msg, group, user)
                     end)
 
                     if not success then
@@ -148,12 +165,12 @@ function bot:on_edit(msg)
         self.database.administration.groups[tostring(msg.chat.id)]
 
     for _, plugin in ipairs(self.plugins) do
-        if plugin.edit_action and (not plugin.internal or group) and user.rank >= (plugin.privilege or 0) then
+        if plugin.edit_action and (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
                     local success, result = pcall(function()
-                        return plugin.edit_action(self, msg, group, user)
+                        return plugin:edit_action(self, msg, group, user)
                     end)
 
                     if not success then
@@ -172,7 +189,7 @@ end
 
  -- main
 function bot:run()
-    bot.init(self)
+    self:init()
     while self.is_started do
         -- Update loop.
         local res = bindings.getUpdates{
@@ -185,9 +202,9 @@ function bot:run()
             for _,v in ipairs(res.result) do
                 self.last_update = v.update_id
                 if v.message then
-                    bot.on_message(self, v.message)
+                    self:on_message(v.message)
                 elseif v.edited_message then
-                    bot.on_edit(self, v.edited_message)
+                    self:on_edit(v.edited_message)
                 end
             end
         else
@@ -197,9 +214,9 @@ function bot:run()
         -- Run cron jobs every minute.
         local now = os.date('%M')
         if self.last_cron ~= now then
-            for _, v in ipairs(self.plugins) do
-                if v.cron then -- Call each plugin's cron function, if it has one.
-                    local suc, err = pcall(function() v.cron(self, now) end)
+            for _, plugin in ipairs(self.plugins) do
+                if plugin.cron then -- Call each plugin's cron function, if it has one.
+                    local suc, err = pcall(function() plugin:cron(self, now) end)
                     if not suc then
                         utilities.log_error(err, self.config.log_chat)
                     end
