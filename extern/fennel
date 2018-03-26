@@ -1,0 +1,58 @@
+#!/usr/bin/env lua
+
+package.path = arg[0]:match("(.-)[^\\/]+$") .. "?.lua;" .. package.path
+local fennel = require('fennel')
+
+local help = [[
+Usage: fennel [FLAG] [FILE]
+
+  --repl          :  Launch an interactive repl session
+  --compile FILES :  Compile files and write their Lua to stdout
+  --help          :  Display this text
+
+  When not given a flag, runs the file given as the first argument.]]
+
+local options = {}
+
+if arg[1] == "--repl" or #arg == 0 then
+    local initFilename = (os.getenv("HOME") or "") .. "/.fennelrc"
+    local init = io.open(initFilename, "rb")
+    if init then
+        init:close()
+        -- pass in options so fennerlrc can make changes to it
+        fennel.dofile(initFilename, options, options)
+    end
+    print("Welcome to fennel!")
+    fennel.repl(options)
+elseif arg[1] == "--compile" then
+    if arg[2] == "--indent" then
+        options.indent = table.remove(arg, 3)
+        if options.indent == "false" then options.indent = false end
+        table.remove(arg, 2)
+    end
+    for i = 2, #arg do
+        local f = assert(io.open(arg[i], "rb"))
+        options.filename=arg[i]
+        if os.getenv("DEBUG") then
+            fennel.compileString(f:read("*all"), options)
+        else
+            local ok, val = pcall(fennel.compileString, f:read("*all"), options)
+            print(val)
+            if(not ok) then os.exit(1) end
+        end
+        f:close()
+    end
+elseif #arg >= 1 and arg[1] ~= "--help" then
+    local filename = table.remove(arg, 1) -- let the script have remaining args
+    if os.getenv("DEBUG") then
+        fennel.dofile(filename, { accurate=true })
+    else
+        local ok, val = pcall(fennel.dofile, filename, { accurate=true })
+        if(not ok) then
+            print(val)
+            os.exit(1)
+        end
+    end
+else
+    print(help)
+end
