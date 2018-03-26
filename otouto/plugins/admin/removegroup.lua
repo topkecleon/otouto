@@ -12,7 +12,7 @@ Removes the current or specified group from the administrative system."
 end
 
 function P:action(bot, msg, group)
-    local input = utilities.input_from_msg(msg)
+    local input = utilities.get_word(msg.text, 2)
     local output
 
     if input then
@@ -22,6 +22,10 @@ function P:action(bot, msg, group)
                 output = 'I am no longer administrating ' ..
                     bot.database.administration.groups[id].name .. '.'
                 bot.database.administration.groups[id] = nil
+            elseif bot.database.administration.groups['-100'..id] then
+                output = 'I am no longer administrating ' ..
+                    bot.database.administration.groups['-100'..id].name .. '.'
+                bot.database.administration.groups['-100'..id] = nil
             else
                 output = 'Group not found (' .. id .. ').'
             end
