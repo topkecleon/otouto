@@ -315,8 +315,8 @@ end
 
 -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
 -- I wrote this for administration but it could be useful elsewhere.
-function utilities.format_name(self, id)
-    local user = self.database.users[tostring(id)] or { first_name = 'Unknown' }
+function utilities.format_name(bot, id)
+    local user = bot.database.users[tostring(id)] or { first_name = 'Unknown' }
     local s = string.format(
         '%s <code>[%s]</code>',
         utilities.html_escape(
