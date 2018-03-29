@@ -147,29 +147,83 @@ end
 
 utilities.data_table_meta = {
     __index = function (self, key)
-        if rawget(self, "_data")._parent then
-            local val = rawget(self, "_data")[key]
+        local data = rawget(self, "_data")
+        if data._parent then
+            local val = data[key]
             return val and
                 setmetatable({_data = val, _key = rawget(self, "_key")}, getmetatable(self))
         else
-            local val = rawget(self, "_data")[key]
+            local val = data[key]
             return val and val[rawget(self, "_key")]
         end
     end,
     __newindex = function (self, key, value)
-        if rawget(self, "_data")._parent then
+        local data = rawget(self, "_data")
+        if data._parent then
             error("Can't set non-terminal key " .. tostring(key) .. " in a data_table")
             return
         else
-            local t = rawget(self, "_data")[key]
+            local t = data[key]
             if t == nil then
                 t = {}
-                rawget(self, "_data")[key] = t
+                data[key] = t
             end
             t[rawget(self, "_key")] = value
             return
         end
-    end
+    end,
+    __pairs = function (self)
+        local data = rawget(self, "_data")
+        if data._parent then
+            local selfmeta = getmetatable(self)
+            local function iter(table, index)
+                local new_index, val = next(table, index)
+                if new_index then
+                    return new_index, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        else
+            local function iter(table, index)
+                local new_index, val = next(table, index)
+                if new_index then
+                    return new_index, val[rawget(self, "_key")]
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        end
+    end,
+    __ipairs = function (self)
+        local data = rawget(self, "_data")
+        if data._parent then
+            local selfmeta = getmetatable(self)
+            local function iter(table, i)
+                i = i + 1
+                local val = table[i]
+                if val then
+                    return i, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
+                else
+                    return nil
+                end
+            end
+            return iter, data, 0
+        else
+            local function iter(table, index)
+                i = i + 1
+                local val = table[i]
+                if val then
+                    return i, val[rawget(self, "_key")]
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        end
+    end,
 }
 function utilities.data_table(data, key)
     return setmetatable({_data = data, _key = key}, utilities.data_table_meta)
