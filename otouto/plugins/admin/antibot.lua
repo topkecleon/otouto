@@ -9,7 +9,7 @@ function P:init(bot)
     self.flag = 'antibot'
     self.flag_desc = 'Only moderators may add bots.'
     flags_plugin.flags[self.flag] = self.flag_desc
-    self.triggers = { '' }
+    self.triggers = { '^$' }
     self.administration = true
 end
 

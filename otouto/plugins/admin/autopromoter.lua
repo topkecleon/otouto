@@ -4,7 +4,7 @@ local autils = require('otouto.autils')
 local P = {}
 
 function P:init(_bot)
-    self.triggers = {''}
+    self.triggers = {'^$'}
     self.administration = true
 end
 

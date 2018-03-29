@@ -9,7 +9,7 @@ function P:init(bot)
     self.flag = 'nostickers'
     self.flag_desc = 'Stickers are filtered.'
     flags_plugin.flags[self.flag] = self.flag_desc
-    self.triggers = {''}
+    self.triggers = {'^$'}
     self.administration = true
 end
 

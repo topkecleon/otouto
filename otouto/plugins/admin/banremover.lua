@@ -6,7 +6,6 @@ local P = {}
 function P:init(_bot)
     self.triggers = {''}
     self.administration = true
-    self.privilege = 0
 end
 
 function P:action(bot, msg, _group, user)
