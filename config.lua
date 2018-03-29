@@ -67,6 +67,7 @@ Send /help to get started.
         'admin.antilink',
         'admin.nostickers',
         'admin.filter',
+        'admin.delete_left_messages',
 
         'admin.addadmin',
         'admin.addgroup',
