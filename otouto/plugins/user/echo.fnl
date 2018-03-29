@@ -1,4 +1,4 @@
-;; echo.lua
+;; echo.fnl
 ;; Returns input.
 
 ;; Copyright 2018 topkecleon <drew@otou.to>
@@ -21,7 +21,7 @@
         (do (utilities.send_plugin_help msg.chat.id msg.message_id bot.config.cmd_pat self) nil)
         (let [html_input (utilities.html_escape input)
               output (if (= msg.chat.type :supergroup)
-                         (.. "<b>Echo:</b>\n\"" (utilities.html_escape input) "\"")
+                         (f-str "<b>Echo:</b>\n\"{}\"" (utilities.html_escape input))
                          (utilities.html_escape (.. utilities.char.zwnj input)))]
           (utilities.send_message msg.chat.id output true nil :html)
           nil)))

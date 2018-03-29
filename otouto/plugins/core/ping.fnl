@@ -1,4 +1,4 @@
-;; ping.lua
+;; ping.fnl
 ;; Sends a response, then updates it with the time it took to send.
 
 ;; Copyright 2018 topkecleon <drew@otou.to>

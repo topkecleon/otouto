@@ -49,6 +49,24 @@ Send /help to get started."
     }
   }
 
+  :remind {
+    ; Should reminders be saved if they fail to send?
+    :persist false
+    :max_length 1000
+    :max_duration 526000
+    :max_reminders_group 10
+    :max_reminders_private 50
+  }
+
+  :reactions {
+    :shrug "¯\\_(ツ)_/¯"
+    :lenny "( ͡° ͜ʖ ͡°)"
+    :flip "(╯°□°）╯︵ ┻━┻"
+    :look "ಠ_ಠ"
+    :shots "SHOTS FIRED"
+    :facepalm "(－‸ლ)"
+  }
+
   ; To enable a plugin, add its name to the list.
   :plugins (let
       [
@@ -74,6 +92,7 @@ Send /help to get started."
         ]
         core [
           :core.about
+          :core.disable_plugins
           :core.help
           :core.ping
         ]
@@ -107,8 +126,13 @@ Send /help to get started."
           :admin.unrestrict
         ]
         user [
+          :user.cats
           :user.dice
           :user.echo
+          :user.maybe
+          :user.reactions
+          :user.slap
+          :user.whoami
         ]
       ]
 
@@ -116,6 +140,7 @@ Send /help to get started."
       core-critical
       admin-critical
       admin-filters
+      [:core.end_forwards]
       core
       admin
       user

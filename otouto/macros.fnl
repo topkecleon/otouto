@@ -10,10 +10,11 @@
     (table.insert out (list (sym :values)))
     out)
 
-  "f-str" (lambda [input]
+  "f-str" (lambda [input ...]
     (when (~= (type input) :string)
       (error "f-str: must be called with a string"))
-    (var cat (list (sym "..")))
+    (local cat (list (sym "..")))
+    (local args [...])
     (var state :string)
     (var bytes [])
     (for [i 1 (# input)]
@@ -29,8 +30,8 @@
               (error "f-str: can't have curly braces in expressions")
               (= state :escape-right)
               (error "f-str: unmatched right curly must be followed by another")
-              ; else
-              (error "f-str: improper left curly brace")) ; unreachable
+              ; else (unreachable)
+              (error "f-str: improper left curly brace"))
           (= b 125) ; right curly
           (if (= state :expr)
               (do
@@ -44,9 +45,14 @@
                 (set state :string)
                 (table.insert bytes b))
               (= state :expr-first)
-              (error "f-str: empty single curly braces")
-              ; else
-              (error "f-str: improper right curly brace")) ; unreachable
+              (do
+                (assert (> (# args) 0) "f-str: Missing argument")
+                (set state :string)
+                (table.insert cat (string.char (table.unpack bytes)))
+                (set bytes [])
+                (table.insert cat (table.remove args 1)))
+              ; else (unreachable)
+              (error "f-str: improper right curly brace"))
           ; else
           (if (or (= state :string) (= state :expr))
               (table.insert bytes b)
@@ -57,8 +63,8 @@
                 (set bytes [b]))
               (= state :escape-right)
               (error "f-str: unmatched right curly must be followed by another")
-              ; else
-              (error (.. "f-str: unknown state " state))))) ; unreachable
+              ; else (unreachable)
+              (error (.. "f-str: unknown state " state)))))
     (if (= state :string)
         (when (> (# input) 0)
           (table.insert cat (string.char (table.unpack bytes))))
@@ -66,7 +72,7 @@
         (error "f-str: unmatched right curly")
         (= state :escape-right)
         (error "f-str: unmatched left curly")
-        ; else
-        (error (.. "f-str: unknown state " state))) ; unreachable
+        ; else (unreachable)
+        (error (.. "f-str: unknown state " state)))
     cat)
 }

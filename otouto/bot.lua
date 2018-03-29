@@ -1,6 +1,6 @@
 --[[
     bot.lua
-    The heart and soul of otouto, ie the init and main loop.
+    The heart and soul of otouto, i.e. the init and main loop.
 
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
@@ -46,6 +46,8 @@ function bot:init()
     if not self.database.userdata then
         self.database.userdata = { hammers = {}, administrators = {} }
     end
+    -- Database table to store disabled plugins for chats.
+    self.database.disabled_plugins = self.database.disabled_plugins or {}
 
     if not self.database.groupdata then
         self.database.groupdata = { admin = {} }
@@ -71,11 +73,11 @@ function bot:load_plugins(pnames, pos)
     local loaded = {}
     local errors = {}
     for i, pname in ipairs(pnames) do
-        local success, plugin = pcall(function ()
+        local success, plugin = xpcall(function ()
             return assert(require('otouto.plugins.'..pname), pname .. ' is falsy')
-        end)
+        end, function (msg) return debug.traceback(msg) end)
         if not success then
-            table.insert(errors, plugin)
+            table.insert(errors, {pname, plugin})
         else
             if pos == nil then
                 table.insert(self.plugins, plugin)
@@ -92,7 +94,7 @@ function bot:load_plugins(pnames, pos)
     if #errors > 0 then
         text = "Error(s) loading the following plugin(s):"
         for _, error in ipairs(errors) do
-            text = text .. "\n" .. "=> " .. error[1] .. "\n" .. error[2]
+            text = text .. "\n" .. "=> " .. tostring(error[1]) .. "\n" .. tostring(error[2])
         end
         utilities.log_error(text, self.config.log_chat)
     end
@@ -152,6 +154,8 @@ function bot:on_message(msg)
 
     msg.text_lower = msg.text:lower()
 
+    local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
+
     local user = {
         id_str = tostring(msg.from.id),
         rank = autils.rank(self, msg.from.id, msg.chat.id),
@@ -165,13 +169,16 @@ function bot:on_message(msg)
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        if (not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0) then
+        if
+            (not (disabled_plugins and disabled_plugins[plugin.name])) and
+            ((not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0))
+        then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
-                    local success, result = pcall(function()
+                    local success, result = xpcall(function ()
                         return plugin:action(self, msg, group, user)
-                    end)
+                    end, function (msg) return debug.traceback(msg) end)
 
                     if not success then
                         -- If the plugin has an error message, send it. If it does
@@ -214,13 +221,17 @@ function bot:on_edit(msg)
     }
 
     for _, plugin in ipairs(self.plugins) do
-        if plugin.edit_action and (not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0) then
+        if
+            plugin.edit_action and
+            (not (disabled_plugins and disabled_plugins[plugin.name])) and
+            ((not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0))
+        then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
-                    local success, result = pcall(function()
+                    local success, result = xpcall(function ()
                         return plugin:edit_action(self, msg, group, user)
-                    end)
+                    end, function (msg) return debug.traceback(msg) end)
 
                     if not success then
                         -- The message contents are included for debugging purposes.
@@ -265,7 +276,9 @@ function bot:run()
         if self.last_cron ~= now then
             for _, plugin in ipairs(self.plugins) do
                 if plugin.cron then -- Call each plugin's cron function, if it has one.
-                    local suc, err = pcall(function() plugin:cron(self, now) end)
+                    local suc, err = xpcall(function ()
+                        plugin:cron(self, now)
+                    end, function (msg) return debug.traceback(msg) end)
                     if not suc then
                         utilities.log_error(err, self.config.log_chat)
                     end

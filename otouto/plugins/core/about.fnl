@@ -1,4 +1,4 @@
-;; about.lua
+;; about.fnl
 ;; Returns owner-configured information related to the bot and a link to the
 ;; source code.
 

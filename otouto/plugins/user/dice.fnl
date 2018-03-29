@@ -1,4 +1,4 @@
-;; dice.lua
+;; dice.fnl
 ;; Returns a set of random numbers. Accepts D&D notation.
 
 ;; Copyright 2018 topkecleon <drew@otou.to>
@@ -37,7 +37,7 @@
                 (let [output (f-str "*{count}d{range}*\n`")]
                   (var output output)
                   (for [a b c]
-                    (set output (.. output (math.random range) "\t")))
+                    (set output (f-str "{output}{}\t" (math.random range))))
                   (set output (f-str "{output}`"))
                   (utilities.send_message msg.chat.id output true msg.message_id true)
                   nil)))))))

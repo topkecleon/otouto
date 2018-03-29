@@ -45,22 +45,7 @@ function utilities.send_message(chat_id, text, disable_web_page_preview, reply_t
 end
 
 function utilities.send_reply(msg, text, use_markdown)
-    local parse_mode
-    if type(use_markdown) == 'string' then
-        parse_mode = use_markdown
-    elseif use_markdown == true then
-        parse_mode = 'markdown'
-    end
-    return bindings.request(
-        'sendMessage',
-        {
-            chat_id = msg.chat.id,
-            text = text,
-            disable_web_page_preview = true,
-            reply_to_message_id = msg.message_id,
-            parse_mode = parse_mode
-        }
-    )
+    return utilities.send_message(msg.chat.id, text, true, msg.message_id, use_markdown)
 end
 
 -- get the indexed word in a string
