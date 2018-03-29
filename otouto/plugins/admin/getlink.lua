@@ -12,15 +12,16 @@ function P:init(bot)
 end
 
 function P:action(_bot, msg, group, user)
+    local admin = group.data.admin
     local output
     local link = string.format(
         '<a href="%s">%s</a>',
-        group.link,
+        admin.link,
         utilities.html_escape(msg.chat.title)
     )
 
     -- Links to private groups are mods+ and are only PM'd.
-    if group.flags.private then
+    if admin.flags.private then
         if user.rank > 1 then
             if utilities.send_message(msg.from.id, link, true, nil, 'html') then
                 output = 'I have sent you the requested information in a private message.'

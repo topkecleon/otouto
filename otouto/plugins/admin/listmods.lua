@@ -11,11 +11,12 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
+    local admin = group.data.admin
     local output = '<b>Governor:</b> ' ..
-        utilities.format_name(bot, group.governor)
-    if next(group.moderators) ~= nil then
+        utilities.format_name(bot, admin.governor)
+    if next(admin.moderators) ~= nil then
         local mod_list = {}
-        for id_str in pairs(group.moderators) do
+        for id_str in pairs(admin.moderators) do
             table.insert(mod_list, utilities.format_name(bot, id_str))
         end
         output = output ..  '\n\n<b>Moderators:</b>\n• ' ..

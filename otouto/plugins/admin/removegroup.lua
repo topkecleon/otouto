@@ -18,14 +18,13 @@ function P:action(bot, msg, group)
     if input then
         local id = tostring(tonumber(input))
         if id then
-            if bot.database.administration.groups[id] then
-                output = 'I am no longer administrating ' ..
-                    bot.database.administration.groups[id].name .. '.'
-                bot.database.administration.groups[id] = nil
-            elseif bot.database.administration.groups['-100'..id] then
-                output = 'I am no longer administrating ' ..
-                    bot.database.administration.groups['-100'..id].name .. '.'
-                bot.database.administration.groups['-100'..id] = nil
+            local admin = bot.database.groupdata.admin
+            if admin[id] then
+                output = 'I am no longer administrating ' ..  admin[id].name .. '.'
+                admin[id] = nil
+            elseif admin['-100'..id] then
+                output = 'I am no longer administrating ' ..  admin['-100'..id].name .. '.'
+                admin['-100'..id] = nil
             else
                 output = 'Group not found (' .. id .. ').'
             end
@@ -34,9 +33,10 @@ function P:action(bot, msg, group)
         end
 
     else
-        if group then
+        local admin = group.data.admin
+        if admin then
             output = 'I am no longer administrating ' .. msg.chat.title .. '.'
-            bot.database.administration.groups[tostring(msg.chat.id)] = nil
+            group.data.admin = nil
         else
             output = 'Run in an administrated group or pass one\'s ID.'
         end

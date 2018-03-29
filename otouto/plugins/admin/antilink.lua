@@ -50,16 +50,16 @@ antilink can be enabled with /flag antilink (see /help flags)."
 
     -- Infractions are stored, and users are globally banned after three within
     -- one day of each other.
-    if not bot.database.administration.antilink then
-        bot.database.administration.antilink = {}
+    if not bot.database.userdata.antilink then
+        bot.database.userdata.antilink = {}
     end
-    self.store = bot.database.administration.antilink
 
     self.administration = true
 end
 
 function P:action(bot, msg, group, user)
-    if not group.flags[self.flag] then return true end
+    local admin = group.data.admin
+    if not admin.flags[self.flag] then return true end
     if user.rank > 1 then return true end
     if msg.forward_from and (
         (msg.forward_from.id == bot.info.id) or
@@ -69,32 +69,36 @@ function P:action(bot, msg, group, user)
         return true
     end
     if self:check(bot, msg) then
-        self.store[user.id_str] = self.store[user.id_str] or {
-            count = 0,
-            groups = {},
-        }
-        self.store[user.id_str].count = self.store[user.id_str].count +1
-        self.store[user.id_str].groups[tostring(msg.chat.id)] = true
-        self.store[user.id_str].latest = os.time()
+        local store = user.data.antilink
+        if not store then
+            store = {
+                count = 0,
+                groups = {},
+            }
+            user.data.antilink = store
+        end
+        store.count = store.count +1
+        store.groups[tostring(msg.chat.id)] = true
+        store.latest = os.time()
 
-        if self.store[user.id_str].count == 3 then
-            bot.database.userdata.hammers[user.id_str] = true
+        if store.count == 3 then
+            user.data.hammers = true
             bindings.deleteMessage{ chat_id = msg.chat.id,
                 message_id = msg.message_id }
             autils.log(bot, {
-                chat_id = not group.flags.private and msg.chat.id,
+                chat_id = not admin.flags.private and msg.chat.id,
                 target = msg.from.id,
                 action = 'Globally banned',
                 source = self.flag,
                 reason = self.flag_desc
             })
-            for chat_id_str in pairs(self.store[user.id_str].groups) do
+            for chat_id_str in pairs(store.groups) do
                 bindings.kickChatMember{
                     chat_id = chat_id_str,
                     user_id = msg.from.id
                 }
             end
-            self.store[user.id_str] = nil
+            user.data.antilink = nil
         else
             autils.strike(bot, msg, self.flag)
         end
@@ -103,11 +107,12 @@ function P:action(bot, msg, group, user)
     end
 end
 
-function P:cron(_bot, _now)
+function P:cron(bot, _now)
     if self.last_clear ~= os.date('%H') then
-        for id_str, u in pairs(self.store) do
+        local store = bot.database.userdata.antilink
+        for id_str, u in pairs(store) do
             if os.time() > u.latest + 86400 then
-                self.store[id_str] = nil
+                store[id_str] = nil
             end
         end
         self.last_clear = os.date('%H')
@@ -169,7 +174,7 @@ function P:is_code_external(bot, code)
     local pattern = '/' .. code:gsub('%-', '%%-') .. '$'
     -- Iterate through groups and return false if the joinchat code belongs to
     -- any one of them.
-    for _, group in pairs(bot.database.administration.groups) do
+    for _, group in pairs(bot.database.groupdata.admin) do
         if group.link:match(pattern) then return false end
     end
     return true
@@ -181,7 +186,7 @@ function P:is_username_external(bot, username)
     local res = bindings.getChat{chat_id = '@' .. username}
     -- If the username is an external supergroup or channel, return true.
     if res and (res.result.type=='supergroup' or res.result.type=='channel') and
-        not bot.database.administration.groups[tostring(res.result.id)] then
+        not bot.database.groupdata.admin[tostring(res.result.id)] then
             return true
     end
     return false
