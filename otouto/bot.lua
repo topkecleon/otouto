@@ -43,13 +43,14 @@ function bot:init()
 
     -- Database table to store user-specific information, such as nicknames or
     -- API usernames.
-    self.database.userdata = self.database.userdata or {}
+    if not self.database.userdata then
+        self.database.userdata = { hammers = {}, administrators = {} }
+    end
 
     -- administration
+    -- database.groupdata when?
     self.database.administration = self.database.administration or {
-        groups = {},
-        administrators = {},
-        hammers = {}
+        groups = {}
     }
 
     self.plugins = {}

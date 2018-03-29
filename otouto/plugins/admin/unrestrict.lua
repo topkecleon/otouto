@@ -34,7 +34,7 @@ function P:action(bot, msg, group)
                     group.bans[tostring(id)] = nil
                     table.insert(output, utilities.format_name(bot, id) ..
                         ' has been unbanned and unrestricted.')
-                elseif bot.database.administration.hammers[tostring(id)] then
+                elseif bot.database.userdata.hammers[tostring(id)] then
                     table.insert(output, utilities.format_name(bot, id) ..
                         ' is globally banned.')
                 else

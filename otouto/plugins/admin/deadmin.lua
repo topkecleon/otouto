@@ -19,9 +19,8 @@ function P:action(bot, msg, _group, _user)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                if bot.database.administration.administrators[tostring(id)]
-                then
-                    bot.database.administration.administrators[tostring(id)] =
+                if bot.database.userdata.administrators[tostring(id)] then
+                    bot.database.userdata.administrators[tostring(id)] =
                         nil
                     for chat_id in pairs(bot.database.administration.groups) do
                         if autils.rank(bot, id, chat_id) < 2 then

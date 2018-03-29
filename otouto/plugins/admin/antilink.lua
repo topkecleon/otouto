@@ -78,7 +78,7 @@ function P:action(bot, msg, group, user)
         self.store[user.id_str].latest = os.time()
 
         if self.store[user.id_str].count == 3 then
-            bot.database.administration.hammers[user.id_str] = true
+            bot.database.userdata.hammers[user.id_str] = true
             bindings.deleteMessage{ chat_id = msg.chat.id,
                 message_id = msg.message_id }
             autils.log(bot, {

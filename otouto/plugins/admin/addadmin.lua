@@ -23,7 +23,7 @@ function P:action(bot, msg, _group, _user)
                     table.insert(output, utilities.format_name(bot, id) ..
                         ' is already an administrator.')
                 else
-                    bot.database.administration.administrators[tostring(id)] =
+                    bot.database.userdata.administrators[tostring(id)] =
                         true
                     table.insert(output, utilities.format_name(bot, id) ..
                         ' is now an administrator.')

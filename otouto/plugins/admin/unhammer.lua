@@ -20,8 +20,8 @@ function P:action(bot, msg, _group)
             if tonumber(id) then
                 local name = utilities.format_name(bot, id)
                 local id_str = tostring(id)
-                if bot.database.administration.hammers[id_str] then
-                    bot.database.administration.hammers[id_str] = nil
+                if bot.database.userdata.hammers[id_str] then
+                    bot.database.userdata.hammers[id_str] = nil
                     table.insert(output, name..' is no longer globally banned.')
                 else
                     table.insert(output, name .. ' is not globally banned.')
