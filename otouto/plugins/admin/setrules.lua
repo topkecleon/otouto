@@ -86,14 +86,15 @@ end
 
 P.subcommands = {
     change = function (super, group, new_rules, idx)
+        local admin = group.data.admin
         if #new_rules == 0 then
             return 'Please specify the new rule or rules.'
 
         elseif not idx then -- /setrules
-            group.rules = new_rules
-            local output = '<b>Rules for ' .. utilities.html_escape(group.name) ..
+            admin.rules = new_rules
+            local output = '<b>Rules for ' .. utilities.html_escape(admin.name) ..
                 ':</b>'
-            for i, rule in ipairs(group.rules) do
+            for i, rule in ipairs(admin.rules) do
                 output = output .. '\n<b>' .. i .. '.</b> ' .. rule
             end
             return output
@@ -101,13 +102,13 @@ P.subcommands = {
         elseif idx < 1 then
             return 'Invalid index.'
 
-        elseif idx > #group.rules then
+        elseif idx > #admin.rules then
             return super.subcommands.add(group, new_rules, idx)
 
         else -- /changerule i
             local output = ''
             for i = 1, #new_rules do
-                group.rules[idx+i-1] = new_rules[i]
+                admin.rules[idx+i-1] = new_rules[i]
                 output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
             end
             return output
@@ -115,14 +116,15 @@ P.subcommands = {
     end,
 
     add = function (_super, group, new_rules, idx)
+        local admin = group.data.admin
         if #new_rules == 0 then
             return 'Please specify the new rule or rules.'
 
-        elseif not idx or idx > #group.rules then -- /addrule
+        elseif not idx or idx > #admin.rules then -- /addrule
             local output = ''
             for i = 1, #new_rules do
-                table.insert(group.rules, new_rules[i])
-                output = output .. '\n<b>' .. #group.rules .. '.</b> ' .. new_rules[i]
+                table.insert(admin.rules, new_rules[i])
+                output = output .. '\n<b>' .. #admin.rules .. '.</b> ' .. new_rules[i]
             end
             return output
 
@@ -132,7 +134,7 @@ P.subcommands = {
         else -- /addrule i
             local output = ''
             for i = 1, #new_rules do
-                table.insert(group.rules, idx+i-1, new_rules[i])
+                table.insert(admin.rules, idx+i-1, new_rules[i])
                 output = output .. '\n<b>' .. idx+i-1 .. '.</b> ' .. new_rules[i]
             end
             return output
@@ -140,15 +142,16 @@ P.subcommands = {
     end,
 
     del = function (_super, group, _new_rules, idx)
+        local admin = group.data.admin
         if not idx then -- /setrules --
-            group.rules = {}
+            admin.rules = {}
             return 'The rules have been deleted.'
 
-        elseif idx > #group.rules or idx < 0 then
+        elseif idx > #admin.rules or idx < 0 then
             return 'Invalid index.'
 
         else -- /changerule i --
-            table.remove(group.rules, idx)
+            table.remove(admin.rules, idx)
             return 'Rule ' .. idx .. ' has been deleted.'
         end
     end,

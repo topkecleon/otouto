@@ -29,6 +29,7 @@ table.concat(default_flags, '\n•')
 end
 
 function P:action(_bot, msg, group)
+    local admin = group.data.admin
     local input = utilities.input_from_msg(msg)
     local output = {}
 
@@ -36,11 +37,11 @@ function P:action(_bot, msg, group)
         for word in input:gmatch('%g+') do
             local word_lwr = word:lower()
             if self.flags[word_lwr] then
-                if group.flags[word_lwr] then
-                    group.flags[word_lwr] = nil
+                if admin.flags[word_lwr] then
+                    admin.flags[word_lwr] = nil
                     table.insert(output, word .. ' has been disabled.')
                 else
-                    group.flags[word_lwr] = true
+                    admin.flags[word_lwr] = true
                     table.insert(output, word .. ' has been enabled.')
                 end
             else
@@ -53,7 +54,7 @@ function P:action(_bot, msg, group)
         table.insert(output, '<b>Flags:</b>')
         for name, desc in pairs(self.flags) do
             table.insert(output, string.format('%s <b>%s</b>\n%s',
-                group.flags[name] and '✔️' or '❌',
+                admin.flags[name] and '✔️' or '❌',
                 name,
                 desc
             ))

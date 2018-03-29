@@ -14,7 +14,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group, _user)
-    if group.flags[self.flag] and msg.sticker then
+    if group.data.admin.flags[self.flag] and msg.sticker then
         bindings.deleteMessage{
             message_id = msg.message_id,
             chat_id = msg.chat.id

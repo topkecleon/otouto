@@ -30,11 +30,12 @@ function P:action(bot, msg, group)
                         ' is greater than a moderator.')
                 else
                     autils.promote_admin(msg.chat.id, id)
-                    if group.moderators[id_str] then
+                    local admin = group.data.admin
+                    if admin.moderators[id_str] then
                         table.insert(output, name .. ' is already a moderator.')
                     else
-                        group.moderators[id_str] = true
-                        group.bans[id_str] = nil
+                        admin.moderators[id_str] = true
+                        admin.bans[id_str] = nil
                         table.insert(output, name .. ' is now a moderator.')
                     end
                 end

@@ -27,11 +27,13 @@ function P:action(bot, msg, group)
                     can_send_other_messages = true,
                     can_add_web_page_previews = true
                 }
-                if bot.database.administration.automoderation[tostring(msg.chat.id)] then
-                    bot.database.administration.automoderation[tostring(msg.chat.id)][tostring(id)] = nil
+                local automoderation = group.data.automoderation
+                if automoderation then
+                    automoderation[tostring(id)] = nil
                 end
-                if group.bans[tostring(id)] then
-                    group.bans[tostring(id)] = nil
+                local admin = group.data.admin
+                if admin.bans[tostring(id)] then
+                    admin.bans[tostring(id)] = nil
                     table.insert(output, utilities.format_name(bot, id) ..
                         ' has been unbanned and unrestricted.')
                 elseif bot.database.userdata.hammers[tostring(id)] then

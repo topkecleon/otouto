@@ -25,11 +25,12 @@ function P:action(bot, msg, group)
             else
                 local id_str = tostring(id)
                 local name = utilities.format_name(bot, id)
+                local admin = group.data.admin
                 if autils.rank(bot, id, msg.chat.id) < 3 then
                     autils.demote_admin(msg.chat.id, id)
                 end
-                if group.moderators[id_str] then
-                    group.moderators[id_str] = nil
+                if admin.moderators[id_str] then
+                    admin.moderators[id_str] = nil
                     table.insert(output, name .. ' is no longer a moderator.')
                 else
                     table.insert(output, name .. ' is not a moderator.')

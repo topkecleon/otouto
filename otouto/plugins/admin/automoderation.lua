@@ -12,8 +12,8 @@ local bindings = require('otouto.bindings')
 local P = {}
 
 function P:init(bot)
-    bot.database.administration.automoderation =
-        bot.database.administration.automoderation or {}
+    bot.database.groupdata.automoderation =
+        bot.database.groupdata.automoderation or {}
     bot.database.administration.automod_timer =
         bot.database.administration.automod_timer or os.date('%d')
 
@@ -35,7 +35,7 @@ end
 
 function P:cron(bot, _now)
     if bot.database.administration.automod_timer ~= os.date('%d') then
-        bot.database.administration.automoderation = {}
+        bot.database.groupdata.automoderation = {}
         bot.database.administration.automod_timer = os.date('%d')
     end
 

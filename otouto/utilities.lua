@@ -145,6 +145,36 @@ function utilities.table_size(tab)
     return i
 end
 
+utilities.data_table_meta = {
+    __index = function (self, key)
+        if rawget(self, "_data")._parent then
+            local val = rawget(self, "_data")[key]
+            return val and
+                setmetatable({_data = val, _key = rawget(self, "_key")}, getmetatable(self))
+        else
+            local val = rawget(self, "_data")[key]
+            return val and val[rawget(self, "_key")]
+        end
+    end,
+    __newindex = function (self, key, value)
+        if rawget(self, "_data")._parent then
+            error("Can't set non-terminal key " .. tostring(key) .. " in a data_table")
+            return
+        else
+            local t = rawget(self, "_data")[key]
+            if t == nil then
+                t = {}
+                rawget(self, "_data")[key] = t
+            end
+            t[rawget(self, "_key")] = value
+            return
+        end
+    end
+}
+function utilities.data_table(data, key)
+    return setmetatable({_data = data, _key = key}, utilities.data_table_meta)
+end
+
 -- Just an easy way to get a user's full name.
 -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
@@ -236,13 +266,14 @@ utilities.triggers_meta = {
         return self
     end
 }
+utilities.triggers_meta.__index = utilities.triggers_meta
 
 function utilities.triggers(username, cmd_pat, trigger_table)
     return setmetatable({
         username = username,
         cmd_pat = cmd_pat,
         table = trigger_table or {}
-    }, {__index = utilities.triggers_meta})
+    }, utilities.triggers_meta)
 end
 
 function utilities.pretty_float(x)
@@ -293,8 +324,9 @@ utilities.set_meta = {
         return self.__count
     end
 }
+utilities.set_meta.__index = utilities.set_meta
 function utilities.new_set()
-    return setmetatable({__count = 0}, {__index = utilities.set_meta})
+    return setmetatable({__count = 0}, utilities.set_meta)
 end
 
 -- Converts a gross string back into proper UTF-8.

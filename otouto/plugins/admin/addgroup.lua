@@ -39,11 +39,11 @@ function P:action(bot, msg, group)
             output =
                 'I must have permission to change group info, delete messages,'
                 .. ' and add, ban, and promote members.'
-        elseif group then
+        elseif group.data.admin then
             output = 'I am already administrating this group.'
         else
             local chat_id_str = tostring(msg.chat.id)
-            bot.database.administration.groups[chat_id_str] = {
+            group.data.admin = {
                 name = msg.chat.title,
                 link =
                     bindings.exportChatInviteLink{chat_id = msg.chat.id}.result,

@@ -22,7 +22,7 @@ function P:action(bot, msg, _group, _user)
                 if bot.database.userdata.administrators[tostring(id)] then
                     bot.database.userdata.administrators[tostring(id)] =
                         nil
-                    for chat_id in pairs(bot.database.administration.groups) do
+                    for chat_id in pairs(bot.database.groupdata.admin) do
                         if autils.rank(bot, id, chat_id) < 2 then
                             autils.demote_admin(chat_id, id)
                         end

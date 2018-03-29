@@ -13,28 +13,29 @@ function P:init(bot)
 end
 
 function P:action(_bot, msg, group, _user)
+    local admin = group.data.admin
     local input = utilities.input(msg.text_lower)
     local output
     if input then
         local idx
-        for i = 1, #group.filter do
-            if group.filter[i] == input then
+        for i = 1, #admin.filter do
+            if admin.filter[i] == input then
                 idx = i
                 break
             end
         end
         if idx then
-            table.remove(group.filter, idx)
+            table.remove(admin.filter, idx)
             output = 'That term has been removed from the filter.'
         else
-            table.insert(group.filter, input)
+            table.insert(admin.filter, input)
             output = 'That term has been added to the filter.'
         end
-    elseif #group.filter == 0 then
+    elseif #admin.filter == 0 then
         output = 'There are currently no filtered terms.'
     else
         output = '<b>Filtered terms:</b>\n• ' ..
-            utilities.html_escape(table.concat(group.filter, '\n• '))
+            utilities.html_escape(table.concat(admin.filter, '\n• '))
     end
     utilities.send_reply(msg, output, 'html')
 end
