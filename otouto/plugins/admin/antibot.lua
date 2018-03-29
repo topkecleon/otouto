@@ -33,7 +33,7 @@ function P:action(bot, msg, group, user)
             })
         end
     else
-        return true
+        return 'continue'
     end
 end
 

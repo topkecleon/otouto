@@ -23,7 +23,7 @@ end
 
 function luarun:action(bot, msg, ...)
     if msg.from.id ~= bot.config.admin then
-        return true
+        return 'continue'
     end
 
     local input = utilities.input(msg.text)

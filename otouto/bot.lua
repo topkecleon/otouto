@@ -55,9 +55,7 @@ function bot:init()
 
     self.plugins = {}
     self.named_plugins = {}
-    for _, pname in ipairs(self.config.plugins) do
-        self:load_plugin(pname)
-    end
+    self:load_plugins(self.config.plugins)
 
     -- Set loop variables.
     self.last_update = self.last_update or 0 -- Update offset.
@@ -69,30 +67,76 @@ function bot:init()
 
 end
 
-function bot:load_plugin(pname, pos)
-    local plugin = require('otouto.plugins.'..pname)
-    if pos == nil then
-        table.insert(self.plugins, plugin)
-    else
-        table.insert(self.plugins, pos, plugin)
+function bot:load_plugins(pnames, pos)
+    local loaded = {}
+    local errors = {}
+    for i, pname in ipairs(pnames) do
+        local success, plugin = pcall(function ()
+            return assert(require('otouto.plugins.'..pname), pname .. ' is falsy')
+        end)
+        if not success then
+            table.insert(errors, plugin)
+        else
+            if pos == nil then
+                table.insert(self.plugins, plugin)
+            else
+                table.insert(self.plugins, pos + 1, plugin)
+            end
+            table.insert(loaded, plugin)
+            self.named_plugins[pname] = plugin
+            plugin.name = pname
+            if plugin.init then plugin:init(self) end
+            if not plugin.triggers then plugin.triggers = {} end
+        end
     end
-    self.named_plugins[pname] = plugin
-    plugin.name = pname
-    if plugin.init then plugin:init(self) end
-    if not plugin.triggers then plugin.triggers = {} end
+    if #errors > 0 then
+        text = "Error(s) loading the following plugin(s):"
+        for _, error in ipairs(errors) do
+            text = text .. "\n" .. "=> " .. error[1] .. "\n" .. error[2]
+        end
+        utilities.log_error(text, self.config.log_chat)
+    end
+    for _, plugin in ipairs(self.plugins) do
+        if plugin.on_plugins_load then
+            plugin:on_plugins_load(self, loaded)
+        end
+    end
 end
 
-function bot:unload_plugin(pname)
-    local plugin = require('otouto.plugins.'..pname)
-    lume.remove(self.plugins, plugin)
-    self.named_plugins[pname] = nil
+function bot:unload_plugins(pnames)
+    local unloaded = {}
+    local not_found = {}
+    for _, pname in ipairs(pnames) do
+        local found = nil
+        for i, plugin in ipairs(self.plugins) do
+            if pname == plugin.name then
+                found = table.remove(self.plugins, i)
+                break
+            end
+        end
+        if found then
+            self.named_plugins[pname] = nil
+            table.insert(unloaded, found)
+        else
+            table.insert(not_found, pname)
+        end
+    end
+    if #not_found > 0 then
+        local text = "The following plugin(s) could not be found: " .. table.concat(not_found, ", ")
+        utilities.log_error(text, self.config.log_chat)
+    end
+    for _, plugin in ipairs(self.plugins) do
+        if plugin.on_plugins_unload then
+            plugin:on_plugins_unload(self, unloaded)
+        end
+    end
 end
 
  -- Function to be run on each new message.
 function bot:on_message(msg)
 
     -- Do not process old messages.
-    if msg.date < os.time() - 5 then return end
+    if msg.date < os.time() - 15 then return end
 
     -- If no text, use captions.
     msg.text = msg.text or msg.caption or ''
@@ -141,8 +185,8 @@ function bot:on_message(msg)
                         -- The message contents are included for debugging purposes.
                         utilities.log_error(result..'\n'..msg.text, self.config.log_chat)
                         return
-                    -- Continue if the return value is true.
-                    elseif result ~= true then
+                    -- Continue if the return value is 'continue'.
+                    elseif result ~= 'continue' then
                         return
                     end
                 end

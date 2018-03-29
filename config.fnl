@@ -74,6 +74,7 @@ Send /help to get started."
         ]
         core [
           :core.about
+          :core.help
           :core.ping
         ]
         admin [
@@ -105,6 +106,10 @@ Send /help to get started."
           :admin.unhammer
           :admin.unrestrict
         ]
+        user [
+          :user.dice
+          :user.echo
+        ]
       ]
 
     (lume.concat
@@ -113,7 +118,7 @@ Send /help to get started."
       admin-filters
       core
       admin
-      [:core.help]
+      user
     ))
 
 }

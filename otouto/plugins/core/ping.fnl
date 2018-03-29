@@ -12,10 +12,10 @@
 {
   :init (fn [self bot]
     (set self.command "ping")
-    (set self.doc (f-str "{bot.config.cmd_pat}ping\z
-      \nPong!\z
-      \nUpdates the message with the time used, in seconds, to send the response."))
-    (set self.triggers (make-triggers bot [] :ping :marco :annyong)))
+    (set self.doc "Pong!\z
+      \nUpdates the message with the time used, in seconds, to send the response.")
+    (set self.triggers (utilities.make_triggers bot [] :ping :marco :annyong))
+    (values))
 
   :action (fn [self bot msg]
     (local a (socket.gettime))
@@ -23,14 +23,16 @@
                       "Polo!"
                       (: msg.text_lower :match :annyong)
                       "Annyong."
-                      :else
+                      ; else
                       "Pong!"))
     (local message (utilities.send_reply msg answer))
     (local b (string.format "%.3f" (- (socket.gettime) a)))
-    (when message (bindings.editMessageText {
+    (when message
+      (local edit (bindings.editMessageText {
         :chat_id msg.chat.id
         :message_id message.result.message_id
         :text (f-str "{answer}\n`{b}`")
         :parse_mode :Markdown
       })))
+    nil)
 }

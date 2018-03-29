@@ -43,10 +43,10 @@ function P:action(bot, msg, _group, user)
                 reason = 'User is banned.'
             })
         else
-            return true
+            return 'continue'
         end
     else
-        return true
+        return 'continue'
     end
 end
 

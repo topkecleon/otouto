@@ -5,6 +5,11 @@
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
 {
+  "void" (fn [...]
+    (local out (list (sym :do) ...))
+    (table.insert out (list (sym :values)))
+    out)
+
   "f-str" (lambda [input]
     (when (~= (type input) :string)
       (error "f-str: must be called with a string"))
@@ -24,7 +29,8 @@
               (error "f-str: can't have curly braces in expressions")
               (= state :escape-right)
               (error "f-str: unmatched right curly must be followed by another")
-              :else (error "f-str: improper left curly brace")) ; unreachable
+              ; else
+              (error "f-str: improper left curly brace")) ; unreachable
           (= b 125) ; right curly
           (if (= state :expr)
               (do
@@ -39,8 +45,9 @@
                 (table.insert bytes b))
               (= state :expr-first)
               (error "f-str: empty single curly braces")
-              :else (error "f-str: improper right curly brace")) ; unreachable
-          :else
+              ; else
+              (error "f-str: improper right curly brace")) ; unreachable
+          ; else
           (if (or (= state :string) (= state :expr))
               (table.insert bytes b)
               (= state :expr-first) ; starting expression
@@ -50,7 +57,8 @@
                 (set bytes [b]))
               (= state :escape-right)
               (error "f-str: unmatched right curly must be followed by another")
-              :else (error (.. "f-str: unknown state " state))))) ; unreachable
+              ; else
+              (error (.. "f-str: unknown state " state))))) ; unreachable
     (if (= state :string)
         (when (> (# input) 0)
           (table.insert cat (string.char (table.unpack bytes))))
@@ -58,18 +66,7 @@
         (error "f-str: unmatched right curly")
         (= state :escape-right)
         (error "f-str: unmatched left curly")
-        :else (error (.. "f-str: unknown state " state))) ; unreachable
+        ; else
+        (error (.. "f-str: unknown state " state))) ; unreachable
     cat)
-
-  :make-triggers (fn [bot init ...]
-    (var triggers (list (list (sym :require) :otouto.utilities.triggers)
-                        (list (sym ".>") bot :info :username)
-                        (list (sym ".>") bot :config :cmd_pat)))
-    (each [_ trigger (pairs [...])]
-      (set triggers (list (sym ":") triggers :t
-                          (if (= (type trigger) :table)
-                              (table.unpack trigger)
-                              :else
-                              trigger))))
-    (list (sym ".") triggers :table))
 }

@@ -36,7 +36,7 @@ function P:action(bot, msg, group, _user)
         end
     end
 
-    return true
+    return 'continue'
 end
 
 return P

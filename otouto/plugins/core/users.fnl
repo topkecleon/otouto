@@ -10,7 +10,8 @@
     (set self.triggers [""])
     (local users (or bot.database.users {}))
     (set bot.database.users users)
-    (tset users (tostring bot.info.id) bot.info))
+    (tset users (tostring bot.info.id) bot.info)
+    (values))
 
   :action (fn [self bot msg]
     (local users bot.database.users)
@@ -24,7 +25,7 @@
         (tset users (tostring msg.new_chat_member.id) msg.new_chat_member)
       msg.left_chat_member
         (tset users (tostring msg.left_chat_member.id) msg.left_chat_member)
-      :else
+      ; else
         nil)
-    true)
+    :continue)
 }
