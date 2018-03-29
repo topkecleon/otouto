@@ -27,12 +27,13 @@ function P:action(bot, msg, group)
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local name = utilities.format_name(bot, id)
+                local admin = group.data.admin
                 if autils.rank(bot, id, msg.chat.id) > 2 then
                     table.insert(output, name .. ' is too privileged to be banned.')
-                elseif group.bans[tostring(id)] then
+                elseif admin.bans[tostring(id)] then
                     table.insert(output, name .. ' is already banned.')
                 else
-                    group.bans[tostring(id)] = true
+                    admin.bans[tostring(id)] = true
                     bindings.kickChatMember{
                         chat_id = msg.chat.id,
                         user_id = id

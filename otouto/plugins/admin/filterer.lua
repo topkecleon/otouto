@@ -19,8 +19,9 @@ function P:action(bot, msg, group, user)
     ) then
         return true
     end
-    for i = 1, #group.filter do
-        if msg.text_lower:match(group.filter[i]) then
+    local admin = group.data.admin
+    for i = 1, #admin.filter do
+        if msg.text_lower:match(admin.filter[i]) then
             bindings.deleteMessage{
                 message_id = msg.message_id,
                 chat_id = msg.chat.id
@@ -30,7 +31,7 @@ function P:action(bot, msg, group, user)
                 target = msg.from.id,
                 action = 'Message deleted',
                 source = self.name,
-                reason = utilities.html_escape(rot13.cipher(group.filter[i]))
+                reason = utilities.html_escape(rot13.cipher(admin.filter[i]))
             })
             return
         end

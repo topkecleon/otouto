@@ -6,7 +6,7 @@ local autils = {}
 function autils.rank(bot, user_id, chat_id)
     local user_id_str = tostring(user_id)
     user_id = tonumber(user_id)
-    local group = bot.database.administration.groups[tostring(chat_id)]
+    local group = bot.database.groupdata.admin[tostring(chat_id)]
 
     if user_id == bot.config.admin then
         return 5 -- Owner
@@ -133,10 +133,10 @@ function autils.strike(bot, msg, source)
         message_id = msg.message_id
     }
 
-    bot.database.administration.automoderation[tostring(msg.chat.id)] =
-        bot.database.administration.automoderation[tostring(msg.chat.id)] or {}
+    bot.database.groupdata.automoderation[tostring(msg.chat.id)] =
+        bot.database.groupdata.automoderation[tostring(msg.chat.id)] or {}
     local chat =
-        bot.database.administration.automoderation[tostring(msg.chat.id)]
+        bot.database.groupdata.automoderation[tostring(msg.chat.id)]
     local user_id_str = tostring(msg.from.id)
     chat[user_id_str] = (chat[user_id_str] or 0) + 1
 
@@ -225,7 +225,7 @@ function autils.log(bot, params)
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
         local group =
-            bot.database.administration.groups[tostring(params.chat_id)]
+            bot.database.groupdata.admin[tostring(params.chat_id)]
         output = output .. string.format(
             '<b>%s</b> <code>[%s]</code> <i>%s</i>\n',
             utilities.html_escape(group.name),

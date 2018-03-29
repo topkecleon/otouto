@@ -15,7 +15,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group, user)
-    if not group.flags[self.flag] then return true end
+    if not group.data.admin.flags[self.flag] then return true end
     if user.rank > 1 then return true end
     if user.name:match(utilities.char.arabic) or
         user.name:match(utilities.char.rtl_override) or
