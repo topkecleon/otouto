@@ -230,7 +230,7 @@ function autils.log(bot, params)
             title = group.name,
             id = chat_id,
             username = group.username
-        }
+        } .. '\n'
 
         if group.flags.private then
             log_chat = bot.config.log_chat
