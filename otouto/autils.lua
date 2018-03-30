@@ -228,7 +228,7 @@ function autils.log(bot, params)
         local group = bot.database.groupdata.admin[tostring(params.chat_id)]
         output = output .. utilities.format_name{
             title = group.name,
-            id = chat_id,
+            id = params.chat_id,
             username = group.username
         } .. '\n'
 
