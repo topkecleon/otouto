@@ -23,7 +23,7 @@ function P:action(bot, msg, group)
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local id_str = tostring(id)
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 if admin.antihammer[id_str] then
                     admin.antihammer[id_str] = nil
                     table.insert(output, name ..
@@ -41,7 +41,7 @@ function P:action(bot, msg, group)
     elseif next(admin.antihammer) ~= nil then
         table.insert(output, '<b>Antihammered users:</b>')
         for id in pairs(admin.antihammer) do
-            table.insert(output, '• ' .. utilities.format_name(bot, id))
+            table.insert(output, '• ' .. utilities.lookup_name(bot, id))
         end
 
     else

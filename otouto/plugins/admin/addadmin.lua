@@ -20,12 +20,12 @@ function P:action(bot, msg, _group, _user)
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 if autils.rank(bot, id) > 3 then
-                    table.insert(output, utilities.format_name(bot, id) ..
+                    table.insert(output, utilities.lookup_name(bot, id) ..
                         ' is already an administrator.')
                 else
                     bot.database.userdata.administrators[tostring(id)] =
                         true
-                    table.insert(output, utilities.format_name(bot, id) ..
+                    table.insert(output, utilities.lookup_name(bot, id) ..
                         ' is now an administrator.')
                 end
             else

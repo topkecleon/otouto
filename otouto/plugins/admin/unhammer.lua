@@ -18,7 +18,7 @@ function P:action(bot, msg, _group)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 local id_str = tostring(id)
                 if bot.database.userdata.hammers[id_str] then
                     bot.database.userdata.hammers[id_str] = nil

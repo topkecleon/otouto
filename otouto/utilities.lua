@@ -400,22 +400,22 @@ function utilities.normalize_id(id)
 end
 
 -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
--- I wrote this for administration but it could be useful elsewhere.
-function utilities.format_name(bot, id)
-    local user = bot.database.users[tostring(id)] or { first_name = 'Unknown' }
-    local s = string.format(
-        '%s <code>[%s]</code>',
+function utilities.format_name(user) -- or chat
+    return string.format(
+        '%s <code>[%s]</code>%s',
         utilities.html_escape(
-            utilities.build_name(user.first_name, user.last_name)
-                :gsub(utilities.char.rtl_override, '')
-                :gsub(utilities.char.rtl_mark, '')
+            user.title or utilities.build_name(user.first_name, user.last_name)
         ),
-        id
+        user.id,
+        user.username and ' <i>@' .. user.username .. '</i>' or ''
+    ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, '')
+end
+
+function utilities.lookup_name(bot, id)
+    return utilities.format_name(
+        bot.database.users and bot.database.users[tostring(id)]
+        or { id = id, first_name = 'Unknown' }
     )
-    if user.username then
-        s = s .. ' <i>@' .. utilities.html_escape(user.username) .. '</i>'
-    end
-    return s
 end
 
 function utilities.divmod(x, y)

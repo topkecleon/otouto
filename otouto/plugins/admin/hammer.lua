@@ -24,7 +24,7 @@ function P:action(bot, msg, group)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 local id_str = tostring(id)
 
                 if autils.rank(bot, id, msg.chat.id) >= 4 then

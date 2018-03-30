@@ -26,7 +26,7 @@ function P:action(bot, msg, group)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 local admin = group.data.admin
                 if autils.rank(bot, id, msg.chat.id) > 2 then
                     table.insert(output, name .. ' is too privileged to be banned.')

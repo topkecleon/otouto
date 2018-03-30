@@ -21,6 +21,7 @@ function P:action(bot, msg, group)
     if targets then
         for _, id in ipairs(targets) do
             if tonumber(id) then
+                local name = utilities.lookup_name(bot, id)
                 bindings.restrictChatMember{
                     chat_id = msg.chat.id,
                     user_id = id,
@@ -34,14 +35,12 @@ function P:action(bot, msg, group)
                 local admin = group.data.admin
                 if admin.bans[tostring(id)] then
                     admin.bans[tostring(id)] = nil
-                    table.insert(output, utilities.format_name(bot, id) ..
-                        ' has been unbanned and unrestricted.')
+                    table.insert(output,
+                        name ..' has been unbanned and unrestricted.')
                 elseif bot.database.userdata.hammers[tostring(id)] then
-                    table.insert(output, utilities.format_name(bot, id) ..
-                        ' is globally banned.')
+                    table.insert(output, name .. ' is globally banned.')
                 else
-                    table.insert(output, utilities.format_name(bot, id) ..
-                        ' has been unrestricted.')
+                    table.insert(output, name .. ' has been unrestricted.')
                 end
             else
                 table.insert(output, id)

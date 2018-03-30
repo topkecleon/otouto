@@ -24,7 +24,7 @@ function P:action(bot, msg, group)
 
             else
                 local id_str = tostring(id)
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 local admin = group.data.admin
                 if autils.rank(bot, id, msg.chat.id) < 3 then
                     autils.demote_admin(msg.chat.id, id)

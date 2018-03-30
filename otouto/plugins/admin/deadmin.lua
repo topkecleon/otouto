@@ -27,10 +27,10 @@ function P:action(bot, msg, _group, _user)
                             autils.demote_admin(chat_id, id)
                         end
                     end
-                    table.insert(output, utilities.format_name(bot, id) ..
+                    table.insert(output, utilities.lookup_name(bot, id) ..
                         ' is no longer an administrator.')
                 else
-                    table.insert(output, utilities.format_name(bot, id) ..
+                    table.insert(output, utilities.lookup_name(bot, id) ..
                         ' is not an administrator.')
                 end
             else

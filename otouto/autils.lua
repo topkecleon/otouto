@@ -155,7 +155,7 @@ function autils.strike(bot, msg, source)
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.format_name(bot, msg.from.id) ..
+            utilities.format_name(bot, msg.from) ..
             '. The next automoderation trigger will result in a five-minute tempban.'
             .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
         if bot.config.administration.log_chat_username then
@@ -224,14 +224,13 @@ function autils.log(bot, params)
 
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
-        local group =
-            bot.database.groupdata.admin[tostring(params.chat_id)]
-        output = output .. string.format(
-            '<b>%s</b> <code>[%s]</code> <i>%s</i>\n',
-            utilities.html_escape(group.name),
-            utilities.normalize_id(params.chat_id),
-            group.username and '@' .. group.username or ''
-        )
+        -- This is unideal because we're not storing group info properly.
+        local group = bot.database.groupdata.admin[tostring(params.chat_id)]
+        output = output .. utilities.format_name{
+            title = group.name,
+            id = chat_id,
+            username = group.username
+        }
 
         if group.flags.private then
             log_chat = bot.config.log_chat
@@ -241,10 +240,10 @@ function autils.log(bot, params)
     local target_names = {}
     if params.targets then
         for _, id in ipairs(params.targets) do
-            table.insert(target_names, utilities.format_name(bot, id))
+            table.insert(target_names, utilities.lookup_name(bot, id))
         end
     elseif params.target then
-        table.insert(target_names, utilities.format_name(bot, params.target))
+        table.insert(target_names, utilities.lookup_name(bot, params.target))
     end
 
     if #target_names > 0 then
@@ -255,8 +254,9 @@ function autils.log(bot, params)
         '%s%s by %s',
         output,
         params.action,
-        params.source_id and utilities.format_name(bot, params.source_id)
-            or params.source or utilities.format_name(bot, 0)
+        -- Should source_id be made source_user instead?
+        params.source_id and utilities.lookup_name(bot, params.source_id)
+            or params.source or 'Unknown'
     )
 
     if params.reason then

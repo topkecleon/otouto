@@ -74,12 +74,12 @@ function P:desc(bot, chat_id)
     end
 
     output = output .. '\n\n<b>Governor:</b> ' ..
-        utilities.format_name(bot, admin.governor)
+        utilities.lookup_name(bot, admin.governor)
 
     if next(admin.moderators) ~= nil then
         output = output .. '\n\n<b>Moderators:</b>'
         for id in pairs(admin.moderators) do
-            output = output .. '\n• ' .. utilities.format_name(bot, id)
+            output = output .. '\n• ' .. utilities.lookup_name(bot, id)
         end
     end
 

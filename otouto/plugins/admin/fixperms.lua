@@ -24,7 +24,7 @@ function P:action(bot, msg, _group, _user)
         autils.demote_admin(msg.chat.id, target)
     end
     utilities.send_reply(msg, 'Permissions have been corrected for ' ..
-        utilities.format_name(bot, target) .. '.', 'html')
+        utilities.lookup_name(bot, target) .. '.', 'html')
 end
 
 return P

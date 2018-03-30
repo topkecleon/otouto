@@ -21,7 +21,7 @@ function P:action(bot, msg, group)
         for _, id in ipairs(targets) do
             if tonumber(id) then
                 local id_str = tostring(id)
-                local name = utilities.format_name(bot, id)
+                local name = utilities.lookup_name(bot, id)
                 local rank = autils.rank(bot, id, msg.chat.id)
 
                 if rank > 2 then

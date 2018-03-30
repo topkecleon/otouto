@@ -11,11 +11,9 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, _group, _user)
-    local admin_list = {
-        utilities.format_name(bot, bot.config.admin) .. ' ★'
-    }
+    local admin_list = { utilities.lookup_name(bot, bot.config.admin) .. ' ★' }
     for id_str in pairs(bot.database.userdata.administrators) do
-        table.insert(admin_list, utilities.format_name(bot, id_str))
+        table.insert(admin_list, utilities.lookup_name(bot, id_str))
     end
     local output = '<b>Global administrators:</b>\n• ' ..
         table.concat(admin_list, '\n• ')

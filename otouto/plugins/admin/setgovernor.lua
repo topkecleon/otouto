@@ -18,7 +18,7 @@ function P:action(bot, msg, group)
     local output
     if tonumber(target) then
         local admin = group.data.admin
-        local name = utilities.format_name(bot, target)
+        local name = utilities.lookup_name(bot, target)
         autils.promote_admin(msg.chat.id, target, true)
         if target == admin.governor then
             output = name .. ' is already governor.'
