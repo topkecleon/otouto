@@ -25,30 +25,8 @@ function help:init(bot)
         if glossary then self.glossaries[name] = glossary end
     end
 
-    local commandlist = {}
-    for _, plugin in pairs(bot.plugins) do
-        if plugin.command then
-            local s = plugin.command
-            if plugin.targeting then
-                s = s .. '*'
-                if plugin.duration then
-                    s = s .. '†'
-                end
-            end
-            table.insert(commandlist, s)
-            if plugin.doc and not plugin.help_word then
-                plugin.help_word = utilities.get_word(plugin.command, 1)
-            end
-        end
-    end
-    table.sort(commandlist)
-    local comlist = '\n• ' .. bot.config.cmd_pat ..
-        table.concat(commandlist, '\n• ' .. bot.config.cmd_pat) .. '\n' ..
-"Arguments: <required> [optional]\
-* Targets may be specified via reply, username, mention, or ID. \z
-  In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.\
-† A duration may be specified before the reason, in minutes or in the format 5d12h30m15s."
-    self.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
+    self.commandlist = {}
+    self:generate_text(bot.config.cmd_pat)
 end
 
 function help:action(bot, msg)
@@ -57,11 +35,7 @@ function help:action(bot, msg)
         input = input:lower():gsub('^' .. bot.config.cmd_pat, '')
         for _, plugin in ipairs(bot.plugins) do
             if plugin.help_word and input:match(plugin.help_word) then
-                utilities.send_message(msg.chat.id, string.format(
-                    '<b>Help for</b> <i>%s</i><b>:</b>\n%s',
-                    plugin.help_word,
-                    plugin.doc
-                ), true, nil, 'html')
+                utilities.send_plugin_help(msg.chat.id, nil, bot.config.cmd_pat, plugin)
                 return
             end
         end
@@ -69,11 +43,7 @@ function help:action(bot, msg)
         for _glossary_name, glossary in pairs(self.glossaries) do
             for name, entry in pairs(glossary) do
                 if input:match(name) then
-                    utilities.send_message(msg.chat.id, string.format(
-                        '<b>Help for</b> <i>%s</i><b>:</b>\n%s',
-                        name,
-                        entry
-                    ), true, nil, 'html')
+                    utilities.send_help_for(msg.chat.id, nil, name, entry)
                     return
                 end
             end
@@ -94,6 +64,51 @@ function help:action(bot, msg)
             utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
         end
     end
+end
+
+function help:on_plugins_load(bot, plugins)
+    for _, plugin in pairs(plugins) do
+        if plugin.command then
+            local s = plugin.command
+            if plugin.targeting then
+                s = s .. '*'
+                if plugin.duration then
+                    s = s .. '†'
+                end
+            end
+            table.insert(self.commandlist, {plugin.name, s})
+            if plugin.doc and not plugin.help_word then
+                plugin.help_word = utilities.get_word(plugin.command, 1)
+            end
+        end
+    end
+    table.sort(self.commandlist, function (a, b) return a[2] < b[2] end)
+    self:generate_text(bot.config.cmd_pat)
+end
+
+function help:on_plugins_unload(bot, plugins)
+    for _, plugin in pairs(plugins) do
+        for i, pair in ipairs(self.commandlist) do
+            if pair[1] == plugin.name then
+                table.remove(self.commandlist, i)
+                break
+            end
+        end
+    end
+    self:generate_text(bot.config.cmd_pat)
+end
+
+function help:generate_text(cmd_pat)
+    local comlist = '\n'
+    for _, pair in ipairs(self.commandlist) do
+        comlist = comlist .. '• ' .. cmd_pat .. pair[2] .. '\n'
+    end
+    comlist = comlist ..
+"Arguments: <required> [optional]\
+* Targets may be specified via reply, username, mention, or ID. \z
+  In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.\
+† A duration may be specified before the reason, in minutes or in the format 5d12h30m15s."
+    self.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 
 return help

@@ -15,7 +15,7 @@ function P:action(bot, msg, _group, _user)
             autils.promote_admin(msg.chat.id, msg.new_chat_member.id, rank > 2)
         end
     end
-    return true
+    return 'continue'
 end
 
 return P

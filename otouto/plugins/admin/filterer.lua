@@ -11,13 +11,13 @@ function P:init(_bot)
 end
 
 function P:action(bot, msg, group, user)
-    if user.rank > 1 then return true end
+    if user.rank > 1 then return 'continue' end
     if msg.forward_from and (
         (msg.forward_from.id == bot.info.id) or
         (msg.forward_from.id == bot.config.log_chat) or
         (msg.forward_from.id == bot.config.administration.log_chat)
     ) then
-        return true
+        return 'continue'
     end
     local admin = group.data.admin
     for i = 1, #admin.filter do
@@ -36,7 +36,7 @@ function P:action(bot, msg, group, user)
             return
         end
     end
-    return true
+    return 'continue'
 end
 
 P.edit_action = P.action

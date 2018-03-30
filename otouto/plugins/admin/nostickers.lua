@@ -27,7 +27,7 @@ function P:action(bot, msg, group, _user)
             reason = self.flag_desc
         })
     else
-        return true
+        return 'continue'
     end
 end
 

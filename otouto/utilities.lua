@@ -45,22 +45,7 @@ function utilities.send_message(chat_id, text, disable_web_page_preview, reply_t
 end
 
 function utilities.send_reply(msg, text, use_markdown)
-    local parse_mode
-    if type(use_markdown) == 'string' then
-        parse_mode = use_markdown
-    elseif use_markdown == true then
-        parse_mode = 'markdown'
-    end
-    return bindings.request(
-        'sendMessage',
-        {
-            chat_id = msg.chat.id,
-            text = text,
-            disable_web_page_preview = true,
-            reply_to_message_id = msg.message_id,
-            parse_mode = parse_mode
-        }
-    )
+    return utilities.send_message(msg.chat.id, text, true, msg.message_id, use_markdown)
 end
 
 -- get the indexed word in a string
@@ -271,6 +256,25 @@ function utilities.log_error(text, log_chat)
     end
 end
 
+function utilities.send_help_for(chat_id, reply_to_message_id, name, doc)
+    return utilities.send_message(
+        chat_id,
+        "<b>Help for</b> <i>" .. utilities.html_escape(name) .. "</i><b>:</b>\n" .. doc,
+        true,
+        nil,
+        'html'
+    )
+end
+
+function utilities.plugin_help(cmd_pat, plugin)
+    return cmd_pat .. utilities.html_escape(plugin.command) .. "\n" .. plugin.doc
+end
+
+function utilities.send_plugin_help(chat_id, reply_to_message_id, cmd_pat, plugin)
+    local doc = utilities.plugin_help(cmd_pat, plugin)
+    return utilities.send_help_for(chat_id, reply_to_message_id, plugin.help_word, doc)
+end
+
 function utilities.download_file(file_url, filename)
     if not filename then
         filename = os.tmpname()
@@ -328,6 +332,18 @@ function utilities.triggers(username, cmd_pat, trigger_table)
         cmd_pat = cmd_pat,
         table = trigger_table or {}
     }, utilities.triggers_meta)
+end
+
+function utilities.make_triggers(bot, trigger_table, ...)
+    local triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat, trigger_table)
+    for _, trigger in pairs({...}) do
+        if type(trigger) == 'table' then
+            triggers:t(table.unpack(trigger))
+        else
+            triggers:t(trigger)
+        end
+    end
+    return triggers.table
 end
 
 function utilities.pretty_float(x)
