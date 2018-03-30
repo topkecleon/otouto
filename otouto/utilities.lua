@@ -401,14 +401,14 @@ end
 
 -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
 function utilities.format_name(user) -- or chat
-    return string.format(
+    return (string.format(
         '%s <code>[%s]</code>%s',
         utilities.html_escape(
             user.title or utilities.build_name(user.first_name, user.last_name)
         ),
         user.id,
         user.username and ' <i>@' .. user.username .. '</i>' or ''
-    ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, '')
+    ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
 end
 
 function utilities.lookup_name(bot, id)
