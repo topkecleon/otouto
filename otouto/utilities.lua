@@ -145,6 +145,90 @@ function utilities.table_size(tab)
     return i
 end
 
+utilities.data_table_meta = {
+    __index = function (self, key)
+        local data = rawget(self, "_data")
+        if data._parent then
+            local val = data[key]
+            return val and
+                setmetatable({_data = val, _key = rawget(self, "_key")}, getmetatable(self))
+        else
+            local val = data[key]
+            return val and val[rawget(self, "_key")]
+        end
+    end,
+    __newindex = function (self, key, value)
+        local data = rawget(self, "_data")
+        if data._parent then
+            error("Can't set non-terminal key " .. tostring(key) .. " in a data_table")
+            return
+        else
+            local t = data[key]
+            if t == nil then
+                t = {}
+                data[key] = t
+            end
+            t[rawget(self, "_key")] = value
+            return
+        end
+    end,
+    __pairs = function (self)
+        local data = rawget(self, "_data")
+        if data._parent then
+            local selfmeta = getmetatable(self)
+            local function iter(table, index)
+                local new_index, val = next(table, index)
+                if new_index then
+                    return new_index, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        else
+            local function iter(table, index)
+                local new_index, val = next(table, index)
+                if new_index then
+                    return new_index, val[rawget(self, "_key")]
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        end
+    end,
+    __ipairs = function (self)
+        local data = rawget(self, "_data")
+        if data._parent then
+            local selfmeta = getmetatable(self)
+            local function iter(table, i)
+                i = i + 1
+                local val = table[i]
+                if val then
+                    return i, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
+                else
+                    return nil
+                end
+            end
+            return iter, data, 0
+        else
+            local function iter(table, index)
+                i = i + 1
+                local val = table[i]
+                if val then
+                    return i, val[rawget(self, "_key")]
+                else
+                    return nil
+                end
+            end
+            return iter, data, nil
+        end
+    end,
+}
+function utilities.data_table(data, key)
+    return setmetatable({_data = data, _key = key}, utilities.data_table_meta)
+end
+
 -- Just an easy way to get a user's full name.
 -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)
@@ -236,13 +320,14 @@ utilities.triggers_meta = {
         return self
     end
 }
+utilities.triggers_meta.__index = utilities.triggers_meta
 
 function utilities.triggers(username, cmd_pat, trigger_table)
     return setmetatable({
         username = username,
         cmd_pat = cmd_pat,
         table = trigger_table or {}
-    }, {__index = utilities.triggers_meta})
+    }, utilities.triggers_meta)
 end
 
 function utilities.pretty_float(x)
@@ -293,8 +378,9 @@ utilities.set_meta = {
         return self.__count
     end
 }
+utilities.set_meta.__index = utilities.set_meta
 function utilities.new_set()
-    return setmetatable({__count = 0}, {__index = utilities.set_meta})
+    return setmetatable({__count = 0}, utilities.set_meta)
 end
 
 -- Converts a gross string back into proper UTF-8.

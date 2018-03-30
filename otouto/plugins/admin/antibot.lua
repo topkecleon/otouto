@@ -15,7 +15,7 @@ end
 
 function P:action(bot, msg, group, user)
     if
-        group.flags[self.flag] and
+        group.data.admin.flags[self.flag] and
         msg.new_chat_member and
         msg.new_chat_member.is_bot and
         user.rank < 2

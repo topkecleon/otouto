@@ -16,6 +16,7 @@ end
 
 function P:action(bot, msg, group)
     local targets = autils.targets(bot, msg)
+    local admin = group.data.admin
     local output = {}
 
     if targets then
@@ -23,12 +24,12 @@ function P:action(bot, msg, group)
             if tonumber(id) then
                 local id_str = tostring(id)
                 local name = utilities.format_name(bot, id)
-                if group.antihammer[id_str] then
-                    group.antihammer[id_str] = nil
+                if admin.antihammer[id_str] then
+                    admin.antihammer[id_str] = nil
                     table.insert(output, name ..
                         ' has been removed from the antihammer whitelist.')
                 else
-                    group.antihammer[id_str] = true
+                    admin.antihammer[id_str] = true
                     table.insert(output, name ..
                         ' has been added to the antihammer whitelist.')
                 end
@@ -37,9 +38,9 @@ function P:action(bot, msg, group)
             end
         end
 
-    elseif next(group.antihammer) ~= nil then
+    elseif next(admin.antihammer) ~= nil then
         table.insert(output, '<b>Antihammered users:</b>')
-        for id in pairs(group.antihammer) do
+        for id in pairs(admin.antihammer) do
             table.insert(output, '• ' .. utilities.format_name(bot, id))
         end
 

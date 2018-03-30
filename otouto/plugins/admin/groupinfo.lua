@@ -12,9 +12,10 @@ function P:init(_bot)
 end
 
 function P:action(bot, msg, group)
-    group.username = msg.chat.username
+    local admin = group.data.admin
+    admin.username = msg.chat.username
     -- Log when the chat title has been changed.
-    if msg.chat.title ~= group.name then
+    if msg.chat.title ~= admin.name then
         autils.log(bot, {
             chat_id = msg.chat.id,
             action = 'Title changed',
@@ -23,7 +24,7 @@ function P:action(bot, msg, group)
             -- notice the name change), the source will be unknown.
             source_id = msg.new_chat_title and msg.from.id or nil
         })
-        group.name = msg.chat.title
+        admin.name = msg.chat.title
     end
     return true
 end

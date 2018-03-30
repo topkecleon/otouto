@@ -21,7 +21,7 @@ function luarun:init(bot)
     end
 end
 
-function luarun:action(bot, msg, group)
+function luarun:action(bot, msg, ...)
     if msg.from.id ~= bot.config.admin then
         return true
     end
@@ -46,13 +46,13 @@ function luarun:action(bot, msg, group)
         local lume = require('lume')\n\z
         local serpent = require('serpent')\n\z
         local url = require('socket.url')\n\z
-        return function (bot, msg, group)\n" .. input .. "\nend"
+        return function (bot, msg, group, user)\n" .. input .. "\nend"
     )
 
     if output == nil then
         output = success
     else
-        _, output = xpcall(output(), self.err_msg, bot, msg, group)
+        _, output = xpcall(output(), self.err_msg, bot, msg, ...)
     end
 
     if output == nil then

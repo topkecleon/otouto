@@ -18,7 +18,7 @@ function P:action(bot, msg, group)
     local results = {}
     local listed_groups = {}
 
-    for _, chat in pairs(bot.database.administration.groups) do
+    for _, chat in pairs(bot.database.groupdata.admin) do
         if not chat.flags.private then
             local link = string.format('<a href="%s">%s</a>',
                 chat.link,
@@ -49,7 +49,7 @@ function P:action(bot, msg, group)
             '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
         if #listed_groups == 0 then
             output = 'There are no listed groups.'
-        elseif group then
+        elseif group.data.admin then
             if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
                 output = 'I have sent you the requested information in a private message.'
             else

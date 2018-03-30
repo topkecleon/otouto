@@ -47,11 +47,11 @@ function bot:init()
         self.database.userdata = { hammers = {}, administrators = {} }
     end
 
+    if not self.database.groupdata then
+        self.database.groupdata = { admin = {} }
+    end
     -- administration
-    -- database.groupdata when?
-    self.database.administration = self.database.administration or {
-        groups = {}
-    }
+    self.database.administration = self.database.administration or {}
 
     self.plugins = {}
     self.named_plugins = {}
@@ -111,15 +111,17 @@ function bot:on_message(msg)
     local user = {
         id_str = tostring(msg.from.id),
         rank = autils.rank(self, msg.from.id, msg.chat.id),
-        name = utilities.build_name(msg.from.first_name, msg.from.last_name)
+        name = utilities.build_name(msg.from.first_name, msg.from.last_name),
+        data = utilities.data_table(self.database.userdata, tostring(msg.from.id)),
     }
 
-    local group = self.database.administration and
-        self.database.administration.groups[tostring(msg.chat.id)]
+    local group = {
+        data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
+    }
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
-        if (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
+        if (not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
@@ -159,14 +161,16 @@ function bot:on_edit(msg)
     local user = {
         id_str = tostring(msg.from.id),
         rank = autils.rank(self, msg.from.id, msg.chat.id),
-        name = utilities.build_name(msg.from.first_name, msg.from.last_name)
+        name = utilities.build_name(msg.from.first_name, msg.from.last_name),
+        data = utilities.data_table(self.database.userdata, tostring(msg.from.id)),
     }
 
-    local group = self.database.administration and
-        self.database.administration.groups[tostring(msg.chat.id)]
+    local group = {
+        data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
+    }
 
     for _, plugin in ipairs(self.plugins) do
-        if plugin.edit_action and (not plugin.administration or group) and user.rank >= (plugin.privilege or 0) then
+        if plugin.edit_action and (not plugin.administration or group.data.admin) and user.rank >= (plugin.privilege or 0) then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
 
