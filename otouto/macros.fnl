@@ -10,6 +10,23 @@
     (table.insert out (list (sym :values)))
     out)
 
+  "set?" (fn [lhs rhs]
+    (local check (list (sym :and)))
+    (if (sym? lhs)
+        (table.insert check (list (sym :=) (sym :nil) lhs))
+        (list? lhs)
+        (each [_ symb (ipairs lhs)]
+          (assert (sym? symb) "set?: destructuring not supported")
+          (table.insert check (list (sym :=) (sym :nil) symb)))
+        ; else
+        (error "set?: destructuring not supported"))
+    (list (sym :when) check (list (sym :tset) lhs rhs)))
+
+  ; not safe against side-effects, needs gensym or once to be exposed
+  "tset?" (fn [table key val]
+    (list (sym :when) (list (sym :=) (sym :nil) (list (sym :.) table key))
+      (list (sym :tset) table key val)))
+
   "require*" (fn [...]
     (local names (list))
     (local requires (list (sym :values)))
