@@ -26,7 +26,7 @@ function P:action(bot, msg)
             chat_id = msg.chat.id,
             target = msg.from.id,
             action = 'Kicked for one minute',
-            source = 'kickme'
+            source = self.name
         })
     end
 end
