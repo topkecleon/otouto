@@ -5,11 +5,10 @@
 ;; Copyright 2017 bb010g <bb010g@gmail.com>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(local lume (require :lume))
-
-(local bindings (require :otouto.bindings))
-(local utilities (require :otouto.utilities))
 (require-macros :otouto.macros)
+(require* lume
+          otouto.bindings
+          otouto.utilities)
 
 {
   :init (fn [self bot]

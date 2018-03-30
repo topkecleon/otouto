@@ -10,6 +10,39 @@
     (table.insert out (list (sym :values)))
     out)
 
+  "require*" (fn [...]
+    (local names (list))
+    (local requires (list (sym :values)))
+    (each [_ spec (pairs [...])]
+      (if ; path, import as tail
+         (sym? spec)
+         (let [path (. spec 1)
+               path-parts (or (multi-sym? path) [path])
+               tail (. path-parts (# path-parts))]
+           (table.insert names (sym tail))
+           (table.insert requires (list (sym :require) path)))
+         ; typed spec
+         (and (list? spec))
+         (let [ty (. spec 1)
+               len (# spec)]
+           (assert (sym? ty) "require*: spec type must be a symbol")
+           (if ; rename, import as second arg
+               (= (. ty 1) :rename)
+               (do
+                (assert (= (% len 2) 1) "require*: rename needs pairs of paths and names")
+                (for [i 2 len 2]
+                  (let [path (. spec i)
+                        name (. spec (+ 1 i))]
+                    (assert (sym? path) "require*: rename's paths must be symbols")
+                    (assert (sym? name) "require*: rename's names must be symbols")
+                    (table.insert names name)
+                    (table.insert requires (list (sym :require) (. path 1))))))
+               ; unknown typed spec type
+               (error "require*: unknown spec type")))
+         ; unknown require spec
+         (error "require*: unknown spec")))
+    (list (sym :local) names requires))
+
   "f-str" (lambda [input ...]
     (when (~= (type input) :string)
       (error "f-str: must be called with a string"))

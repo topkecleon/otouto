@@ -4,9 +4,9 @@
 ;; Copyright 2016 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(local utilities (require :otouto.utilities))
 (require-macros :otouto.macros)
-(local data (require :otouto.plugins.user.data.slap))
+(require* otouto.utilities
+          (rename otouto.plugins.user.data.slap data))
 
 {
   :init (fn [self bot]

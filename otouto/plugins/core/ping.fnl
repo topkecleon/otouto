@@ -4,10 +4,10 @@
 ;; Copyright 2018 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(local socket (require :socket))
-(local bindings (require :otouto.bindings))
-(local utilities (require :otouto.utilities))
 (require-macros :otouto.macros)
+(require* socket
+          otouto.bindings
+          otouto.utilities)
 
 {
   :init (fn [self bot]

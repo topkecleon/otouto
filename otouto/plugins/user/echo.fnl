@@ -4,9 +4,9 @@
 ;; Copyright 2018 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(local serpent (require :serpent))
-(local utilities (require :otouto.utilities))
 (require-macros :otouto.macros)
+(require* serpent
+          otouto.utilities)
 
 {
   :init (fn [self bot]
