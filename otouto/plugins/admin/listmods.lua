@@ -4,7 +4,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('mods'):t('ops').table
+        :t('mods'):t('ops'):t('listmods').table
     self.command = 'mods'
     self.doc = 'Returns a list of group moderators.'
     self.administration = true
@@ -12,16 +12,10 @@ end
 
 function P:action(bot, msg, group)
     local admin = group.data.admin
-    local output = '<b>Governor:</b> ' ..
-        utilities.lookup_name(bot, admin.governor)
-    if next(admin.moderators) ~= nil then
-        local mod_list = {}
-        for id_str in pairs(admin.moderators) do
-            table.insert(mod_list, utilities.lookup_name(bot, id_str))
-        end
-        output = output ..  '\n\n<b>Moderators:</b>\n• ' ..
-            table.concat(mod_list, '\n• ')
-    end
+    local mod_list = utilities.list_names(bot, admin.moderators)
+    table.insert(mod_list, 1, '\n<b>Moderators:</b>')
+    local output = '<b>Governor:</b> ' .. utilities.lookup_name(bot,
+        admin.governor) .. table.concat(mod_list, '\n• ')
     utilities.send_reply(msg, output, 'html')
 end
 

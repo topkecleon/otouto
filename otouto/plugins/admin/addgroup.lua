@@ -42,7 +42,6 @@ function P:action(bot, msg, group)
         elseif group.data.admin then
             output = 'I am already administrating this group.'
         else
-            local chat_id_str = tostring(msg.chat.id)
             group.data.admin = {
                 name = msg.chat.title,
                 link =

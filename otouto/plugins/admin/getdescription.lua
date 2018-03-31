@@ -29,7 +29,7 @@ function P:action(bot, msg, group)
         return
     end
 
-    local description = self:desc(bot, chat_id)
+    local description = self.desc(bot, chat_id)
 
     if msg.chat.id == msg.from.id then
         utilities.send_reply(msg, description, 'html')
@@ -42,48 +42,39 @@ function P:action(bot, msg, group)
     end
 end
 
-function P:desc(bot, chat_id)
+function P.desc(bot, chat_id)
     local admin = bot.database.groupdata.admin[tostring(chat_id)]
+    local output = {}
 
-    local output = '<b>Welcome to '
-    if admin.flags.private then
-        output = output .. utilities.html_escape(admin.name) .. '!</b>'
-    else
-        output = output .. '</b><a href="' .. admin.link .. '">' ..
-            utilities.html_escape(admin.name) .. '</a><b>!</b>'
-    end
+    -- Group title
+    table.insert(output, utilities.lookup_name(bot, chat_id))
 
-    output = output ..' <code>['.. utilities.normalize_id(chat_id) .. ']</code>'
+    -- Description
+    table.insert(output, admin.description)
 
-    if admin.description then
-        output = output .. '\n\n' .. admin.description
-    end
-
+    -- Rules
     if #admin.rules > 0 then
-        output = output .. '\n\n<b>Rules:</b>'
-        for i, rule in ipairs(admin.rules) do
-            output = output .. '\n<b>' .. i .. '.</b> ' .. rule
-        end
+        table.insert(output, '<b>Rules:</b>\n' .. table.concat(
+            bot.named_plugins['admin.listrules'].rule_list(admin.rules), '\n'))
     end
 
+    -- Flags
     if next(admin.flags) ~= nil then
-        output = output .. '\n\n<b>Flags:</b>'
-        for flag in pairs(admin.flags) do
-            output = output .. '\n• ' .. bot.named_plugins['admin.flags'].flags[flag]
-        end
+        table.insert(output, '<b>Flags:</b>\n• ' .. table.concat(
+            bot.named_plugins['admin.flags']:flag_list(admin.flags), '\n• '))
     end
 
-    output = output .. '\n\n<b>Governor:</b> ' ..
-        utilities.lookup_name(bot, admin.governor)
+    -- Governor
+    table.insert(output, '<b>Governor:</b> ' ..
+        utilities.lookup_name(bot, admin.governor))
 
+    -- Moderators
     if next(admin.moderators) ~= nil then
-        output = output .. '\n\n<b>Moderators:</b>'
-        for id in pairs(admin.moderators) do
-            output = output .. '\n• ' .. utilities.lookup_name(bot, id)
-        end
+        table.insert(output, '<b>Moderators:</b>\n• ' .. table.concat(
+            utilities.list_names(admin.moderators), '\n• '))
     end
 
-    return output
+    return table.concat(output, '\n\n')
 end
 
 return P
