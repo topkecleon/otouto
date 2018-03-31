@@ -81,7 +81,7 @@ function P:list_flags(local_flags)
     local disabled_flags = {}
     for flag in pairs(self.flags) do
         if not local_flags[flag] then
-            table.insert(disabled_flags, flag)
+            disabled_flags[flag] = true
         end
     end
     return string.format(
