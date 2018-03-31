@@ -19,7 +19,7 @@ function P:action(_bot, msg, group)
     elseif input and admin.rules[input] then
         output = self.rule_list(admin.rules)[input]
     else
-        output = '<b>Rules for ' ..utilities.html_escape(admin.name).. ':</b>'
+        output = '<b>Rules for ' ..utilities.html_escape(admin.name).. ':</b>\n'
             .. table.concat(self.rule_list(admin.rules), '\n')
     end
     utilities.send_reply(msg, output, 'html')

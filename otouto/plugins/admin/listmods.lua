@@ -13,7 +13,7 @@ end
 function P:action(bot, msg, group)
     local admin = group.data.admin
     local mod_list = utilities.list_names(bot, admin.moderators)
-    table.insert(mod_list, 1, '\n<b>Moderators:</b>')
+    table.insert(mod_list, 1, '\n\n<b>Moderators:</b>')
     local output = '<b>Governor:</b> ' .. utilities.lookup_name(bot,
         admin.governor) .. table.concat(mod_list, '\n• ')
     utilities.send_reply(msg, output, 'html')
