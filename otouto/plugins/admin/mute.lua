@@ -22,12 +22,14 @@ Examples:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, reason, duration = autils.targets(bot, msg)
+    local targets, errors, reason, duration = autils.targets(bot, msg, true)
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.
-    if duration and (duration > (366*24*60*60) or duration < 30) then
+    if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
+        table.insert(errors,
+            'Durations must be longer than a minute and shorter than a year.')
     end
 
     local out_str, log_str
@@ -43,29 +45,24 @@ function P:action(bot, msg, _group, _user)
     local muted_users = {} -- Passed to the log function at the end.
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
 
-                if autils.rank(bot, id, msg.chat.id) > 1 then
-                    table.insert(output,name..' is too privileged to be muted.')
-                else
-                    local a, b = bindings.restrictChatMember{
-                        chat_id = msg.chat.id,
-                        user_id = id,
-                        until_date = duration and os.time() + duration,
-                        can_send_messages = false
-                    }
-                    if not a then
-                        table.insert(output, b.description .. ' (' .. id .. ')')
-                    else
-                        table.insert(output, name .. out_str)
-                        table.insert(muted_users, id)
-                    end
-                end
-
+            if autils.rank(bot, target, msg.chat.id) > 1 then
+                table.insert(output,name .. ' is too privileged to be muted.')
             else
-                table.insert(output, id)
+                local a, b = bindings.restrictChatMember{
+                    chat_id = msg.chat.id,
+                    user_id = target,
+                    until_date = duration and os.time() + duration,
+                    can_send_messages = false
+                }
+                if not a then
+                    table.insert(output, b.description .. ' (' .. target .. ')')
+                else
+                    table.insert(output, name .. out_str)
+                    muted_users[target] = true
+                end
             end
         end
 
@@ -73,6 +70,7 @@ function P:action(bot, msg, _group, _user)
         table.insert(output, bot.config.errors.specify_targets)
     end
 
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
         autils.log(bot, {

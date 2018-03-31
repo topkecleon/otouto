@@ -85,7 +85,7 @@ function P:list_flags(local_flags)
         end
     end
     return string.format(
-        '<b>Enabled flags:</b>\n%s\n<b>Disabled flags:</b>\n%s',
+        '<b>Enabled flags:</b>\n• %s\n<b>Disabled flags:</b>\n• %s',
         table.concat(self:flag_list(local_flags), '\n• '),
         table.concat(self:flag_list(disabled_flags), '\n• ')
     )

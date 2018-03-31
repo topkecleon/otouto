@@ -12,29 +12,35 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, _group)
-    local targets = autils.targets(bot, msg)
-    local output = {}
+    local targets, errors, reason = autils.targets(bot, msg)
+    local output, unhammered_users = {}, {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
-                local id_str = tostring(id)
-                if bot.database.userdata.hammers[id_str] then
-                    bot.database.userdata.hammers[id_str] = nil
-                    table.insert(output, name..' is no longer globally banned.')
-                else
-                    table.insert(output, name .. ' is not globally banned.')
-                end
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
+            if bot.database.userdata.hammers[target] then
+                bot.database.userdata.hammers[target] = nil
+                table.insert(output, name..' is no longer globally banned.')
+                unhammered_users[target] = true
             else
-                table.insert(output, id)
+                table.insert(output, name .. ' is not globally banned.')
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
 
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
+    if #unhammered_users > 0 then
+        autils.log(bot, {
+            chat_id = msg.chat.id,
+            targets = unhammered_users,
+            action = "Unhammered",
+            source_id = msg.from.id,
+            reason = reason
+        })
+    end
 end
 
 return P

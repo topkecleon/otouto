@@ -72,7 +72,7 @@ end
 function bot:load_plugins(pnames, pos)
     local loaded = {}
     local errors = {}
-    for i, pname in ipairs(pnames) do
+    for _, pname in ipairs(pnames) do
         local success, plugin = xpcall(function ()
             return assert(require('otouto.plugins.'..pname), pname .. ' is falsy')
         end, function (msg) return debug.traceback(msg) end)
@@ -92,7 +92,7 @@ function bot:load_plugins(pnames, pos)
         end
     end
     if #errors > 0 then
-        text = "Error(s) loading the following plugin(s):"
+        local text = "Error(s) loading the following plugin(s):"
         for _, error in ipairs(errors) do
             text = text .. "\n" .. "=> " .. tostring(error[1]) .. "\n" .. tostring(error[2])
         end

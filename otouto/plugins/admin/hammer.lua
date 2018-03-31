@@ -17,37 +17,32 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets, reason = autils.targets(bot, msg)
+    local targets, errors, reason = autils.targets(bot, msg)
     local output = {}
     local hammered_users = {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
-                local id_str = tostring(id)
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
 
-                if autils.rank(bot, id, msg.chat.id) >= 4 then
-                    table.insert(output, name .. ' is an administrator.')
-                elseif bot.database.userdata.hammers[id_str] then
-                    table.insert(output, name .. ' is already globally banned.')
-                else
-                    bindings.kickChatMember{
-                        chat_id = msg.chat.id,
-                        user_id = id
-                    }
-                    bot.database.userdata.hammers[id_str] = true
-                    table.insert(output, name .. ' has been globally banned.')
-                    table.insert(hammered_users, id)
-                end
+            if autils.rank(bot, target, msg.chat.id) >= 4 then
+                table.insert(output, name .. ' is an administrator.')
+            elseif bot.database.userdata.hammers[target] then
+                table.insert(output, name .. ' is already globally banned.')
             else
-                table.insert(output, id)
+                bindings.kickChatMember{
+                    chat_id = msg.chat.id,
+                    user_id = target
+                }
+                bot.database.userdata.hammers[target] = true
+                table.insert(output, name .. ' has been globally banned.')
+                hammered_users[target] = true
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
-
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
         local admin = group.data.admin

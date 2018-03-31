@@ -19,36 +19,34 @@ with /unban. A reason can be given on a new line. Example:\
 end
 
 function P:action(bot, msg, group)
-    local targets, reason = autils.targets(bot, msg)
+    local admin = group.data.admin
+    local targets, errors, reason = autils.targets(bot, msg)
     local output = {}
     local banned_users = {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
-                local admin = group.data.admin
-                if autils.rank(bot, id, msg.chat.id) > 2 then
-                    table.insert(output, name .. ' is too privileged to be banned.')
-                elseif admin.bans[tostring(id)] then
-                    table.insert(output, name .. ' is already banned.')
-                else
-                    admin.bans[tostring(id)] = true
-                    bindings.kickChatMember{
-                        chat_id = msg.chat.id,
-                        user_id = id
-                    }
-                    table.insert(output, name .. ' has been banned.')
-                    table.insert(banned_users, id)
-                end
+        for id_str in pairs(targets) do
+            local id = tonumber(id_str)
+            local name = utilities.lookup_name(bot, id)
+            if autils.rank(bot, id, msg.chat.id) > 2 then
+                table.insert(output, name .. ' is too privileged to be banned.')
+            elseif admin.bans[id_str] then
+                table.insert(output, name .. ' is already banned.')
             else
-                table.insert(output, id)
+                admin.bans[id_str] = true
+                bindings.kickChatMember{
+                    chat_id = msg.chat.id,
+                    user_id = id
+                }
+                table.insert(output, name .. ' has been banned.')
+                banned_users[id_str] = true
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
 
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #banned_users > 0 then
         autils.log(bot, {

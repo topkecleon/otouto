@@ -16,39 +16,36 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets = autils.targets(bot, msg)
+    local targets, errors = autils.targets(bot, msg)
     local output = {}
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
-                bindings.restrictChatMember{
-                    chat_id = msg.chat.id,
-                    user_id = id,
-                    can_send_other_messages = true,
-                    can_add_web_page_previews = true
-                }
-                local automoderation = group.data.automoderation
-                if automoderation then
-                    automoderation[tostring(id)] = nil
-                end
-                local admin = group.data.admin
-                if admin.bans[tostring(id)] then
-                    admin.bans[tostring(id)] = nil
-                    table.insert(output,
-                        name ..' has been unbanned and unrestricted.')
-                elseif bot.database.userdata.hammers[tostring(id)] then
-                    table.insert(output, name .. ' is globally banned.')
-                else
-                    table.insert(output, name .. ' has been unrestricted.')
-                end
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
+            bindings.restrictChatMember{
+                chat_id = msg.chat.id,
+                user_id = target,
+                can_send_other_messages = true,
+                can_add_web_page_previews = true
+            }
+            local automoderation = group.data.automoderation
+            if automoderation then
+                automoderation[target] = nil
+            end
+            local admin = group.data.admin
+            if admin.bans[target] then
+                admin.bans[target] = nil
+                table.insert(output, name ..
+                    ' has been unbanned and unrestricted.')
+            elseif bot.database.userdata.hammers[target] then
+                table.insert(output, name .. ' is globally banned.')
             else
-                table.insert(output, id)
+                table.insert(output, name .. ' has been unrestricted.')
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 

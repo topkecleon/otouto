@@ -13,33 +13,28 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets = autils.targets(bot, msg)
+    local targets, errors = autils.targets(bot, msg)
     local output = {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                if bot.database.userdata.administrators[tostring(id)] then
-                    bot.database.userdata.administrators[tostring(id)] =
-                        nil
-                    for chat_id in pairs(bot.database.groupdata.admin) do
-                        if autils.rank(bot, id, chat_id) < 2 then
-                            autils.demote_admin(chat_id, id)
-                        end
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
+            if bot.database.userdata.administrators[target] then
+                bot.database.userdata.administrators[target] = nil
+                for chat_id in pairs(bot.database.groupdata.admin) do
+                    if autils.rank(bot, target, chat_id) < 2 then
+                        autils.demote_admin(chat_id, target)
                     end
-                    table.insert(output, utilities.lookup_name(bot, id) ..
-                        ' is no longer an administrator.')
-                else
-                    table.insert(output, utilities.lookup_name(bot, id) ..
-                        ' is not an administrator.')
                 end
+                table.insert(output, name .. ' is no longer an administrator.')
             else
-                table.insert(output, id)
+                table.insert(output, name .. ' is not an administrator.')
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 

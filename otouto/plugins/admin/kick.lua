@@ -19,9 +19,11 @@ on a new line. Example:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, reason, duration = autils.targets(bot, msg)
+    local targets, errors, reason, duration = autils.targets(bot, msg, true)
     if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
+        table.insert(errors,
+            'Durations must be longer than a minute and shorter than a year.')
     end
 
     local out_str, log_str
@@ -37,28 +39,25 @@ function P:action(bot, msg, _group, _user)
     local kicked_users = {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local name = utilities.lookup_name(bot, id)
-                if autils.rank(bot, id, msg.chat.id) > 2 then
-                    table.insert(output, name .. ' is too privileged to be kicked.')
-                else
-                    bindings.kickChatMember{
-                        chat_id = msg.chat.id,
-                        user_id = id,
-                        until_date = duration and duration + os.time() or 35
-                    }
-                    table.insert(output, name .. out_str)
-                    table.insert(kicked_users, id)
-                end
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
+            if autils.rank(bot, target, msg.chat.id) > 2 then
+                table.insert(output, name .. ' is too privileged to be kicked.')
             else
-                table.insert(output, id)
+                bindings.kickChatMember{
+                    chat_id = msg.chat.id,
+                    user_id = target,
+                    until_date = duration and duration + os.time() or 45
+                }
+                table.insert(output, name .. out_str)
+                kicked_users[target] = true
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
 
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
         autils.log(bot, {

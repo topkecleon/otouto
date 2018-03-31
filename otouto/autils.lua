@@ -60,17 +60,26 @@ function autils.duration_from_reason(text)
     return reason, duration
 end
 
-function autils.targets(bot, msg)
+  -- Returns a set of targets, a list of errors, a reason, and a duration (sec).
+function autils.targets(bot, msg, get_duration)
     local input = utilities.input(msg.text)
+    local errors = {}
 
     -- Reply messages target the replied-to message's sender, or the added/
     -- removed user. The reason is always the text given after the command.
     if msg.reply_to_message then
-        return {
-            (msg.reply_to_message.new_chat_member
+        local user_ids = { [tostring((
+            msg.reply_to_message.new_chat_member
             or msg.reply_to_message.left_chat_member
-            or msg.reply_to_message.from).id
-        }, autils.duration_from_reason(input)
+            or msg.reply_to_message.from).id)] = true }
+
+        -- return user_ids, nil, autils.duration_from_reason(input) or input
+        -- would only return the first value from duration_from_reason.
+        if get_duration then
+            return user_ids, errors, autils.duration_from_reason(input)
+        else
+            return user_ids, errors, input
+        end
 
     elseif input then
         local user_ids = {}
@@ -81,7 +90,7 @@ function autils.targets(bot, msg)
          -- number or time string (eg 6h45m30s), it will be the duration.
         if text:match('\n') then
             text, reason = text:match('^(.-)\n+(.+)$')
-            if reason then
+            if reason and get_duration then
                 reason, duration = autils.duration_from_reason(reason)
             end
         end
@@ -92,7 +101,7 @@ function autils.targets(bot, msg)
             for i = #msg.entities, 1, -1 do
                 local entity = msg.entities[i]
                 if entity.type == 'text_mention' then
-                    table.insert(user_ids, 1, entity.user.id)
+                    user_ids[tostring(entity.user.id)] = true
 
                     text = text:sub(1, entity.offset) ..
                         text:sub(entity.offset + entity.length + 2)
@@ -106,22 +115,27 @@ function autils.targets(bot, msg)
             for word in text:gmatch('%g+') do
                 -- User IDs.
                 if tonumber(word) then
-                    table.insert(user_ids, tonumber(word))
+                    user_ids[word] = true
 
                 -- Usernames.
                 elseif word:match('^@.') then
                     local user = utilities.resolve_username(bot, word)
-                    table.insert(user_ids, user and user.id or
-                        'Unrecognized username (' .. word .. ').')
+                    if user then
+                        user_ids[tostring(user.id)] = true
+                    else
+                        table.insert(errors,
+                            'Unrecognized username: ' .. word .. '.')
+                    end
 
                 else
-                    table.insert(user_ids,
-                        'Invalid username or ID (' .. word .. ').')
+                    table.insert(errors,
+                        'Invalid username, mention, or ID: ' .. word .. '.')
                 end
             end
         end
 
-        return user_ids, reason, duration
+        return utilities.table_size(user_ids) > 0 and user_ids or nil,
+            errors, reason, duration
     end
 end
 
@@ -155,7 +169,7 @@ function autils.strike(bot, msg, source)
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.format_name(bot, msg.from) ..
+            utilities.lookup_name(bot, msg.from) ..
             '. The next automoderation trigger will result in a five-minute tempban.'
             .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
         if bot.config.administration.log_chat_username then
@@ -209,8 +223,8 @@ end
     params = {
         target = 55994550, -- OR
         targets = {
-            55994550,
-            117099167
+            ['55994550'] = true,
+            ['117099167'] = true
         },
         chat_id = -100987654321,
         action = "Kicked",
@@ -232,15 +246,8 @@ function autils.log(bot, params)
         end
     end
 
-    -- targets ought to be a set, this could use utilities.list_names.
-    local target_names = {}
-    if params.targets then
-        for _, id in ipairs(params.targets) do
-            table.insert(target_names, utilities.lookup_name(bot, id))
-        end
-    elseif params.target then
-        table.insert(target_names, utilities.lookup_name(bot, params.target))
-    end
+    local target_names = params.targets and utilities.list_names(params.targets)
+        or params.target and { utilities.lookup_name(params.target) } or {}
 
     if #target_names > 0 then
         output = output .. table.concat(target_names, '\n') .. '\n'

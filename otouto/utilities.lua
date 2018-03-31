@@ -197,7 +197,7 @@ utilities.data_table_meta = {
             end
             return iter, data, 0
         else
-            local function iter(table, index)
+            local function iter(table, i)
                 i = i + 1
                 local val = table[i]
                 if val then
@@ -494,5 +494,18 @@ utilities.tiem = {
         return math.floor(seconds)
     end,
 }
+
+-- Merges arrays into the first.
+-- Distinct from lume.concat because the latter creates a new array.
+function utilities.merge_arrs(base, ...)
+    local size = #base
+    for i = 1, select('#', ...) do
+        local arr = select(i, ...)
+        for j = 1, #arr do
+            size = size + 1
+            base[size] = arr[j]
+        end
+    end
+end
 
 return utilities

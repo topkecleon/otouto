@@ -15,29 +15,26 @@ hammer inside this group), or toggles the whitelist status of the specified user
 end
 
 function P:action(bot, msg, group)
-    local targets = autils.targets(bot, msg)
+    local targets, errors = autils.targets(bot, msg)
     local admin = group.data.admin
     local output = {}
 
-    if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local id_str = tostring(id)
-                local name = utilities.lookup_name(bot, id)
-                if admin.antihammer[id_str] then
-                    admin.antihammer[id_str] = nil
+    if targets or #errors > 0 then
+        if targets then
+            for target in pairs(targets) do
+                local name = utilities.lookup_name(bot, target)
+                if admin.antihammer[target] then
+                    admin.antihammer[target] = nil
                     table.insert(output, name ..
                         ' has been removed from the antihammer whitelist.')
                 else
-                    admin.antihammer[id_str] = true
+                    admin.antihammer[target] = true
                     table.insert(output, name ..
                         ' has been added to the antihammer whitelist.')
                 end
-            else
-                table.insert(output, id)
             end
         end
-
+        utilities.merge_arrs(output, errors)
     elseif next(admin.antihammer) ~= nil then
         table.insert(output, '<b>Antihammered users:</b>')
         for id in pairs(admin.antihammer) do

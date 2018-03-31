@@ -13,15 +13,19 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets = autils.targets(bot, msg)
-    local target = targets and targets[1]
+    local targets, errors = autils.targets(bot, msg)
+    local targets_count = utilities.table_size(targets)
     local output
-    if tonumber(target) then
+
+    if targets_count == 1 then
+        local target = next(targets)
         local admin = group.data.admin
         local name = utilities.lookup_name(bot, target)
         autils.promote_admin(msg.chat.id, target, true)
+
         if target == admin.governor then
             output = name .. ' is already governor.'
+
         else
             -- Demote the old governor if he's not an admin.
             if autils.rank(bot, admin.governor, msg.chat.id) < 4 then
@@ -33,11 +37,17 @@ function P:action(bot, msg, group)
             admin.governor = target
             output = name .. ' is now governor.'
         end
-    elseif not target then
+
+    elseif #errors > 0 then
+        output = table.concat(errors, '\n')
+
+    elseif targets_count == 0 then
         output = bot.config.errors.specify_target
-    else
-        output = target
+
+    else -- multiple targets
+        output = 'Please only specify one new governor.'
     end
+
     utilities.send_reply(msg, output, 'html')
 end
 

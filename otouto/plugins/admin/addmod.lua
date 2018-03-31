@@ -14,38 +14,33 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets = autils.targets(bot, msg)
+    local targets, errors = autils.targets(bot, msg)
     local output = {}
 
     if targets then
-        for _, id in ipairs(targets) do
-            if tonumber(id) then
-                local id_str = tostring(id)
-                local name = utilities.lookup_name(bot, id)
-                local rank = autils.rank(bot, id, msg.chat.id)
+        for target in pairs(targets) do
+            local name = utilities.lookup_name(bot, target)
+            local rank = autils.rank(bot, target, msg.chat.id)
 
-                if rank > 2 then
-                    autils.promote_admin(msg.chat.id, id, true)
-                    table.insert(output, name ..
-                        ' is greater than a moderator.')
-                else
-                    autils.promote_admin(msg.chat.id, id)
-                    local admin = group.data.admin
-                    if admin.moderators[id_str] then
-                        table.insert(output, name .. ' is already a moderator.')
-                    else
-                        admin.moderators[id_str] = true
-                        admin.bans[id_str] = nil
-                        table.insert(output, name .. ' is now a moderator.')
-                    end
-                end
+            if rank > 2 then
+                autils.promote_admin(msg.chat.id, target, true)
+                table.insert(output, name ..' is greater than a moderator.')
             else
-                table.insert(output, id)
+                autils.promote_admin(msg.chat.id, target)
+                local admin = group.data.admin
+                if admin.moderators[target] then
+                    table.insert(output, name .. ' is already a moderator.')
+                else
+                    admin.moderators[target] = true
+                    admin.bans[target] = nil
+                    table.insert(output, name .. ' is now a moderator.')
+                end
             end
         end
     else
         table.insert(output, bot.config.errors.specify_targets)
     end
+    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 
