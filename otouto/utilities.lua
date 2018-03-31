@@ -261,7 +261,7 @@ function utilities.send_help_for(chat_id, reply_to_message_id, name, doc)
         chat_id,
         "<b>Help for</b> <i>" .. utilities.html_escape(name) .. "</i><b>:</b>\n" .. doc,
         true,
-        nil,
+        reply_to_message_id,
         'html'
     )
 end
