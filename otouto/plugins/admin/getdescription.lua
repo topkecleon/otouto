@@ -71,7 +71,7 @@ function P.desc(bot, chat_id)
     -- Moderators
     if next(admin.moderators) ~= nil then
         table.insert(output, '<b>Moderators:</b>\n• ' .. table.concat(
-            utilities.list_names(admin.moderators), '\n• '))
+            utilities.list_names(bot, admin.moderators), '\n• '))
     end
 
     return table.concat(output, '\n\n')
