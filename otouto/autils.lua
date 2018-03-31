@@ -224,19 +224,15 @@ function autils.log(bot, params)
 
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
-        -- This is unideal because we're not storing group info properly.
-        local group = bot.database.groupdata.admin[tostring(params.chat_id)]
-        output = output .. utilities.format_name{
-            title = group.name,
-            id = utilities.normalize_id(params.chat_id),
-            username = group.username
-        } .. '\n'
+        output = output .. utilities.lookup_name(bot, params.chat_id) .. '\n'
 
-        if group.flags.private then
+        if bot.database.groupdata.admin[tostring(params.chat_id)].flags.private
+        then
             log_chat = bot.config.log_chat
         end
     end
 
+    -- targets ought to be a set, this could use utilities.list_names.
     local target_names = {}
     if params.targets then
         for _, id in ipairs(params.targets) do

@@ -422,16 +422,31 @@ function utilities.format_name(user) -- or chat
         utilities.html_escape(
             user.title or utilities.build_name(user.first_name, user.last_name)
         ),
-        user.id,
+        utilities.normalize_id(user.id),
         user.username and ' <i>@' .. user.username .. '</i>' or ''
     ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
 end
 
-function utilities.lookup_name(bot, id)
-    return utilities.format_name(
-        bot.database.users and bot.database.users[tostring(id)]
+function utilities.lookup_user(bot, id)
+    return (bot.database.users and bot.database.users[tostring(id)])
+        or (bot.database.groupdata.info
+            and bot.database.groupdata.info[tostring(id)])
         or { id = id, first_name = 'Unknown' }
-    )
+end
+
+-- format_name with lookup_user
+function utilities.lookup_name(bot, id)
+    return utilities.format_name(utilities.lookup_user(bot, id))
+end
+
+-- Takes a set of ID (id_str because set), eg a userdata table or a mod list,
+-- and return an array of their formatted names.
+function utilities.list_names(bot, ids)
+    local t = {}
+    for id in pairs(ids) do
+        table.insert(t, utilities.lookup_name(bot, id))
+    end
+    return t
 end
 
 function utilities.divmod(x, y)
