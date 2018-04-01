@@ -257,7 +257,7 @@ function autils.log(bot, params)
         target_names = { utilities.lookup_name(bot, params.target) }
     end
 
-    if #target_names > 0 then
+    if target_names then
         output = output .. table.concat(target_names, '\n') .. '\n'
     end
 

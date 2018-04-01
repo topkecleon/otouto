@@ -499,9 +499,11 @@ function utilities.merge_arrs(base, ...)
     local size = #base
     for i = 1, select('#', ...) do
         local arr = select(i, ...)
-        for j = 1, #arr do
-            size = size + 1
-            base[size] = arr[j]
+        if arr then
+            for j = 1, #arr do
+                size = size + 1
+                base[size] = arr[j]
+            end
         end
     end
 end
