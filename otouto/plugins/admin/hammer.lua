@@ -19,7 +19,7 @@ end
 function P:action(bot, msg, group)
     local targets, errors, reason = autils.targets(bot, msg)
     local output = {}
-    local hammered_users = {}
+    local hammered_users = utilities.new_set()
 
     if targets then
         for target in pairs(targets) do
@@ -36,7 +36,7 @@ function P:action(bot, msg, group)
                 }
                 bot.database.userdata.hammers[target] = true
                 table.insert(output, name .. ' has been globally banned.')
-                hammered_users[target] = true
+                hammered_users:add(target)
             end
         end
     else
@@ -44,7 +44,7 @@ function P:action(bot, msg, group)
     end
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if utilities.table_size(hammered_users) > 0 then
+    if #hammered_users > 0 then
         local admin = group.data.admin
         autils.log(bot, {
             -- Do not send the chat ID from PMs or private groups.

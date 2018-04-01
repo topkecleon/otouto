@@ -36,7 +36,7 @@ function P:action(bot, msg, _group, _user)
     end
 
     local output = {}
-    local kicked_users = {}
+    local kicked_users = utilities.new_set()
 
     if targets then
         for target in pairs(targets) do
@@ -50,7 +50,7 @@ function P:action(bot, msg, _group, _user)
                     until_date = duration and duration + os.time() or 45
                 }
                 table.insert(output, name .. out_str)
-                kicked_users[target] = true
+                kicked_users:add(target)
             end
         end
     else
@@ -59,7 +59,7 @@ function P:action(bot, msg, _group, _user)
 
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if utilities.table_size(kicked_users) > 0 then
+    if #kicked_users > 0 then
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = kicked_users,

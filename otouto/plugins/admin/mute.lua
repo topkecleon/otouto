@@ -42,7 +42,7 @@ function P:action(bot, msg, _group, _user)
     end
 
     local output = {}
-    local muted_users = {} -- Passed to the log function at the end.
+    local muted_users = utilities.new_set()
 
     if targets then
         for target in pairs(targets) do
@@ -61,7 +61,7 @@ function P:action(bot, msg, _group, _user)
                     table.insert(output, b.description .. ' (' .. target .. ')')
                 else
                     table.insert(output, name .. out_str)
-                    muted_users[target] = true
+                    muted_users:add(target)
                 end
             end
         end
@@ -72,7 +72,7 @@ function P:action(bot, msg, _group, _user)
 
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if utilities.table_size(muted_users) > 0 then
+    if #muted_users > 0 then
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = muted_users,
