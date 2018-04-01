@@ -13,11 +13,11 @@
     (set self.command "about")
     (set self.doc "Returns information about the bot")
     (set self.text (f-str "{bot.config.about_text}\z
-      \nBased on [otouto](https://github.com/topkecleon/otouto) v{bot.version} by topkecleon."))
+      \nBased on <a href=\"https://github.com/topkecleon/otouto\">otouto</a> v{bot.version} by topkecleon."))
     (set self.triggers (utilities.make_triggers bot [] :about :start))
     nil)
 
   :action (fn [self, bot, msg]
-    (utilities.send_message msg.chat.id self.text true nil true)
+    (utilities.send_message msg.chat.id self.text true nil "html")
     (values))
 }
