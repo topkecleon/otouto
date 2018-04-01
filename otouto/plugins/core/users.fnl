@@ -8,13 +8,13 @@
 {
   :init (fn [self bot]
     (set self.triggers [""])
-    (local users (or bot.database.users {}))
-    (set bot.database.users users)
+    (local users (or bot.database.userdata.info {}))
+    (set bot.database.userdata.info users)
     (tset users (tostring bot.info.id) bot.info)
     (values))
 
   :action (fn [self bot msg]
-    (local users bot.database.users)
+    (local users bot.database.userdata.info)
     (tset users (tostring msg.from.id) msg.from)
     (if
       msg.reply_to_message

@@ -28,6 +28,7 @@
   :action (fn [self bot msg]
     (local victor (self.get_name bot msg.from))
     (local input (utilities.input msg.text))
+    (local users bot.database.userdata.info)
     (local victim (if msg.reply_to_message
                       (self.get_name bot msg.reply_to_message.from)
                       input
@@ -36,8 +37,8 @@
                           (: input :match "^@.")
                           (let [user (utilities.resolve_username bot input)]
                             (if user (self.get_name bot user) input))
-                          (and (tonumber input) bot.database.users bot.database.users[input])
-                          (self.get_name bot bot.database.users[input])
+                          (and (tonumber input) users users[input])
+                          (self.get_name bot users[input])
                           ; else
                           input)
                       ; else

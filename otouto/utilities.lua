@@ -226,14 +226,10 @@ end
 
 function utilities.resolve_username(bot, input)
     input = input:gsub('^@', '')
-    if not bot.database.users then return end
-    for _, user in pairs(bot.database.users) do
+    if not bot.database.userdata.info then return end
+    for _, user in pairs(bot.database.userdata.info) do
         if user.username and user.username:lower() == input:lower() then
-            local t = {}
-            for key, val in pairs(user) do
-                t[key] = val
-            end
-            return t
+            return user
         end
     end
 end
@@ -428,7 +424,9 @@ function utilities.format_name(user) -- or chat
 end
 
 function utilities.lookup_user(bot, id)
-    return (bot.database.users and bot.database.users[tostring(id)])
+    return
+        (bot.database.userdata.info
+            and bot.database.userdata.info[tostring(id)])
         or (bot.database.groupdata.info
             and bot.database.groupdata.info[tostring(id)])
         or { id = id, first_name = 'Unknown' }
