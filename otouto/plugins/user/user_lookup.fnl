@@ -18,8 +18,6 @@
 
     :action (fn [self bot msg]
         (let [(targets output) (autils.targets bot msg)]
-            (if targets
-                (utilities.merge_arrs output (utilities.list_names bot targets))
-                (table.insert output bot.config.errors.specify_targets))
+            (if targets (utilities.merge_arrs output (utilities.list_names bot targets)))
             (utilities.send_reply msg (table.concat output "\n") "html")))
 }

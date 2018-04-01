@@ -60,9 +60,11 @@ function autils.duration_from_reason(text)
     return reason, duration
 end
 
-  -- Returns a set of targets, a list of errors, a reason, and a duration (sec).
-function autils.targets(bot, msg, get_duration)
+ -- Returns a set of targets, a list of errors, a reason, and a duration (sec).
+ -- options are currently get_duration and unknown_ids_err
+function autils.targets(bot, msg, options)
     local input = utilities.input(msg.text)
+    options = options or {}
     local errors = {}
 
     -- Reply messages target the replied-to message's sender, or the added/
@@ -75,7 +77,7 @@ function autils.targets(bot, msg, get_duration)
 
         -- return user_ids, nil, autils.duration_from_reason(input) or input
         -- would only return the first value from duration_from_reason.
-        if get_duration then
+        if options.get_duration then
             return user_ids, errors, autils.duration_from_reason(input)
         else
             return user_ids, errors, input
@@ -90,7 +92,7 @@ function autils.targets(bot, msg, get_duration)
          -- number or time string (eg 6h45m30s), it will be the duration.
         if text:match('\n') then
             text, reason = text:match('^(.-)\n+(.+)$')
-            if reason and get_duration then
+            if reason and options.get_duration then
                 reason, duration = autils.duration_from_reason(reason)
             end
         end
@@ -115,7 +117,14 @@ function autils.targets(bot, msg, get_duration)
             for word in text:gmatch('%g+') do
                 -- User IDs.
                 if tonumber(word) then
-                    user_ids[word] = true
+                    if options.unknown_ids_err and (
+                        not bot.database.userdata.info
+                        or not bot.database.userdata.info[word]
+                    ) then
+                        table.insert(errors, 'Unknown ID: ' .. word .. '.')
+                    else
+                        user_ids[word] = true
+                    end
 
                 -- Usernames.
                 elseif word:match('^@.') then
@@ -136,6 +145,9 @@ function autils.targets(bot, msg, get_duration)
 
         return utilities.table_size(user_ids) > 0 and user_ids or nil,
             errors, reason, duration
+
+    else
+        return nil, { bot.config.errors.specify_targets }
     end
 end
 
