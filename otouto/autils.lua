@@ -246,9 +246,16 @@ function autils.log(bot, params)
         end
     end
 
-    local target_names =
-        params.targets and utilities.list_names(bot, params.targets)
-        or params.target and { utilities.lookup_name(params.target) } or {}
+    local target_names
+    if params.targets then
+        -- Temporary fix until proper set iterator.
+        setmetatable(params.targets, nil)
+        params.targets.__count = nil
+
+        target_names = utilities.list_names(bot, params.targets)
+    elseif params.target then
+        target_names = { utilities.lookup_name(bot, params.target) }
+    end
 
     if #target_names > 0 then
         output = output .. table.concat(target_names, '\n') .. '\n'
