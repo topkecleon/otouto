@@ -246,7 +246,8 @@ function autils.log(bot, params)
         end
     end
 
-    local target_names = params.targets and utilities.list_names(params.targets)
+    local target_names =
+        params.targets and utilities.list_names(bot, params.targets)
         or params.target and { utilities.lookup_name(params.target) } or {}
 
     if #target_names > 0 then
