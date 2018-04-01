@@ -47,7 +47,7 @@ function P:action(bot, msg, group)
 
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if banned_users > 0 then
+    if #banned_users > 0 then
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = banned_users,
