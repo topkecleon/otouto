@@ -6,18 +6,18 @@
 
 (require-macros :otouto.macros)
 (require* otouto.utilities
-    otouto.autils)
+  otouto.autils)
 
 {
-    :init (fn [self bot]
-        (set self.command "lookup")
-        (set self.doc "Returns stored user info, if any, for the given users.")
-        (set self.triggers (utilities.make_triggers bot [] [:lookup true]))
-        (set self.targeting true)
-        (values))
+  :init (fn [self bot]
+    (set self.command "lookup")
+    (set self.doc "Returns stored user info, if any, for the given users.")
+    (set self.triggers (utilities.make_triggers bot [] [:lookup true]))
+    (set self.targeting true)
+    (values))
 
-    :action (fn [self bot msg]
-        (let [(targets output) (autils.targets bot msg)]
-            (if targets (utilities.merge_arrs output (utilities.list_names bot targets)))
-            (utilities.send_reply msg (table.concat output "\n") "html")))
+  :action (fn [self bot msg]
+    (local (targets output) (autils.targets bot msg {:unknown_ids_err true}))
+      (if targets (utilities.merge_arrs output (utilities.list_names bot targets)))
+      (utilities.send_reply msg (table.concat output "\n") "html"))
 }

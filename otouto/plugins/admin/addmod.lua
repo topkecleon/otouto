@@ -14,7 +14,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets, output = autils.targets(bot, msg)
+    local targets, output = autils.targets(bot, msg, {unknown_ids_err = true})
     if targets then
         for target in pairs(targets) do
             local name = utilities.lookup_name(bot, target)
