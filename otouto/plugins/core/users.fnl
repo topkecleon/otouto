@@ -16,6 +16,10 @@
   :action (fn [self bot msg]
     (local users bot.database.userdata.info)
     (tset users (tostring msg.from.id) msg.from)
+    (if msg.entities
+        (each [_ entity (ipairs msg.entities)]
+            (if entity.user
+                (tset users (tostring entity.user.id) entity.user))))
     (if
       msg.reply_to_message
         (tset users (tostring msg.reply_to_message.from.id) msg.reply_to_message.from)
