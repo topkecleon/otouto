@@ -44,7 +44,7 @@ function P:action(bot, msg, group)
     end
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if #hammered_users > 0 then
+    if utilities.table_size(hammered_users) > 0 then
         local admin = group.data.admin
         autils.log(bot, {
             -- Do not send the chat ID from PMs or private groups.

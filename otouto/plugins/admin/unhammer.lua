@@ -32,7 +32,7 @@ function P:action(bot, msg, _group)
 
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if #unhammered_users > 0 then
+    if utilities.table_size(unhammered_users) > 0 then
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = unhammered_users,

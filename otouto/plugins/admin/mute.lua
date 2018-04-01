@@ -72,7 +72,7 @@ function P:action(bot, msg, _group, _user)
 
     utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
-    if #muted_users > 0 then
+    if utilities.table_size(muted_users) > 0 then
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = muted_users,
