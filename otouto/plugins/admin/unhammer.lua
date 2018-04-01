@@ -35,7 +35,8 @@ function P:action(bot, msg, _group)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #unhammered_users > 0 then
         autils.log(bot, {
-            chat_id = msg.chat.id,
+            -- Do not send the chat ID from PMs or private groups.
+            chat_id = admin and (not admin.flags.private) and msg.chat.id,
             targets = unhammered_users,
             action = "Unhammered",
             source_id = msg.from.id,
