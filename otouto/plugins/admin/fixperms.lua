@@ -13,8 +13,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg)
-    local targets, errors = autils.targets(bot, msg)
-    local output = {}
+    local targets, output = autils.targets(bot, msg)
     if targets then
         for target in pairs(targets) do
             local rank = autils.rank(bot, msg.chat.id, target)
@@ -35,10 +34,7 @@ function P:action(bot, msg)
                     name .. ': ' .. err.description)
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 

@@ -20,8 +20,7 @@ end
 
 function P:action(bot, msg, group)
     local admin = group.data.admin
-    local targets, errors, reason = autils.targets(bot, msg)
-    local output = {}
+    local targets, output, reason = autils.targets(bot, msg)
     local banned_users = utilities.new_set()
 
     if targets then
@@ -41,11 +40,8 @@ function P:action(bot, msg, group)
                 banned_users:add(target)
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
 
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #banned_users > 0 then
         autils.log(bot, {

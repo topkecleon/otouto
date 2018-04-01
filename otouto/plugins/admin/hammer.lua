@@ -17,8 +17,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets, errors, reason = autils.targets(bot, msg)
-    local output = {}
+    local targets, output, reason = autils.targets(bot, msg)
     local hammered_users = utilities.new_set()
 
     if targets then
@@ -39,10 +38,8 @@ function P:action(bot, msg, group)
                 hammered_users:add(target)
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
-    utilities.merge_arrs(output, errors)
+
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
         local admin = group.data.admin

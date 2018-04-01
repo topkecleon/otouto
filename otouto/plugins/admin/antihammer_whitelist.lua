@@ -15,9 +15,8 @@ hammer inside this group), or toggles the whitelist status of the specified user
 end
 
 function P:action(bot, msg, group)
-    local targets, errors = autils.targets(bot, msg)
+    local targets, output = autils.targets(bot, msg)
     local admin = group.data.admin
-    local output = {}
 
     if targets or #errors > 0 then
         if targets then
@@ -34,7 +33,6 @@ function P:action(bot, msg, group)
                 end
             end
         end
-        utilities.merge_arrs(output, errors)
     elseif next(admin.antihammer) ~= nil then
         table.insert(output, '<b>Antihammered users:</b>')
         for id in pairs(admin.antihammer) do

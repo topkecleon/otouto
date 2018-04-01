@@ -22,14 +22,15 @@ Examples:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, errors, reason, duration =
+    local targets, output, reason, duration =
         autils.targets(bot, msg, {get_duration = true})
+    local muted_users = utilities.new_set()
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.
     if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
-        table.insert(errors,
+        table.insert(output,
             'Durations must be longer than a minute and shorter than a year.')
     end
 
@@ -41,9 +42,6 @@ function P:action(bot, msg, _group, _user)
         out_str = ' has been muted.'
         log_str = 'Muted'
     end
-
-    local output = {}
-    local muted_users = utilities.new_set()
 
     if targets then
         for target in pairs(targets) do
@@ -66,12 +64,8 @@ function P:action(bot, msg, _group, _user)
                 end
             end
         end
-
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
 
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #muted_users > 0 then
         autils.log(bot, {

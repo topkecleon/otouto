@@ -14,7 +14,7 @@ end
 
 function P:action(bot, msg, group)
     local targets, errors = autils.targets(bot, msg)
-    local targets_count = utilities.table_size(targets)
+    local targets_count = targets and utilities.table_size(targets) or 0
     local output
 
     if targets_count == 1 then

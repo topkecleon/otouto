@@ -12,8 +12,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, _group)
-    local targets, errors, reason = autils.targets(bot, msg)
-    local output = {}
+    local targets, output, reason = autils.targets(bot, msg)
     local unhammered_users = utilities.new_set()
 
     if targets then
@@ -27,11 +26,8 @@ function P:action(bot, msg, _group)
                 table.insert(output, name .. ' is not globally banned.')
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
 
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #unhammered_users > 0 then
         autils.log(bot, {

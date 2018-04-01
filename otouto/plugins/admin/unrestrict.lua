@@ -16,8 +16,7 @@ function P:init(bot)
 end
 
 function P:action(bot, msg, group)
-    local targets, errors = autils.targets(bot, msg)
-    local output = {}
+    local targets, output = autils.targets(bot, msg)
     if targets then
         for target in pairs(targets) do
             local name = utilities.lookup_name(bot, target)
@@ -42,10 +41,7 @@ function P:action(bot, msg, group)
                 table.insert(output, name .. ' has been unrestricted.')
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 

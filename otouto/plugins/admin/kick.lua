@@ -19,11 +19,12 @@ on a new line. Example:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, errors, reason, duration =
+    local targets, output, reason, duration =
         autils.targets(bot, msg, {get_duration = true})
+    local kicked_users = utilities.new_set()
     if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
-        table.insert(errors,
+        table.insert(output,
             'Durations must be longer than a minute and shorter than a year.')
     end
 
@@ -35,9 +36,6 @@ function P:action(bot, msg, _group, _user)
         out_str = ' has been kicked.'
         log_str = 'Kicked'
     end
-
-    local output = {}
-    local kicked_users = utilities.new_set()
 
     if targets then
         for target in pairs(targets) do
@@ -54,11 +52,8 @@ function P:action(bot, msg, _group, _user)
                 kicked_users:add(target)
             end
         end
-    else
-        table.insert(output, bot.config.errors.specify_targets)
     end
 
-    utilities.merge_arrs(output, errors)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #kicked_users > 0 then
         autils.log(bot, {
