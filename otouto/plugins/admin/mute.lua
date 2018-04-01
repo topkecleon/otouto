@@ -22,7 +22,8 @@ Examples:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, errors, reason, duration = autils.targets(bot, msg, true)
+    local targets, errors, reason, duration =
+        autils.targets(bot, msg, {get_duration = true})
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.

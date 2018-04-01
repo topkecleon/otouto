@@ -19,7 +19,8 @@ on a new line. Example:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, errors, reason, duration = autils.targets(bot, msg, true)
+    local targets, errors, reason, duration =
+        autils.targets(bot, msg, {get_duration = true})
     if duration and (duration > 366*24*60*60 or duration < 30) then
         duration = nil
         table.insert(errors,
