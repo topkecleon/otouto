@@ -463,17 +463,30 @@ utilities.tiem = {
         m = 60,
         s = 1
     },
-    format = function (seconds)
-        local time_str = ''
+    pretty = {
+        y = 'year',
+        w = 'week',
+        d = 'day',
+        h = 'hour',
+        m = 'minute',
+        s = 'second'
+    },
+    format = function (seconds, pretty)
+        local output = {}
         for _, l in ipairs(utilities.tiem.order) do
             local v = utilities.tiem.dict[l]
             if seconds >= v then
                 local q, r = utilities.divmod(seconds, v)
-                time_str = time_str .. q .. l
+                if pretty then
+                    table.insert(output, string.format('%s %s%s',
+                        q, utilities.tiem.pretty[l], q == 1 and '' or 's'))
+                else
+                    table.insert(output, q .. l)
+                end
                 seconds = r
             end
         end
-        return time_str
+        return table.concat(output, pretty and ', ')
     end,
     deformat = function (time_str)
         if

@@ -18,6 +18,6 @@
 
   :action (fn [self bot msg]
     (local (targets output) (autils.targets bot msg {:unknown_ids_err true}))
-      (if targets (utilities.merge_arrs output (utilities.list_names bot targets)))
-      (utilities.send_reply msg (table.concat output "\n") "html"))
+    (if targets (utilities.merge_arrs output (utilities.list_names bot targets)))
+    (utilities.send_reply msg (table.concat output "\n") "html"))
 }
