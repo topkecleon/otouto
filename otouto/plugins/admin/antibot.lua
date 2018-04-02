@@ -18,7 +18,7 @@ function P:action(bot, msg, group, user)
         group.data.admin.flags[self.flag]
         and msg.new_chat_member
         and msg.new_chat_member.is_bot
-        and user:rank(bot) < 2
+        and user:rank(bot, msg.chat.id) < 2
     then
         if bindings.kickChatMember{
             chat_id = msg.chat.id,

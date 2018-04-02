@@ -60,7 +60,7 @@ end
 function P:action(bot, msg, group, user)
     local admin = group.data.admin
     if not admin.flags[self.flag] then return 'continue' end
-    if user:rank(bot) > 1 then return 'continue' end
+    if user:rank(bot, msg.chat.id) > 1 then return 'continue' end
     if msg.forward_from and (
         (msg.forward_from.id == bot.info.id) or
         (msg.forward_from.id == bot.config.log_chat) or
@@ -82,7 +82,7 @@ function P:action(bot, msg, group, user)
         store.latest = os.time()
 
         if store.count == 3 then
-            user.data.hammers = true
+            user.data.hammered = true
             bindings.deleteMessage{ chat_id = msg.chat.id,
                 message_id = msg.message_id }
             autils.log(bot, {

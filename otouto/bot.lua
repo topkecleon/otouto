@@ -44,7 +44,7 @@ function bot:init()
     -- Database table to store user-specific information, such as nicknames or
     -- API usernames.
     if not self.database.userdata then
-        self.database.userdata = { hammers = {}, administrators = {} }
+        self.database.userdata = { hammered = {}, administrator = {} }
     end
     -- Database table to store disabled plugins for chats.
     self.database.disabled_plugins = self.database.disabled_plugins or {}
@@ -166,7 +166,7 @@ function bot:on_message(msg)
     for _, plugin in ipairs(self.plugins) do
         if
             (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self) >= (plugin.privilege or 0))
+            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
@@ -214,7 +214,7 @@ function bot:on_edit(msg)
         if
             plugin.edit_action and
             (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self) >= (plugin.privilege or 0))
+            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then

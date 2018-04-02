@@ -15,17 +15,17 @@ end
 function P:action(bot, msg, _group, _user)
     local targets, output = autils.targets(bot, msg)
     for target in pairs(targets) do
-        local name = utilities.lookup_name(bot, target)
-        if bot.database.userdata.administrators[target] then
-            bot.database.userdata.administrators[target] = nil
+        local user = utilities.user(bot, target)
+        if user.data.administrator then
+            user.data.administrator = nil
             for chat_id in pairs(bot.database.groupdata.admin) do
-                if autils.rank(bot, target, chat_id) < 2 then
+                if user:rank(bot, chat_id) < 2 then
                     autils.demote_admin(chat_id, target)
                 end
             end
-            table.insert(output, name .. ' is no longer an administrator.')
+            table.insert(output, user:name() .. ' is no longer an administrator.')
         else
-            table.insert(output, name .. ' is not an administrator.')
+            table.insert(output, user:name() .. ' is not an administrator.')
         end
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')

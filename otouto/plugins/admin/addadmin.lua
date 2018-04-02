@@ -15,11 +15,11 @@ end
 function P:action(bot, msg, _group, _user)
     local targets, output = autils.targets(bot, msg, {unknown_ids_err = true})
     for target in pairs(targets) do
-        local name = utilities.lookup_name(bot, target)
-        if autils.rank(bot, target) > 3 then
+        local user = utilities.user(bot, target)
+        if user:rank(bot, msg.chat.id) > 3 then
             table.insert(output, name .. ' is already an administrator.')
         else
-            bot.database.userdata.administrators[tostring(target)] = true
+            user.data.administrator = true
             table.insert(output, name .. ' is now an administrator.')
         end
     end

@@ -17,13 +17,13 @@ function P:action(bot, msg, group)
     local unhammered_users = utilities.new_set()
 
     for target in pairs(targets) do
-        local name = utilities.lookup_name(bot, target)
-        if bot.database.userdata.hammers[target] then
-            bot.database.userdata.hammers[target] = nil
-            table.insert(output, name..' is no longer globally banned.')
+        local user = utilities.user(bot, target)
+        if user.data.hammered then
+            user.data.hammered[target] = nil
             unhammered_users:add(target)
+            table.insert(output, user:name() .. ' is no longer globally banned.')
         else
-            table.insert(output, name .. ' is not globally banned.')
+            table.insert(output, user:name() .. ' is not globally banned.')
         end
     end
 

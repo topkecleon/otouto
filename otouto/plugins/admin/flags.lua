@@ -47,7 +47,7 @@ function P:action(bot, msg, group, user)
     local input = utilities.input_from_msg(msg)
     local output
 
-    if user:rank(bot) < 3 then
+    if user:rank(bot, msg.chat.id) < 3 then
         output = self:list_flags(admin.flags)
 
     elseif not input then

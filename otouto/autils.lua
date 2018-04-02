@@ -14,7 +14,7 @@ function autils.rank(bot, user_id, chat_id)
     elseif user_id == bot.info.id then
         return 5 -- Bot
 
-    elseif bot.database.userdata.administrators[user_id_str] then
+    elseif bot.database.userdata.administrator[user_id_str] then
         return 4 -- Administrator
 
     elseif group then
@@ -32,7 +32,7 @@ function autils.rank(bot, user_id, chat_id)
         end
     end
 
-    if bot.database.userdata.hammers[user_id_str] then
+    if bot.database.userdata.hammered[user_id_str] then
         if not group or not group.antihammer[user_id_str] then
             return 0 -- Hammered
         end

@@ -16,7 +16,7 @@ end
 
 function P:action(bot, msg, group, user)
     if not group.data.admin.flags[self.flag] then return 'continue' end
-    if user:rank(bot) > 1 then return 'continue' end
+    if user:rank(bot, msg.chat.id) > 1 then return 'continue' end
     local name = utilities.build_name(user.data.info.first_name, user.data.info.last_name)
     if name:match(utilities.char.arabic) or
         name:match(utilities.char.rtl_override) or

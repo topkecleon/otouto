@@ -25,14 +25,14 @@ function P:action(bot, msg, group)
 
         if autils.rank(bot, target, msg.chat.id) >= 4 then
             table.insert(output, name .. ' is an administrator.')
-        elseif bot.database.userdata.hammers[target] then
+        elseif bot.database.userdata.hammered[target] then
             table.insert(output, name .. ' is already globally banned.')
         else
             bindings.kickChatMember{
                 chat_id = msg.chat.id,
                 user_id = target
             }
-            bot.database.userdata.hammers[target] = true
+            bot.database.userdata.hammered[target] = true
             table.insert(output, name .. ' has been globally banned.')
             hammered_users:add(target)
         end
