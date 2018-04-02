@@ -156,7 +156,7 @@ function bot:on_message(msg)
 
     local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
 
-    local user = utilities.user(bot, tostring(msg.from.id))
+    local user = utilities.user(self, msg.from.id)
 
     local group = {
         data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
