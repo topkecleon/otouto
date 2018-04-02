@@ -11,7 +11,7 @@ function P:init(bot)
     self.administration = true
 end
 
-function P:action(_bot, msg, group, user)
+function P:action(bot, msg, group, user)
     local admin = group.data.admin
     local output
     local link = string.format(

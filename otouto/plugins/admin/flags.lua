@@ -42,7 +42,7 @@ table.concat(default_flags, '\n•')
     ]]
 end
 
-function P:action(_bot, msg, group, user)
+function P:action(bot, msg, group, user)
     local admin = group.data.admin
     local input = utilities.input_from_msg(msg)
     local output
