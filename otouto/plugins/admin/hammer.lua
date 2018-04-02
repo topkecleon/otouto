@@ -20,23 +20,21 @@ function P:action(bot, msg, group)
     local targets, output, reason = autils.targets(bot, msg)
     local hammered_users = utilities.new_set()
 
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
 
-            if autils.rank(bot, target, msg.chat.id) >= 4 then
-                table.insert(output, name .. ' is an administrator.')
-            elseif bot.database.userdata.hammers[target] then
-                table.insert(output, name .. ' is already globally banned.')
-            else
-                bindings.kickChatMember{
-                    chat_id = msg.chat.id,
-                    user_id = target
-                }
-                bot.database.userdata.hammers[target] = true
-                table.insert(output, name .. ' has been globally banned.')
-                hammered_users:add(target)
-            end
+        if autils.rank(bot, target, msg.chat.id) >= 4 then
+            table.insert(output, name .. ' is an administrator.')
+        elseif bot.database.userdata.hammers[target] then
+            table.insert(output, name .. ' is already globally banned.')
+        else
+            bindings.kickChatMember{
+                chat_id = msg.chat.id,
+                user_id = target
+            }
+            bot.database.userdata.hammers[target] = true
+            table.insert(output, name .. ' has been globally banned.')
+            hammered_users:add(target)
         end
     end
 

@@ -1,5 +1,6 @@
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
+local lume = require('extern.lume')
 
 local P = {}
 
@@ -14,7 +15,7 @@ end
 
 function P:action(bot, msg, group)
     local targets, errors = autils.targets(bot, msg, {unknown_ids_err = true})
-    local targets_count = targets and utilities.table_size(targets) or 0
+    local targets_count = lume.count(targets)
     local output
 
     if targets_count == 1 then

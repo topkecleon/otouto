@@ -15,19 +15,17 @@ end
 
 function P:action(bot, msg, group)
     local targets, output = autils.targets(bot, msg)
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
-            local admin = group.data.admin
-            if autils.rank(bot, target, msg.chat.id) < 3 then
-                autils.demote_admin(msg.chat.id, target)
-            end
-            if admin.moderators[target] then
-                admin.moderators[target] = nil
-                table.insert(output, name .. ' is no longer a moderator.')
-            else
-                table.insert(output, name .. ' is not a moderator.')
-            end
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
+        local admin = group.data.admin
+        if autils.rank(bot, target, msg.chat.id) < 3 then
+            autils.demote_admin(msg.chat.id, target)
+        end
+        if admin.moderators[target] then
+            admin.moderators[target] = nil
+            table.insert(output, name .. ' is no longer a moderator.')
+        else
+            table.insert(output, name .. ' is not a moderator.')
         end
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')

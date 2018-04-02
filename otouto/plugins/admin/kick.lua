@@ -38,20 +38,18 @@ function P:action(bot, msg, _group, _user)
         log_str = 'Kicked'
     end
 
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
-            if autils.rank(bot, target, msg.chat.id) > 2 then
-                table.insert(output, name .. ' is too privileged to be kicked.')
-            else
-                bindings.kickChatMember{
-                    chat_id = msg.chat.id,
-                    user_id = target,
-                    until_date = duration and duration + os.time() or 45
-                }
-                table.insert(output, name .. out_str)
-                kicked_users:add(target)
-            end
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
+        if autils.rank(bot, target, msg.chat.id) > 2 then
+            table.insert(output, name .. ' is too privileged to be kicked.')
+        else
+            bindings.kickChatMember{
+                chat_id = msg.chat.id,
+                user_id = target,
+                until_date = duration and duration + os.time() or 45
+            }
+            table.insert(output, name .. out_str)
+            kicked_users:add(target)
         end
     end
 

@@ -143,8 +143,7 @@ function autils.targets(bot, msg, options)
             end
         end
 
-        return utilities.table_size(user_ids) > 0 and user_ids or nil,
-            errors, reason, duration
+        return user_ids, errors, reason, duration
 
     else
         return nil, { bot.config.errors.specify_targets }

@@ -44,25 +44,23 @@ function P:action(bot, msg, _group, _user)
         log_str = 'Muted'
     end
 
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
 
-            if autils.rank(bot, target, msg.chat.id) > 1 then
-                table.insert(output,name .. ' is too privileged to be muted.')
+        if autils.rank(bot, target, msg.chat.id) > 1 then
+            table.insert(output,name .. ' is too privileged to be muted.')
+        else
+            local a, b = bindings.restrictChatMember{
+                chat_id = msg.chat.id,
+                user_id = target,
+                until_date = duration and os.time() + duration,
+                can_send_messages = false
+            }
+            if not a then
+                table.insert(output, b.description .. ' (' .. target .. ')')
             else
-                local a, b = bindings.restrictChatMember{
-                    chat_id = msg.chat.id,
-                    user_id = target,
-                    until_date = duration and os.time() + duration,
-                    can_send_messages = false
-                }
-                if not a then
-                    table.insert(output, b.description .. ' (' .. target .. ')')
-                else
-                    table.insert(output, name .. out_str)
-                    muted_users:add(target)
-                end
+                table.insert(output, name .. out_str)
+                muted_users:add(target)
             end
         end
     end

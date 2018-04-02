@@ -121,15 +121,6 @@ function utilities.get_coords(input)
     end
 end
 
--- Get the number of values in a key/value table.
-function utilities.table_size(tab)
-    local i = 0
-    for _ in pairs(tab) do
-        i = i + 1
-    end
-    return i
-end
-
 utilities.data_table_meta = {
     __index = function (self, key)
         local data = rawget(self, "_data")

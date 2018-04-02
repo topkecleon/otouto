@@ -23,22 +23,20 @@ function P:action(bot, msg, group)
     local targets, output, reason = autils.targets(bot, msg)
     local banned_users = utilities.new_set()
 
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
-            if autils.rank(bot, target, msg.chat.id) > 2 then
-                table.insert(output, name .. ' is too privileged to be banned.')
-            elseif admin.bans[target] then
-                table.insert(output, name .. ' is already banned.')
-            else
-                admin.bans[target] = true
-                bindings.kickChatMember{
-                    chat_id = msg.chat.id,
-                    user_id = target
-                }
-                table.insert(output, name .. ' has been banned.')
-                banned_users:add(target)
-            end
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
+        if autils.rank(bot, target, msg.chat.id) > 2 then
+            table.insert(output, name .. ' is too privileged to be banned.')
+        elseif admin.bans[target] then
+            table.insert(output, name .. ' is already banned.')
+        else
+            admin.bans[target] = true
+            bindings.kickChatMember{
+                chat_id = msg.chat.id,
+                user_id = target
+            }
+            table.insert(output, name .. ' has been banned.')
+            banned_users:add(target)
         end
     end
 

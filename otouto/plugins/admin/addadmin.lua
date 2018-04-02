@@ -14,15 +14,13 @@ end
 
 function P:action(bot, msg, _group, _user)
     local targets, output = autils.targets(bot, msg, {unknown_ids_err = true})
-    if targets then
-        for target in pairs(targets) do
-            local name = utilities.lookup_name(bot, target)
-            if autils.rank(bot, target) > 3 then
-                table.insert(output, name .. ' is already an administrator.')
-            else
-                bot.database.userdata.administrators[tostring(target)] = true
-                table.insert(output, name .. ' is now an administrator.')
-            end
+    for target in pairs(targets) do
+        local name = utilities.lookup_name(bot, target)
+        if autils.rank(bot, target) > 3 then
+            table.insert(output, name .. ' is already an administrator.')
+        else
+            bot.database.userdata.administrators[tostring(target)] = true
+            table.insert(output, name .. ' is now an administrator.')
         end
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
