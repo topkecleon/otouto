@@ -22,7 +22,7 @@ function P:action(bot, msg, _group, _user)
     local targets, output, reason, duration =
         autils.targets(bot, msg, {get_duration = true})
     local kicked_users = utilities.new_set()
-    if duration and (duration > 366*24*60*60 or duration < 30) then
+    if duration and (duration > 366*24*60*60 or duration < 60) then
         duration = nil
         table.insert(output,
             'Durations must be longer than a minute and shorter than a year.')
