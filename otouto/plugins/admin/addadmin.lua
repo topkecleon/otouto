@@ -17,10 +17,10 @@ function P:action(bot, msg, _group, _user)
     for target in pairs(targets) do
         local user = utilities.user(bot, target)
         if user:rank(bot, msg.chat.id) > 3 then
-            table.insert(output, name .. ' is already an administrator.')
+            table.insert(output, user:name() .. ' is already an administrator.')
         else
             user.data.administrator = true
-            table.insert(output, name .. ' is now an administrator.')
+            table.insert(output, user:name() .. ' is now an administrator.')
         end
     end
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')

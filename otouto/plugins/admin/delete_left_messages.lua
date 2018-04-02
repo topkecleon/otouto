@@ -2,7 +2,7 @@ local bindings = require('otouto.bindings')
 
 local P = {}
 
-function P:init(_bot)
+function P:init(bot)
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, self.name .. ' requires flags')
     self.flag = 'delete_left_messages'
@@ -12,7 +12,7 @@ function P:init(_bot)
     self.administration = true
 end
 
-function P:action(_bot, msg, _group, _user)
+function P:action(_bot, msg, group, _user)
     if not group.data.admin.flags[self.flag] then return 'continue' end
     if msg.left_chat_member and msg.from.id == msg.left_chat_member.id then
         bindings.deleteMessage{
