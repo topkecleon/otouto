@@ -394,8 +394,19 @@ utilities.set_meta = {
             return true
         end
     end,
+    next = function(self, key)
+        local val
+        repeat key, val = next(self, key)
+            until val == nil or val == true
+        return key, val
+    end,
     __len = function (self)
         return self.__count
+    end,
+    __pairs = function(self)
+        return function(tab, key)
+            return tab:next(key)
+        end, self
     end
 }
 utilities.set_meta.__index = utilities.set_meta

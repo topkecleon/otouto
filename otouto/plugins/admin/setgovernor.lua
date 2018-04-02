@@ -1,6 +1,5 @@
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
-local lume = require('extern.lume')
 
 local P = {}
 
@@ -15,11 +14,10 @@ end
 
 function P:action(bot, msg, group)
     local targets, errors = autils.targets(bot, msg, {unknown_ids_err = true})
-    local targets_count = lume.count(targets)
     local output
 
-    if targets_count == 1 then
-        local target = next(targets)
+    if #targets == 1 then
+        local target = targets:next()
         local admin = group.data.admin
         local name = utilities.lookup_name(bot, target)
         autils.promote_admin(msg.chat.id, target, true)
@@ -33,23 +31,20 @@ function P:action(bot, msg, group)
                 autils.demote_admin(msg.chat.id, admin.governor)
             end
 
-            admin.moderators[tostring(target)] = nil
-            admin.bans[tostring(target)] = nil
+            admin.moderators[target] = nil
+            admin.bans[target] = nil
             admin.governor = target
             output = name .. ' is now governor.'
         end
 
-    elseif #errors > 0 then
-        output = table.concat(errors, '\n')
-
-    elseif targets_count == 0 then
+    elseif #targets == 0 then
         output = bot.config.errors.specify_target
 
     else -- multiple targets
         output = 'Please only specify one new governor.'
     end
 
-    utilities.send_reply(msg, output, 'html')
+    utilities.send_reply(msg, output .. table.concat(errors, '\n'), 'html')
 end
 
 return P

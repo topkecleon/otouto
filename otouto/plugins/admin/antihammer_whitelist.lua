@@ -18,7 +18,7 @@ function P:action(bot, msg, group)
     local targets, output = autils.targets(bot, msg)
     local admin = group.data.admin
 
-    if next(targets) or #output > 0 then
+    if #targets > 0 or #output > 0 then
         for target in pairs(targets) do
             local name = utilities.lookup_name(bot, target)
             if admin.antihammer[target] then

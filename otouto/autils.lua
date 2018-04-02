@@ -66,15 +66,16 @@ end
 function autils.targets(bot, msg, options)
     local input = utilities.input(msg.text)
     options = options or {}
+    local user_ids = utilities.new_set()
     local errors = {}
 
     -- Reply messages target the replied-to message's sender, or the added/
     -- removed user. The reason is always the text given after the command.
     if msg.reply_to_message then
-        local user_ids = { [tostring((
-            msg.reply_to_message.new_chat_member
-            or msg.reply_to_message.left_chat_member
-            or msg.reply_to_message.from).id)] = true }
+        user_ids:add(tostring((
+        msg.reply_to_message.new_chat_member
+        or msg.reply_to_message.left_chat_member
+        or msg.reply_to_message.from).id))
 
         -- return user_ids, nil, autils.duration_from_reason(input) or input
         -- would only return the first value from duration_from_reason.
@@ -85,7 +86,6 @@ function autils.targets(bot, msg, options)
         end
 
     elseif input then
-        local user_ids = {}
         local reason, duration
         local text = msg.text
 
@@ -104,8 +104,7 @@ function autils.targets(bot, msg, options)
             for i = #msg.entities, 1, -1 do
                 local entity = msg.entities[i]
                 if entity.type == 'text_mention' then
-                    user_ids[tostring(entity.user.id)] = true
-
+                    user_ids:add(tostring(entity.user.id))
                     text = text:sub(1, entity.offset) ..
                         text:sub(entity.offset + entity.length + 2)
                 end
@@ -124,14 +123,14 @@ function autils.targets(bot, msg, options)
                     ) then
                         table.insert(errors, 'Unknown ID: ' .. word .. '.')
                     else
-                        user_ids[word] = true
+                        user_ids:add(word)
                     end
 
                 -- Usernames.
                 elseif word:match('^@.') then
                     local user = utilities.resolve_username(bot, word)
                     if user then
-                        user_ids[tostring(user.id)] = true
+                        user_ids:add(tostring(user.id))
                     else
                         table.insert(errors,
                             'Unrecognized username: ' .. word .. '.')
@@ -147,10 +146,11 @@ function autils.targets(bot, msg, options)
         return user_ids, errors, reason, duration
 
     elseif options.self_targeting then
-        return { [tostring(msg.from.id)] = true }, errors
+        user_ids:add(tostring(msg.from.id))
+        return user_ids, errors
 
     else
-        return nil, { bot.config.errors.specify_targets }
+        return user_ids, { bot.config.errors.specify_targets }
     end
 end
 
@@ -267,10 +267,6 @@ function autils.log(bot, params)
 
     local target_names
     if params.targets then
-        -- Temporary fix until proper set iterator.
-        setmetatable(params.targets, nil)
-        params.targets.__count = nil
-
         target_names = utilities.list_names(bot, params.targets)
     elseif params.target then
         target_names = { utilities.lookup_name(bot, params.target) }
