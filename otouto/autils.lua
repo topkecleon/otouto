@@ -181,7 +181,7 @@ function autils.strike(bot, msg, source)
 
         -- Let's send a concise warning to the group for first-strikers.
         local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.lookup_name(bot, msg.from.id) ..
+            utilities.format_name(msg.from) ..
             '. The next automoderation trigger will result in a five-minute tempban.'
             .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
         if bot.config.administration.log_chat_username then

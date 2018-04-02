@@ -156,12 +156,7 @@ function bot:on_message(msg)
 
     local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
 
-    local user = {
-        id_str = tostring(msg.from.id),
-        rank = autils.rank(self, msg.from.id, msg.chat.id),
-        name = utilities.build_name(msg.from.first_name, msg.from.last_name),
-        data = utilities.data_table(self.database.userdata, tostring(msg.from.id)),
-    }
+    local user = utilities.user(bot, tostring(msg.from.id))
 
     local group = {
         data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
