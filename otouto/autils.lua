@@ -280,7 +280,7 @@ function autils.log(bot, params)
         '%s%s by %s',
         output,
         params.action,
-        params.source_user and utilities.format_name(bot, params.source_user)
+        params.source_user and utilities.format_name(params.source_user)
             or params.source or 'Unknown'
     )
 
