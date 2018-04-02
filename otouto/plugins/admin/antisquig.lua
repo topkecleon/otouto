@@ -19,7 +19,7 @@ end
 
 function P:action(bot, msg, group, user)
     if not group.data.admin.flags[self.flag] then return 'continue' end
-    if user.rank > 1 then return 'continue' end
+    if user:rank(bot) > 1 then return 'continue' end
     if msg.forward_from and (
         msg.forward_from.id == bot.info.id or
         msg.forward_from.id == bot.config.log_chat or

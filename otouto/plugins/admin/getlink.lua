@@ -22,7 +22,7 @@ function P:action(_bot, msg, group, user)
 
     -- Links to private groups are mods+ and are only PM'd.
     if admin.flags.private then
-        if user.rank > 1 then
+        if user:rank(bot) > 1 then
             if utilities.send_message(msg.from.id, link, true, nil, 'html') then
                 output = 'I have sent you the requested information in a private message.'
             else

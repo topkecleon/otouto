@@ -218,13 +218,7 @@ utilities.user_meta = {
     rank = function(self, bot, chat_id)
         return require('otouto.autils').rank(bot, self.data.info.id, chat_id)
     end,
-    id_str = function(self)
-        return tostring(self.data.info.id)
-    end,
     name = function(self)
-        return utilities.build_name(self.data.first_name, self.data.last_name)
-    end,
-    format_name = function(self)
         return utilities.format_name(self.info)
     end
 }

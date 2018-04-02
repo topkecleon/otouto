@@ -9,7 +9,7 @@ function P:init(_bot)
 end
 
 function P:action(bot, msg, _group, user)
-    if user.rank == 0 then
+    if user:rank(bot) == 0 then
         bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id
