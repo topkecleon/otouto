@@ -61,7 +61,8 @@ function autils.duration_from_reason(text)
 end
 
  -- Returns a set of targets, a list of errors, a reason, and a duration (sec).
- -- options are currently get_duration and unknown_ids_err
+ -- Options are get_duration, unknown_ids_err, and self_targeting (which uses
+ -- the sender as target if there are no others).
 function autils.targets(bot, msg, options)
     local input = utilities.input(msg.text)
     options = options or {}
@@ -144,6 +145,9 @@ function autils.targets(bot, msg, options)
         end
 
         return user_ids, errors, reason, duration
+
+    elseif options.self_targeting then
+        return { [tostring(msg.from.id)] = true }
 
     else
         return nil, { bot.config.errors.specify_targets }
