@@ -18,7 +18,7 @@ function P:action(bot, msg, group)
     local targets, output = autils.targets(bot, msg)
     local admin = group.data.admin
 
-    if targets or #errors > 0 then
+    if targets or #output > 0 then
         if targets then
             for target in pairs(targets) do
                 local name = utilities.lookup_name(bot, target)

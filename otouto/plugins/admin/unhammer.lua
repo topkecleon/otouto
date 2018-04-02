@@ -11,8 +11,9 @@ function P:init(bot)
     self.targeting = true
 end
 
-function P:action(bot, msg, _group)
+function P:action(bot, msg, group)
     local targets, output, reason = autils.targets(bot, msg)
+    local admin = group.data.admin
     local unhammered_users = utilities.new_set()
 
     if targets then
