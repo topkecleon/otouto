@@ -73,7 +73,7 @@ function P:action(bot, msg, _group, _user)
             chat_id = msg.chat.id,
             targets = muted_users,
             action = log_str,
-            source_id = msg.from.id,
+            source_user = msg.from,
             reason = reason
         })
     end

@@ -26,7 +26,7 @@ function P:action(bot, msg, group, _user)
                 reason = msg.chat.title,
                 -- If this message isn't the message that changed it (the bot
                 -- didn't notice the name change), the source will be unknown.
-                source_id = msg.new_chat_title and msg.from.id or nil
+                source_user = msg.new_chat_title and msg.from or nil
             })
             info.title = msg.chat.title
         end

@@ -48,7 +48,7 @@ function P:action(bot, msg, group)
             chat_id = msg.chat.id,
             targets = banned_users,
             action = 'Banned',
-            source_id = msg.from.id,
+            source_user = msg.from,
             reason = reason
         })
     end

@@ -241,7 +241,11 @@ end
         chat_id = -100987654321,
         action = "Kicked",
         source = "antisquig" -- OR
-        source_id = 151278060,
+        source_user = {
+            first_name 'Hayao',
+            last_name = 'Miyazaki',
+            id = 151278060
+        },
         reason = "Spamming pony stickers", -- could be a flag desc
     }
 ]]
@@ -277,8 +281,7 @@ function autils.log(bot, params)
         '%s%s by %s',
         output,
         params.action,
-        -- Should source_id be made source_user instead?
-        params.source_id and utilities.lookup_name(bot, params.source_id)
+        params.source_user and utilities.format_name(bot, params.source_user)
             or params.source or 'Unknown'
     )
 

@@ -48,7 +48,7 @@ function P:action(bot, msg, group)
             chat_id = admin and (not admin.flags.private) and msg.chat.id,
             targets = hammered_users,
             action = 'Globally banned',
-            source_id = msg.from.id,
+            source_user = msg.from,
             reason = reason
         })
     end

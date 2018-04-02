@@ -35,7 +35,7 @@ function P:action(bot, msg, _group)
             chat_id = admin and (not admin.flags.private) and msg.chat.id,
             targets = unhammered_users,
             action = "Unhammered",
-            source_id = msg.from.id,
+            source_user = msg.from,
             reason = reason
         })
     end
