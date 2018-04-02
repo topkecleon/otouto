@@ -204,12 +204,7 @@ function bot:on_edit(msg)
     end
     msg.text_lower = msg.text:lower()
 
-    local user = {
-        id_str = tostring(msg.from.id),
-        rank = autils.rank(self, msg.from.id, msg.chat.id),
-        name = utilities.build_name(msg.from.first_name, msg.from.last_name),
-        data = utilities.data_table(self.database.userdata, tostring(msg.from.id)),
-    }
+    local user = utilities.user(self, msg.from.id)
 
     local group = {
         data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
