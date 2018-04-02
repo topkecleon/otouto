@@ -147,7 +147,7 @@ function autils.targets(bot, msg, options)
         return user_ids, errors, reason, duration
 
     elseif options.self_targeting then
-        return { [tostring(msg.from.id)] = true }
+        return { [tostring(msg.from.id)] = true }, errors
 
     else
         return nil, { bot.config.errors.specify_targets }
