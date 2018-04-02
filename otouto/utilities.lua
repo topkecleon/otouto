@@ -219,7 +219,7 @@ utilities.user_meta = {
         return require('otouto.autils').rank(bot, self.data.info.id, chat_id)
     end,
     name = function(self)
-        return utilities.format_name(self.info)
+        return utilities.format_name(self.data.info)
     end
 }
 utilities.user_meta.__index = utilities.user_meta
