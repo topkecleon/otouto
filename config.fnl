@@ -113,6 +113,7 @@ Send /help to get started."
           :admin.kick
           :admin.kickme
           :admin.listadmins
+          :admin.listflags
           :admin.listgroups
           :admin.listmods
           :admin.listrules
