@@ -253,7 +253,7 @@ end
     }
 ]]
 function autils.log(bot, params)
-    local output = { '<code>' .. os.date('%F %T') .. '</code>\n' }
+    local output = { '<code>' .. os.date('%F %T') .. '</code>' }
 
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then

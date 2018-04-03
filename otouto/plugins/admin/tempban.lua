@@ -54,7 +54,7 @@ function P:action(bot, msg, _group, _user)
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = banned_users,
-            action = 'Banned for '..utilities.tiem.format(duration, true)..'.',
+            action = 'Banned for '..utilities.tiem.format(duration, true),
             source_user = msg.from,
             reason = reason
         })
