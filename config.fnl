@@ -122,6 +122,7 @@ Send /help to get started."
           :admin.setdescription
           :admin.setgovernor
           :admin.setrules
+          :admin.tempban
           :admin.unhammer
           :admin.unrestrict
         ]

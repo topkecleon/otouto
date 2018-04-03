@@ -31,11 +31,16 @@ function P:action(bot, msg, group)
             table.insert(output, name .. ' is already banned.')
         else
             admin.bans[target] = true
-            bindings.kickChatMember{
+            local a, b = bindings.kickChatMember{
                 chat_id = msg.chat.id,
                 user_id = target
             }
-            table.insert(output, name .. ' has been banned.')
+            if a then
+                table.insert(output, name .. ' has been banned.')
+            else
+                table.insert(output, 'Error kicking ' .. name .. ': ' ..
+                    b.result.description)
+            end
             banned_users:add(target)
         end
     end

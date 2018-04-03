@@ -6,7 +6,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('kick', true):t('tempban', true).table
+        :t('kick', true).table
     self.command = 'kick'
     self.doc = "Removes a user or users from the group. A reason can be given \z
 on a new line. Example:\
@@ -19,36 +19,25 @@ on a new line. Example:\
 end
 
 function P:action(bot, msg, _group, _user)
-    local targets, output, reason, duration =
-        autils.targets(bot, msg, {get_duration = true})
+    local targets, output, reason = autils.targets(bot, msg)
     local kicked_users = utilities.new_set()
-    if duration and (duration > 366*24*60*60 or duration < 60) then
-        duration = nil
-        table.insert(output,
-            'Durations must be longer than a minute and shorter than a year.')
-    end
-
-    local out_str, log_str
-    if duration then
-        out_str = ' has been banned for ' ..
-            utilities.tiem.format(duration, true) .. '.'
-        log_str = 'Banned for ' .. utilities.tiem.format(duration, true)
-    else
-        out_str = ' has been kicked.'
-        log_str = 'Kicked'
-    end
 
     for target in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
         if autils.rank(bot, target, msg.chat.id) > 2 then
             table.insert(output, name .. ' is too privileged to be kicked.')
         else
-            bindings.kickChatMember{
+            -- It isn't documented, but unbanChatMember also kicks.
+            local a, b = bindings.unbanChatMember{
                 chat_id = msg.chat.id,
-                user_id = target,
-                until_date = duration and duration + os.time() or 45
+                user_id = target
             }
-            table.insert(output, name .. out_str)
+            if a then
+                table.insert(output, name .. ' has been kicked.')
+            else
+                table.insert(output, 'Error kicking ' .. name .. ': ' ..
+                    b.result.description)
+            end
             kicked_users:add(target)
         end
     end
@@ -58,7 +47,7 @@ function P:action(bot, msg, _group, _user)
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = kicked_users,
-            action = log_str,
+            action = 'Kicked',
             source_user = msg.from,
             reason = reason
         })
