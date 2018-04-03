@@ -28,6 +28,7 @@ function P:action(bot, msg, _group, _user)
             table.insert(output, name .. ' is too privileged to be kicked.')
         else
             -- It isn't documented, but unbanChatMember also kicks.
+            -- Thanks, Durov.
             local a, b = bindings.unbanChatMember{
                 chat_id = msg.chat.id,
                 user_id = target

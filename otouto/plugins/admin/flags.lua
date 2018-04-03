@@ -8,9 +8,10 @@ P.flags = {
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('flags?', true):t('listflags').table
-    self.command = 'flags [flag]'
+        :t('flags?', true).table
+    self.command = 'flags <flag>'
     self.help_word = 'flags?'
+    self.privilege = 3
     local default_flags = {}
     for flag in pairs(bot.config.administration.flags) do
         table.insert(default_flags, flag)
@@ -42,15 +43,12 @@ table.concat(default_flags, '\n•')
     ]]
 end
 
-function P:action(bot, msg, group, user)
+function P:action(_bot, msg, group)
     local admin = group.data.admin
     local input = utilities.input_from_msg(msg)
     local output
 
-    if user:rank(bot, msg.chat.id) < 3 then
-        output = self:list_flags(admin.flags)
-
-    elseif not input then
+    if not input then
         output = self:list_flags(admin.flags)
             .. '\n\nSpecify a flag or flags to toggle.'
     else
