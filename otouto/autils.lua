@@ -208,26 +208,26 @@ function autils.strike(bot, msg, source)
         end
 
     elseif chat[user_id_str] == 2 then
-        local a, b = bindings.kickChatMember{
+        local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
             until_date = msg.date + 300
         }
-        if a then
+        if success then
             logstuff.action = 'Banned for five minutes'
         else
-            logstuff.action = b.description
+            logstuff.action = result.description
         end
 
     elseif chat[user_id_str] == 3 then
-        local a, b = bindings.kickChatMember{
+        local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
         }
-        if a then
+        if success then
             logstuff.action = 'Banned'
         else
-            logstuff.action = b.description
+            logstuff.action = result.description
         end
         chat[user_id_str] = 0
     end

@@ -32,17 +32,17 @@ function P:action(bot, msg, _group, _user)
             if autils.rank(bot, target, msg.chat.id) > 2 then
                 table.insert(output, name .. ' is too privileged to be banned.')
             else
-                local a, b = bindings.kickChatMember{
+                local success, result = bindings.kickChatMember{
                     chat_id = msg.chat.id,
                     user_id = target,
                     until_date = duration + os.time()
                 }
-                if a then
+                if success then
                     table.insert(output, name .. ' has been banned for ' ..
                         utilities.tiem.format(duration, true) .. '.')
                 else
                     table.insert(output, 'Error banning ' .. name .. ': ' ..
-                        b.result.description)
+                        result.description)
                 end
                 banned_users:add(target)
             end

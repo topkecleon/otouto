@@ -50,17 +50,17 @@ function P:action(bot, msg, _group, _user)
         if autils.rank(bot, target, msg.chat.id) > 1 then
             table.insert(output,name .. ' is too privileged to be muted.')
         else
-            local a, b = bindings.restrictChatMember{
+            local success, result = bindings.restrictChatMember{
                 chat_id = msg.chat.id,
                 user_id = target,
                 until_date = duration and os.time() + duration,
                 can_send_messages = false
             }
-            if not a then
-                table.insert(output, b.description .. ' (' .. target .. ')')
-            else
+            if success then
                 table.insert(output, name .. out_str)
                 muted_users:add(target)
+            else
+                table.insert(output, result.description .. ' (' ..target.. ')')
             end
         end
     end
