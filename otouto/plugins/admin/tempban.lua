@@ -39,7 +39,7 @@ function P:action(bot, msg, _group, _user)
                 }
                 if a then
                     table.insert(output, name .. ' has been banned for ' ..
-                        utilities.tiem_format(duration, true) .. '.')
+                        utilities.tiem.format(duration, true) .. '.')
                 else
                     table.insert(output, 'Error banning ' .. name .. ': ' ..
                         b.result.description)
@@ -54,7 +54,7 @@ function P:action(bot, msg, _group, _user)
         autils.log(bot, {
             chat_id = msg.chat.id,
             targets = banned_users,
-            action = 'Banned for '..utilities.tiem_format(duration, true)..'.',
+            action = 'Banned for '..utilities.tiem.format(duration, true)..'.',
             source_user = msg.from,
             reason = reason
         })
