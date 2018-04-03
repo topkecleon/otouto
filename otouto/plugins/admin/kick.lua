@@ -29,18 +29,17 @@ function P:action(bot, msg, _group, _user)
         else
             -- It isn't documented, but unbanChatMember also kicks.
             -- Thanks, Durov.
-
             local success, result = bindings.unbanChatMember{
                 chat_id = msg.chat.id,
                 user_id = target
             }
             if success then
                 table.insert(output, name .. ' has been kicked.')
+                kicked_users:add(target)
             else
                 table.insert(output, 'Error kicking ' .. name .. ': ' ..
                     result.description)
             end
-            kicked_users:add(target)
         end
     end
 

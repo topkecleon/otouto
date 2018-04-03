@@ -40,11 +40,11 @@ function P:action(bot, msg, _group, _user)
                 if success then
                     table.insert(output, name .. ' has been banned for ' ..
                         utilities.tiem.format(duration, true) .. '.')
+                    banned_users:add(target)
                 else
                     table.insert(output, 'Error banning ' .. name .. ': ' ..
                         result.description)
                 end
-                banned_users:add(target)
             end
         end
     end
