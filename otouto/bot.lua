@@ -20,7 +20,7 @@ function bot:init()
     assert(self.config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
     assert(self.config.admin, 'You didn\'t set your admin ID in config.lua!')
 
-    bindings = require('otouto.bindings').init(self.config.bot_api_key)
+    bindings = require('otouto.bindings').set_token(self.config.bot_api_key)
     utilities = require('otouto.utilities')
     lume = require('lume')
     autils = require('otouto.autils')

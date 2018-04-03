@@ -32,18 +32,19 @@ local json = require('dkjson')
 local ltn12 = require('ltn12')
 local mp = require('multipart-post')
 
-function bindings.init(token)
+function bindings.set_token(token)
     bindings.BASE_URL = 'https://api.telegram.org/bot' .. token .. '/'
     return bindings
 end
 
  -- Build and send a request to the API.
- -- Expecting self, method, and parameters, where method is a string indicating
+ -- Expecting method, parameters, and ?file, where method is a string indicating
  -- the API method and parameters is a key/value table of parameters with their
- -- values.
- -- Returns the table response with success. Returns false and the table
- -- response with failure. Returns false and false with a connection error.
- -- To mimic old/normal behavior, it errs if used with an invalid method.
+ -- values. Optional file is a table of a key/value pair of the file type (eg
+ -- photo, document, video) and its location on-disk. The pair should be in
+ -- parameters instead if the desired file is a URL or file ID.
+ -- Returns true, response on success, returns false, response on failure.
+ -- Returns false, false on a connection error. Errs if given an invalid method.
 function bindings.request(method, parameters, file)
     parameters = parameters or {}
     for k,v in pairs(parameters) do
