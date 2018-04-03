@@ -26,10 +26,11 @@ function bot:init()
     autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.
+    local success
     repeat
         print('Fetching bot information...\n')
-        self.info = bindings.getMe()
-    until self.info
+        success, self.info = bindings.getMe()
+    until success
     self.info = self.info.result
 
     -- todo: use a real database
@@ -240,12 +241,12 @@ function bot:run()
     self:init()
     while self.is_started do
         -- Update loop.
-        local res = bindings.getUpdates{
+        local suc, res = bindings.getUpdates{
             timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
             allowed_updates = '["message","edited_message"]'
         }
-        if res then
+        if suc then
             -- Iterate over every new message.
             for _,v in ipairs(res.result) do
                 self.last_update = v.update_id

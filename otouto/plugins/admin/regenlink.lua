@@ -13,10 +13,13 @@ function P:init(bot)
 end
 
 function P:action(_bot, msg, group)
-    group.data.admin.link = bindings.exportChatInviteLink{
-        chat_id = msg.chat.id
-    }.result
-    utilities.send_reply(msg, 'The link has been regenerated.')
+    local success, result = bindings.exportChatInviteLink{chat_id = msg.chat.id}
+    if success then
+        group.data.admin.link = result.result
+        utilities.send_reply(msg, 'The link has been regenerated.')
+    else
+        utilities.send_reply(msg, result.description)
+    end
 end
 
 return P

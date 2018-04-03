@@ -1,5 +1,5 @@
 --[[
-    bindings.lua (rev. 2016/08/20)
+    bindings.lua (rev. 2018/04/03)
     otouto's bindings for the Telegram bot API.
     https://core.telegram.org/bots/api
     See the "Bindings" section of README.md for usage information.
@@ -49,7 +49,7 @@ function bindings.request(method, parameters, file)
     for k,v in pairs(parameters) do
         parameters[k] = tostring(v)
     end
-    if file and next(file) ~= nil then
+    if file and next(file) then
         local file_type, file_name = next(file)
         local file_file = io.open(file_name, 'r')
         local file_data = {
@@ -74,16 +74,15 @@ function bindings.request(method, parameters, file)
         source = ltn12.source.string(body),
         sink = ltn12.sink.table(response)
     }
-    local data = table.concat(response)
     if not success then
-        print(method .. ': Connection error. [' .. code  .. ']')
+        io.write(method .. ': Connection error. [' .. code  .. ']\n')
         return false, false
     else
-        local result = json.decode(data)
+        local result = json.decode(table.concat(response))
         if not result then
             return false, false
         elseif result.ok then
-            return result
+            return true, result
         elseif result.description == 'Method not found' then
             error(method .. ': Method not found.')
         else

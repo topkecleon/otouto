@@ -192,17 +192,18 @@ function autils.strike(bot, msg, source)
                 bot.config.administration.log_chat_username .. '.'
         end
 
-        -- Successfully-sent warnings get their IDs stored to be deleted about
-        -- five minutes later by automoderation.lua.
-        local m = utilities.send_message(msg.chat.id, warning, true, nil, 'html')
-        if m then
+        -- Successfully-sent warnings get their IDs stored to be deleted
+        -- later by automoderation.lua.
+        local suc, res =
+            utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+        if suc then
             local automoderation_plugin = bot.named_plugins['admin.automoderation']
             assert(automoderation_plugin, 'autils.strike requires automoderation')
 
             table.insert(automoderation_plugin.store, {
-                message_id = m.result.message_id,
-                chat_id = m.result.chat.id,
-                date = m.result.date
+                message_id = res.result.message_id,
+                chat_id = res.result.chat.id,
+                date = res.result.date
             })
         end
 

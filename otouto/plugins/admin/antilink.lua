@@ -183,9 +183,9 @@ end
  -- This function determines whether or not a username refers to a supergroup
  -- outside the realm (true/false).
 function P:is_username_external(bot, username)
-    local res = bindings.getChat{chat_id = '@' .. username}
+    local suc, res = bindings.getChat{chat_id = '@' .. username}
     -- If the username is an external supergroup or channel, return true.
-    if res and (res.result.type=='supergroup' or res.result.type=='channel') and
+    if suc and (res.result.type=='supergroup' or res.result.type=='channel') and
         not bot.database.groupdata.admin[tostring(res.result.id)] then
             return true
     end
