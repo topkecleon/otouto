@@ -6,7 +6,7 @@
     (set self.command "listflags")
     (set self.doc "Returns a list of enabled and disabled flags. Governors and\z
  administrators can use /flags to configure them.")
-    (set self.triggers (utilities.make_triggers bot [] :listflags))
+    (set self.triggers (utilities.make_triggers bot [] :listflags :flags))
     (set self.administration true)
     (values))
 
