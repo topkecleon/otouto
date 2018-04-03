@@ -241,14 +241,14 @@ function bot:run()
     self:init()
     while self.is_started do
         -- Update loop.
-        local suc, res = bindings.getUpdates{
+        local success, result = bindings.getUpdates{
             timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
             allowed_updates = '["message","edited_message"]'
         }
-        if suc then
+        if success then
             -- Iterate over every new message.
-            for _,v in ipairs(res.result) do
+            for _,v in ipairs(result.result) do
                 self.last_update = v.update_id
                 if v.message then
                     self:on_message(v.message)

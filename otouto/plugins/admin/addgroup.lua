@@ -23,7 +23,7 @@ function P:action(bot, msg, group)
     else
         local perms, group_owner
         local _, res = bindings.getChatAdministrators{ chat_id = msg.chat.id }
-        for _, administrator in pairs(result.res) do
+        for _, administrator in pairs(res.result) do
             if administrator.user.id == bot.info.id then
                 perms = administrator
             elseif administrator.status == 'creator' then
