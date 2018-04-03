@@ -155,9 +155,7 @@ function bot:on_message(msg)
     msg.text_lower = msg.text:lower()
 
     local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
-
     local user = utilities.user(self, msg.from.id)
-
     local group = {
         data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
     }
@@ -166,7 +164,7 @@ function bot:on_message(msg)
     for _, plugin in ipairs(self.plugins) do
         if
             (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
+            ((not plugin.privilege) or user:rank(self, msg.chat.id) >= plugin.privilege)
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
@@ -214,7 +212,7 @@ function bot:on_edit(msg)
         if
             plugin.edit_action and
             (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
+            ((not plugin.privilege) or user:rank(self, msg.chat.id) >= plugin.privilege)
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then

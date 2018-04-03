@@ -253,11 +253,11 @@ end
     }
 ]]
 function autils.log(bot, params)
-    local output = '<code>' .. os.date('%F %T') .. '</code>\n'
+    local output = { '<code>' .. os.date('%F %T') .. '</code>\n' }
 
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
-        output = output .. utilities.lookup_name(bot, params.chat_id) .. '\n'
+        table.insert(output, utilities.lookup_name(bot, params.chat_id))
 
         if bot.database.groupdata.admin[tostring(params.chat_id)].flags.private
         then
@@ -265,30 +265,26 @@ function autils.log(bot, params)
         end
     end
 
-    local target_names
     if params.targets then
-        target_names = utilities.list_names(bot, params.targets)
+        utilities.merge_arrs(output, utilities.list_names(bot, params.targets))
     elseif params.target then
-        target_names = { utilities.lookup_name(bot, params.target) }
+        table.insert(output, utilities.lookup_name(bot, params.target))
     end
 
-    if target_names then
-        output = output .. table.concat(target_names, '\n') .. '\n'
-    end
-
-    output = string.format(
-        '%s%s by %s',
-        output,
+    table.insert(output, string.format(
+        '%s by %s',
         params.action,
         params.source_user and utilities.format_name(params.source_user)
             or params.source or 'Unknown'
-    )
+    ))
 
     if params.reason then
-        output = output ..':\n<i>'..utilities.html_escape(params.reason)..'</i>'
+        table.insert(output,
+            ':\n<i>' .. utilities.html_escape(params.reason) .. '</i>')
     end
 
-    utilities.send_message(log_chat, output, true, nil, 'html')
+    utilities.send_message(log_chat, table.concat(output, '\n'),
+        true, nil, 'html')
 end
 
 -- Shortcut to promote admins. Passing true as all_perms enables the
