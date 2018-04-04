@@ -14,9 +14,11 @@ local autils = require('otouto.autils')
 local help = {}
 
 function help:init(bot)
-    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat):t('help', true):t('h', true).table
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
+        :t('help', true):t('h', true).table
     self.command = 'help [command]'
-    self.doc = bot.config.cmd_pat .. 'help [command] \nReturns usage information for a given command.'
+    self.doc = bot.config.cmd_pat ..
+        'help [command] \nReturns usage information for a given command.'
 
     self.glossaries = {}
     for name, glossary in pairs({

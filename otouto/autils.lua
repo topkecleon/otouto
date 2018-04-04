@@ -273,7 +273,7 @@ function autils.log(bot, params)
     end
 
     table.insert(output, string.format(
-        '%s by %s',
+        '%s by %s.',
         params.action,
         params.source_user and utilities.format_name(params.source_user)
             or params.source or 'Unknown'
@@ -281,7 +281,7 @@ function autils.log(bot, params)
 
     if params.reason then
         table.insert(output,
-            ':\n<i>' .. utilities.html_escape(params.reason) .. '</i>')
+            '<i>' .. utilities.html_escape(params.reason) .. '</i>')
     end
 
     utilities.send_message(log_chat, table.concat(output, '\n'),
