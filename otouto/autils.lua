@@ -326,12 +326,12 @@ Most commands accept multiple targets. In a reply command, the sender of the \z
 replied-to message is the target. \
 A reason can usually be specified. In reply commands, the reason is the text \z
 after the command. In normal commands, the reason is specified on a new line. \
-Some commands accept an optional duration, specified at the beginning of the \z
+Some commands expect a duration, specified at the beginning of the \z
 reason. The duration can be a number of minutes, or a time interval in the \z
 format 1y12w28d12h45m30s. Read more on time formatting with /help tiem."
 
 autils.glossary.tiem = "\z
-Some commands, such as /mute and /tempban, accept an optional duration. The \z
+Some commands, such as /mute and /tempban, expect duration. The \z
 duration can be specified before or in place of the reason. If a number is \z
 given, the interval will be that number of minutes. An interval can also be \z
 a tiem string, eg 3d12h30m. \
@@ -343,8 +343,7 @@ The tiem format handles intervals in the following units: \
 • minute (m) \
 • seconds (s) \
 Units can be repeated and do not need to be in order of size. Their amounts \z
-can exceed the size of a larger unit. Invalid tiem strings are overlooked and \z
-included in the reason. \
+can exceed the size of a larger unit. \z
 Be aware that most (or all) Telegram bot API calls limit intervals to one year."
 
 

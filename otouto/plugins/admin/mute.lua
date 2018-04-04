@@ -9,7 +9,7 @@ function P:init(bot)
         :t('mute', true).table
     self.command = 'mute'
     self.doc = "Mute a user or users indefinitely or for the time specified. \z
-The duration can be specified before the reason.\
+A duration can be specified before the reason.\
 Examples:\
     /mute @foo @bar 8675309\
     2h30m No cursing on my Christian server.\
