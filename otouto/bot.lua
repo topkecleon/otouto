@@ -20,16 +20,17 @@ function bot:init()
     assert(self.config.bot_api_key, 'You didn\'t set your bot token in config.lua!')
     assert(self.config.admin, 'You didn\'t set your admin ID in config.lua!')
 
-    bindings = require('otouto.bindings').init(self.config.bot_api_key)
+    bindings = require('otouto.bindings').set_token(self.config.bot_api_key)
     utilities = require('otouto.utilities')
     lume = require('lume')
     autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.
+    local success
     repeat
         print('Fetching bot information...\n')
-        self.info = bindings.getMe()
-    until self.info
+        success, self.info = bindings.getMe()
+    until success
     self.info = self.info.result
 
     -- todo: use a real database
@@ -155,9 +156,7 @@ function bot:on_message(msg)
     msg.text_lower = msg.text:lower()
 
     local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
-
     local user = utilities.user(self, msg.from.id)
-
     local group = {
         data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
     }
@@ -242,14 +241,14 @@ function bot:run()
     self:init()
     while self.is_started do
         -- Update loop.
-        local res = bindings.getUpdates{
+        local success, result = bindings.getUpdates{
             timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
             allowed_updates = '["message","edited_message"]'
         }
-        if res then
+        if success then
             -- Iterate over every new message.
-            for _,v in ipairs(res.result) do
+            for _,v in ipairs(result.result) do
                 self.last_update = v.update_id
                 if v.message then
                     self:on_message(v.message)

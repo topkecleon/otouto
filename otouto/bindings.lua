@@ -1,5 +1,5 @@
 --[[
-    bindings.lua (rev. 2016/08/20)
+    bindings.lua (rev. 2018/04/03)
     otouto's bindings for the Telegram bot API.
     https://core.telegram.org/bots/api
     See the "Bindings" section of README.md for usage information.
@@ -32,24 +32,25 @@ local json = require('dkjson')
 local ltn12 = require('ltn12')
 local mp = require('multipart-post')
 
-function bindings.init(token)
+function bindings.set_token(token)
     bindings.BASE_URL = 'https://api.telegram.org/bot' .. token .. '/'
     return bindings
 end
 
  -- Build and send a request to the API.
- -- Expecting self, method, and parameters, where method is a string indicating
+ -- Expecting method, parameters, and ?file, where method is a string indicating
  -- the API method and parameters is a key/value table of parameters with their
- -- values.
- -- Returns the table response with success. Returns false and the table
- -- response with failure. Returns false and false with a connection error.
- -- To mimic old/normal behavior, it errs if used with an invalid method.
+ -- values. Optional file is a table of a key/value pair of the file type (eg
+ -- photo, document, video) and its location on-disk. The pair should be in
+ -- parameters instead if the desired file is a URL or file ID.
+ -- Returns true, response on success, returns false, response on failure.
+ -- Returns false, false on a connection error. Errs if given an invalid method.
 function bindings.request(method, parameters, file)
     parameters = parameters or {}
     for k,v in pairs(parameters) do
         parameters[k] = tostring(v)
     end
-    if file and next(file) ~= nil then
+    if file and next(file) then
         local file_type, file_name = next(file)
         local file_file = io.open(file_name, 'r')
         local file_data = {
@@ -74,16 +75,15 @@ function bindings.request(method, parameters, file)
         source = ltn12.source.string(body),
         sink = ltn12.sink.table(response)
     }
-    local data = table.concat(response)
     if not success then
-        print(method .. ': Connection error. [' .. code  .. ']')
+        io.write(method .. ': Connection error. [' .. code  .. ']\n')
         return false, false
     else
-        local result = json.decode(data)
+        local result = json.decode(table.concat(response))
         if not result then
             return false, false
         elseif result.ok then
-            return result
+            return true, result
         elseif result.description == 'Method not found' then
             error(method .. ': Method not found.')
         else

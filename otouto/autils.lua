@@ -192,41 +192,42 @@ function autils.strike(bot, msg, source)
                 bot.config.administration.log_chat_username .. '.'
         end
 
-        -- Successfully-sent warnings get their IDs stored to be deleted about
-        -- five minutes later by automoderation.lua.
-        local m = utilities.send_message(msg.chat.id, warning, true, nil, 'html')
-        if m then
+        -- Successfully-sent warnings get their IDs stored to be deleted
+        -- later by automoderation.lua.
+        local suc, res =
+            utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+        if suc then
             local automoderation_plugin = bot.named_plugins['admin.automoderation']
             assert(automoderation_plugin, 'autils.strike requires automoderation')
 
             table.insert(automoderation_plugin.store, {
-                message_id = m.result.message_id,
-                chat_id = m.result.chat.id,
-                date = m.result.date
+                message_id = res.result.message_id,
+                chat_id = res.result.chat.id,
+                date = res.result.date
             })
         end
 
     elseif chat[user_id_str] == 2 then
-        local a, b = bindings.kickChatMember{
+        local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
             until_date = msg.date + 300
         }
-        if a then
+        if success then
             logstuff.action = 'Banned for five minutes'
         else
-            logstuff.action = b.description
+            logstuff.action = result.description
         end
 
     elseif chat[user_id_str] == 3 then
-        local a, b = bindings.kickChatMember{
+        local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
         }
-        if a then
+        if success then
             logstuff.action = 'Banned'
         else
-            logstuff.action = b.description
+            logstuff.action = result.description
         end
         chat[user_id_str] = 0
     end
@@ -253,11 +254,11 @@ end
     }
 ]]
 function autils.log(bot, params)
-    local output = '<code>' .. os.date('%F %T') .. '</code>\n'
+    local output = { '<code>' .. os.date('%F %T') .. '</code>' }
 
     local log_chat = bot.config.administration.log_chat or bot.config.log_chat
     if params.chat_id then
-        output = output .. utilities.lookup_name(bot, params.chat_id) .. '\n'
+        table.insert(output, utilities.lookup_name(bot, params.chat_id))
 
         if bot.database.groupdata.admin[tostring(params.chat_id)].flags.private
         then
@@ -265,30 +266,26 @@ function autils.log(bot, params)
         end
     end
 
-    local target_names
     if params.targets then
-        target_names = utilities.list_names(bot, params.targets)
+        utilities.merge_arrs(output, utilities.list_names(bot, params.targets))
     elseif params.target then
-        target_names = { utilities.lookup_name(bot, params.target) }
+        table.insert(output, utilities.lookup_name(bot, params.target))
     end
 
-    if target_names then
-        output = output .. table.concat(target_names, '\n') .. '\n'
-    end
-
-    output = string.format(
-        '%s%s by %s',
-        output,
+    table.insert(output, string.format(
+        '%s by %s',
         params.action,
         params.source_user and utilities.format_name(params.source_user)
             or params.source or 'Unknown'
-    )
+    ))
 
     if params.reason then
-        output = output ..':\n<i>'..utilities.html_escape(params.reason)..'</i>'
+        table.insert(output,
+            ':\n<i>' .. utilities.html_escape(params.reason) .. '</i>')
     end
 
-    utilities.send_message(log_chat, output, true, nil, 'html')
+    utilities.send_message(log_chat, table.concat(output, '\n'),
+        true, nil, 'html')
 end
 
 -- Shortcut to promote admins. Passing true as all_perms enables the

@@ -25,6 +25,12 @@ function P:action(bot, msg, _group, user)
             source = self.name,
             reason = 'User is banned.'
         })
+        if msg.new_chat_member then
+            bindings.kickChatMember {
+                chat_id = msg.chat.id,
+                user_id = msg.new_chat_member.id
+            }
+        end
     elseif msg.new_chat_member then
         if autils.rank(bot, msg.new_chat_member.id, msg.chat.id) == 0 then
             bindings.kickChatMember{

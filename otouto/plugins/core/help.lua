@@ -52,8 +52,7 @@ function help:action(bot, msg)
     else
         -- Attempt to send the help message via PM.
         -- If msg is from a group, tell the group whether the PM was successful.
-        local res = utilities.send_message(msg.from.id, self.text, true, nil, 'html')
-        if not res then
+        if not utilities.send_message(msg.from.id, self.text, true, nil, 'html') then
             utilities.send_reply(
                 msg,
                 'Please <a href="http://t.me/' .. bot.info.username ..
