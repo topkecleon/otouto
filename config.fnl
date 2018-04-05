@@ -12,7 +12,7 @@
           (or (and lang (: lang :sub 1 2)) "en"))
   ; The channel, group, or user to send error reports to.
   ; If this is not set, errors will be printed to the console.
-  :log_chat (math.floor (os.getenv "OTOUTO_LOG_ID"))
+  :log_chat (let [log_chat (os.getenv "OTOUTO_LOG_ID")] (or log_chat nil))
   ; The symbol that starts a command. Usually noted as "/" in documentation.
   :cmd_pat "/"
   ; The filename of the database. If left nil, defaults to $username.db.
