@@ -43,7 +43,7 @@ function P:action(bot, msg, group)
             output = 'I am already administrating this group.'
         else
             group.data.admin = {
-                link =
+                _, link =
                     bindings.exportChatInviteLink{chat_id = msg.chat.id}.result,
                 governor = group_owner or msg.from.id,
                 owner = group_owner,

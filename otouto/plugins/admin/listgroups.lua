@@ -20,7 +20,8 @@ function P:action(bot, msg, group)
 
     for _, chat in pairs(bot.database.groupdata.admin) do
         if not chat.flags.private then
-            local link = string.format('<a href="%s">%s</a>',
+            local link = string.format(
+                '<a href="%s">%s</a>',
                 chat.link,
                 utilities.html_escape(chat.name)
             )
