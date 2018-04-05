@@ -28,7 +28,7 @@ function P:action(bot, msg, _group)
             )
             table.insert(listed_groups, link)
 
-            if input and title.name:lower():match(input) then
+            if input and title:lower():match(input) then
                 table.insert(results, link)
             end
         end
