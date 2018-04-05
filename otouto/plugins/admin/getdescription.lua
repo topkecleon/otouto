@@ -13,7 +13,8 @@ function P:action(bot, msg, group)
     local chat_id
     if input then
         for id_str, chat in pairs(bot.database.groupdata.admin) do
-            if not chat.flags.private and chat.name:lower():match(input) then
+            local title = bot.database.groupdata.info[id_str].title
+            if not chat.flags.private and title:lower():match(input) then
                 chat_id = id_str
                 break
             end
