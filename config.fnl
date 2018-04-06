@@ -135,6 +135,7 @@ Send /help to get started."
           :user.reactions
           :user.slap
           :user.whoami
+          :user.user_lookup
         ]
       ]
 
