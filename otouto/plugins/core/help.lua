@@ -79,7 +79,8 @@ function help:on_plugins_load(bot, plugins)
             end
             table.insert(self.commandlist, {plugin.name, s})
             if plugin.doc and not plugin.help_word then
-                plugin.help_word = utilities.get_word(plugin.command, 1)
+                plugin.help_word = '^' .. utilities.get_word(plugin.command, 1)
+                    .. '$'
             end
         end
     end

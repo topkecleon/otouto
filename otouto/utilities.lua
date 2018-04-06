@@ -275,12 +275,14 @@ function utilities.send_help_for(chat_id, reply_to_message_id, name, doc)
 end
 
 function utilities.plugin_help(cmd_pat, plugin)
-    return cmd_pat .. utilities.html_escape(plugin.command) .. "\n" .. plugin.doc
+    return plugin.command and
+        (cmd_pat .. utilities.html_escape(plugin.command) .. "\n" .. plugin.doc)
+        or plugin.doc
 end
 
 function utilities.send_plugin_help(chat_id, reply_to_message_id, cmd_pat, plugin)
     local doc = utilities.plugin_help(cmd_pat, plugin)
-    return utilities.send_help_for(chat_id, reply_to_message_id, plugin.help_word, doc)
+    return utilities.send_help_for(chat_id, reply_to_message_id, plugin.name, doc)
 end
 
 function utilities.download_file(file_url, filename)

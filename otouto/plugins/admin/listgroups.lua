@@ -53,7 +53,9 @@ function P:action(bot, msg, _group)
             output = 'There are no listed groups.'
         else
             if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
-                output = 'I have sent you the requested information in a private message.'
+                if msg.chat.id == msg.from.id then
+                    output = 'I have sent you the requested information in a private message.'
+                end
             else
                 output = string.format(
                     'Please <a href="https://t.me/%s?start=groups">message me privately</a> for a list of groups.',
@@ -63,7 +65,7 @@ function P:action(bot, msg, _group)
         end
     end
 
-    utilities.send_reply(msg, output, 'html')
+    if output then utilities.send_reply(msg, output, 'html') end
 end
 
 return P
