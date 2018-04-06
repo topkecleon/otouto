@@ -15,8 +15,7 @@ function P:action(bot, msg, _group)
 
     -- Output will be a list of results, a list of all groups, or an explanation
     -- that there are no (listed) groups.
-    local results = {}
-    local listed_groups = {}
+    local results, listed_groups = {}, {}
 
     for id_str, chat in pairs(bot.database.groupdata.admin) do
         local title = bot.database.groupdata.info[id_str].title

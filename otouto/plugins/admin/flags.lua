@@ -14,10 +14,6 @@ function P:init(bot)
     self.help_word = 'flags?'
     self.privilege = 3
     self.administration = true
-    local default_flags = {}
-    for flag in pairs(bot.config.administration.flags) do
-        table.insert(default_flags, flag)
-    end
     self.doc = "Returns a list of flags, or toggles the specified flag. \
 Flags are administrative policies at the disposal of the governor. Most \z
 provide optional automoderation (see /help antilink). The private flag \z
@@ -60,7 +56,6 @@ function P:action(_bot, msg, group)
     end
 
     utilities.send_reply(msg, output, 'html')
-    print(true)
 end
 
  -- List flags under Enabled and Disabled.

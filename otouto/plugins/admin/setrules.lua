@@ -42,7 +42,7 @@ Examples:
     -- luacheck: pop
 
     self.privilege = 3
-    self.interior = true
+    self.administration = true
 end
 
 function P:action(bot, msg, group)
