@@ -59,6 +59,9 @@ function bot:init()
     -- administration
     self.database.administration = self.database.administration or {}
 
+    -- do_later stuff
+    self.database.later = self.database.later or {}
+
     self.plugins = {}
     self.named_plugins = {}
     self:load_plugins(self.config.plugins)
@@ -276,6 +279,20 @@ function bot:run()
             self.last_cron = now
         end
 
+ -- Don't indent this until we are completely free of cron.
+local now = os.time()
+local delete_this = {}
+for i, thing in ipairs(self.database.later) do
+    if now >= thing.when then
+        local plugin = self.named_plugins[thing.pname]
+        plugin:later(self, thing.param)
+        table.insert(delete_this, i)
+    end
+end
+for i = #delete_this, 1, -1 do
+    table.remove(self.database.later, delete_this[i])
+end
+
         -- Save the "database" every hour.
         if self.last_database_save ~= os.date('%H') then
             utilities.save_data(self.database_name, self.database)
@@ -285,6 +302,15 @@ function bot:run()
     -- Save the database before exiting.
     utilities.save_data(self.database_name, self.database)
     print('Halted.\n')
+end
+
+ -- Schedule a plugin's later function to be run after the given interval.
+function bot:do_later(plugin, interval, param)
+    table.insert(self.database.later, {
+        when = os.time() + interval,
+        pname = plugin.name,
+        param = param
+    })
 end
 
 return bot
