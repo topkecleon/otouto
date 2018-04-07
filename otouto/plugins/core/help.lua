@@ -14,9 +14,11 @@ local autils = require('otouto.autils')
 local help = {}
 
 function help:init(bot)
-    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat):t('help', true):t('h', true).table
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
+        :t('help', true):t('h', true).table
     self.command = 'help [command]'
-    self.doc = bot.config.cmd_pat .. 'help [command] \nReturns usage information for a given command.'
+    self.doc = bot.config.cmd_pat ..
+        'help [command] \nReturns usage information for a given command.'
 
     self.glossaries = {}
     for name, glossary in pairs({
@@ -77,7 +79,8 @@ function help:on_plugins_load(bot, plugins)
             end
             table.insert(self.commandlist, {plugin.name, s})
             if plugin.doc and not plugin.help_word then
-                plugin.help_word = utilities.get_word(plugin.command, 1)
+                plugin.help_word = '^' .. utilities.get_word(plugin.command, 1)
+                    .. '$'
             end
         end
     end

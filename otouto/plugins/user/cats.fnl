@@ -12,8 +12,8 @@
 {
   :init (fn [self bot]
     (when (not bot.config.thecatapi_key)
-      (print "Missing config value: thecatapi_key.\n\z
-        cats.lua will be enabled, but there are more features with a key."))
+      (io.write "Missing config value: thecatapi_key.\n\z
+        \tuser.cats will be enabled, but there are more features with a key.\n"))
     (set self.url
       (f-str "http://thecatapi.com/api/images/get?format=html&type=jpg{}"
         (if bot.config.thecatapi_key (f-str "&api_key={bot.config.thecatapi_key}") "")))

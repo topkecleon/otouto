@@ -10,6 +10,7 @@ function P:init(bot)
     self.doc = 'Fixes local permissions for the user or specified target.'
     self.privilege = 2
     self.targeting = true
+    self.administration = true
 end
 
 function P:action(bot, msg)

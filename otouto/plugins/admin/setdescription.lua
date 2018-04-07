@@ -8,6 +8,7 @@ function P:init(bot)
     self.command = 'setdesc <text>'
     self.doc = 'Set a group description. Passing "--" will delete the current one.'
     self.privilege = 3
+    self.administration = true
 end
 
 function P:action(_bot, msg, group)

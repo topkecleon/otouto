@@ -25,7 +25,7 @@
                       "Annyong."
                       ; else
                       "Pong!"))
-    (local message (utilities.send_reply msg answer))
+    (local (_ message) (utilities.send_reply msg answer))
     (local b (string.format "%.3f" (- (socket.gettime) a)))
     (when message
       (local edit (bindings.editMessageText {

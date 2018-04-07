@@ -1,4 +1,5 @@
 local utilities = require('otouto.utilities')
+local lume = require('extern.lume')
 
 local P = {}
 
@@ -12,35 +13,18 @@ function P:init(bot)
     self.command = 'flags <flag>'
     self.help_word = 'flags?'
     self.privilege = 3
-    local default_flags = {}
-    for flag in pairs(bot.config.administration.flags) do
-        table.insert(default_flags, flag)
-    end
-    self.doc = "\z
-Usage: " .. bot.config.cmd_pat .. "flags [flag] \
-Returns a list of flags, or toggles the specified flag. \
+    self.administration = true
+    self.doc = "Returns a list of flags, or toggles the specified flag. \
 Flags are administrative policies at the disposal of the governor. Most \z
 provide optional automoderation (see /help antilink). The private flag \z
 removes a group's link from the public list and makes it only available to \z
-moderators and greater. \z
-The following flags are enabled by default:\n" ..
-table.concat(default_flags, '\n•')
-    self.administration = true
-
-    --[[
-    self.help = {
-        {
-            command = 'flag [flag]',
-            doc = ... ,
-            privilege = 3
-        },
-        {
-            command = 'flaglist',
-            doc = ... ,
-            privilege = 1
-        }
-    }
-    ]]
+moderators and greater."
+    if lume.count(bot.config.administration.flags) > 0 then
+        self.doc = self.doc .. "\nThe following flags are enabled by default:"
+        for flag in pairs(bot.config.administration.flags) do
+            self.doc = self.doc .. '\n• ' .. flag
+        end
+    end
 end
 
 function P:action(_bot, msg, group)

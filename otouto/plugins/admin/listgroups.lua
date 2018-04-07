@@ -10,23 +10,24 @@ function P:init(bot)
 Returns a list of all public, administrated groups, or the results of a query."
 end
 
-function P:action(bot, msg, group)
+function P:action(bot, msg, _group)
     local input = utilities.input_from_msg(msg)
 
     -- Output will be a list of results, a list of all groups, or an explanation
     -- that there are no (listed) groups.
-    local results = {}
-    local listed_groups = {}
+    local results, listed_groups = {}, {}
 
-    for _, chat in pairs(bot.database.groupdata.admin) do
+    for id_str, chat in pairs(bot.database.groupdata.admin) do
         if not chat.flags.private then
-            local link = string.format('<a href="%s">%s</a>',
+            local title = bot.database.groupdata.info[id_str].title
+            local link = string.format(
+                '<a href="%s">%s</a>',
                 chat.link,
-                utilities.html_escape(chat.name)
+                utilities.html_escape(title)
             )
             table.insert(listed_groups, link)
 
-            if input and chat.name:lower():match(input) then
+            if input and title:find(input, 1, true) then
                 table.insert(results, link)
             end
         end
@@ -49,21 +50,21 @@ function P:action(bot, msg, group)
             '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
         if #listed_groups == 0 then
             output = 'There are no listed groups.'
-        elseif group.data.admin then
+        else
             if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
-                output = 'I have sent you the requested information in a private message.'
+                if msg.chat.id == msg.from.id then
+                    output = 'I have sent you the requested information in a private message.'
+                end
             else
                 output = string.format(
                     'Please <a href="https://t.me/%s?start=groups">message me privately</a> for a list of groups.',
                     bot.info.username
                 )
             end
-        else
-            output = group_list
         end
     end
 
-    utilities.send_reply(msg, output, 'html')
+    if output then utilities.send_reply(msg, output, 'html') end
 end
 
 return P
