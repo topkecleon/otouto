@@ -12,7 +12,7 @@ local utilities -- Miscellaneous and shared functions.
 local lume -- More utility functions.
 local autils -- Administration-related functions.
 
-bot.version = '3.15.5 admin'
+bot.version = '3.16 admin'
 
  -- Function to be run on start and reload.
 function bot:init()
@@ -28,10 +28,13 @@ function bot:init()
     -- Fetch bot information. Try until it succeeds.
     local success
     repeat
-        print('Fetching bot information...\n')
+        io.write('Fetching bot information...\n')
         success, self.info = bindings.getMe()
     until success
     self.info = self.info.result
+
+    io.write(string.format('%s [%s] @%s\n',
+        self.info.first_name, self.info.id, self.info.username))
 
     -- todo: use a real database
     self.database_name = self.config.database_name or self.info.username .. '.db'
@@ -65,9 +68,6 @@ function bot:init()
     self.last_cron = self.last_cron or os.date('%M') -- Last cron job.
     self.last_database_save = self.last_database_save or os.date('%H') -- Last db save.
     self.is_started = true
-
-    print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')\n')
-
 end
 
 function bot:load_plugins(pnames, pos)
@@ -278,8 +278,8 @@ function bot:run()
 
         -- Save the "database" every hour.
         if self.last_database_save ~= os.date('%H') then
-            self.last_database_save = os.date('%H')
             utilities.save_data(self.database_name, self.database)
+            self.last_database_save = os.date('%H')
         end
     end
     -- Save the database before exiting.
