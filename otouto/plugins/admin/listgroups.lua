@@ -18,8 +18,8 @@ function P:action(bot, msg, _group)
     local results, listed_groups = {}, {}
 
     for id_str, chat in pairs(bot.database.groupdata.admin) do
-        local title = bot.database.groupdata.info[id_str].title
         if not chat.flags.private then
+            local title = bot.database.groupdata.info[id_str].title
             local link = string.format(
                 '<a href="%s">%s</a>',
                 chat.link,
@@ -27,7 +27,7 @@ function P:action(bot, msg, _group)
             )
             table.insert(listed_groups, link)
 
-            if input and title:lower():match(input) then
+            if input and title:find(input, 1, true) then
                 table.insert(results, link)
             end
         end
