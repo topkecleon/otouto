@@ -346,5 +346,15 @@ Units can be repeated and do not need to be in order of size. Their amounts \z
 can exceed the size of a larger unit. \z
 Be aware that most (or all) Telegram bot API calls limit intervals to one year."
 
+autils.glossary.automoderation = "\z
+The automoderation system provides a unified three-strike system in each \z
+group. When a first strike is issued, the offending message is deleted and a \z
+warning is posted. The warning is deleted after a configurable interval \z
+seconds. When the second strike is issued, the offending message is again \z
+deleted and the user is banned for five minutes. On the third strike, the \z
+message is deleted and the user is banned. \
+A user's local strikes can be reset with /unrestrict. Available \z
+automoderation policies can be viewed with /flags (see /help flags)."
+
 
 return autils

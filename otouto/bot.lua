@@ -305,10 +305,11 @@ end
 end
 
  -- Schedule a plugin's later function to be run after the given interval.
-function bot:do_later(plugin, interval, param)
+ -- "when" is a Unix timestamp.
+function bot:do_later(pname, when, param)
     table.insert(self.database.later, {
-        when = os.time() + interval,
-        pname = plugin.name,
+        pname = pname,
+        when = when,
         param = param
     })
 end

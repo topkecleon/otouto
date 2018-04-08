@@ -95,6 +95,7 @@ Send /help to get started."
           :core.disable_plugins
           :core.help
           :core.ping
+          :core.delete_messages
         ]
         admin [
           :admin.addadmin
