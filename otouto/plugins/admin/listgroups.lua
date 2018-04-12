@@ -52,7 +52,7 @@ function P:action(bot, msg, _group)
             output = 'There are no listed groups.'
         else
             if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
-                if msg.chat.id == msg.from.id then
+                if msg.chat.id ~= msg.from.id then
                     output = 'I have sent you the requested information in a private message.'
                 end
             else

@@ -162,12 +162,14 @@ function autils.strike(bot, msg, source)
         message_id = msg.message_id
     }
 
-    bot.database.groupdata.automoderation[tostring(msg.chat.id)] =
-        bot.database.groupdata.automoderation[tostring(msg.chat.id)] or {}
-    local chat =
-        bot.database.groupdata.automoderation[tostring(msg.chat.id)]
-    local user_id_str = tostring(msg.from.id)
-    chat[user_id_str] = (chat[user_id_str] or 0) + 1
+    local user = utilities.user(bot, msg.from.id)
+    local id_str = tostring(msg.from.id)
+
+    if not bot.database.groupdata.automoderation[tostring(msg.chat.id)] then
+        bot.database.groupdata.automoderation[tostring(msg.chat.id)] = {}
+    end
+    local chat = bot.database.groupdata.automoderation[tostring(msg.chat.id)]
+    chat[id_str] = (chat[id_str] or 0) + 1
 
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, 'autils.strike requires flags')
@@ -179,35 +181,30 @@ function autils.strike(bot, msg, source)
         chat_id = msg.chat.id
     }
 
-    if chat[user_id_str] == 1 then
+    local score = chat[id_str]
+    if score == 1 then
         logstuff.action = 'Message deleted'
-
-        -- Let's send a concise warning to the group for first-strikers.
-        local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.format_name(msg.from) ..
-            '. The next automoderation trigger will result in a five-minute tempban.'
-            .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
+        -- Send a warning on the first strike, detailing the flag's job.
+        local warning = string.format("<b>%s:</b> Deleted message by %s. The \z
+            next automoderation trigger will result in a five-minute tempban. \z
+            \n<i>%s</i>", source, user:name(), flags_plugin.flags[source])
+        -- todo: the bot should just store admin.log_chat's info
         if bot.config.administration.log_chat_username then
             warning = warning .. '\n<b>View the logs:</b> ' ..
                 bot.config.administration.log_chat_username .. '.'
         end
 
-        -- Successfully-sent warnings get their IDs stored to be deleted
-        -- later by automoderation.lua.
-        local suc, res =
+        local success, res =
             utilities.send_message(msg.chat.id, warning, true, nil, 'html')
-        if suc then
-            local automoderation_plugin = bot.named_plugins['admin.automoderation']
-            assert(automoderation_plugin, 'autils.strike requires automoderation')
-
-            table.insert(automoderation_plugin.store, {
-                message_id = res.result.message_id,
-                chat_id = res.result.chat.id,
-                date = res.result.date
-            })
+        if success and bot.named_plugins['core.delete_messages'] then
+            bot:do_later(
+                'core.delete_messages',
+                os.time() + bot.config.administration.warning_expiration,
+                {chat_id = res.result.chat.id, message_id = res.result.message_id}
+            )
         end
 
-    elseif chat[user_id_str] == 2 then
+    elseif score == 2 then
         local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
@@ -219,7 +216,7 @@ function autils.strike(bot, msg, source)
             logstuff.action = result.description
         end
 
-    elseif chat[user_id_str] == 3 then
+    elseif score == 3 then
         local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
@@ -229,7 +226,7 @@ function autils.strike(bot, msg, source)
         else
             logstuff.action = result.description
         end
-        chat[user_id_str] = 0
+        chat[id_str] = nil
     end
 
     autils.log(bot, logstuff)

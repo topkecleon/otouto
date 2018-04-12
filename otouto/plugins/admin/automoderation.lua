@@ -19,18 +19,6 @@ function P:init(bot)
 
     -- Store the IDs of warning messages to delete them after five minutes.
     self.store = {}
-
-    self.help_word = 'automoderation'
-    self.doc = "\z
-The automoderation system provides a unified three-strike system in each \z
-group. When a first strike is issued, the offending message is deleted and a \z
-warning is posted. The warning is deleted after " ..
-bot.config.administration.warning_expiration .. " seconds. When the second \z
-strike is issued, the offending message is again deleted and the user is \z
-banned for five minutes. On the third strike, the message is deleted and the \z
-user is banned. \
-A user's local strikes can be reset with /unrestrict. Available \z
-automoderation policies can be viewed with /flags (see /help flags)."
 end
 
 function P:cron(bot, _now)

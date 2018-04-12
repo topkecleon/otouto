@@ -41,7 +41,7 @@ Send /help to get started."
     ; link or username
     :log_chat_username nil
     ; First strike warnings will be deleted after this, in seconds.
-    :warning_expiration 120
+    :warning_expiration 30
     ; Default flag settings.
     :flags {
       :antibot true
@@ -92,10 +92,10 @@ Send /help to get started."
         ]
         core [
           :core.about
+          :core.delete_messages
           :core.disable_plugins
           :core.help
           :core.ping
-          :core.delete_messages
         ]
         admin [
           :admin.addadmin

@@ -285,8 +285,14 @@ local delete_this = {}
 for i, thing in ipairs(self.database.later) do
     if now >= thing.when then
         local plugin = self.named_plugins[thing.pname]
-        plugin:later(self, thing.param)
-        table.insert(delete_this, i)
+        local suc, err = xpcall(function()
+            plugin:later(self, thing.param)
+        end, function(msg) return debug.traceback(msg) end)
+        if suc then
+            table.insert(delete_this, i)
+        else
+            utilities.log_error(err, self.config.log_chat)
+        end
     end
 end
 for i = #delete_this, 1, -1 do

@@ -1,4 +1,5 @@
 local bindings = require('otouto.bindings')
+local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
 
 local P = {}
@@ -13,12 +14,24 @@ function P:init(bot)
     self.administration = true
 end
 
-function P:action(bot, msg, group, _user)
-    if group.data.admin.flags[self.flag] and msg.sticker then
+function P:action(bot, msg, group)
+    local admin = group.data.admin
+    if admin.flags[self.flag] and msg.sticker then
         bindings.deleteMessage{
             message_id = msg.message_id,
             chat_id = msg.chat.id
         }
+        if msg.date >= (admin.last_nosticker_msg or -43200) + 43200 then -- 12h
+            local success, result =
+                utilities.send_message(msg.chat.id, 'Stickers are filtered.')
+            if success then
+                bot:do_later('core.delete_messages', os.time() + 5, {
+                    chat_id = msg.chat.id,
+                    message_id = result.result.message_id
+                })
+                admin.last_nosticker_msg = result.result.date
+            end
+        end
         autils.log(bot, {
             chat_id = msg.chat.id,
             target = msg.from.id,
