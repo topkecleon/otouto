@@ -102,7 +102,6 @@ Send /help to get started."
           :admin.addgroup
           :admin.addmod
           :admin.antihammer_whitelist
-          :admin.automoderation
           :admin.ban
           :admin.deadmin
           :admin.demod
