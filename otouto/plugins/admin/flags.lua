@@ -82,4 +82,16 @@ function P:flag_list(local_flags)
     return t
 end
 
+ -- Decrement a user's strikes in a group.
+function P:later(bot, params)
+    local strikes = bot.database.groupdata.admin[tostring(params.chat_id)].strikes
+    local uis = tostring(params.user_id)
+    if strikes[uis] then
+        strikes[uis] = strikes[uis] - 1
+        if strikes[uis] < 1 then
+            strikes[uis] = nil
+        end
+    end
+end
+
 return P

@@ -154,7 +154,6 @@ function autils.targets(bot, msg, options)
     end
 end
 
- -- source eg "antisquig", "filter", etc
  -- Returns true if action was taken.
 function autils.strike(bot, msg, source)
     bindings.deleteMessage{
@@ -164,26 +163,18 @@ function autils.strike(bot, msg, source)
 
     local user = utilities.user(bot, msg.from.id)
     local id_str = tostring(msg.from.id)
-
-    if not bot.database.groupdata.automoderation[tostring(msg.chat.id)] then
-        bot.database.groupdata.automoderation[tostring(msg.chat.id)] = {}
-    end
-    local chat = bot.database.groupdata.automoderation[tostring(msg.chat.id)]
-    chat[id_str] = (chat[id_str] or 0) + 1
+    local log_action
 
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, 'autils.strike requires flags')
 
-    local logstuff = {
-        source = source,
-        reason = flags_plugin.flags[source],
-        target = msg.from.id,
-        chat_id = msg.chat.id
-    }
+    local strikes = bot.database.groupdata.admin[tostring(msg.chat.id)].strikes
+    strikes[id_str] = (strikes[id_str] or 0) + 1
 
-    local score = chat[id_str]
+    local score = strikes[id_str]
     if score == 1 then
-        logstuff.action = 'Message deleted'
+        log_action = 'Message deleted'
+
         -- Send a warning on the first strike, detailing the flag's job.
         local warning = string.format("<b>%s:</b> Deleted message by %s. The \z
             next automoderation trigger will result in a five-minute tempban. \z
@@ -193,9 +184,10 @@ function autils.strike(bot, msg, source)
             warning = warning .. '\n<b>View the logs:</b> ' ..
                 bot.config.administration.log_chat_username .. '.'
         end
-
         local success, res =
             utilities.send_message(msg.chat.id, warning, true, nil, 'html')
+
+        -- If the warning sent, expire it later.
         if success and bot.named_plugins['core.delete_messages'] then
             bot:do_later(
                 'core.delete_messages',
@@ -204,6 +196,10 @@ function autils.strike(bot, msg, source)
             )
         end
 
+        -- Decrement the user's strikes in 24h.
+        bot:do_later('admin.flags', os.time() + 864000,
+            {chat_id = msg.chat.id, user_id = msg.from.id})
+
     elseif score == 2 then
         local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
@@ -211,10 +207,14 @@ function autils.strike(bot, msg, source)
             until_date = msg.date + 300
         }
         if success then
-            logstuff.action = 'Banned for five minutes'
+            log_action = 'Banned for five minutes'
         else
-            logstuff.action = result.description
+            log_action = result.description
         end
+
+        -- Decrement the user's strikes in 24h.
+        bot:do_later('admin.flags', os.time() + 864000,
+            {chat_id = msg.chat.id, user_id = msg.from.id})
 
     elseif score == 3 then
         local success, result = bindings.kickChatMember{
@@ -222,14 +222,20 @@ function autils.strike(bot, msg, source)
             user_id = msg.from.id,
         }
         if success then
-            logstuff.action = 'Banned'
+            log_action = 'Banned'
         else
-            logstuff.action = result.description
+            log_action = result.description
         end
-        chat[id_str] = nil
+        strikes[id_str] = nil
     end
 
-    autils.log(bot, logstuff)
+    autils.log(bot, {
+        source = source,
+        reason = flags_plugin.flags[source],
+        target = msg.from.id,
+        chat_id = msg.chat.id,
+        action = log_action
+    })
 end
 
 --[[
