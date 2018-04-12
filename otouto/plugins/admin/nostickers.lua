@@ -21,7 +21,8 @@ function P:action(bot, msg, group)
             message_id = msg.message_id,
             chat_id = msg.chat.id
         }
-        if msg.date >= (admin.last_nosticker_msg or -43200) + 43200 then -- 12h
+
+        if msg.date >= (admin.last_nosticker_msg or -3600) + 3600 then -- 1h
             local success, result =
                 utilities.send_message(msg.chat.id, 'Stickers are filtered.')
             if success then
@@ -32,6 +33,7 @@ function P:action(bot, msg, group)
                 admin.last_nosticker_msg = result.result.date
             end
         end
+
         autils.log(bot, {
             chat_id = msg.chat.id,
             target = msg.from.id,

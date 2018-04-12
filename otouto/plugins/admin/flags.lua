@@ -1,5 +1,5 @@
 local utilities = require('otouto.utilities')
-local lume = require('extern.lume')
+local lume = require('lume')
 
 local P = {}
 

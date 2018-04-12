@@ -82,15 +82,16 @@ Send /help to get started."
           :admin.autopromoter
         ]
         admin-filters [
-          :admin.antisquig
-          :admin.antisquigpp
           :admin.antibot
           :admin.antilink
-          :admin.nostickers
-          :admin.filterer
+          :admin.antisquigpp
+          :admin.antisquig
           :admin.delete_left_messages
+          :admin.filterer
+          :admin.nostickers
         ]
         core [
+          :core.end_forwards
           :core.about
           :core.delete_messages
           :core.disable_plugins
@@ -143,7 +144,6 @@ Send /help to get started."
       core-critical
       admin-critical
       admin-filters
-      [:core.end_forwards]
       core
       admin
       user
