@@ -1,5 +1,5 @@
 local utilities = require('otouto.utilities')
-local lume = require('extern.lume')
+local lume = require('lume')
 
 local P = {}
 
@@ -80,6 +80,19 @@ function P:flag_list(local_flags)
         table.insert(t, flag .. ': ' .. self.flags[flag])
     end
     return t
+end
+
+ -- Decrement a user's strikes in a group.
+function P:later(bot, params)
+    local store = bot.database.groupdata.admin[tostring(params.chat_id)].strikes
+    local uis = tostring(params.user_id)
+    if store[uis] then
+        if store[uis] > 1 then
+            store[uis] = store[uis] - 1
+        else
+            store[uis] = nil
+        end
+    end
 end
 
 return P

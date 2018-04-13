@@ -154,7 +154,6 @@ function autils.targets(bot, msg, options)
     end
 end
 
- -- source eg "antisquig", "filter", etc
  -- Returns true if action was taken.
 function autils.strike(bot, msg, source)
     bindings.deleteMessage{
@@ -162,77 +161,81 @@ function autils.strike(bot, msg, source)
         message_id = msg.message_id
     }
 
-    bot.database.groupdata.automoderation[tostring(msg.chat.id)] =
-        bot.database.groupdata.automoderation[tostring(msg.chat.id)] or {}
-    local chat =
-        bot.database.groupdata.automoderation[tostring(msg.chat.id)]
-    local user_id_str = tostring(msg.from.id)
-    chat[user_id_str] = (chat[user_id_str] or 0) + 1
+    local user = utilities.user(bot, msg.from.id)
+    local id_str = tostring(msg.from.id)
+    local log_action
 
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, 'autils.strike requires flags')
 
-    local logstuff = {
-        source = source,
-        reason = flags_plugin.flags[source],
-        target = msg.from.id,
-        chat_id = msg.chat.id
-    }
+    local strikes = bot.database.groupdata.admin[tostring(msg.chat.id)].strikes
+    strikes[id_str] = (strikes[id_str] or 0) + 1
 
-    if chat[user_id_str] == 1 then
-        logstuff.action = 'Message deleted'
+    local score = strikes[id_str]
+    if score == 1 then
+        log_action = 'Message deleted'
 
-        -- Let's send a concise warning to the group for first-strikers.
-        local warning = '<b>' .. source .. ':</b> Deleted message by ' ..
-            utilities.format_name(msg.from) ..
-            '. The next automoderation trigger will result in a five-minute tempban.'
-            .. '\n<i>' .. flags_plugin.flags[source] ..'</i>'
+        -- Send a warning on the first strike, detailing the flag's job.
+        local warning = string.format("<b>%s:</b> Deleted message by %s. The \z
+            next automoderation trigger will result in a five-minute tempban. \z
+            \n<i>%s</i>", source, user:name(), flags_plugin.flags[source])
+        -- todo: the bot should just store admin.log_chat's info
         if bot.config.administration.log_chat_username then
             warning = warning .. '\n<b>View the logs:</b> ' ..
                 bot.config.administration.log_chat_username .. '.'
         end
-
-        -- Successfully-sent warnings get their IDs stored to be deleted
-        -- later by automoderation.lua.
-        local suc, res =
+        local success, res =
             utilities.send_message(msg.chat.id, warning, true, nil, 'html')
-        if suc then
-            local automoderation_plugin = bot.named_plugins['admin.automoderation']
-            assert(automoderation_plugin, 'autils.strike requires automoderation')
 
-            table.insert(automoderation_plugin.store, {
-                message_id = res.result.message_id,
-                chat_id = res.result.chat.id,
-                date = res.result.date
-            })
+        -- If the warning sent, expire it later.
+        if success and bot.named_plugins['core.delete_messages'] then
+            bot:do_later(
+                'core.delete_messages',
+                os.time() + bot.config.administration.warning_expiration,
+                {chat_id = res.result.chat.id, message_id = res.result.message_id}
+            )
         end
 
-    elseif chat[user_id_str] == 2 then
+        -- Decrement the user's strikes in 24h.
+        bot:do_later('admin.flags', os.time() + 864000,
+            {chat_id = msg.chat.id, user_id = msg.from.id})
+
+    elseif score == 2 then
         local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
             until_date = msg.date + 300
         }
         if success then
-            logstuff.action = 'Banned for five minutes'
+            log_action = 'Banned for five minutes'
         else
-            logstuff.action = result.description
+            log_action = result.description
         end
 
-    elseif chat[user_id_str] == 3 then
+        -- Decrement the user's strikes in 24h.
+        bot:do_later('admin.flags', os.time() + 864000,
+            {chat_id = msg.chat.id, user_id = msg.from.id})
+
+    elseif score == 3 then
         local success, result = bindings.kickChatMember{
             chat_id = msg.chat.id,
             user_id = msg.from.id,
         }
         if success then
-            logstuff.action = 'Banned'
+            log_action = 'Banned'
         else
-            logstuff.action = result.description
+            log_action = result.description
         end
-        chat[user_id_str] = 0
+        strikes[id_str] = nil
     end
 
-    autils.log(bot, logstuff)
+    autils.log(bot, {
+        source = source,
+        reason = flags_plugin.flags[source],
+        target = msg.from.id,
+        chat_id = msg.chat.id,
+        action = log_action
+    })
 end
 
 --[[
@@ -345,6 +348,16 @@ The tiem format handles intervals in the following units: \
 Units can be repeated and do not need to be in order of size. Their amounts \z
 can exceed the size of a larger unit. \z
 Be aware that most (or all) Telegram bot API calls limit intervals to one year."
+
+autils.glossary.automoderation = "\z
+The automoderation system provides a unified three-strike system in each \z
+group. When a first strike is issued, the offending message is deleted and a \z
+warning is posted. The warning is deleted after a configurable interval \z
+seconds. When the second strike is issued, the offending message is again \z
+deleted and the user is banned for five minutes. On the third strike, the \z
+message is deleted and the user is banned. \
+A user's local strikes can be reset with /unrestrict. Available \z
+automoderation policies can be viewed with /flags (see /help flags)."
 
 
 return autils

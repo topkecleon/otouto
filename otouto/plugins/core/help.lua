@@ -29,6 +29,9 @@ function help:init(bot)
 
     self.commandlist = {}
     self:generate_text(bot.config.cmd_pat)
+
+    self.proposition = 'Please <a href="http://t.me/' .. bot.info.username ..
+        '?start=help">message me privately</a> for a list of commands.'
 end
 
 function help:action(bot, msg)
@@ -51,19 +54,15 @@ function help:action(bot, msg)
             end
         end
         utilities.send_reply(msg, 'Sorry, there is no help for that command.')
-    else
+
+    elseif not utilities.send_message(msg.from.id, self.text, true, nil, 'html') then
         -- Attempt to send the help message via PM.
         -- If msg is from a group, tell the group whether the PM was successful.
-        if not utilities.send_message(msg.from.id, self.text, true, nil, 'html') then
-            utilities.send_reply(
-                msg,
-                'Please <a href="http://t.me/' .. bot.info.username ..
-                    '?start=help">message me privately</a> for a list of commands.',
-                'html'
-            )
-        elseif msg.chat.type ~= 'private' then
-            utilities.send_reply(msg, 'I have sent you the requested information in a private message.')
-        end
+        utilities.send_reply(msg, self.proposition, 'html')
+
+    elseif msg.chat.type ~= 'private' then
+        utilities.send_reply(msg,
+            'I have sent you the requested information in a private message.')
     end
 end
 

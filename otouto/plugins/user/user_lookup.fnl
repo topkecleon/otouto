@@ -20,5 +20,5 @@
     (local (targets output)
         (autils.targets bot msg {:unknown_ids_err true :self_targeting true}))
     (utilities.merge_arrs output (utilities.list_names bot targets))
-    (utilities.send_reply msg (table.concat output "\n") "html"))
+    (utilities.send_reply msg (table.concat output "\n") :html))
 }

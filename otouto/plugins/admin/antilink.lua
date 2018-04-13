@@ -77,9 +77,10 @@ function P:action(bot, msg, group, user)
             }
             user.data.antilink = store
         end
-        store.count = store.count +1
+        store.count = store.count + 1
         store.groups[tostring(msg.chat.id)] = true
-        store.latest = os.time()
+
+        bot:do_later(self.name, os.time() + 86400, msg.from.id)
 
         if store.count == 3 then
             user.data.hammered = true
@@ -107,15 +108,14 @@ function P:action(bot, msg, group, user)
     end
 end
 
-function P:cron(bot, _now)
-    if self.last_clear ~= os.date('%H') then
-        local store = bot.database.userdata.antilink
-        for id_str, u in pairs(store) do
-            if os.time() > u.latest + 86400 then
-                store[id_str] = nil
-            end
+function P:later(bot, user_id)
+    local store = bot.database.userdata.antilink[tostring(user_id)]
+    if store then
+        if store.count > 1 then
+            store.count = store.count - 1
+        else
+            bot.database.userdata.antilink[tostring(user_id)] = nil
         end
-        self.last_clear = os.date('%H')
     end
 end
 

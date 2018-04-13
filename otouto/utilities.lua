@@ -449,17 +449,20 @@ function utilities.format_name(user) -- or chat
 end
 
 function utilities.lookup_user(bot, id)
-    return
-        (bot.database.userdata.info
+    return (bot.database.userdata.info
             and bot.database.userdata.info[tostring(id)])
         or (bot.database.groupdata.info
             and bot.database.groupdata.info[tostring(id)])
-        or { id = id, first_name = 'Unknown' }
 end
 
 -- format_name with lookup_user
-function utilities.lookup_name(bot, id)
-    return utilities.format_name(utilities.lookup_user(bot, id))
+-- optional user arg to replace the default unknown
+function utilities.lookup_name(bot, id, user)
+    return utilities.format_name(
+        utilities.lookup_user(bot, id)
+        or user
+        or { id = id, first_name = 'Unknown' }
+    )
 end
 
 -- Takes a set of ID (id_str because set), eg a userdata table or a mod list,
@@ -496,22 +499,30 @@ utilities.tiem = {
         m = 'minute',
         s = 'second'
     },
-    format = function (seconds, pretty)
+    print = function (seconds)
         local output = {}
         for _, l in ipairs(utilities.tiem.order) do
             local v = utilities.tiem.dict[l]
             if seconds >= v then
                 local q, r = utilities.divmod(seconds, v)
-                if pretty then
-                    table.insert(output, string.format('%s %s%s',
-                        q, utilities.tiem.pretty[l], q == 1 and '' or 's'))
-                else
-                    table.insert(output, q .. l)
-                end
+                table.insert(output, string.format('%s %s%s',
+                    q, utilities.tiem.pretty[l], q == 1 and '' or 's'))
                 seconds = r
             end
         end
-        return table.concat(output, pretty and ', ')
+        return #output ~= 0 and table.concat(output, ', ') or '0 seconds'
+    end,
+    format = function (seconds)
+        local output = {}
+        for _, l in ipairs(utilities.tiem.order) do
+            local v = utilities.tiem.dict[l]
+            if seconds >= v then
+                local q, r = utilities.divmod(seconds, v)
+                table.insert(output, q .. l)
+                seconds = r
+            end
+        end
+        return table.concat(output)
     end,
     deformat = function (time_str)
         if

@@ -16,7 +16,7 @@ end
 function P:action(bot, msg)
     local targets, output = autils.targets(bot, msg, {self_targeting = true})
     for target in pairs(targets) do
-        local rank = autils.rank(bot, msg.chat.id, target)
+        local rank = autils.rank(bot, target, msg.chat.id)
         local name = utilities.lookup_name(bot, target)
         local suc, res
         if rank >= 3 then

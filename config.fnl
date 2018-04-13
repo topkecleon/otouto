@@ -41,21 +41,12 @@ Send /help to get started."
     ; link or username
     :log_chat_username nil
     ; First strike warnings will be deleted after this, in seconds.
-    :warning_expiration 120
+    :warning_expiration 30
     ; Default flag settings.
     :flags {
       :antibot true
       :antilink true
     }
-  }
-
-  :remind {
-    ; Should reminders be saved if they fail to send?
-    :persist false
-    :max_length 1000
-    :max_duration 526000
-    :max_reminders_group 10
-    :max_reminders_private 50
   }
 
   :reactions {
@@ -82,16 +73,18 @@ Send /help to get started."
           :admin.autopromoter
         ]
         admin-filters [
-          :admin.antisquig
-          :admin.antisquigpp
           :admin.antibot
           :admin.antilink
-          :admin.nostickers
-          :admin.filterer
+          :admin.antisquigpp
+          :admin.antisquig
           :admin.delete_left_messages
+          :admin.filterer
+          :admin.nostickers
         ]
         core [
+          :core.end_forwards
           :core.about
+          :core.delete_messages
           :core.disable_plugins
           :core.help
           :core.ping
@@ -101,7 +94,6 @@ Send /help to get started."
           :admin.addgroup
           :admin.addmod
           :admin.antihammer_whitelist
-          :admin.automoderation
           :admin.ban
           :admin.deadmin
           :admin.demod
@@ -133,6 +125,7 @@ Send /help to get started."
           :user.echo
           :user.maybe
           :user.reactions
+          :user.reminders
           :user.slap
           :user.whoami
           :user.user_lookup
@@ -143,7 +136,6 @@ Send /help to get started."
       core-critical
       admin-critical
       admin-filters
-      [:core.end_forwards]
       core
       admin
       user

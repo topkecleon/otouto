@@ -18,6 +18,6 @@
     nil)
 
   :action (fn [self, bot, msg]
-    (utilities.send_message msg.chat.id self.text true nil "html")
+    (utilities.send_message msg.chat.id self.text true nil :html)
     (values))
 }

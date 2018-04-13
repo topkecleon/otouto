@@ -1,5 +1,5 @@
 --[[
-    bindings.lua (rev. 2018/04/03)
+    bindings.lua (rev. 2018/04/12)
     otouto's bindings for the Telegram bot API.
     https://core.telegram.org/bots/api
     See the "Bindings" section of README.md for usage information.
@@ -43,8 +43,8 @@ end
  -- values. Optional file is a table of a key/value pair of the file type (eg
  -- photo, document, video) and its location on-disk. The pair should be in
  -- parameters instead if the desired file is a URL or file ID.
- -- Returns true, response on success, returns false, response on failure.
- -- Returns false, false on a connection error. Errs if given an invalid method.
+ -- Returns true, response on success. Returns false, response on failure.
+ -- Returns nil on a connection failure. Errs on invalid methods.
 function bindings.request(method, parameters, file)
     parameters = parameters or {}
     for k,v in pairs(parameters) do
@@ -77,11 +77,12 @@ function bindings.request(method, parameters, file)
     }
     if not success then
         io.write(method .. ': Connection error. [' .. code  .. ']\n')
-        return false, false
+        return
     else
         local result = json.decode(table.concat(response))
         if not result then
-            return false, false
+            io.write('Invalid response.\n' .. table.concat(response) .. '\n')
+            return
         elseif result.ok then
             return true, result
         elseif result.description == 'Method not found' then

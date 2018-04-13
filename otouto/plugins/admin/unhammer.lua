@@ -19,7 +19,7 @@ function P:action(bot, msg, group)
     for target in pairs(targets) do
         local user = utilities.user(bot, target)
         if user.data.hammered then
-            user.data.hammered[target] = nil
+            user.data.hammered = nil
             unhammered_users:add(target)
             table.insert(output, user:name() .. ' is no longer globally banned.')
         else
