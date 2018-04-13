@@ -68,7 +68,6 @@ function bot:init()
 
     -- Set loop variables.
     self.last_update = self.last_update or 0 -- Update offset.
-    self.last_cron = self.last_cron or os.date('%M') -- Last cron job.
     self.last_database_save = self.last_database_save or os.date('%H') -- Last db save.
     self.is_started = true
 end
@@ -263,41 +262,24 @@ function bot:run()
             print('[' .. os.date('%F %T') .. '] Connection error while fetching updates.')
         end
 
-        -- Run cron jobs every minute.
-        local now = os.date('%M')
-        if self.last_cron ~= now then
-            for _, plugin in ipairs(self.plugins) do
-                if plugin.cron then -- Call each plugin's cron function, if it has one.
-                    local suc, err = xpcall(function ()
-                        plugin:cron(self, now)
-                    end, function (msg) return debug.traceback(msg) end)
-                    if not suc then
-                        utilities.log_error(err, self.config.log_chat)
-                    end
+        local now = os.time()
+        local delete_this = {}
+        for i, thing in ipairs(self.database.later) do
+            if now >= thing.when then
+                local plugin = self.named_plugins[thing.pname]
+                local suc, err = xpcall(function()
+                    plugin:later(self, thing.param)
+                end, function(msg) return debug.traceback(msg) end)
+                if suc then
+                    table.insert(delete_this, i)
+                else
+                    utilities.log_error(err, self.config.log_chat)
                 end
             end
-            self.last_cron = now
         end
-
- -- Don't indent this until we are completely free of cron.
-local now = os.time()
-local delete_this = {}
-for i, thing in ipairs(self.database.later) do
-    if now >= thing.when then
-        local plugin = self.named_plugins[thing.pname]
-        local suc, err = xpcall(function()
-            plugin:later(self, thing.param)
-        end, function(msg) return debug.traceback(msg) end)
-        if suc then
-            table.insert(delete_this, i)
-        else
-            utilities.log_error(err, self.config.log_chat)
+        for i = #delete_this, 1, -1 do
+            table.remove(self.database.later, delete_this[i])
         end
-    end
-end
-for i = #delete_this, 1, -1 do
-    table.remove(self.database.later, delete_this[i])
-end
 
         -- Save the "database" every hour.
         if self.last_database_save ~= os.date('%H') then
