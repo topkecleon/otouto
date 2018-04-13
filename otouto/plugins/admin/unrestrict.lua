@@ -25,11 +25,8 @@ function P:action(bot, msg, group)
             can_send_other_messages = true,
             can_add_web_page_previews = true
         }
-        local automoderation = group.data.automoderation
-        if automoderation then
-            automoderation[target] = nil
-        end
         local admin = group.data.admin
+        admin.strikes[target] = nil
         if admin.bans[target] then
             admin.bans[target] = nil
             table.insert(output, name ..
