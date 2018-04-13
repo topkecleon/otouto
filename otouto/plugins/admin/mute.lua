@@ -37,8 +37,8 @@ function P:action(bot, msg, _group, _user)
     local out_str, log_str
     if duration then
         out_str = ' has been muted for ' ..
-            utilities.tiem.pretty(duration) .. '.'
-        log_str = 'Muted for ' .. utilities.tiem.pretty(duration)
+            utilities.tiem.print(duration) .. '.'
+        log_str = 'Muted for ' .. utilities.tiem.print(duration)
     else
         out_str = ' has been muted.'
         log_str = 'Muted'

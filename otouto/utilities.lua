@@ -496,7 +496,7 @@ utilities.tiem = {
         m = 'minute',
         s = 'second'
     },
-    pretty = function (seconds)
+    print = function (seconds)
         local output = {}
         for _, l in ipairs(utilities.tiem.order) do
             local v = utilities.tiem.dict[l]
