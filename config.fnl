@@ -49,15 +49,6 @@ Send /help to get started."
     }
   }
 
-  :remind {
-    ; Should reminders be saved if they fail to send?
-    :persist false
-    :max_length 1000
-    :max_duration 526000
-    :max_reminders_group 10
-    :max_reminders_private 50
-  }
-
   :reactions {
     :shrug "¯\\_(ツ)_/¯"
     :lenny "( ͡° ͜ʖ ͡°)"
@@ -134,6 +125,7 @@ Send /help to get started."
           :user.echo
           :user.maybe
           :user.reactions
+          :user.reminders
           :user.slap
           :user.whoami
           :user.user_lookup
