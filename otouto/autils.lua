@@ -1,3 +1,4 @@
+local anise = require('anise')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
@@ -270,7 +271,7 @@ function autils.log(bot, params)
     end
 
     if params.targets then
-        utilities.merge_arrs(output, utilities.list_names(bot, params.targets))
+        anise.pushcat(output, utilities.list_names(bot, params.targets))
     elseif params.target then
         table.insert(output, utilities.lookup_name(bot, params.target))
     end

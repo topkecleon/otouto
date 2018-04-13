@@ -1,0 +1,3 @@
+[submodule "extern/anise"]
+	path = extern/anise
+	url = https://github.com/bb010g/anise.git

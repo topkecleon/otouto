@@ -542,19 +542,4 @@ utilities.tiem = {
     end,
 }
 
--- Merges arrays into the first.
--- Distinct from lume.concat because the latter creates a new array.
-function utilities.merge_arrs(base, ...)
-    local size = #base
-    for i = 1, select('#', ...) do
-        local arr = select(i, ...)
-        if arr then
-            for j = 1, #arr do
-                size = size + 1
-                base[size] = arr[j]
-            end
-        end
-    end
-end
-
 return utilities

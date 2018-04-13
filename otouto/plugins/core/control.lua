@@ -16,7 +16,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local lume = require('lume')
+local anise = require('anise')
 
 local utilities = require('otouto.utilities')
 
@@ -48,11 +48,11 @@ function control:action(bot, msg)
     if msg.text_lower:match('^'..cmd_pat..'hotswap') then
         local errs = {}
         local init = false
-        for _, modname in ipairs(lume.split(utilities.input(msg.text))) do
+        for _, modname in ipairs(anise.split_str(utilities.input(msg.text))) do
             if modname == '!' then
                 init = true
             else
-                local mod, err = lume.hotswap(modname)
+                local mod, err = anise.hotswap(modname)
                 if err ~= nil then
                     table.insert(errs, err)
                 end
@@ -74,7 +74,7 @@ function control:action(bot, msg)
         end
         package.loaded['otouto.bindings'] = nil
         package.loaded['otouto.utilities'] = nil
-        package.loaded['lume'] = nil
+        package.loaded['anise'] = nil
         package.loaded['otouto.autils'] = nil
         package.loaded['config'] = nil
         if not msg.text_lower:match('%-config') then
@@ -102,7 +102,7 @@ function control:action(bot, msg)
         end
         input = input .. '\n'
         for command in input:gmatch('(.-)\n') do
-            command = lume.trim(command)
+            command = anise.trim(command)
             msg.text = command
             bot:on_message(msg)
         end

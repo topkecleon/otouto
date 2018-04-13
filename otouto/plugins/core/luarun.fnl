@@ -5,7 +5,7 @@
 ;; Copyright 2016 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(require-macros :otouto.macros)
+(require-macros :anise.macros)
 (require* otouto.utilities
           fennel
           fennelview
@@ -19,13 +19,13 @@
     (values))
 
   :fennel_preamble "\z
-(require-macros :otouto.macros)\
-(require* otouto.autils\
+(require-macros :anise.macros)\
+(require* anise\
+          otouto.autils\
           otouto.bindings\
           otouto.utilities\
           fennel\
           fennelview\
-          lume\
           serpent\
           socket.http\
           socket.url\
@@ -33,12 +33,12 @@
           (rename dkjson json))"
 
   :lua_preamble "\z
+local anise = require('anise')\
 local autils = require('otouto.autils')\
 local bindings = require('otouto.bindings')\
 local utilities = require('otouto.utilities')\
 local fennel = require('fennel')\
 local fennelview = require('fennelview')\
-local lume = require('lume')\
 local serpent = require('serpent')\
 local http = require('socket.http')\
 local url = require('socket.url')\

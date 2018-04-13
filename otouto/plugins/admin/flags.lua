@@ -1,5 +1,5 @@
+local anise = require('anise')
 local utilities = require('otouto.utilities')
-local lume = require('lume')
 
 local P = {}
 
@@ -19,7 +19,7 @@ Flags are administrative policies at the disposal of the governor. Most \z
 provide optional automoderation (see /help antilink). The private flag \z
 removes a group's link from the public list and makes it only available to \z
 moderators and greater."
-    if lume.count(bot.config.administration.flags) > 0 then
+    if anise.dict_len(bot.config.administration.flags) > 0 then
         self.doc = self.doc .. "\nThe following flags are enabled by default:"
         for flag in pairs(bot.config.administration.flags) do
             self.doc = self.doc .. '\n• ' .. flag

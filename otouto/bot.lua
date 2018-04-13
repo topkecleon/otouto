@@ -9,7 +9,7 @@
 local bot = {}
 local bindings -- Bot API bindings.
 local utilities -- Miscellaneous and shared functions.
-local lume -- More utility functions.
+local anise -- More utility functions.
 local autils -- Administration-related functions.
 
 bot.version = '3.16 admin'
@@ -22,7 +22,7 @@ function bot:init()
 
     bindings = require('otouto.bindings').set_token(self.config.bot_api_key)
     utilities = require('otouto.utilities')
-    lume = require('lume')
+    anise = require('anise')
     autils = require('otouto.autils')
 
     -- Fetch bot information. Try until it succeeds.

@@ -5,8 +5,8 @@
 ;; Copyright 2017 bb010g <bb010g@gmail.com>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(require-macros :otouto.macros)
-(require* lume
+(require-macros :anise.macros)
+(require* anise
           otouto.bindings
           otouto.utilities)
 
@@ -64,7 +64,7 @@
     (local disabled_plugins bot.database.disabled_plugins)
     (if (not input)
       (let [chat_disabled (self.get_disabled disabled_plugins chat_str false)
-            disabled (lume.keys chat_disabled)]
+            disabled (anise.keys chat_disabled)]
         (if (not (. disabled 1))
           (do (utilities.send_message chat_id "All plugins are enabled.") nil)
           (let [output (.. "<b>Disabled plugins:</b>\n• " (table.concat disabled "\n• "))]
@@ -76,7 +76,7 @@
           (do (utilities.send_reply msg "You need ban permissions.") nil)
           (let [enable
                   (if (: msg.text_lower :match (f-str "^{bot.config.cmd_pat}enable")) true false)
-                pnames (lume.array (: input :gmatch "%S+"))
+                pnames (anise.collect_vals (: input :gmatch "%S+"))
                 (disabled enabled not_found blacklisted)
                   (: self :toggle bot.named_plugins chat_disabled enable pnames)
                 output {}

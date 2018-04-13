@@ -4,9 +4,10 @@
 ;; Copyright 2018 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(require-macros :otouto.macros)
-(require* otouto.utilities
-  otouto.autils)
+(require-macros :anise.macros)
+(require* anise
+          otouto.utilities
+          otouto.autils)
 
 {
   :init (fn [self bot]
@@ -19,6 +20,7 @@
   :action (fn [self bot msg]
     (local (targets output)
         (autils.targets bot msg {:unknown_ids_err true :self_targeting true}))
-    (utilities.merge_arrs output (utilities.list_names bot targets))
-    (utilities.send_reply msg (table.concat output "\n") :html))
+    (anise.pushcat output (utilities.list_names bot targets))
+    (utilities.send_reply msg (table.concat output "\n") :html)
+    nil)
 }

@@ -1,4 +1,4 @@
-local lume = require('lume')
+local anise = require('anise')
 
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
@@ -54,7 +54,7 @@ function P:action(bot, msg, group)
                 strikes = {},
                 moderators = {},
                 bans = {},
-                flags = lume.clone(bot.config.administration.flags)
+                flags = anise.clone(bot.config.administration.flags)
             }
 
             bindings.setChatDescription{

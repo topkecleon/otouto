@@ -1,4 +1,4 @@
-local lume = require('lume')
+local anise = require('anise')
 
 local bindings = require('otouto.bindings')
 local autils = require('otouto.autils')
@@ -45,7 +45,7 @@ antilink can be enabled with /flag antilink (see /help flags)."
         end
         table.insert(self.patterns, s)
     end
-    self.triggers = lume.clone(self.patterns)
+    self.triggers = anise.clone(self.patterns)
     table.insert(self.triggers, '@[%w_]+')
 
     -- Infractions are stored, and users are globally banned after three within
