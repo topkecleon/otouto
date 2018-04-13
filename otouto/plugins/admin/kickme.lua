@@ -17,15 +17,14 @@ function P:action(bot, msg)
         chat_id = msg.chat.id,
         message_id = msg.message_id
     }
-    if bindings.kickChatMember{
+    if bindings.unbanChatMember{
         chat_id = msg.chat.id,
-        user_id = msg.from.id,
-        until_date = msg.date + 60
+        user_id = msg.from.id
     } then
         autils.log(bot, {
             chat_id = msg.chat.id,
             target = msg.from.id,
-            action = 'Kicked for one minute',
+            action = 'Kicked',
             source = self.name
         })
     end
