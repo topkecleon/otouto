@@ -13,5 +13,5 @@
   :action (fn [_self bot msg group]
     (utilities.send_reply msg
       (: (. bot.named_plugins :admin.flags) :list_flags group.data.admin.flags)
-      "html"))
+      :html))
 }
