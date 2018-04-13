@@ -15,17 +15,6 @@
     (set self.triggers (utilities.make_triggers bot [] :who :whoami))
     (values))
 
-  :format_name (fn [user]
-    (if (= (type user) :string)
-      (f-str "a channel <code>[{}]</code>" (utilities.normalize_id user))
-      (let [name (if user.title
-                   (utilities.html_escape user.title)
-                   (utilities.html_escape (utilities.build_name user.first_name user.last_name)))
-            id (utilities.normalize_id user.id)]
-        (if user.username
-          (f-str "<b>{name}</b> (@{user.username}) <code>[{id}]</code>")
-          (f-str "<b>{name}</b> <code>[{id}]</code>")))))
-
   :action (fn [self bot msg]
     (let [; Operate on the replied-to message, if there is one.
           msg (or msg.reply_to_message msg)
@@ -34,15 +23,15 @@
           new_or_left (or msg.new_chat_member msg.left_chat_member)
           output (if new_or_left
                      (f-str "{} {} {} {} {}."
-                       (self.format_name msg.from)
+                       (utilities.format_name msg.from)
                        (if msg.new_chat_member "added" "removed")
-                       (self.format_name new_or_left)
+                       (utilities.format_name new_or_left)
                        (if msg.new_chat_member "to" "from")
-                       (self.format_name chat))
+                       (utilities.format_name chat))
                      ; else
                      (f-str "You are {}, and you are messaging {}."
-                       (self.format_name msg.from)
-                       (self.format_name chat)))]
+                       (utilities.format_name msg.from)
+                       (utilities.format_name chat)))]
       (utilities.send_message msg.chat.id output true msg.message_id :html)
       nil))
 }
