@@ -1,4 +1,4 @@
-(local lume (require :lume))
+(local anise (require :anise))
 ; For details on configuration values, see README.md#configuration.
 {
 
@@ -132,7 +132,7 @@ Send /help to get started."
         ]
       ]
 
-    (lume.concat
+    (anise.concat
       core-critical
       admin-critical
       admin-filters
