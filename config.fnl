@@ -127,8 +127,9 @@ Send /help to get started."
           :user.reactions
           :user.reminders
           :user.slap
-          :user.whoami
           :user.user_lookup
+          :user.whoami
+          :user.xkcd
         ]
       ]
 
