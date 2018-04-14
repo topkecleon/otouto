@@ -262,8 +262,7 @@ local function parser(getbyte, filename)
                     end
                 else -- }
                     if #last % 2 ~= 0 then
-                        error('expected even number of values in table literal'
-                                  .. ' on line ' .. line .. ' of ' .. filename)
+                        error 'expected even number of values in table literal'
                     end
                     val = {}
                     for i = 1, #last, 2 do
@@ -1458,8 +1457,7 @@ local function traceback(msg, start)
     local level = start or 2 -- Can be used to skip some frames
     local lines = {}
     if msg then
-        local _, _, errstr = msg:match("^([^:]+):([^:]+): (.*)$")
-        table.insert(lines, errstr and ('fennel error: ' .. errstr) or msg)
+        table.insert(lines, msg)
     end
     table.insert(lines, 'stack traceback:')
     while true do
