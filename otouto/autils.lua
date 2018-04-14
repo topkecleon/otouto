@@ -198,7 +198,7 @@ function autils.strike(bot, msg, source)
         end
 
         -- Decrement the user's strikes in 24h.
-        bot:do_later('admin.flags', os.time() + 864000,
+        bot:do_later('admin.flags', os.time() + 86400,
             {chat_id = msg.chat.id, user_id = msg.from.id})
 
     elseif score == 2 then
@@ -214,7 +214,7 @@ function autils.strike(bot, msg, source)
         end
 
         -- Decrement the user's strikes in 24h.
-        bot:do_later('admin.flags', os.time() + 864000,
+        bot:do_later('admin.flags', os.time() + 86400,
             {chat_id = msg.chat.id, user_id = msg.from.id})
 
     elseif score == 3 then
