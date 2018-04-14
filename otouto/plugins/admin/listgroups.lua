@@ -50,6 +50,8 @@ function P:action(bot, msg, _group)
             '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
         if #listed_groups == 0 then
             output = 'There are no listed groups.'
+        elseif #listed_groups < 5 then
+            output = group_list
         else
             if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
                 if msg.chat.type ~= 'private' then
