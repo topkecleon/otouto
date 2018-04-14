@@ -25,14 +25,12 @@
                       "Annyong."
                       ; else
                       "Pong!"))
-    (local (_ message) (utilities.send_reply msg answer))
+    (local (success message) (utilities.send_reply msg answer))
     (local b (string.format "%.3f" (- (socket.gettime) a)))
-    (when message
-      (local edit (bindings.editMessageText {
-        :chat_id msg.chat.id
-        :message_id message.result.message_id
-        :text (f-str "{answer}\n`{b}`")
-        :parse_mode :Markdown
-      })))
-    nil)
+    (if success (bindings.editMessageText {
+      :chat_id msg.chat.id
+      :message_id message.result.message_id
+      :text (f-str "{answer}\n`{b}`")
+      :parse_mode :Markdown
+    })))
 }
