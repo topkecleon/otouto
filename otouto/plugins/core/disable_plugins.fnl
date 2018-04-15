@@ -32,6 +32,8 @@
     :control true
     :disable_plugins true
     :end_forwards true
+    :group_whitelist true
+    :group_info true
     :luarun true
     :users true
   }
