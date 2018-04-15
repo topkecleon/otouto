@@ -15,6 +15,7 @@
 
   :action (fn [_ bot msg group]
     (when group (if (and group.data.admin
+                        (not group.data.admin.flags.private)
                         group.data.info
                         (~= msg.chat.title group.data.info.title))
                   (autils.log bot {
