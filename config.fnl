@@ -64,7 +64,7 @@ Send /help to get started."
         core-critical [
           :core.control
           :core.luarun
-          :core.users
+          :core.user_info
           :core.group_whitelist
           :core.group_info
         ]
@@ -84,7 +84,7 @@ Send /help to get started."
         ]
         core [
           :core.end_forwards
-          ;:core.blacklist
+          ;:core.user_blacklist
           :core.about
           :core.delete_messages
           :core.disable_plugins
