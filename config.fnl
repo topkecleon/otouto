@@ -65,10 +65,11 @@ Send /help to get started."
           :core.control
           :core.luarun
           :core.users
+          :core.group_whitelist
+          :core.group_info
         ]
         admin-critical [
           :admin.flags
-          :admin.groupinfo
           :admin.banremover
           :admin.autopromoter
         ]
@@ -83,6 +84,7 @@ Send /help to get started."
         ]
         core [
           :core.end_forwards
+          ;:core.blacklist
           :core.about
           :core.delete_messages
           :core.disable_plugins
