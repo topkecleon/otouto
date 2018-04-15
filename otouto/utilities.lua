@@ -226,6 +226,10 @@ function utilities.user(bot, user_id)
     )
 end
 
+function utilities.group(bot, chat_id)
+    return {data = utilities.data_table(bot.database.groupdata, tostring(chat_id))}
+end
+
 -- Just an easy way to get a user's full name.
 -- Alternatively, abuse it to concat two strings like I do.
 function utilities.build_name(first, last)

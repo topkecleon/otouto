@@ -14,7 +14,7 @@
   :init (fn [_ bot] (tset? bot.database.groupdata :info {}))
 
   :action (fn [_ bot msg group]
-    (if (= msg.chat.type "private") :continue
+    (if (= msg.chat.type :private) :continue
     ;else
       (do (if (and group.data.admin
                    group.data.info

@@ -23,7 +23,7 @@ function P:action(bot, msg, group)
             utilities.send_reply(msg, 'Group not found.')
             return
         end
-    elseif group.data.admin then
+    elseif group and group.data.admin then
         chat_id = msg.chat.id
     else
         utilities.send_reply(msg, 'Specify a group.')

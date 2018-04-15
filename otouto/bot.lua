@@ -159,9 +159,10 @@ function bot:on_message(msg)
 
     local disabled_plugins = self.database.disabled_plugins[tostring(msg.chat.id)]
     local user = utilities.user(self, msg.from.id)
-    local group = {
-        data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
-    }
+    local group
+    if msg.chat.type ~= 'private' then
+        group = utilities.group(bot, msg.chat.id)
+    end
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
