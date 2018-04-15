@@ -24,7 +24,7 @@ function P:action(bot, msg, _group, _user)
 
     for target in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
-        if autils.rank(bot, target, msg.chat.id) > 2 then
+        if autils.rank(bot, target, msg.chat.id) >= 2 then
             table.insert(output, name .. ' is too privileged to be kicked.')
         else
             -- It isn't documented, but unbanChatMember also kicks.
