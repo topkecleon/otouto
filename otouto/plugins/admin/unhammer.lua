@@ -13,7 +13,6 @@ end
 
 function P:action(bot, msg, group)
     local targets, output, reason = autils.targets(bot, msg)
-    local admin = group.data.admin
     local unhammered_users = utilities.new_set()
 
     for target in pairs(targets) do
@@ -31,7 +30,8 @@ function P:action(bot, msg, group)
     if #unhammered_users > 0 then
         autils.log(bot, {
             -- Do not send the chat ID from PMs or private groups.
-            chat_id = admin and (not admin.flags.private) and msg.chat.id,
+            chat_id = group and group.data.admin
+                and not group.data.admin.flags.private and msg.chat.id,
             targets = unhammered_users,
             action = "Unhammered",
             source_user = msg.from,

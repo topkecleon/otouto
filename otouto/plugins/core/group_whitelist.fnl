@@ -12,7 +12,7 @@
   :triggers [""]
 
   :action (fn [_ bot msg group user]
-    (if (= msg.chat.type :private) :continue
+    (if (not group) :continue
       ;else
       (do (if (and msg.left_chat_member (= msg.left_chat_member.id bot.info.id))
                 (set group.data.whitelisted nil)

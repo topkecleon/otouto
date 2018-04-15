@@ -40,10 +40,10 @@ function P:action(bot, msg, group)
 
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
     if #hammered_users > 0 then
-        local admin = group.data.admin
         autils.log(bot, {
             -- Do not send the chat ID from PMs or private groups.
-            chat_id = admin and (not admin.flags.private) and msg.chat.id,
+            chat_id = group and group.data.admin
+                and not group.data.admin.flags.private and msg.chat.id,
             targets = hammered_users,
             action = 'Globally banned',
             source_user = msg.from,

@@ -32,14 +32,11 @@ function P:action(bot, msg, group)
             output = 'Input must be a group ID.'
         end
 
+    elseif group and group.data.admin then
+        output = 'I am no longer administrating ' .. msg.chat.title .. '.'
+        group.data.admin = nil
     else
-        local admin = group.data.admin
-        if admin then
-            output = 'I am no longer administrating ' .. msg.chat.title .. '.'
-            group.data.admin = nil
-        else
-            output = 'Run in an administrated group or pass one\'s ID.'
-        end
+        output = 'Run in an administrated group or pass one\'s ID.'
     end
 
     utilities.send_reply(msg, output)
