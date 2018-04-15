@@ -13,13 +13,15 @@
 
   :init (fn [_ bot] (tset? bot.database.groupdata :info {}))
 
-  :action (fn [_ bot msg _ group]
-    (if (and group.data.admin group.data.info (~= msg.chat.title group.data.info.title))
+  :action (fn [_ bot msg group _] (if (= msg.chat.type "private") :continue
+    (do (if (and group.data.admin
+                 group.data.info
+                 (~= msg.chat.title group.data.info.title))
           (autils.log bot {
             :chat_id msg.chat.id
             :action "Title changed."
             :reason msg.chat.title
             :source_user (if msg.new_chat_title msg.from)}))
-    (set group.data.info msg.chat)
-    :continue)
+      (set group.data.info msg.chat)
+      :continue)))
 }
