@@ -161,14 +161,15 @@ function bot:on_message(msg)
     local user = utilities.user(self, msg.from.id)
     local group
     if msg.chat.type ~= 'private' then
-        group = utilities.group(bot, msg.chat.id)
+        group = utilities.group(self, msg.chat.id)
     end
 
     -- Do the thing.
     for _, plugin in ipairs(self.plugins) do
         if
             (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
+            ((not plugin.administration or (group and group.data.admin))
+                and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
@@ -207,16 +208,16 @@ function bot:on_edit(msg)
     msg.text_lower = msg.text:lower()
 
     local user = utilities.user(self, msg.from.id)
-
-    local group = {
-        data = utilities.data_table(self.database.groupdata, tostring(msg.chat.id)),
-    }
+    local group
+    if msg.chat.type ~= 'private' then
+        group = utilities.group(self, msg.chat.id)
+    end
 
     for _, plugin in ipairs(self.plugins) do
         if
             plugin.edit_action and
-            (not (disabled_plugins and disabled_plugins[plugin.name])) and
-            ((not plugin.administration or group.data.admin) and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
+            ((not plugin.administration or (group and group.data.admin))
+                and user:rank(self, msg.chat.id) >= (plugin.privilege or 0))
         then
             for _, trigger in ipairs(plugin.triggers) do
                 if string.match(msg.text_lower, trigger) then
