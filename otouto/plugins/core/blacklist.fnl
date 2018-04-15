@@ -6,7 +6,7 @@
 ;; Copyright 2016 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
-(require-macros :otouto.macros)
+(require-macros :anise.macros)
 (require* otouto.utilities
           otouto.autils)
 
@@ -14,7 +14,7 @@
   :init (fn [self bot]
     (set self.triggers [""])
     (set self.error false)
-    (set? bot.database.userdata.blacklist {}))
+    (tset? bot.database.userdata :blacklist {}))
 
   :blacklist (fn [userdata]
     (if userdata.blacklist
@@ -30,7 +30,7 @@
         (set userdata.blacklist nil)
         " has been unblacklisted.")))
 
-  :action (fn [self bot msg group user]
+  :action (fn [self bot msg _ user]
     (if ; non-owner is blacklisted
         (and user.data.blacklist (~= msg.from.id self.config.admin))
         nil
@@ -41,7 +41,7 @@
                        self.unblacklist
                        ; else
                        nil)]
-          (if (not (and action (= msg.from.id self.config.admin)))
+          (if (not (and act (= msg.from.id self.config.admin)))
             :continue
             (let [targets (autils.targets bot msg)
                   output []]
