@@ -12,6 +12,7 @@ end
 
 function P:action(bot, msg, _group)
     local input = utilities.input_from_msg(msg)
+    input = input and input:lower()
 
     -- Output will be a list of results, a list of all groups, or an explanation
     -- that there are no (listed) groups.
