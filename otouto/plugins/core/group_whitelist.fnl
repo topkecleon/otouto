@@ -11,14 +11,16 @@
 {
   :triggers [""]
 
-  :action (fn [_ bot msg group user] (if (= msg.chat.type "private") :continue
-    (do (if (and msg.left_chat_member (= msg.left_chat_member.id bot.info.id))
-              (set group.data.whitelisted nil)
-            (and msg.new_chat_member
-              (= msg.new_chat_member.id bot.info.id)
-              (> (: user :rank bot) 3))
-                (set group.data.whitelisted true))
-        (if (or group.data.whitelisted group.data.admin)
-              :continue
-            (bindings.leaveChat {:chat_id msg.chat.id})))))
+  :action (fn [_ bot msg group user]
+    (if (= msg.chat.type "private") :continue
+      ;else
+      (do (if (and msg.left_chat_member (= msg.left_chat_member.id bot.info.id))
+                (set group.data.whitelisted nil)
+              (and msg.new_chat_member
+                (= msg.new_chat_member.id bot.info.id)
+                (> (: user :rank bot) 3))
+                  (set group.data.whitelisted true))
+          (if (or group.data.whitelisted group.data.admin)
+                :continue
+              (bindings.leaveChat {:chat_id msg.chat.id})))))
 }
