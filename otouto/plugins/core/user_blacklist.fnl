@@ -13,26 +13,26 @@
 {
   :init (fn [self bot]
     (set self.triggers [""])
-    (set self.error false)
-    (tset? bot.database.userdata :blacklist {}))
+    ;(set self.error false)
+    (tset? bot.database.userdata :blacklisted {}))
 
   :blacklist (fn [userdata]
-    (if userdata.blacklist
+    (if userdata.blacklisted
       " is already blacklisted."
       (do
-        (set userdata.blacklist true)
+        (set userdata.blacklisted true)
         " has been blacklisted.")))
 
   :unblacklist (fn [userdata]
-    (if (not userdata.blacklist)
+    (if (not userdata.blacklisted)
       " is not blacklisted."
       (do
-        (set userdata.blacklist nil)
+        (set userdata.blacklisted nil)
         " has been unblacklisted.")))
 
   :action (fn [self bot msg _ user]
     (if ; non-owner is blacklisted
-        (and user.data.blacklist (~= msg.from.id self.config.admin))
+        (and user.data.blacklisted (~= msg.from.id bot.config.admin))
         nil
         ; else
         (let [act (if (: msg.text :match (f-str "^{bot.config.cmd_pat}blacklist"))
@@ -41,18 +41,12 @@
                        self.unblacklist
                        ; else
                        nil)]
-          (if (not (and act (= msg.from.id self.config.admin)))
-            :continue
-            (let [targets (autils.targets bot msg)
-                  output []]
-              (if (not targets)
-                (table.insert output bot.config.errors.specify_targets)
-                (each [_ id (ipairs targets)]
-                  (table.insert output
-                    (if (tonumber id)
-                      (let [name (utilities.lookup_name bot id)
-                            ud (utilities.data_table user.data._data (tostring id))]
-                        (.. name (act ud)))
-                      id))))
-              (utilities.send_reply msg (table.concat output "\n") :html))))))
+          (if (not (and act (= msg.from.id bot.config.admin)))
+                :continue
+              (let [(targets errors) (autils.targets bot msg)]
+                (each [target (pairs targets)]
+                  (table.insert errors
+                    (let [user (utilities.user bot target)]
+                      (.. (: user :name) (act user.data)))))
+                (utilities.send_reply msg (table.concat errors "\n") :html))))))
 }

@@ -10,6 +10,7 @@
 
 {
   :triggers [""]
+  :error false
 
   :action (fn [_ bot msg group user]
     (if (not group) :continue

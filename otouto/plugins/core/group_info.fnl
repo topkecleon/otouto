@@ -10,6 +10,7 @@
 
 {
   :triggers [""]
+  :error false
 
   :init (fn [_ bot] (tset? bot.database.groupdata :info {}))
 

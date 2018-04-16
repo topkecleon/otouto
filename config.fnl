@@ -84,7 +84,7 @@ Send /help to get started."
         ]
         core [
           :core.end_forwards
-          ;:core.user_blacklist
+          :core.user_blacklist
           :core.about
           :core.delete_messages
           :core.disable_plugins

@@ -8,6 +8,7 @@
 {
   :init (fn [self bot]
     (set self.triggers [""])
+    (set self.errors false)
     (local users (or bot.database.userdata.info {}))
     (set bot.database.userdata.info users)
     (tset users (tostring bot.info.id) bot.info)
