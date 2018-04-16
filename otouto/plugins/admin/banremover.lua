@@ -1,3 +1,9 @@
+--[[
+    banremover.lua
+    Copyright 2018 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
+
 local bindings = require('otouto.bindings')
 local autils = require('otouto.autils')
 

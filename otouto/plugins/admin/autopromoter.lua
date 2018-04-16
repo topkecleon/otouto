@@ -1,4 +1,10 @@
- -- Promotes mods & admins when they join a group.
+--[[
+    autopromoter.lua
+    Promotes mods & admins when they join a group.
+    Copyright 2018 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
+
 local autils = require('otouto.autils')
 
 local P = {}

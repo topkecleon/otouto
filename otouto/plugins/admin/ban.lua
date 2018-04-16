@@ -1,3 +1,9 @@
+--[[
+    ban.lua
+    Copyright 2018 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
+]]--
+
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
