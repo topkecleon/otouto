@@ -279,9 +279,16 @@ function utilities.send_help_for(chat_id, reply_to_message_id, name, doc)
 end
 
 function utilities.plugin_help(cmd_pat, plugin)
-    return plugin.command and
-        (cmd_pat .. utilities.html_escape(plugin.command) .. "\n" .. plugin.doc)
-        or plugin.doc
+    local output = plugin.doc
+    if plugin.command then
+        output = cmd_pat .. utilities.html_escape(plugin.command) .. "\n"
+            .. output
+        if plugin.targeting then
+            output = output .. ('\nFor help on targeting, see %shelp targets.')
+                :format(cmd_pat)
+        end
+    end
+    return output
 end
 
 function utilities.send_plugin_help(chat_id, reply_to_message_id, cmd_pat, plugin)
