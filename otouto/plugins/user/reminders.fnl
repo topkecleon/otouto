@@ -39,7 +39,7 @@
 
       ; text is message text and/or replied-to text, or nil.
       (set text (if (and msg.reply_to_message (> (# msg.reply_to_message.text) 0))
-          (if text (.. msg.reply_to_message.text "\n" text)
+          (if text (.. msg.reply_to_message.text "\n\n" text)
             ;else
             msg.reply_to_message.text)
         text text
@@ -55,7 +55,8 @@
             :chat_id msg.chat.id
             :text text
             :date msg.date})
-          (.. "I will remind you in " (utilities.tiem.print interval) "."))))
+          (.. "I will remind you in " (utilities.tiem.print interval) ":\n"
+            (utilities.html_escape text)))))
 
       ; else (if not input)
       (utilities.plugin_help bot.config.cmd_pat self)))
