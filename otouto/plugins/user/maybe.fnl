@@ -21,6 +21,6 @@
       (do (utilities.send_plugin_help msg.chat.id msg.message_id bot.config.cmd_pat self) nil)
       (let [probability (or (tonumber probability) 50)]
         (when (< (* (math.random) 100) probability)
-          (set msg.text (utilities.trim input))
+          (set msg.text (anise.trim input))
           (: self :on_message msg)))))
 }

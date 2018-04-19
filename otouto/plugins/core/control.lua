@@ -100,8 +100,9 @@ function control:action(bot, msg)
             utilities.send_reply(msg, 'usage: ```\n'..cmd_pat..'do\n'..cmd_pat..'command <arg>\n...\n```', true)
             return
         end
-        input = input .. '\n'
-        for command in input:gmatch('(.-)\n') do
+    print(input)
+        for command in (input..'\n'):gmatch('(.-)\n+') do
+    print(command)
             command = anise.trim(command)
             msg.text = command
             bot:on_message(msg)
