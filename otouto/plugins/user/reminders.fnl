@@ -36,9 +36,13 @@
   :action (fn [self bot msg] (let [input (utilities.input msg.text)]
     (local output (if input (do
       (var (text interval) (autils.duration_from_reason input))
-      (set text (if text text ; text = text or reply.text or nil
-        (and msg.reply_to_message (> #msg.reply_to_message.text 0))
-          msg.reply_to_message.text
+
+      ; text is message text and/or replied-to text, or nil.
+      (set text (if (and msg.reply_to_message (> (# msg.reply_to_message.text) 0))
+          (if text (.. msg.reply_to_message.text "\n" text)
+            ;else
+            msg.reply_to_message.text)
+        text text
         ;else
         nil))
 
