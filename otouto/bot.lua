@@ -261,7 +261,7 @@ function bot:run()
                 end
             end
         else
-            print('[' .. os.date('%F %T') .. '] Connection error while fetching updates.')
+            io.write('[' .. os.date('%F %T') .. '] Error while fetching updates.\n')
         end
 
         local now = os.time()
@@ -269,13 +269,18 @@ function bot:run()
         for i, thing in ipairs(self.database.later) do
             if now >= thing.when then
                 local plugin = self.named_plugins[thing.pname]
-                local suc, err = xpcall(function()
-                    plugin:later(self, thing.param)
-                end, function(msg) return debug.traceback(msg) end)
-                if suc then
-                    table.insert(delete_this, i)
+                if plugin then
+                    local suc, err = xpcall(function()
+                        plugin:later(self, thing.param)
+                    end, function(msg) return debug.traceback(msg) end)
+                    if suc then
+                        table.insert(delete_this, i)
+                    else
+                        utilities.log_error(err, self.config.log_chat)
+                    end
                 else
-                    utilities.log_error(err, self.config.log_chat)
+                    io.write('Later job failed for ' .. thing.pname ..
+                        ': Plugin not loaded.\n')
                 end
             end
         end
@@ -291,7 +296,7 @@ function bot:run()
     end
     -- Save the database before exiting.
     utilities.save_data(self.database_name, self.database)
-    print('Halted.\n')
+    io.write('Halted.\n')
 end
 
  -- Schedule a plugin's later function to be run after the given interval.
