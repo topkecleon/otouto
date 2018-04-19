@@ -5,7 +5,8 @@
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
 (require-macros :anise.macros)
-(require* otouto.utilities)
+(require* anise
+  otouto.utilities)
 
 {
   :init (fn [self bot]
@@ -22,5 +23,5 @@
       (let [probability (or (tonumber probability) 50)]
         (when (< (* (math.random) 100) probability)
           (set msg.text (anise.trim input))
-          (: self :on_message msg)))))
+          (: bot :on_message msg)))))
 }
