@@ -553,4 +553,22 @@ utilities.tiem = {
     end,
 }
 
+utilities.inline_keyboard_meta = {
+    row = function(self, new_row)
+        table.insert(self.inline_keyboard, new_row or {})
+        return self
+    end,
+    button = function(self, new_button)
+        table.insert(self.inline_keyboard[#self.inline_keyboard], new_button)
+        return self
+    end,
+    serialize = function(self)
+        return (json.encode(self))
+    end
+}
+utilities.inline_keyboard_meta.__index = utilities.inline_keyboard_meta
+utilities.inline_keyboard = function()
+    return setmetatable({inline_keyboard = {}}, utilities.inline_keyboard_meta)
+end
+
 return utilities
