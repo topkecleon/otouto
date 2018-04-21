@@ -553,22 +553,41 @@ utilities.tiem = {
     end,
 }
 
-utilities.inline_keyboard_meta = {
+ -- This will create, build, and serialize a keyboard for reply keyboards,
+ -- inline keyboards, and hopefully any future use of keyboard markdown.
+ -- ex myKeyboard = utilities.keyboard("keyboard", "one_time_keyboard", ...)
+ -- or myKeyboard = utilities.keyboard("inline_keyboard")
+ -- myKeyboard:row() or myKeyboard:row(premade_row)
+ -- myKeyboard:button("Label text") for reply keyboards
+ -- myKeyboard:button("Label text", "mandatory_optional_field", "its value")
+ -- or myKeyboard:button{text="Label text", optional_field = value, ...}
+ -- myKeyboard:serialize() to stringify, eg
+ -- bindings.sendMessage{chat_id = 8675309, text = "whatever",
+ --     reply_markup = myKeyboard:serialize()}
+
+utilities.keyboard_meta = {
     row = function(self, new_row)
-        table.insert(self.inline_keyboard, new_row or {})
+        table.insert(self[self.__type], new_row or {})
         return self
     end,
-    button = function(self, new_button)
-        table.insert(self.inline_keyboard[#self.inline_keyboard], new_button)
+    button = function(self, btn, key, val)
+        table.insert(self[self.__type][#self[self.__type]],
+            type(btn) == 'table' and btn or {text = btn, [key] = val or true})
         return self
     end,
     serialize = function(self)
         return (json.encode(self))
     end
 }
-utilities.inline_keyboard_meta.__index = utilities.inline_keyboard_meta
-utilities.inline_keyboard = function()
-    return setmetatable({inline_keyboard = {}}, utilities.inline_keyboard_meta)
+utilities.keyboard_meta.__index = utilities.keyboard_meta
+utilities.keyboard = function(kbtype, ...)
+    local kb = {}
+    for i = 1, select('#', ...) do
+        kb[select(i, ...)] = true
+    end
+    kb[kbtype] = {}
+    kb.__type = kbtype
+    return setmetatable(kb, utilities.keyboard_meta)
 end
 
 return utilities
