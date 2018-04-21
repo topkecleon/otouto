@@ -240,6 +240,27 @@ function bot:on_edit(msg)
     end
 end
 
+function bot:on_callback_query(query)
+    if query.data then
+        local pname = query.data:match('^%g+')
+        if self.named_plugins[pname] then
+            local plugin = self.named_plugins[pname]
+            local success, result = xpcall(function()
+                return plugin:callback_action(self, query)
+            end, function(msg) return debug.traceback(msg) end)
+            if not success then
+                utilities.log_error(result..'\ncallback_action for '..pname,
+                    self.config.log_chat)
+            end
+            return
+        end
+        utilities.log_error('Orphaned callback query: ' .. query.data,
+            self.config.log_chat)
+    elseif query.game_short_name then
+        -- to do
+    end
+end
+
  -- main
 function bot:run()
     self:init()
@@ -248,7 +269,7 @@ function bot:run()
         local success, result = bindings.getUpdates{
             timeout = 5, -- change the global http/s timeout in utilities.lua
             offset = self.last_update + 1,
-            allowed_updates = '["message","edited_message"]'
+            allowed_updates = '["message","edited_message","callback_query"]'
         }
         if success then
             -- Iterate over every new message.
@@ -258,6 +279,8 @@ function bot:run()
                     self:on_message(v.message)
                 elseif v.edited_message then
                     self:on_edit(v.edited_message)
+                elseif v.callback_query then
+                    self:on_callback_query(v.callback_query)
                 end
             end
         else
