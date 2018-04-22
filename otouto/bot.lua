@@ -243,7 +243,7 @@ end
 function bot:on_callback_query(query)
     if query.data then
         local pname = query.data:match('^%g+')
-        if self.named_plugins[pname] then
+        if self.named_plugins[pname] and self.named_plugins[pname].callback_action then
             local plugin = self.named_plugins[pname]
             local success, result = xpcall(function()
                 return plugin:callback_action(self, query)
