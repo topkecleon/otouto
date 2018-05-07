@@ -459,6 +459,18 @@ function utilities.format_name(user) -- or chat
     ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
 end
 
+ -- For names without formatting, in captions and the console etc.
+function utilities.print_name(user)
+    return (string.format(
+        '%s [%s]%s',
+        (user.title
+            or user.last_name and user.first_name .. ' ' .. user.last_name
+            or user.first_name),
+        utilities.normalize_id(user.id),
+        user.username and ' @' .. user.username or ''
+    ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
+end
+
 function utilities.lookup_user(bot, id)
     return (bot.database.userdata.info
             and bot.database.userdata.info[tostring(id)])
