@@ -97,8 +97,8 @@ P.subcommands = {
 
         elseif not idx then -- /setrules
             admin.rules = new_rules
-            local output = '<b>Rules for ' .. utilities.html_escape(admin.name) ..
-                ':</b>'
+            local output = '<b>Rules for ' .. utilities.html_escape(
+                utilities.format_name(group.info)) .. ':</b>'
             for i, rule in ipairs(admin.rules) do
                 output = output .. '\n<b>' .. i .. '.</b> ' .. rule
             end
