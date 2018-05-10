@@ -34,10 +34,10 @@ function P:action(bot, msg, group)
         elseif bot.database.userdata.hammered[target] then
             table.insert(output, name .. ' is already globally banned.')
         else
-            bindings.kickChatMember{
+            if group then bindings.kickChatMember{
                 chat_id = msg.chat.id,
                 user_id = target
-            }
+            } end
             bot.database.userdata.hammered[target] = true
             table.insert(output, name .. ' has been globally banned.')
             hammered_users:add(target)
