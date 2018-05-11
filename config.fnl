@@ -80,6 +80,7 @@ Send /help to get started."
           :admin.antisquig
           :admin.delete_left_messages
           :admin.filterer
+          :admin.filesonly
           :admin.nostickers
         ]
         core [
