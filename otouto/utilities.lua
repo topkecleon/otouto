@@ -214,7 +214,10 @@ utilities.user_meta = {
         end
     end,
     name = function(self)
-        return utilities.format_name(self.data.info)
+        return utilities.format_name(self.data.info or {
+            id = tonumber(self.data._key),
+            first_name = 'Unknown'
+        })
     end
 }
 utilities.user_meta.__index = utilities.user_meta
@@ -463,9 +466,9 @@ end
 function utilities.print_name(user)
     return (string.format(
         '%s [%s]%s',
-        (user.title
+        user.title
             or user.last_name and user.first_name .. ' ' .. user.last_name
-            or user.first_name),
+            or user.first_name
         utilities.normalize_id(user.id),
         user.username and ' @' .. user.username or ''
     ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
