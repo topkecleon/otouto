@@ -254,6 +254,10 @@ function bot:on_callback_query(query)
             end
             return
         end
+        bindings.answerCallbackQuery{
+            callback_query_id = query.id,
+            text = "Something went wrong! It's been noted."
+        }
         utilities.log_error('Orphaned callback query: ' .. query.data,
             self.config.log_chat)
     elseif query.game_short_name then
