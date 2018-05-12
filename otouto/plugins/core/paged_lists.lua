@@ -55,9 +55,10 @@ function P:page(list)
         '\n• '
     ))
     table.insert(output, string.format(
-        '\nPage %d/%d\nList owner: %s',
+        '\nPage %d of %d | %d total\nList owner: %s',
         list.page,
         math.ceil(#list.array / self.plen),
+        #list.array,
         utilities.format_name(list.owner)
     ))
     return table.concat(output, '\n')
@@ -78,13 +79,17 @@ function P:callback_action(_, query)
                 chat_id = list.chat_id,
                 message_id = list.message_id
             }
-            bindings.deleteMessage{
-                chat_id = list.chat_id,
-                message_id = list.command_id
-            }
+            if list.chat_id ~= list.owner_id then
+                bindings.deleteMessage{
+                    chat_id = list.chat_id,
+                    message_id = list.command_id
+                }
+            end
             self.lists[tostring(query.message.message_id)] = nil
-        else
+
+        elseif page_count == 1 then
             bindings.answerCallbackQuery{callback_query_id = query.id}
+        else
             if command == 'next' then
                 if list.page == page_count then
                     list.page = 1
@@ -117,10 +122,12 @@ function P:later(_, list_id)
             chat_id = list.chat_id,
             message_id = list.message_id
         }
-        bindings.deleteMessage{
-            chat_id = list.chat_id,
-            message_id = list.command_id
-        }
+        if list.chat_id ~= list.owner_id then
+            bindings.deleteMessage{
+                chat_id = list.chat_id,
+                message_id = list.command_id
+            }
+        end
         self.lists[tostring(list_id)] = nil
     end
 end
