@@ -42,6 +42,7 @@ function P:send_list(bot, msg, array, title)
         self.lists[tostring(list.message_id)] = list
         bot:do_later(self.name, os.time() + 3600, list.message_id)
     end
+    return success, result
 end
 
 function P:page(list)
