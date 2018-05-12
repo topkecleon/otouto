@@ -22,6 +22,8 @@
 "I am otouto, the plugin-wielding, multipurpose Telegram bot.\
 \
 Send /help to get started."
+  ; Length of lists per page.
+  :page_length 12
 
   ; Generic error messages.
   :errors {
@@ -90,6 +92,7 @@ Send /help to get started."
           :core.delete_messages
           :core.disable_plugins
           :core.help
+          :core.paged_lists
           :core.ping
         ]
         admin [
