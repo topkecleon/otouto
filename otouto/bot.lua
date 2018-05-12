@@ -306,8 +306,11 @@ function bot:run()
                         utilities.log_error(err, self.config.log_chat)
                     end
                 else
-                    io.write('Later job failed for ' .. thing.pname ..
-                        ': Plugin not loaded.\n')
+                    table.insert(delete_this, i)
+                    utilities.log_error(
+                        'Later job discarded for missing plugin: '..thing.pname,
+                        self.config.log_chat
+                    )
                 end
             end
         end

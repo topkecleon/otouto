@@ -23,29 +23,18 @@ local utilities = {}
 
 -- For the sake of ease to new contributors and familiarity to old contributors,
 -- we'll provide a couple of aliases to real bindings here.
--- Edit: To keep things working and allow for HTML messages, you can now pass a
--- string for use_markdown and that will be sent as the parse mode.
-function utilities.send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
-    local parse_mode
-    if type(use_markdown) == 'string' then
-        parse_mode = use_markdown
-    elseif use_markdown == true then
-        parse_mode = 'markdown'
-    end
-    return bindings.request(
-        'sendMessage',
-        {
-            chat_id = chat_id,
-            text = text,
-            disable_web_page_preview = disable_web_page_preview,
-            reply_to_message_id = reply_to_message_id,
-            parse_mode = parse_mode
-        }
-    )
+function utilities.send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, parse_mode)
+    return bindings.sendMessage{
+        chat_id = chat_id,
+        text = text,
+        disable_web_page_preview = disable_web_page_preview,
+        reply_to_message_id = reply_to_message_id,
+        parse_mode = parse_mode
+    }
 end
 
-function utilities.send_reply(msg, text, use_markdown)
-    return utilities.send_message(msg.chat.id, text, true, msg.message_id, use_markdown)
+function utilities.send_reply(msg, text, parse_mode)
+    return utilities.send_message(msg.chat.id, text, true, msg.message_id, parse_mode)
 end
 
 -- get the indexed word in a string

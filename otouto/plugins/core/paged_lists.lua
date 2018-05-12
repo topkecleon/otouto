@@ -15,31 +15,32 @@ function P:init(bot)
         :button('🗑', 'callback_data', self.name .. ' del'):serialize()
 
     bot.database.paged_lists = bot.database.paged_lists or {}
-    self.lists = bot.database.paged_lists
+    self.db = bot.database.paged_lists
     self.plen = bot.config.page_length
 end
 
- -- Cache the list, send it, schedule it for expiration.
-function P:send_list(bot, msg, array, title)
+ -- Send a page, store the list, and schedule it for expiration.
+function P:list(bot, msg, array, title)
     local list = {
         title = title,
         array = array,
-        command_id = msg.message_id,
         chat_id = msg.chat.id,
+        command_id = msg.message_id,
         owner = msg.from,
         page = 1
     }
-    local page = self:page(list)
+
     local success, result = bindings.sendMessage{
-        chat_id = msg.chat.id,
-        text = page,
+        chat_id = list.chat_id,
+        text = self:page(list),
         parse_mode = 'html',
         disable_web_page_preview = true,
-        reply_markup = self.kb
+        reply_markup = self:count(list) > 1 and self.kb or nil
     }
+
     if success then
         list.message_id = result.result.message_id
-        self.lists[tostring(list.message_id)] = list
+        self.db[tostring(list.message_id)] = list
         bot:do_later(self.name, os.time() + 3600, list.message_id)
     end
     return success, result
@@ -47,33 +48,47 @@ end
 
 function P:page(list)
     local output = {}
-    if list.title then table.insert(output,
-        '<b>' .. utilities.html_escape(list.title) .. '</b>'
-    ) end
+    if list.title then
+        table.insert(
+            output,
+            '<b>' .. utilities.html_escape(list.title) .. '</b>'
+        )
+    end
     local last = list.page * self.plen
-    table.insert(output, '• ' .. table.concat(
-        table.move(list.array, last - self.plen + 1, last, 1, {}),
-        '\n• '
-    ))
-    table.insert(output, string.format(
-        '\nPage %d of %d | %d total\nList owner: %s',
-        list.page,
-        math.ceil(#list.array / self.plen),
-        #list.array,
-        utilities.format_name(list.owner)
-    ))
+    table.insert(
+        output,
+        '• ' .. table.concat(
+            table.move(list.array, last - self.plen + 1, last, 1, {}),
+            '\n• '
+        )
+    )
+    if self:count(list) > 1 then
+        table.insert(
+            output,
+            string.format(
+                '\nPage %d of %d | %d total',
+                list.page,
+                math.ceil(#list.array / self.plen),
+                #list.array
+            )
+        )
+    end
     return table.concat(output, '\n')
 end
 
+ -- Page count for a given list.
+function P:count(list)
+    return math.ceil(#list.array / self.plen)
+end
+
 function P:callback_action(_, query)
-    local list = self.lists[tostring(query.message.message_id)]
+    local list = self.db[tostring(query.message.message_id)]
     if query.from.id ~= list.owner.id then
         bindings.answerCallbackQuery{
             callback_query_id = query.id,
             text = 'Only ' .. list.owner.first_name .. ' may use this keyboard.'
         }
     else
-        local page_count = math.ceil(#list.array / self.plen)
         local command = utilities.get_word(query.data, 2)
         if command == 'del' then
             bindings.deleteMessage{
@@ -86,20 +101,20 @@ function P:callback_action(_, query)
                     message_id = list.command_id
                 }
             end
-            self.lists[tostring(query.message.message_id)] = nil
+            self.db[tostring(query.message.message_id)] = nil
 
-        elseif page_count == 1 then
+        elseif self:count(list) == 1 then
             bindings.answerCallbackQuery{callback_query_id = query.id}
         else
             if command == 'next' then
-                if list.page == page_count then
+                if list.page == self:count(list) then
                     list.page = 1
                 else
                     list.page = list.page + 1
                 end
             elseif command == 'prev' then
                 if list.page == 1 then
-                    list.page = page_count
+                    list.page = self:count(list)
                 else
                     list.page = list.page - 1
                 end
@@ -110,14 +125,14 @@ function P:callback_action(_, query)
                 text = self:page(list),
                 parse_mode = 'html',
                 disable_web_page_preview = true,
-                reply_markup = self.kb
+                reply_markup = self:count(list) > 1 and self.kb or nil
             }
         end
     end
 end
 
 function P:later(_, list_id)
-    local list = self.lists[tostring(list_id)]
+    local list = self.db[tostring(list_id)]
     if list then
         bindings.deleteMessage{
             chat_id = list.chat_id,
@@ -129,7 +144,7 @@ function P:later(_, list_id)
                 message_id = list.command_id
             }
         end
-        self.lists[tostring(list_id)] = nil
+        self.db[tostring(list_id)] = nil
     end
 end
 
