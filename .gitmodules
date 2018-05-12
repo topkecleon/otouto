@@ -1,3 +1,6 @@
 [submodule "extern/anise"]
 	path = extern/anise
 	url = https://github.com/bb010g/anise.git
+[submodule "otouto/bindings"]
+	path = otouto/bindings
+	url = https://github.com/topkecleon/bindings
