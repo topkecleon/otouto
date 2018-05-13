@@ -542,6 +542,8 @@ utilities.tiem = {
     deformat = function (time_str)
         if string.match(time_str, '^%d+$') then
             return tonumber(time_str)
+        elseif type(time_str) ~= 'string' then
+            return false
         elseif
             (not time_str:match('^[%dywdhms]+$'))
             or time_str:match('%l%l')
