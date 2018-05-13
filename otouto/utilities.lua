@@ -540,7 +540,9 @@ utilities.tiem = {
         return table.concat(output)
     end,
     deformat = function (time_str)
-        if
+        if string.match(time_str, '^%d+$') then
+            return tonumber(time_str)
+        elseif
             (not time_str:match('^[%dywdhms]+$'))
             or time_str:match('%l%l')
             or time_str:match('^%l')
