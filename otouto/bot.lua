@@ -201,6 +201,7 @@ function bot:on_message(msg)
 end
 
 function bot:on_edit(msg)
+    if msg.edit_date < os.time() - 15 then return end
     msg.text = msg.text or msg.caption or ''
     if msg.reply_to_message then
         msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
