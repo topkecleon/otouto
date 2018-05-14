@@ -1,10 +1,22 @@
 --[[
     paged_lists.lua
     Support for inline buttons and expiration for paged lists.
+
+    This has become such a convoluted piece of code. Here's a quick rundown.
+    P:list stores a list object and generates a page (via P:page) and sends it,
+    schedules it for deletion (P:later), and returns its results.
+    P:action is for local admins (with can_edit_info perm) to configure page
+    length, list duration, and whether (most) lists are sent in private.
+    P:callback_action is to handle keyboard events on paged lists, such as
+    scrolling (generating a new page with P:page) and deleting the keyboard.
+
+    Copyright 2018 topkecleon <drew@otou.to>
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]
 
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
+local anise = require('extern.anise')
 
 local P = {}
 
@@ -15,37 +27,97 @@ function P:init(bot)
         :button('🗑', 'callback_data', self.name .. ' del'):serialize()
 
     bot.database.paged_lists = bot.database.paged_lists or {}
+    bot.database.groupdata.plists = bot.database.groupdata.plists or {}
     self.db = bot.database.paged_lists
-    self.plen = bot.config.page_length
+
+    self.default = bot.config.paged_lists
+
+    do -- somewhat consistent message width, kinda gross, really sorry
+        local t = {}
+        local spacer = '⠀'
+        for i = 1, 20 do
+            table.insert(t, spacer)
+        end
+        self.blank = table.concat(t, spacer)
+    end
+
+    -- P.action will let local admins with can_change_info configure the length
+    -- of pages, duration of lists, and whether or not lists will be sent
+    -- publicly or privately.
+    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
+        :t('listconf', true):t('plists', true).table
+    self.command = 'listconf <key [value]>'
+    self.doc = ("Change a setting for paged lists in the group. You must have \z
+        permission to edit group info to use this command. \n\n\z
+        <b>Settings</b> (defaults parenthesized): \n\z
+            • length (%s) - The number of items per page. \n\z
+            • duration (%s) - The period of time after a list is \z
+                created that it should expire. This may be a number of \z
+                seconds or an interval in the tiem format (see /help tiem). \n\z
+            • private (%s) - Whether (most) lists should be sent \z
+                in private rather than to the group. This can be set to \z
+                <i>true</i> or <i>false</i>. \n\n\z
+        If no setting is given, this text is returned. If a setting is named \z
+        without a value, its current value will be returned.")
+        :format(
+            self.default.page_length,
+            utilities.tiem.print(self.default.list_duration),
+            tostring(self.default.private_lists)
+        )
 end
 
  -- Send a page, store the list, and schedule it for expiration.
-function P:list(bot, msg, array, title)
+ -- title and chat_id are optional. chat_id defaults to msg.chat.id unless
+ -- private_lists is set.
+function P:list(bot, msg, array, title, chat_id)
+    local plists =
+        bot.database.groupdata.plists[tostring(chat_id or msg.chat.id)] or {}
+
+    if not chat_id then
+        -- private_lists can be true, false, or nil.
+        -- True or false overrides the global default, nil does not.
+        if
+            plists.private_lists == true
+            or plists.private_lists == nil and self.default.private_lists
+        then
+            chat_id = msg.from.id
+            plists = {}
+        else
+            chat_id = msg.chat.id
+        end
+    end
+
     local list = {
-        title = title,
         array = array,
-        chat_id = msg.chat.id,
-        command_id = msg.message_id,
+        title = title,
+        chat_id = chat_id,
         owner = msg.from,
-        page = 1
+        page = 1,
+        page_length = plists.page_length or self.default.page_length
     }
+    list.page_count = math.ceil(#list.array / list.page_length)
 
     local success, result = bindings.sendMessage{
         chat_id = list.chat_id,
         text = self:page(list),
         parse_mode = 'html',
         disable_web_page_preview = true,
-        reply_markup = self:count(list) > 1 and self.kb or nil
+        reply_markup = list.page_count > 1 and self.kb or nil
     }
 
     if success then
         list.message_id = result.result.message_id
         self.db[tostring(list.message_id)] = list
-        bot:do_later(self.name, os.time() + 3600, list.message_id)
+        bot:do_later(
+            self.name,
+            os.time() + (plists.list_duration or self.default.list_duration),
+            list.message_id
+        )
     end
     return success, result
 end
 
+ -- Generate a page.
 function P:page(list)
     local output = {}
     if list.title then
@@ -54,36 +126,124 @@ function P:page(list)
             '<b>' .. utilities.html_escape(list.title) .. '</b>'
         )
     end
-    local last = list.page * self.plen
+
+    local last = list.page * list.page_length
     table.insert(
         output,
         '• ' .. table.concat(
-            table.move(list.array, last - self.plen + 1, last, 1, {}),
+            table.move(list.array, last - list.page_length + 1, last, 1, {}),
             '\n• '
         )
     )
-    if self:count(list) > 1 then
+
+    if list.page_count > 1 then
+        table.insert(output, self.blank)
         table.insert(
             output,
             string.format(
-                '\nPage %d of %d | %d total',
+                '<code>Page %d of %d | %d total</code>',
                 list.page,
-                math.ceil(#list.array / self.plen),
+                list.page_count,
                 #list.array
             )
         )
     end
+
     return table.concat(output, '\n')
 end
 
- -- Page count for a given list.
-function P:count(list)
-    return math.ceil(#list.array / self.plen)
+ -- For P.action
+P.conf = {
+    length = function(self, plists, num)
+        if not num then
+            return plists.page_length
+        elseif tonumber(num) then
+            num = math.floor(math.abs(tonumber(num)))
+            if num < 1 or num > 40 then
+                return 'The range for page length is 1-40.'
+            else
+                plists.page_length = num
+                return 'Page length is now ' .. num .. '.'
+            end
+        else
+            return 'Page length must be a number.'
+        end
+    end,
+
+    duration = function(self, plists, dur)
+        if not dur then
+            return utilities.tiem.print(plists.list_duration)
+        elseif utilities.tiem.deformat(dur) then
+            local interval = utilities.tiem.deformat(dur)
+            if interval < 60 or interval > 86400 then
+                return 'The range for list duration is one minute through one day.'
+            else
+                plists.list_duration = interval
+                return 'The list duration is now ' ..
+                    utilities.tiem.print(interval) .. '.'
+            end
+        else
+            return 'The list duration must be an interval (see /help tiem).'
+        end
+    end,
+
+    private = function(self, plists, bool)
+        if not bool then
+            return tostring(plists.private_lists)
+        elseif bool:lower() == 'true' then
+            plists.private_lists = true
+            return 'Most lists will now be sent privately.'
+        elseif bool:lower() == 'false' then
+            plists.private_lists = false
+            return 'Most lists will no longer be sent privately.'
+        else
+            return 'This setting is true/false.'
+        end
+    end
+}
+
+ -- For local admins to configure paged lists in the group.
+function P:action(bot, msg, group)
+    local _, result = bindings.getChatMember{
+        chat_id = msg.chat.id,
+        user_id = msg.from.id
+    }
+    if result.result.can_change_info or result.result.status == 'creator' then
+        local plists = group.data.plists or anise.clone(self.default)
+        local setting = utilities.get_word(msg.text:lower(), 2)
+        setting = setting and setting:lower()
+
+        if setting and self.conf[setting] then
+            group.data.plists = plists
+            local value = utilities.get_word(msg.text:lower(), 3)
+            utilities.send_reply(msg, self.conf[setting](self, plists, value))
+
+        else
+            local output = utilities.plugin_help(bot.config.cmd_pat, self) ..
+                ("\n\n<b>Current settings:</b> \n\z
+                    • length - %s \n\z
+                    • duration - %s \n\z
+                    • private - %s"):format(
+                plists.page_length,
+                utilities.tiem.print(plists.list_duration),
+                tostring(plists.private_lists)
+            )
+            utilities.send_reply(msg, output, 'html')
+        end
+    else
+        utilities.send_reply(msg, 'You need permission to edit group info.')
+    end
 end
 
+ -- For the inline keyboard buttons on lists.
 function P:callback_action(_, query)
     local list = self.db[tostring(query.message.message_id)]
-    if query.from.id ~= list.owner.id then
+    if not list then -- Remove the keyboard from a list we're not storing.
+        bindings.deleteMessage{
+            chat_id = query.message.chat.id,
+            message_id = query.message.message_id
+        }
+    elseif query.from.id ~= list.owner.id then
         bindings.answerCallbackQuery{
             callback_query_id = query.id,
             text = 'Only ' .. list.owner.first_name .. ' may use this keyboard.'
@@ -95,26 +255,20 @@ function P:callback_action(_, query)
                 chat_id = list.chat_id,
                 message_id = list.message_id
             }
-            if list.chat_id ~= list.owner_id then
-                bindings.deleteMessage{
-                    chat_id = list.chat_id,
-                    message_id = list.command_id
-                }
-            end
             self.db[tostring(query.message.message_id)] = nil
 
-        elseif self:count(list) == 1 then
+        elseif list.page_count == 1 then
             bindings.answerCallbackQuery{callback_query_id = query.id}
         else
             if command == 'next' then
-                if list.page == self:count(list) then
+                if list.page == list.page_count then
                     list.page = 1
                 else
                     list.page = list.page + 1
                 end
             elseif command == 'prev' then
                 if list.page == 1 then
-                    list.page = self:count(list)
+                    list.page = list.page_count
                 else
                     list.page = list.page - 1
                 end
@@ -125,12 +279,13 @@ function P:callback_action(_, query)
                 text = self:page(list),
                 parse_mode = 'html',
                 disable_web_page_preview = true,
-                reply_markup = self:count(list) > 1 and self.kb or nil
+                reply_markup = list.page_count > 1 and self.kb or nil
             }
         end
     end
 end
 
+ -- For the expiration of lists.
 function P:later(_, list_id)
     local list = self.db[tostring(list_id)]
     if list then
@@ -138,12 +293,6 @@ function P:later(_, list_id)
             chat_id = list.chat_id,
             message_id = list.message_id
         }
-        if list.chat_id ~= list.owner_id then
-            bindings.deleteMessage{
-                chat_id = list.chat_id,
-                message_id = list.command_id
-            }
-        end
         self.db[tostring(list_id)] = nil
     end
 end
