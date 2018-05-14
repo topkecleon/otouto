@@ -241,7 +241,7 @@ end
 function P:callback_action(_, query)
     local list = self.db[tostring(query.message.message_id)]
     if not list then -- Remove the keyboard from a list we're not storing.
-        bindings.deleteMessage{
+        bindings.editMessageReplyMarkup{
             chat_id = query.message.chat.id,
             message_id = query.message.message_id
         }
@@ -259,31 +259,28 @@ function P:callback_action(_, query)
             }
             self.db[tostring(query.message.message_id)] = nil
 
-        elseif list.page_count == 1 then
-            bindings.answerCallbackQuery{callback_query_id = query.id}
-        else
-            if command == 'next' then
-                if list.page == list.page_count then
-                    list.page = 1
-                else
-                    list.page = list.page + 1
-                end
-            elseif command == 'prev' then
-                if list.page == 1 then
-                    list.page = list.page_count
-                else
-                    list.page = list.page - 1
-                end
+        elseif command == 'next' then
+            if list.page == list.page_count then
+                list.page = 1
+            else
+                list.page = list.page + 1
             end
-            bindings.editMessageText{
-                chat_id = list.chat_id,
-                message_id = list.message_id,
-                text = self:page(list),
-                parse_mode = 'html',
-                disable_web_page_preview = true,
-                reply_markup = list.page_count > 1 and self.kb or nil
-            }
+
+        elseif command == 'prev' then
+            if list.page == 1 then
+                list.page = list.page_count
+            else
+                list.page = list.page - 1
+            end
         end
+        bindings.editMessageText{
+            chat_id = list.chat_id,
+            message_id = list.message_id,
+            text = self:page(list),
+            parse_mode = 'html',
+            disable_web_page_preview = true,
+            reply_markup = list.page_count > 1 and self.kb or nil
+        }
     end
 end
 

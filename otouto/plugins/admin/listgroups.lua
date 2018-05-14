@@ -26,22 +26,27 @@ function P:action(bot, msg)
 
     -- Output will be a list of results, a list of all groups, or an explanation
     -- that there are no (listed) groups.
-    local results, listed_groups = {}, {}
+    local titles, links = {}, {}
+    local listed_groups, results = {}, {}
 
     for id_str, chat in pairs(bot.database.groupdata.admin) do
         if not chat.flags.private then
             local title = bot.database.groupdata.info[id_str].title
-            local link = string.format(
-                '<a href="%s">%s</a>',
-                chat.link,
-                utilities.html_escape(title)
-            )
-            table.insert(listed_groups, link)
-
+            table.insert(titles, title)
+            links[title] = chat.link
             if input and title:lower():find(input, 1, true) then
                 table.insert(results, link)
             end
         end
+    end
+
+    table.sort(titles)
+    for _, title in ipairs(titles) do
+        table.insert(listed_groups, string.format(
+            '<a href="%s">%s</a>',
+            links[title],
+            utilities.html_escape(title)
+        ))
     end
 
     local output
