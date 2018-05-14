@@ -5,18 +5,22 @@
 ]]--
 
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
+local plists
 
 local P = {}
 
 function P:init(bot)
+    plists = bot.named_plugins['core.paged_lists']
+    assert(plists, self.name .. ' requires core.paged_lists.')
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('groups', true):t('listgroups', true).table
-    self.command = 'groups [query]'
+        :t('groups?', true):t('listgroups', true).table
+    self.command = 'listgroups [query]'
     self.doc = "/groups [query]\
 Returns a list of all public, administrated groups, or the results of a query."
 end
 
-function P:action(bot, msg, _group)
+function P:action(bot, msg)
     local input = utilities.input_from_msg(msg)
     input = input and input:lower()
 
@@ -41,38 +45,30 @@ function P:action(bot, msg, _group)
     end
 
     local output
-
     if input then
         if #results == 0 then
             output = bot.config.errors.results
         else
-            output = string.format(
-                '<b>Groups matching</b> <i>%s</i><b>:</b>\n• %s',
-                utilities.html_escape(input),
-                table.concat(results, '\n• ')
-            )
+            plists:list(bot, msg, results, 'Group Results', msg.chat.id)
         end
+    elseif #listed_groups == 0 then
+        output = 'There are no listed groups.'
     else
-        local group_list =
-            '<b>Groups:</b>\n• ' .. table.concat(listed_groups, '\n• ')
-        if #listed_groups == 0 then
-            output = 'There are no listed groups.'
-        elseif #listed_groups < 5 then
-            output = group_list
-        else
-            if utilities.send_message(msg.from.id, group_list, true, nil, 'html') then
-                if msg.chat.type ~= 'private' then
-                    output = 'I have sent you the requested information in a private message.'
-                end
+        local success, result = plists:list(bot, msg, listed_groups, 'Groups')
+        if success then
+            if result.result.chat.id ~= msg.chat.id then
+                output = 'I have sent you the requested info privately.'
             else
-                output = string.format(
-                    'Please <a href="https://t.me/%s?start=groups">message me privately</a> for a list of groups.',
-                    bot.info.username
-                )
+                bindings.deleteMessage{
+                    chat_id = msg.chat.id,
+                    message_id = msg.message_id
+                }
             end
+        else
+            output = 'Please <a href="https://t.me/' .. bot.info.username
+                .. '?start=groups">message me privately</a> first.'
         end
     end
-
     if output then utilities.send_reply(msg, output, 'html') end
 end
 

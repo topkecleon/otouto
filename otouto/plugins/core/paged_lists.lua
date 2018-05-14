@@ -51,8 +51,8 @@ function P:init(bot)
         permission to edit group info to use this command. \n\n\z
         <b>Settings</b> (defaults parenthesized): \n\z
             • length (%s) - The number of items per page. \n\z
-            • duration (%s) - The period of time after a list is \z
-                created that it should expire. This may be a number of \z
+            • duration (%s) - The period of time after a list is created \z
+                that its keyboard should expire. This may be a number of \z
                 seconds or an interval in the tiem format (see /help tiem). \n\z
             • private (%s) - Whether (most) lists should be sent \z
                 in private rather than to the group. This can be set to \z
@@ -189,13 +189,15 @@ P.conf = {
 
     private = function(self, plists, bool)
         if not bool then
-            return tostring(plists.private_lists)
-        elseif bool:lower() == 'true' then
+            bool = tostring(not plists.private_lists)
+        end
+
+        if bool:lower() == 'true' then
             plists.private_lists = true
             return 'Most lists will now be sent privately.'
         elseif bool:lower() == 'false' then
             plists.private_lists = false
-            return 'Most lists will no longer be sent privately.'
+            return 'Lists will no longer be sent privately.'
         else
             return 'This setting is true/false.'
         end
@@ -289,10 +291,12 @@ end
 function P:later(_, list_id)
     local list = self.db[tostring(list_id)]
     if list then
-        bindings.deleteMessage{
-            chat_id = list.chat_id,
-            message_id = list.message_id
-        }
+        if list.page_count ~= 1 then
+            bindings.editMessageReplyMarkup{
+                chat_id = list.chat_id,
+                message_id = list.message_id
+            }
+        end
         self.db[tostring(list_id)] = nil
     end
 end
