@@ -21,10 +21,15 @@ local anise = require('extern.anise')
 local P = {}
 
 function P:init(bot)
-    self.kb = utilities.keyboard('inline_keyboard'):row()
+    self.kb = {}
+    self.kb.default = utilities.keyboard('inline_keyboard'):row()
         :button('◀', 'callback_data', self.name .. ' prev')
         :button('▶', 'callback_data', self.name .. ' next')
         :button('🗑', 'callback_data', self.name .. ' del'):serialize()
+
+    self.kb.private = utilities.keyboard('inline_keyboard'):row()
+        :button('◀', 'callback_data', self.name .. ' prev')
+        :button('▶', 'callback_data', self.name .. ' next'):serialize()
 
     bot.database.paged_lists = bot.database.paged_lists or {}
     bot.database.groupdata.plists = bot.database.groupdata.plists or {}
@@ -35,7 +40,7 @@ function P:init(bot)
     do -- somewhat consistent message width, kinda gross, really sorry
         local t = {}
         local spacer = '⠀'
-        for i = 1, 20 do
+        for _ = 1, 20 do
             table.insert(t, spacer)
         end
         self.blank = table.concat(t, spacer)
@@ -96,13 +101,20 @@ function P:list(bot, msg, array, title, chat_id)
         page_length = plists.page_length or self.default.page_length
     }
     list.page_count = math.ceil(#list.array / list.page_length)
+    if list.page_count == 1 then
+        list.kb = nil
+    elseif list.owner.id == list.chat_id then
+        list.kb = 'private'
+    else
+        list.kb = 'default'
+    end
 
     local success, result = bindings.sendMessage{
         chat_id = list.chat_id,
         text = self:page(list),
         parse_mode = 'html',
         disable_web_page_preview = true,
-        reply_markup = list.page_count > 1 and self.kb or nil
+        reply_markup = self.kb[list.kb]
     }
 
     if success then
@@ -154,7 +166,7 @@ end
 
  -- For P.action
 P.conf = {
-    length = function(self, plists, num)
+    length = function(plists, num)
         if not num then
             return plists.page_length
         elseif tonumber(num) then
@@ -170,7 +182,7 @@ P.conf = {
         end
     end,
 
-    duration = function(self, plists, dur)
+    duration = function(plists, dur)
         if not dur then
             return utilities.tiem.print(plists.list_duration)
         elseif utilities.tiem.deformat(dur) then
@@ -187,7 +199,7 @@ P.conf = {
         end
     end,
 
-    private = function(self, plists, bool)
+    private = function(plists, bool)
         if not bool then
             bool = tostring(not plists.private_lists)
         end
@@ -218,7 +230,7 @@ function P:action(bot, msg, group)
         if setting and self.conf[setting] then
             group.data.plists = plists
             local value = utilities.get_word(msg.text:lower(), 3)
-            utilities.send_reply(msg, self.conf[setting](self, plists, value))
+            utilities.send_reply(msg, self.conf[setting](plists, value))
 
         else
             local output = utilities.plugin_help(bot.config.cmd_pat, self) ..
@@ -279,7 +291,7 @@ function P:callback_action(_, query)
             text = self:page(list),
             parse_mode = 'html',
             disable_web_page_preview = true,
-            reply_markup = list.page_count > 1 and self.kb or nil
+            reply_markup = self.kb[list.kb]
         }
     end
 end

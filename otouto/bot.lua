@@ -176,7 +176,7 @@ function bot:on_message(msg)
 
                     local success, result = xpcall(function ()
                         return plugin:action(self, msg, group, user)
-                    end, function (msg) return debug.traceback(msg) end)
+                    end, function (message) return debug.traceback(message) end)
 
                     if not success then
                         -- If the plugin has an error message, send it. If it does
@@ -225,7 +225,7 @@ function bot:on_edit(msg)
 
                     local success, result = xpcall(function ()
                         return plugin:edit_action(self, msg, group, user)
-                    end, function (msg) return debug.traceback(msg) end)
+                    end, function (message) return debug.traceback(message) end)
 
                     if not success then
                         -- The message contents are included for debugging purposes.
