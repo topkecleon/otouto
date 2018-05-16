@@ -368,6 +368,7 @@ local function assertCompile(condition, msg, ast)
 end
 
 local GLOBAL_SCOPE = makeScope()
+GLOBAL_SCOPE.vararg = true
 local SPECIALS = GLOBAL_SCOPE.specials
 local COMPILER_SCOPE = makeScope(GLOBAL_SCOPE)
 
@@ -746,6 +747,7 @@ local function compile1(ast, scope, parent, opts)
             exprs = handleCompileOpts({expr(call, 'statement')}, parent, opts, ast)
         end
     elseif isVarg(ast) then
+        assert(scope.vararg, "unexpected vararg")
         exprs = handleCompileOpts({expr('...', 'varg')}, parent, opts, ast)
     elseif isSym(ast) then
         local e
@@ -825,6 +827,7 @@ local function destructure(to, from, ast, scope, parent, opts)
     local nomulti = opts.nomulti
     local noundef = opts.noundef
     local forceglobal = opts.forceglobal
+    local forceset = opts.forceset
     local setter = declaration and "local %s = %s" or "%s = %s"
 
     -- Get Lua source for symbol, and check for errors
@@ -837,7 +840,7 @@ local function destructure(to, from, ast, scope, parent, opts)
         else
             local parts = isMultiSym(raw) or {raw}
             local meta = scope.symmeta[parts[1]]
-            if #parts == 1 then
+            if #parts == 1 and not forceset then
                 assertCompile(not(forceglobal and meta),
                     'expected global, found var', up1)
                 assertCompile(meta or not noundef,
@@ -957,8 +960,9 @@ local function doImpl(ast, scope, parent, opts, start, chunk, subScope)
         else
             -- We will use an IIFE for the do
             local fname = gensym(scope)
-            emit(parent, ('local function %s()'):format(fname), ast)
-            retexprs = expr(fname .. '()', 'statement')
+            local fargs = scope.vararg and '...' or ''
+            emit(parent, ('local function %s(%s)'):format(fname, fargs), ast)
+            retexprs = expr(fname .. '(' .. fargs .. ')', 'statement')
             outerTail = true
             outerTarget = nil
         end
@@ -1003,6 +1007,7 @@ SPECIALS['fn'] = function(ast, scope, parent)
     local index = 2
     local fnName = isSym(ast[index])
     local isLocalFn
+    fScope.vararg = false
     if fnName and fnName[1] ~= 'nil' then
         isLocalFn = not isMultiSym(fnName[1])
         if isLocalFn then
@@ -1020,6 +1025,7 @@ SPECIALS['fn'] = function(ast, scope, parent)
     local argNameList = {}
     for i = 1, #argList do
         if isVarg(argList[i]) then
+            assertCompile(i == #argList, "expected vararg in last parameter position", ast)
             argNameList[i] = '...'
             fScope.vararg = true
         elseif isSym(argList[i])
@@ -1090,6 +1096,13 @@ SPECIALS['set'] = function(ast, scope, parent)
     assertCompile(#ast == 3, "expected name and value", ast)
     destructure(ast[2], ast[3], ast, scope, parent, {
         noundef = true
+    })
+end
+
+SPECIALS['set-forcably!'] = function(ast, scope, parent)
+    assertCompile(#ast == 3, "expected name and value", ast)
+    destructure(ast[2], ast[3], ast, scope, parent, {
+        forceset = true
     })
 end
 
@@ -1214,10 +1227,11 @@ SPECIALS['if'] = function(ast, scope, parent, opts)
     end
 
     if wrapper == 'iife' then
-        emit(parent, ('local function %s()'):format(tostring(s)), ast)
+        local iifeargs = scope.vararg and '...' or ''
+        emit(parent, ('local function %s(%s)'):format(tostring(s), iifeargs), ast)
         emit(parent, buffer, ast)
         emit(parent, 'end', ast)
-        return expr(('%s()'):format(tostring(s)), 'statement')
+        return expr(('%s(%s)'):format(tostring(s), iifeargs), 'statement')
     elseif wrapper == 'none' then
         -- Splice result right into code
         for i = 1, #buffer do
@@ -1602,6 +1616,8 @@ local function repl(options)
     end
 end
 
+local macroLoaded = {}
+
 local module = {
     parser = parser,
     granulate = granulate,
@@ -1620,6 +1636,7 @@ local module = {
     eval = eval,
     repl = repl,
     dofile = dofile_fennel,
+    macroLoaded = macroLoaded,
     path = "./?.fnl;./?/init.fnl",
     traceback = traceback
 }
@@ -1672,11 +1689,18 @@ end
 
 SPECIALS['require-macros'] = function(ast, scope, parent)
     for i = 2, #ast do
-        local filename = assertCompile(searchModule(ast[i]),
-                                       ast[i] .. " not found.", ast)
-        local mod = dofile_fennel(filename, {env=makeCompilerEnv(ast, scope, parent)})
-        for k, v in pairs(assertCompile(isTable(mod), 'expected ' .. ast[i] ..
-                                        'module to be table', ast)) do
+        local modname = ast[i];
+        local mod;
+        if macroLoaded[modname] then
+            mod = macroLoaded[modname]
+        else
+            local filename = assertCompile(searchModule(modname),
+                                           modname .. " not found.", ast)
+            mod = dofile_fennel(filename, {env=makeCompilerEnv(ast, scope, parent)})
+            macroLoaded[modname] = mod
+        end
+        for k, v in pairs(assertCompile(isTable(mod), 'expected ' .. modname ..
+                                        ' module to be table', ast)) do
             scope.specials[k] = macroToSpecial(v)
         end
     end
@@ -1707,9 +1731,7 @@ local stdmacros = [===[
          x)
  :defn (fn [name args ...]
          (assert (sym? name) "defn: function names must be symbols")
-         (let [op (if (multi-sym? (. name 1)) :set :local)]
-           (list (sym op) name
-                 (list (sym :fn) args ...))))
+         (list (sym :fn) name args ...))
  :when (fn [condition body1 ...]
          (assert body1 "expected body")
          (list (sym 'if') condition
@@ -1724,16 +1746,16 @@ local stdmacros = [===[
                  arglist (if has-internal-name? (. args 2) (. args 1))
                  arity-check-position (if has-internal-name? 3 2)]
              (assert (> (# args) 1) "missing body expression")
-             (each [i arg (ipairs arglist)]
-               (if (and (not (: (tostring arg) :match "^?"))
-                        (~= (tostring arg) "..."))
+             (each [i a (ipairs arglist)]
+               (if (and (not (: (tostring a) :match "^?"))
+                        (~= (tostring a) "..."))
                    (table.insert args arity-check-position
                                  (list (sym "assert")
-                                       (list (sym "~=") (sym "nil") arg)
+                                       (list (sym "~=") (sym "nil") a)
                                        (: "Missing argument %s on %s:%s"
-                                          :format (tostring arg)
-                                          (or arg.filename "unknown")
-                                          (or arg.line "?"))))))
+                                          :format (tostring a)
+                                          (or a.filename "unknown")
+                                          (or a.line "?"))))))
              (list (sym "fn") ((or unpack table.unpack) args))))
 }
 ]===]
