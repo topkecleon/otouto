@@ -98,6 +98,7 @@ Send /help to get started."
           :core.help
           :core.paged_lists
           :core.ping
+          :core.user_lists
         ]
         admin [
           :admin.addadmin

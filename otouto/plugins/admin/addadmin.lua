@@ -32,4 +32,11 @@ function P:action(bot, msg, _group, _user)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 
+P.list = {
+    name = 'admins',
+    title = 'Global Administrators',
+    type = 'userdata',
+    key = 'administrator'
+}
+
 return P

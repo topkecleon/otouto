@@ -24,4 +24,12 @@
           (if (or group.data.whitelisted group.data.admin)
                 :continue
               (bindings.leaveChat {:chat_id msg.chat.id})))))
+
+  :list {
+    :name :whitelist
+    :title "Whitelisted Groups"
+    :type :groupdata
+    :key :whitelisted
+    :sudo true
+  }
 }

@@ -77,4 +77,12 @@ function P:action(bot, msg, group)
     utilities.send_reply(msg, output)
 end
 
+P.list = {
+    name = 'administrated',
+    title = 'Administrated Groups',
+    type = 'groupdata',
+    key = 'admin',
+    sudo = true
+}
+
 return P

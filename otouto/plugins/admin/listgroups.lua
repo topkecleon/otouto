@@ -51,12 +51,12 @@ function P:action(bot, msg)
         if #results == 0 then
             output = bot.config.errors.results
         else
-            plists:list(bot, msg, results, 'Group Results', msg.chat.id)
+            plists:send(bot, msg, results, 'Group Results', msg.chat.id)
         end
     elseif #listed_groups == 0 then
         output = 'There are no listed groups.'
     else
-        local success, result = plists:list(bot, msg, listed_groups, 'Groups')
+        local success, result = plists:send(bot, msg, listed_groups, 'Groups')
         if success then
             if result.result.chat.id ~= msg.chat.id then
                 output = 'I have sent you the requested info privately.'

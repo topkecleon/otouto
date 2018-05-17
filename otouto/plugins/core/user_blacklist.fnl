@@ -49,4 +49,12 @@
                     (let [user (utilities.user bot target)]
                       (.. (: user :name) (act user.data)))))
                 (utilities.send_reply msg (table.concat errors "\n") :html))))))
+
+  :list {
+    :name :blacklist
+    :title "Blacklisted Users"
+    :type :userdata
+    :key :blacklisted
+    :sudo true
+  }
 }

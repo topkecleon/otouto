@@ -43,4 +43,11 @@ function P:action(bot, msg, group)
     utilities.send_reply(msg, table.concat(output, '\n'), 'html')
 end
 
+P.list = {
+    name = 'mods',
+    title = 'Moderators',
+    type = 'admin',
+    key = 'moderators'
+}
+
 return P

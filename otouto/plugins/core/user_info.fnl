@@ -33,4 +33,12 @@
       ; else
         nil)
     :continue)
+
+  :list {
+    :name :users
+    :title "Known Users"
+    :type :userdata
+    :key :info
+    :sudo true
+  }
 }

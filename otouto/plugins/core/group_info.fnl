@@ -26,4 +26,12 @@
                     :source_user (if msg.new_chat_title msg.from)}))
       (set group.data.info msg.chat))
     :continue)
+
+  :list {
+    :name :groups
+    :title "Known Groups"
+    :type :groupdata
+    :key :info
+    :sudo true
+  }
 }

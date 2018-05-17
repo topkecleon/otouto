@@ -3,7 +3,7 @@
     Support for inline buttons and expiration for paged lists.
 
     This has become such a convoluted piece of code. Here's a quick rundown.
-    P:list stores a list object and generates a page (via P:page) and sends it,
+    P:send stores a list object and generates a page (via P:page) and sends it,
     schedules it for deletion (P:later), and returns its results.
     P:action is for local admins (with can_edit_info perm) to configure page
     length, list duration, and whether (most) lists are sent in private.
@@ -33,6 +33,7 @@ function P:init(bot)
 
     bot.database.paged_lists = bot.database.paged_lists or {}
     bot.database.groupdata.plists = bot.database.groupdata.plists or {}
+    bot.database.userdata.plists = bot.database.userdata.plists or {}
     self.db = bot.database.paged_lists
 
     self.default = bot.config.paged_lists
@@ -74,7 +75,7 @@ end
  -- Send a page, store the list, and schedule it for expiration.
  -- title and chat_id are optional. chat_id defaults to msg.chat.id unless
  -- private_lists is set.
-function P:list(bot, msg, array, title, chat_id)
+function P:send(bot, msg, array, title, chat_id)
     local plists =
         bot.database.groupdata.plists[tostring(chat_id or msg.chat.id)] or {}
 
@@ -101,7 +102,7 @@ function P:list(bot, msg, array, title, chat_id)
         page_length = plists.page_length or self.default.page_length
     }
     list.page_count = math.ceil(#list.array / list.page_length)
-    if list.page_count == 1 then
+    if list.page_count <= 1 then
         list.kb = nil
     elseif list.owner.id == list.chat_id then
         list.kb = 'private'
@@ -140,13 +141,17 @@ function P:page(list)
     end
 
     local last = list.page * list.page_length
-    table.insert(
-        output,
-        '• ' .. table.concat(
-            table.move(list.array, last - list.page_length + 1, last, 1, {}),
-            '\n• '
+    if #list.array == 0 then
+        table.insert(output, '<i>This list is empty!</i>')
+    else
+        table.insert(
+            output,
+            '• ' .. table.concat(
+                table.move(list.array, last - list.page_length + 1, last, 1, {}),
+                '\n• '
+            )
         )
-    )
+    end
 
     if list.page_count > 1 then
         table.insert(output, self.blank)
@@ -217,21 +222,32 @@ P.conf = {
 }
 
  -- For local admins to configure paged lists in the group.
-function P:action(bot, msg, group)
+function P:action(bot, msg, group, user)
     local _, result = bindings.getChatMember{
         chat_id = msg.chat.id,
         user_id = msg.from.id
     }
     if result.result.can_change_info or result.result.status == 'creator' then
-        local plists = group.data.plists or anise.clone(self.default)
+        local plists
+        if group and group.data.plists then
+            plists = group.data.plists
+        elseif user and user.data.plists then
+            plists = user.data.plists
+        else
+            plists = anise.clone(self.default)
+        end
+
         local setting = utilities.get_word(msg.text:lower(), 2)
         setting = setting and setting:lower()
-
         if setting and self.conf[setting] then
-            group.data.plists = plists
+            if group then
+                group.data.plists = plists
+            else
+                user.data.plists = plists
+            end
+
             local value = utilities.get_word(msg.text:lower(), 3)
             utilities.send_reply(msg, self.conf[setting](plists, value))
-
         else
             local output = utilities.plugin_help(bot.config.cmd_pat, self) ..
                 ("\n\n<b>Current settings:</b> \n\z

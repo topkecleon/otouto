@@ -58,4 +58,11 @@ function P:action(bot, msg, group)
     end
 end
 
+P.list = {
+    name = 'hammered',
+    title = 'Globally Banned Users',
+    type = 'userdata',
+    key = 'hammered'
+}
+
 return P
