@@ -108,7 +108,7 @@ function help:generate_text(cmd_pat)
 "Arguments: <required> [optional]\
 * Targets may be specified via reply, username, mention, or ID. \z
   In a reply command, a reason can be given after the command. Otherwise, it must be on a new line.\
-† A duration may be specified before the reason, in minutes or in the format 5d12h30m15s."
+† A duration may be specified before the reason, in seconds or in the format 5d12h30m15s."
     self.text = '<b>Available commands:</b>' .. utilities.html_escape(comlist)
 end
 

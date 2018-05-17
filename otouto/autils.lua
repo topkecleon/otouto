@@ -54,17 +54,9 @@ function autils.duration_from_reason(text)
     local reason = text
     local duration
     local first = utilities.get_word(text, 1)
-    if first then
-        if tonumber(first) then
-            duration = first * 60
-            reason = utilities.input(text)
-        elseif first:match('^%d[%dywdhms]*%l$') then
-            local n = utilities.tiem.deformat(first)
-            if n then
-                duration = n
-                reason = utilities.input(text)
-            end
-        end
+    if first and utilities.tiem.deformat(first) then
+        reason = utilities.input(text)
+        duration = utilities.tiem.deformat(first)
     end
     return reason, duration
 end
@@ -345,7 +337,7 @@ format 1y12w28d12h45m30s. Read more on time formatting with /help tiem."
 autils.glossary.tiem = "\z
 Some commands, such as /mute and /tempban, expect duration. The \z
 duration can be specified before or in place of the reason. If a number is \z
-given, the interval will be that number of minutes. An interval can also be \z
+given, the interval will be that number of seconds. An interval can also be \z
 a tiem string, eg 3d12h30m. \
 The tiem format handles intervals in the following units: \
 • year (y): 365.25 days or 31557600 seconds. \

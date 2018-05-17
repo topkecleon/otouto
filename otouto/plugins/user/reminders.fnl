@@ -11,7 +11,7 @@
     (set self.command "remind <interval> <text>")
     (set self.triggers (utilities.make_triggers bot []
       [:remind true] [:remindme true] [:reminder true]))
-    (set self.doc "Set a reminder. The interval may be a number of minutes, \z
+    (set self.doc "Set a reminder. The interval may be a number of seconds, \z
         or a <i>tiem</i> string, eg <code>3d12h30m</code> (see /help tiem). \z
         Reminders support HTML formatting. The text of a replied-to message \z
         can be made a reminder, if a valid interval follows the command. \n\z
@@ -46,8 +46,7 @@
         ;else
         nil))
 
-      (if (not interval) "Please specify a valid interval, as a number of \z
-        minutes or a tiem string, eg <code>3d12h30m</code>."
+      (if (not interval) "Please specify a valid interval. See /help tiem."
         (not text) "Please specify text for the reminder."
         ;else
         (do (: bot :do_later self.name (+ (os.time) interval) {

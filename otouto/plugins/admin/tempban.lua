@@ -15,7 +15,8 @@ function P:init(bot)
         :t('tempban', true).table
     self.command = 'tempban'
     self.doc = "Bans a user or users. A duration must be given on a new line \z
-(or after the command in a reply). A reason can be given after that. Example:\
+(or after the command in a reply). A reason can be given after that. The \z
+duration must be an interval in the tiem format (see /help tiem). Example:\
     /tempban @examplus 5554321\
     3d12h Bad jokes."
     self.privilege = 2
