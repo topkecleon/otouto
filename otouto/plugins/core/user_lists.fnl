@@ -37,12 +37,21 @@
             (utils.send_reply msg "You must be the bot owner to see this list.")
           ; else
             (let [arr (anise.sort (utils.list_names bot (. (if
-                    (= linfo.type :userdata) bot.database.userdata
-                    (= linfo.type :groupdata) bot.database.groupdata
-                    (= linfo.type :admin) group.data.admin)
-                  linfo.key))
-                self.gt)]
-              (: (. bot.named_plugins :core.paged_lists) :send bot msg arr linfo.title)))))
+                      (= linfo.type :userdata) bot.database.userdata
+                      (= linfo.type :groupdata) bot.database.groupdata
+                      (= linfo.type :admin) group.data.admin)
+                    linfo.key))
+                  self.gt)
+                  (success result) (: (. bot.named_plugins :core.paged_lists)
+                                      :send bot msg arr linfo.title)]
+              (if success
+                (when (~= result.result.chat.id msg.chat.id)
+                  (utils.send_reply msg "List sent privately."))
+                ; else
+                (utils.send_reply msg (..
+                  "Please <a href=\"https://t.me/" bot.info.username
+                  "?start=lists\">message me privately</a> first.") :html))
+              ))))
 
   :listcats (fn [self bot msg]
     (.. "<b>Available Lists</b>\n• " (table.concat (anise.pushcat {}
