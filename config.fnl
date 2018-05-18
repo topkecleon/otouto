@@ -32,7 +32,7 @@ Send /help to get started."
   ; some dumb stuff
   :user_lists {
     ; Lists are sorted alphabetically. Set to true to sort backward.
-    :reverse_sort true
+    :reverse_sort false
   }
 
   ; Generic error messages.
