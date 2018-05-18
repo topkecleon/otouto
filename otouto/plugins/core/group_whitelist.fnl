@@ -9,6 +9,7 @@
 (local bindings (require "otouto.bindings"))
 
 {
+  :init (fn [_ bot] (set? bot.database.groupdata.whitelisted {}))
   :triggers [""]
   :error false
 
@@ -18,9 +19,9 @@
       (do (if (and msg.left_chat_member (= msg.left_chat_member.id bot.info.id))
                 (set group.data.whitelisted nil)
               (and msg.new_chat_member
-                (= msg.new_chat_member.id bot.info.id)
-                (> (: user :rank bot) 3))
-                  (set group.data.whitelisted true))
+                  (= msg.new_chat_member.id bot.info.id)
+                  (> (: user :rank bot) 3))
+                    (set group.data.whitelisted true))
           (if (or group.data.whitelisted group.data.admin)
                 :continue
               (bindings.leaveChat {:chat_id msg.chat.id})))))
