@@ -29,6 +29,12 @@ Send /help to get started."
     :private_lists false
   }
 
+  ; some dumb stuff
+  :user_lists {
+    ; Lists are sorted alphabetically. Set to true to sort backward.
+    :reverse_sort true
+  }
+
   ; Generic error messages.
   :errors {
     :generic "An unexpected error occurred."

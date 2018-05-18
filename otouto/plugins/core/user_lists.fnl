@@ -21,6 +21,8 @@
     (assert (. bot.named_plugins :core.paged_lists)
             "core.list requires core.paged_lists")
 
+    (when bot.config.user_lists.reverse_sort (set self.gt (fn [a b] (> a b))))
+
     (set self.triggers (utils.make_triggers bot {} [:lists? true]))
     (set self.command "list <category>")
     (set self.doc "Returns a paged list of users in the specified category."))
@@ -34,10 +36,12 @@
           (and linfo.sudo (~= msg.from.id bot.config.admin))
             (utils.send_reply msg "You must be the bot owner to see this list.")
           ; else
-            (let [arr (utils.list_names bot (. (if
+            (let [arr (anise.sort (utils.list_names bot (. (if
                     (= linfo.type :userdata) bot.database.userdata
                     (= linfo.type :groupdata) bot.database.groupdata
-                    (= linfo.type :admin) group.data.admin) linfo.key))]
+                    (= linfo.type :admin) group.data.admin)
+                  linfo.key))
+                self.gt)]
               (: (. bot.named_plugins :core.paged_lists) :send bot msg arr linfo.title)))))
 
   :listcats (fn [self bot msg]
