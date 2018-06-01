@@ -108,7 +108,7 @@ P.subcommands = {
             return 'Invalid index.'
 
         elseif idx > #admin.rules then
-            return super.subcommands.add(group, new_rules, idx)
+            return super.subcommands.add(_, group, new_rules, idx)
 
         else -- /changerule i
             local output = ''
