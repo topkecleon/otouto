@@ -35,6 +35,11 @@ Send /help to get started."
     :reverse_sort false
   }
 
+  :user_info {
+    ; If set to true, user info will only be collected in administrated groups.
+    :admin_only false
+  }
+
   ; Generic error messages.
   :errors {
     :generic "An unexpected error occurred."

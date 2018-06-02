@@ -1,4 +1,4 @@
-; core.list.fnl
+; user_lists.fnl
 ; Paged lists of formatted names.
 
 (local utils (require :otouto.utilities))

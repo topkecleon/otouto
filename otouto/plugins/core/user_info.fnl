@@ -1,6 +1,9 @@
-;; users.fnl
+;; user_info.fnl
 ;; Stores usernames, IDs, and display names for users seen by the bot.
 ;; Worthless on its own but prerequisite for some plugins.
+
+;; config.user_info.admin_only - set to true to only store user info from
+;; administrated groups.
 
 ;; Copyright 2018 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
@@ -12,6 +15,7 @@
     (local users (or bot.database.userdata.info {}))
     (set bot.database.userdata.info users)
     (tset users (tostring bot.info.id) bot.info)
+    (set self.administration (or bot.config.user_info.admin_only nil))
     (values))
 
   :action (fn [self bot msg]
