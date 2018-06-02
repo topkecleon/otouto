@@ -2,8 +2,6 @@
     help.lua
     Returns a list of commands, or command-specific help.
 
-    Load this after every plugin you want to appear in the command list.
-
     Copyright 2016 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
