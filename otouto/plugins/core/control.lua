@@ -48,7 +48,7 @@ function control:action(bot, msg)
     if msg.text_lower:match('^'..cmd_pat..'hotswap') then
         local errs = {}
         local init = false
-        for _, modname in ipairs(anise.split_str(utilities.input(msg.text))) do
+        for modname in anise.split_str_iter(utilities.input(msg.text)) do
             if modname == '!' then
                 init = true
             else
@@ -76,11 +76,9 @@ function control:action(bot, msg)
         package.loaded['otouto.utilities'] = nil
         package.loaded['anise'] = nil
         package.loaded['otouto.autils'] = nil
-        package.loaded['config'] = nil
         if not msg.text_lower:match('%-config') then
-            for k, v in pairs(require('config')) do
-                bot.config[k] = v
-            end
+            package.loaded['config'] = nil
+            bot.config = require('config')
         end
         bot.database.control.on_start = {
             id = msg.chat.id,

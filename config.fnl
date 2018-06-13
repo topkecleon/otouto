@@ -146,6 +146,7 @@ Send /help to get started."
           :user.dice
           :user.echo
           :user.maybe
+          :user.regex
           :user.reminders
           :user.slap
           :user.user_lookup

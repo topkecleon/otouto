@@ -27,15 +27,18 @@
     chat_disabled)
 
   :blacklist {
-    :about true
-    :blacklist true
-    :control true
-    :disable_plugins true
-    :end_forwards true
-    :group_whitelist true
-    :group_info true
-    :luarun true
-    :users true
+    :core.about true
+    :core.control true
+    :core.delete_messages true
+    :core.disable_plugins true
+    :core.end_forwards true
+    :core.group_info true
+    :core.group_whitelist true
+    :core.luarun true
+    :core.paged_lists true
+    :core.user_blacklist true
+    :core.user_info true
+    :core.user_lists true
   }
 
   :toggle (fn [self named_plugins chat_disabled enable pnames]
@@ -73,12 +76,17 @@
             (utilities.send_message chat_id output true nil :html)
             nil)))
       (let [chat_disabled (self.get_disabled disabled_plugins chat_str true)
-            chat_member (. (bindings.getChatMember {:chat_id chat_id :user_id msg.from.id}) :result)]
-        (if (not (or chat_member.can_restrict_members (= chat_member.status :creator)))
+            (cm_success chat_member) (bindings.getChatMember {:chat_id chat_id :user_id msg.from.id})
+            chat_member (and cm_success chat_member.result)]
+        (if
+          (not cm_success)
+          (do (utilities.send_reply msg "Couldn't fetch permissions.") nil)
+          (not (or chat_member.can_restrict_members (= chat_member.status :creator)))
           (do (utilities.send_reply msg "You need ban permissions.") nil)
+          ; else
           (let [enable
-                  (if (: msg.text_lower :match (f-str "^{bot.config.cmd_pat}enable")) true false)
-                pnames (anise.collect_vals (: input :gmatch "%S+"))
+                  (and-or (: msg.text_lower :match (f-str "^{bot.config.cmd_pat}enable")) true false)
+                pnames (anise.split_str input)
                 (disabled enabled not_found blacklisted)
                   (: self :toggle bot.named_plugins chat_disabled enable pnames)
                 output {}

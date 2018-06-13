@@ -19,7 +19,7 @@
 {
   :init (fn [self bot]
     (assert (. bot.named_plugins :core.paged_lists)
-            "core.list requires core.paged_lists")
+            (.. self.name " requires core.paged_lists"))
 
     (when bot.config.user_lists.reverse_sort (set self.gt (fn [a b] (> a b))))
 

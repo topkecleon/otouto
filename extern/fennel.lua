@@ -206,6 +206,9 @@ local function parser(getbyte, filename)
         if r == 10 then line = line + 1 end
         return r
     end
+    local function parseError(msg)
+        return error(msg .. ' in ' .. (filename or 'unknown') .. ':' .. line, 0)
+    end
 
     -- Parse stream
     return function ()
@@ -230,7 +233,7 @@ local function parser(getbyte, filename)
                 b = getb()
             until not b or not iswhitespace(b)
             if not b then
-                if #stack > 0 then error 'unexpected end of source' end
+                if #stack > 0 then parseError 'unexpected end of source' end
                 return nil
             end
 
@@ -246,11 +249,12 @@ local function parser(getbyte, filename)
                     bytestart = byteindex
                 }, LIST_MT))
             elseif delims[b] then -- Closing delimiter
-                if #stack == 0 then error 'unexpected closing delimiter' end
+                if #stack == 0 then parseError 'unexpected closing delimiter' end
                 local last = stack[#stack]
                 local val
                 if last.closer ~= b then
-                    error('unexpected delimiter ' .. string.char(b) .. ', expected ' .. string.char(last.closer))
+                    parseError('unexpected delimiter ' .. string.char(b) ..
+                               ', expected ' .. string.char(last.closer))
                 end
                 last.byteend = byteindex -- Set closing byte index
                 if b == 41 then -- )
@@ -262,7 +266,7 @@ local function parser(getbyte, filename)
                     end
                 else -- }
                     if #last % 2 ~= 0 then
-                        error 'expected even number of values in table literal'
+                        parseError('expected even number of values in table literal')
                     end
                     val = {}
                     for i = 1, #last, 2 do
@@ -289,7 +293,7 @@ local function parser(getbyte, filename)
                         state = "base"
                     end
                 until not b or (state == "done")
-                if not b then error 'unexpected end of source' end
+                if not b then parseError('unexpected end of source') end
                 local raw = string.char(unpack(chars))
                 local loadFn = loadCode(('return %s'):format(raw), nil, filename)
                 dispatch(loadFn())
@@ -311,7 +315,7 @@ local function parser(getbyte, filename)
                     local forceNumber = rawstr:match('^%d')
                     local x
                     if forceNumber then
-                        x = tonumber(rawstr) or error('could not read token "' .. rawstr .. '"')
+                        x = tonumber(rawstr) or parseError('could not read token "' .. rawstr .. '"')
                     else
                         x = tonumber(rawstr) or sym(rawstr, nil, {
                             line = line,
@@ -361,7 +365,8 @@ end
 local function assertCompile(condition, msg, ast)
     -- if we use regular `assert' we can't provide the `level' argument of zero
     if not condition then
-        error(string.format("Compile error in '%s' %s:%s: %s", ast[1][1],
+        error(string.format("Compile error in '%s' %s:%s: %s",
+                            isSym(ast[1]) and ast[1][1] or ast[1] or '()',
                             ast.filename or "unknown", ast.line or '?', msg), 0)
     end
     return condition
@@ -449,13 +454,13 @@ end
 -- Creates a symbol from a string by mangling it.
 -- ensures that the generated symbol is unique
 -- if the input string is unique in the scope.
-local function localMangling(str, scope)
+local function localMangling(str, scope, ast)
     if scope.manglings[str] then
         return scope.manglings[str]
     end
     local append = 0
     local mangling = str
-    if isMultiSym(str) then error 'did not expect a multi symbol' end
+    assertCompile(not isMultiSym(str), 'did not expect multi symbol ' .. str, ast)
 
     -- Mapping mangling to a valid Lua identifier
     if luaKeywords[mangling] or mangling:match('^%d') then
@@ -505,7 +510,7 @@ end
 local function declareLocal(symbol, meta, scope, ast)
     local name = symbol[1]
     assertCompile(not isMultiSym(name), "did not expect mutltisym", ast)
-    local mangling = localMangling(name, scope)
+    local mangling = localMangling(name, scope, ast)
     scope.symmeta[name] = meta
     return mangling
 end
@@ -544,6 +549,33 @@ local function peephole(chunk)
         chunk[i] = peephole(v)
     end
     return chunk
+end
+
+-- correlate line numbers in input with line numbers in output
+local function flattenChunkCorrelated(mainChunk)
+    local function flatten(chunk, out, lastLine, file)
+        if chunk.leaf then
+            out[lastLine] = (out[lastLine] or "") .. " " .. chunk.leaf
+        else
+            for _, subchunk in ipairs(chunk) do
+                -- Ignore empty chunks
+                if subchunk.leaf or #subchunk > 0 then
+                    -- don't increase line unless it's from the same file
+                    if subchunk.ast and file == subchunk.ast.file then
+                        lastLine = math.max(lastLine, subchunk.ast.line or 0)
+                    end
+                    lastLine = flatten(subchunk, out, lastLine, file)
+                end
+            end
+        end
+        return lastLine
+    end
+    local out = {}
+    local last = flatten(mainChunk, out, 1, mainChunk.file)
+    for i = 1, last do
+        if out[i] == nil then out[i] = "" end
+    end
+    return table.concat(out, "\n")
 end
 
 -- Flatten a tree of indented Lua source code lines.
@@ -591,21 +623,25 @@ end
 local function flatten(chunk, options)
     local sm = options.sourcemap and {}
     chunk = peephole(chunk)
-    local ret = flattenChunk(sm, chunk, options.indent, 0)
-    if sm then
-        local key, short_src
-        if options.filename then
-            short_src = options.filename
-            key = '@' .. short_src
-        else
-            key = ret
-            short_src = makeShortSrc(options.source or ret)
+    if(options.correlate) then
+        return flattenChunkCorrelated(chunk), {}
+    else
+        local ret = flattenChunk(sm, chunk, options.indent, 0)
+        if sm then
+            local key, short_src
+            if options.filename then
+                short_src = options.filename
+                key = '@' .. short_src
+            else
+                key = ret
+                short_src = makeShortSrc(options.source or ret)
+            end
+            sm.short_src = short_src
+            sm.key = key
+            fennelSourcemap[key] = sm
         end
-        sm.short_src = short_src
-        sm.key = key
-        fennelSourcemap[key] = sm
+        return ret, sm
     end
-    return ret, sm
 end
 
 -- Convert expressions to Lua string
@@ -697,7 +733,7 @@ local function compile1(ast, scope, parent, opts)
     if isList(ast) then
         -- Function call or special form
         local len = #ast
-        assert(len > 0, "expected a function to call")
+        assertCompile(len > 0, "expected a function to call", ast)
         -- Test for special form
         local first = ast[1]
         if isSym(first) then -- Resolve symbol
@@ -726,7 +762,8 @@ local function compile1(ast, scope, parent, opts)
             local fcallee = compile1(ast[1], scope, parent, {
                 nval = 1
             })[1]
-            assert(fcallee.type ~= 'literal', 'cannot call literal value')
+            assertCompile(fcallee.type ~= 'literal',
+                          'cannot call literal value', ast)
             fcallee = tostring(fcallee)
             for i = 2, len do
                 local subexprs = compile1(ast[i], scope, parent, {
@@ -747,7 +784,7 @@ local function compile1(ast, scope, parent, opts)
             exprs = handleCompileOpts({expr(call, 'statement')}, parent, opts, ast)
         end
     elseif isVarg(ast) then
-        assert(scope.vararg, "unexpected vararg")
+        assertCompile(scope.vararg, "unexpected vararg", ast)
         exprs = handleCompileOpts({expr('...', 'varg')}, parent, opts, ast)
     elseif isSym(ast) then
         local e
@@ -790,10 +827,10 @@ local function compile1(ast, scope, parent, opts)
             buffer[#buffer + 1] = ('%s = %s'):format(
                 k[1], tostring(compile1(v, scope, parent, {nval = 1})[1]))
         end
-        local tbl = '({' .. table.concat(buffer, ', ') ..'})'
+        local tbl = '{' .. table.concat(buffer, ', ') ..'}'
         exprs = handleCompileOpts({expr(tbl, 'expression')}, parent, opts, ast)
     else
-        error('could not compile value of type ' .. type(ast))
+        assertCompile(false, 'could not compile value of type ' .. type(ast), ast)
     end
     exprs.returned = true
     return exprs
@@ -1099,7 +1136,7 @@ SPECIALS['set'] = function(ast, scope, parent)
     })
 end
 
-SPECIALS['set-forcably!'] = function(ast, scope, parent)
+SPECIALS['set-forcibly!'] = function(ast, scope, parent)
     assertCompile(#ast == 3, "expected name and value", ast)
     destructure(ast[2], ast[3], ast, scope, parent, {
         forceset = true
@@ -1342,12 +1379,13 @@ SPECIALS[':'] = function(ast, scope, parent)
         table.concat(args, ', ')), 'statement')
 end
 
-local function defineArithmeticSpecial(name, unaryPrefix)
+local function defineArithmeticSpecial(name, zeroArity, unaryPrefix)
     local paddedOp = ' ' .. name .. ' '
     SPECIALS[name] = function(ast, scope, parent)
         local len = #ast
         if len == 1 then
-            return unaryPrefix or '0'
+            assertCompile(zeroArity ~= nil, 'Expected more than 0 arguments', ast)
+            return expr(zeroArity, 'literal')
         else
             local operands = {}
             for i = 2, len do
@@ -1358,8 +1396,12 @@ local function defineArithmeticSpecial(name, unaryPrefix)
                     operands[#operands + 1] = tostring(subexprs[j])
                 end
             end
-            if #operands == 1 and unaryPrefix then
-                return '(' .. unaryPrefix .. paddedOp .. operands[1] .. ')'
+            if #operands == 1 then
+                if unaryPrefix then
+                    return '(' .. unaryPrefix .. paddedOp .. operands[1] .. ')'
+                else
+                    return operands[1]
+                end
             else
                 return '(' .. table.concat(operands, paddedOp) .. ')'
             end
@@ -1367,33 +1409,37 @@ local function defineArithmeticSpecial(name, unaryPrefix)
     end
 end
 
-defineArithmeticSpecial('+')
-defineArithmeticSpecial('..')
+defineArithmeticSpecial('+', '0')
+defineArithmeticSpecial('..', "''")
 defineArithmeticSpecial('^')
-defineArithmeticSpecial('-', '')
-defineArithmeticSpecial('*')
+defineArithmeticSpecial('-', nil, '')
+defineArithmeticSpecial('*', '1')
 defineArithmeticSpecial('%')
-defineArithmeticSpecial('/', 1)
-defineArithmeticSpecial('//', 1)
-defineArithmeticSpecial('or')
-defineArithmeticSpecial('and')
+defineArithmeticSpecial('/', nil, '1')
+defineArithmeticSpecial('//', nil, '1')
+defineArithmeticSpecial('or', 'false')
+defineArithmeticSpecial('and', 'true')
 
 local function defineComparatorSpecial(name, realop)
     local op = realop or name
     SPECIALS[name] = function(ast, scope, parent)
-        assertCompile(#ast > 2, 'expected at least two arguments', ast)
+        local len = #ast
+        assertCompile(len > 2, 'expected at least two arguments', ast)
         local lhs = compile1(ast[2], scope, parent, {nval = 1})[1]
         local lastval = compile1(ast[3], scope, parent, {nval = 1})[1]
         -- avoid double-eval by introducing locals for possible side-effects
-        if #ast > 3 then lastval = once(lastval, ast[3], scope, parent) end
-        local out = ('(%s) %s (%s)'):
+        if len > 3 then lastval = once(lastval, ast[3], scope, parent) end
+        local out = ('(%s %s %s)'):
             format(tostring(lhs), op, tostring(lastval))
-        for i = 4, #ast do -- variadic comparison
-            local nextval = once(compile1(ast[i], scope, parent, {nval = 1})[1],
-                                 ast[i], scope, parent)
-            out = (out .. " and ((%s) %s (%s))"):
-                format(tostring(lastval), op, tostring(nextval))
-            lastval = nextval
+        if len > 3 then
+            for i = 4, #ast do -- variadic comparison
+                local nextval = once(compile1(ast[i], scope, parent, {nval = 1})[1],
+                                     ast[i], scope, parent)
+                out = (out .. " and (%s %s %s)"):
+                    format(tostring(lastval), op, tostring(nextval))
+                lastval = nextval
+            end
+            out = '(' .. out .. ')'
         end
         return out
     end
@@ -1653,16 +1699,22 @@ local function searchModule(modulename)
     end
 end
 
+module.make_searcher = function(options)
+   return function(modulename)
+      local opts = {}
+      for k,v in pairs(options or {}) do opts[k] = v end
+      local filename = searchModule(modulename)
+      if filename then
+         return function(modname)
+            return dofile_fennel(filename, opts, modname)
+         end
+      end
+   end
+end
+
 -- This will allow regular `require` to work with Fennel:
 -- table.insert(package.loaders, fennel.searcher)
-module.searcher = function(modulename)
-    local filename = searchModule(modulename)
-    if filename then
-        return function(modname)
-            return dofile_fennel(filename, nil, modname)
-        end
-    end
-end
+module.searcher = module.make_searcher()
 
 local function makeCompilerEnv(ast, scope, parent)
     return setmetatable({
