@@ -1,3 +1,6 @@
+if package.path:find('%./%?%.lua') and not package.path:find('%./%?/init%.lua') then
+    package.path = package.path .. ';./?/init.lua'
+end
 dofile('fennel_preamble.lua')
 -- Fennel loaded
 
