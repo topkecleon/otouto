@@ -147,7 +147,7 @@ function P:page(list)
         table.insert(
             output,
             '• ' .. table.concat(
-                table.move(list.array, last - list.page_length + 1, last, 1, {}),
+                anise.move(list.array, last - list.page_length + 1, last, 1, {}),
                 '\n• '
             )
         )
