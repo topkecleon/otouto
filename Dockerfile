@@ -1,20 +1,15 @@
 # Set OTOUTO_BOT_API_KEY to your telegram bot api key
 # Set ADMIN_ID to your telegram id
 # Example: docker run -e OTOUTO_BOT_API_KEY="apikeyhere" -e ADMIN_ID="idhere" jacobamason/otouto
-FROM alpine:3.7
+FROM alpine:latest AS build
+RUN apk --no-cache add luarocks5.3 lua5.3 lua5.3-dev fortune pcre openssl alpine-sdk pcre-dev openssl-dev ca-certificates
+RUN for rock in dkjson lpeg lrexlib-pcre luasec luasocket multipart-post serpent; do /usr/bin/luarocks-5.3 install $rock; done
+RUN apk del alpine-sdk pcre-dev openssl-dev
+RUN rm -rf /root/.cache
 
-RUN apk --no-cache add --virtual build-deps \
-    curl gcc libc-dev pcre-dev libressl-dev && \
-    apk --no-cache add lua5.3 lua5.3-dev luarocks5.3 && \
-    luarocks-5.3 install dkjson && \
-    luarocks-5.3 install lpeg && \
-    luarocks-5.3 install lrexlib-pcre && \
-    luarocks-5.3 install luasec && \
-    luarocks-5.3 install luasocket && \
-    luarocks-5.3 install multipart-post && \
-    apk del build-deps
-
+FROM scratch
+COPY --from=build / /
 COPY . /otouto
 WORKDIR /otouto
-CMD ./launch.sh
+CMD lua5.3 main.lua
 
