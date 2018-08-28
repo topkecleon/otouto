@@ -1,0 +1,7 @@
+version: '3'
+services:
+  bot:
+    container_name: otouto
+    build: .
+    env_file:
+      - .env
