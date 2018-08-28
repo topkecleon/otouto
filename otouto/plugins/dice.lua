@@ -20,20 +20,21 @@ end
 function dice:action(msg)
 
     local input = utilities.input(msg.text_lower)
-    if not input then
-        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, 'html')
-        return
-    end
-
     local count, range
-    if input:match('^[%d]+d[%d]+$') then
-        count, range = input:match('([%d]+)d([%d]+)')
-    elseif input:match('^d?[%d]+$') then
-        count = 1
-        range = input:match('^d?([%d]+)$')
+    local num, sum = 0, 0
+    if input then
+        if input:match('^[%d]+d[%d]+$') then
+            count, range = input:match('([%d]+)d([%d]+)')
+        elseif input:match('^d?[%d]+$') then
+            count = 1
+            range = input:match('^d?([%d]+)$')
+        else
+            utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, 'html')
+            return
+        end
     else
-        utilities.send_message(msg.chat.id, dice.doc, true, msg.message_id, 'html')
-        return
+        count = 1;
+        range = 21;
     end
 
     count = tonumber(count)
@@ -49,9 +50,17 @@ function dice:action(msg)
     end
 
     local output = '*' .. count .. 'd' .. range .. '*\n`'
-    for _ = 1, count do
-        output = output .. math.random(range) .. '\t'
+
+    for i = 1, count do
+        num = math.random(range)
+        sum = sum + num
+        if i < count then
+            output = output .. num .. '\t+\t'
+        else
+            output = output .. num .. '\t=\t' .. sum
+        end
     end
+
     output = output .. '`'
 
     utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
