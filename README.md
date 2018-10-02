@@ -1,3 +1,9 @@
+# Important notice
+
+Please use the [administration branch](https://github.com/topkecleon/otouto/tree/administration)
+for now. This branch is no longer under development, and new features will not
+be added. Only bug fixes will be merged.
+
 # otouto
 The plugin-wielding, multipurpose Telegram bot.
 
