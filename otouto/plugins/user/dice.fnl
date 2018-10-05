@@ -34,11 +34,11 @@
                 (or (> range 1000) (> count 1000))
                 (do (utilities.send_reply msg "The maximum range and count are 1000.") nil)
                 ; else
-                (let [output (f-str "*{count}d{range}*\n`")]
+                (let [output (f-str "<b>{count}d{range}</b>\n<code>")]
                   (var output output)
-                  (for [a b c]
+                  (for [_ 1 count]
                     (set output (f-str "{output}{}\t" (math.random range))))
-                  (set output (f-str "{output}`"))
+                  (set output (f-str "{output}</code>"))
                   (utilities.send_message msg.chat.id output true msg.message_id true)
                   nil)))))))
 }
