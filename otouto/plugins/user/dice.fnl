@@ -21,10 +21,10 @@
     (if (not input)
       (do (utilities.send_plugin_help msg.chat.id msg.message_id bot.config.cmd_pat self) nil)
       (do
-        (var (count range) (: input match "([%d]+)d([%d]+)"))
+        (var (count range) (: input :match "([%d]+)d([%d]+)"))
         (when (not count)
           (set count 1)
-          (set range (: input match "d?([%d]+)$")))
+          (set range (: input :match "d?([%d]+)$")))
         (if (not range)
           (do (utilities.send_message msg.chat.id self.doc true msg.message_id :html) nil)
           (let [count (tonumber count)
