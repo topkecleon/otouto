@@ -37,7 +37,7 @@ function bot:init()
         self.info.first_name, self.info.id, self.info.username))
 
     -- todo: use a real database
-    self.database_name = self.config.database_name or self.info.username .. '.db'
+    self.database_name = self.config.database_name or self.info.username .. '.json'
     if not self.database then
         self.database = utilities.load_data(self.database_name)
     end

@@ -15,8 +15,8 @@
   :log_chat (let [log_chat (os.getenv "OTOUTO_LOG_ID")] (or log_chat nil))
   ; The symbol that starts a command. Usually noted as "/" in documentation.
   :cmd_pat "/"
-  ; The filename of the database. If left nil, defaults to $username.db.
-  :database_name nil
+  ; The filename of the database. If left nil, defaults to $username.json.
+  :database_name (os.getenv "OTOUTO_JSON_FILE")
   ; The block of text returned by /start and /about..
   :about_text
 "I am otouto, the plugin-wielding, multipurpose Telegram bot.\
