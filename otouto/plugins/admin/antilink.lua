@@ -143,18 +143,22 @@ function P:check(bot, msg)
 
         -- Iterate through the messages's entities, if any, and determine if
         -- they're links to external groups.
-        if msg.entities then for _, entity in ipairs(msg.entities) do
-            if entity.url and
-                self:parse_and_detect(bot, entity.url, pattern) then
+        if msg.entities then
+            for _, entity in ipairs(msg.entities) do
+                if entity.url and self:parse_and_detect(bot, entity.url, pattern) then
                     return true
+                end
             end
-        end end
+        end
     end
 
     -- Iterate through all usernames in the message text, and determine if they
     -- are external group links.
     for username in msg.text:gmatch('@([%w_]+)') do
-        if self:is_username_external(bot, username) then
+        if
+            not (msg.forward_from_chat and username == msg.forward_from_chat.username)
+            and self:is_username_external(bot, username)
+        then
             return true
         end
     end
@@ -169,7 +173,9 @@ function P:parse_and_detect(bot, link, pattern)
     local username = link:match(pattern .. '/([%w_]+)')
     if (code and self:is_code_external(bot, code)) or
         (username and self:is_username_external(bot, username))
-    then return true end
+    then
+        return true
+    end
 end
 
  -- This function determines whether or not a given joinchat "code" refers to
@@ -181,7 +187,9 @@ function P:is_code_external(bot, code)
     -- Iterate through groups and return false if the joinchat code belongs to
     -- any one of them.
     for _, group in pairs(bot.database.groupdata.admin) do
-        if group.link:match(pattern) then return false end
+        if group.link:match(pattern) then
+            return false
+        end
     end
     return true
 end
