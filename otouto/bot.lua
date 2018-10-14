@@ -150,11 +150,13 @@ function bot:on_message(msg)
     elseif not msg.text then
         msg.text = ''
     end
-    if msg.reply_to_message and msg.reply_to_message.caption then
-        msg.reply_to_message.text = msg.reply_to_message.caption
-        msg.reply_to_message.entities = msg.reply_to_message.caption_entities
-    elseif not msg.reply_to_message.text then
-        msg.reply_to_message.text = ''
+    if msg.reply_to_message then
+        if msg.reply_to_message.caption then
+            msg.reply_to_message.text = msg.reply_to_message.caption
+            msg.reply_to_message.entities = msg.reply_to_message.caption_entities
+        elseif not msg.reply_to_message.text then
+            msg.reply_to_message.text = ''
+        end
     end
 
     -- Support deep linking.
