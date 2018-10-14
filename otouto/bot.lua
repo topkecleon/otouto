@@ -147,6 +147,8 @@ function bot:on_message(msg)
     if msg.caption then
         msg.text = msg.caption
         msg.entities = msg.caption_entities
+    elseif not msg.text then
+        msg.text = ''
     end
     if msg.reply_to_message and msg.reply_to_message.caption then
         msg.reply_to_message.text = msg.reply_to_message.caption
