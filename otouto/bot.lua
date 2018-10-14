@@ -144,9 +144,13 @@ function bot:on_message(msg)
     if msg.date < os.time() - 15 then return end
 
     -- If no text, use captions.
-    msg.text = msg.text or msg.caption or ''
-    if msg.reply_to_message then
-        msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
+    if msg.caption then
+        msg.text = msg.caption
+        msg.entities = msg.caption_entities
+    end
+    if msg.reply_to_message and msg.reply_to_message.caption then
+        msg.reply_to_message.text = msg.reply_to_message.caption
+        msg.reply_to_message.entities = msg.reply_to_message.caption_entities
     end
 
     -- Support deep linking.
