@@ -23,6 +23,8 @@ function P:action(bot, msg, group)
 
     for target in pairs(targets) do
         local user = utilities.user(bot, target)
+        -- Reset the global antilink counter.
+        user.data.antilink = nil
         if user.data.hammered then
             user.data.hammered = nil
             unhammered_users:add(target)
