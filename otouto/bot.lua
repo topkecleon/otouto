@@ -143,7 +143,7 @@ function bot:on_message(msg)
     -- Do not process old messages.
     if msg.date < os.time() - 15 then return end
 
-    -- If no text, use captions.
+    -- If no text, use captions. If neither, blank string.
     if msg.caption then
         msg.text = msg.caption
         msg.entities = msg.caption_entities
@@ -153,6 +153,8 @@ function bot:on_message(msg)
     if msg.reply_to_message and msg.reply_to_message.caption then
         msg.reply_to_message.text = msg.reply_to_message.caption
         msg.reply_to_message.entities = msg.reply_to_message.caption_entities
+    elseif not msg.reply_to_message.text then
+        msg.reply_to_message.text = ''
     end
 
     -- Support deep linking.
