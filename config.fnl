@@ -96,6 +96,7 @@ Send /help to get started."
           :admin.antisquigpp
           :admin.antisquig
           :admin.delete_left_messages
+          :admin.delete_join_messages
           :admin.filterer
           :admin.filesonly
           :admin.nostickers
