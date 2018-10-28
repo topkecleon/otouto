@@ -1,4 +1,5 @@
-(local anise (require :anise))
+(require-macros :anise.macros)
+(require* anise)
 ; For details on configuration values, see README.md#configuration.
 {
 
@@ -9,10 +10,10 @@
   ; Two-letter language code.
   ; Fetches it from the system if available, or defaults to English.
   :lang (let [lang (os.getenv "LANG")]
-          (or (and lang (: lang :sub 1 2)) "en"))
+          (and-or lang (: lang :sub 1 2) "en"))
   ; The channel, group, or user to send error reports to.
   ; If this is not set, errors will be printed to the console.
-  :log_chat (let [log_chat (os.getenv "OTOUTO_LOG_ID")] (or log_chat nil))
+  :log_chat (or (os.getenv "OTOUTO_LOG_ID") nil)
   ; The symbol that starts a command. Usually noted as "/" in documentation.
   :cmd_pat "/"
   ; The filename of the database. If left nil, defaults to $username.json.

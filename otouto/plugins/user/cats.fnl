@@ -9,30 +9,28 @@
           otouto.bindings
           otouto.utilities)
 
-{
-  :init (fn [self bot]
+{ :init
+  (fn [self bot]
     (when (not bot.config.thecatapi_key)
       (io.write "Missing config value: thecatapi_key.\n\z
-        \tuser.cats will be enabled, but there are more features with a key.\n"))
+                 \tuser.cats will be enabled, but there are more features with a key.\n"))
     (set self.url
-      (f-str "http://thecatapi.com/api/images/get?format=html&type=jpg{}"
-        (if bot.config.thecatapi_key (f-str "&api_key={bot.config.thecatapi_key}") "")))
+      (.. "http://thecatapi.com/api/images/get?format=html&type=jpg"
+        (and-or bot.config.thecatapi_key
+          (.. "&api_key=" bot.config.thecatapi_key)
+          "")))
 
     (set self.command "cat")
     (set self.doc "Returns a cat!")
     (set self.triggers (utilities.make_triggers bot [] :cat))
     (values))
 
-  :action (fn [self bot msg]
+  :action
+  (fn [self bot msg]
     (local (str res) (http.request self.url))
     (if (~= res 200)
-      (do
-        (utilities.send_reply msg bot.config.errors.connection)
-        nil)
-      (do
-        (bindings.sendPhoto {
-          :chat_id msg.chat.id
-          :photo (: str :match "<img src=\"(.-)\">")
-        })
-        nil)))
-}
+      (do (utilities.send_reply msg bot.config.errors.connection) nil)
+      (do (bindings.sendPhoto {:chat_id msg.chat.id
+                               :photo (: str :match "<img src=\"(.-)\">")})
+          nil)))}
+
