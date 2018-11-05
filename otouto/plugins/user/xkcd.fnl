@@ -3,7 +3,7 @@
 ; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
 (require-macros :anise.macros)
-(require* dkjson
+(require* (rename dkjson json)
   ssl.https
   otouto.bindings
   otouto.utilities)
@@ -21,7 +21,7 @@
     (: bot :do_later self.name (+ (os.time) 21600))
     (local (res code) (https.request "https://xkcd.com/info.0.json"))
     (when (= code 200)
-      (set bot.database.xkcd (dkjson.decode res))))
+      (set bot.database.xkcd (json.decode res))))
 
   :action (fn [self bot msg] (let [input (utilities.get_word msg.text 2)
     (res code) (https.request (f-str "https://xkcd.com/{}/info.0.json"
@@ -31,7 +31,7 @@
           input
         ;else
           (tostring bot.database.xkcd.num))))]
-    (when (= code 200) (let [strip (dkjson.decode res)]
+    (when (= code 200) (let [strip (json.decode res)]
       ; Simple way to correct an out-of-date latest strip.
       (when (> strip.num bot.database.xkcd.num) (set bot.database.xkcd strip))
 
