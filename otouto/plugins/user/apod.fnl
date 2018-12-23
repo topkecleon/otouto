@@ -24,7 +24,7 @@
 
   :action (fn [self bot msg]
     (local input (utilities.input msg.text))
-    (local is_date (: input match "^(%d+)%-(%d+)%-(%d+)$") input)
+    (local is_date (and input (: input :match "^%d+%-%d+%-%d+$")))
     (local url (.. self.url (and-or is_date (.. "&date=" (url.escape input)) "")))
 
     (local (jstr code) (https.request url))
@@ -33,10 +33,10 @@
       (let [data (json.decode jstr)]
         (if data.error
           (do (utilities.send_reply msg bot.config.errors.results) nil)
-          (let [output (f-str "<b>{} (</b><a href=\"{}\"><{}</a><b>)</b>\n{}"
+          (let [output (f-str "<b>{}</b> (<a href=\"{}\">{}</a>)\n{}"
                               (utilities.html_escape data.title)
                               (utilities.html_escape (or data.hdurl data.url))
-                              (or date (os.date "%F"))
+                              (or is_date (os.date "%F"))
                               (utilities.html_escape data.explanation))]
             (utilities.send_message msg.chat.id output false nil :html)
             nil)))))
