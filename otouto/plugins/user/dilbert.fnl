@@ -6,8 +6,7 @@
 (require* ssl.https
   socket.url
   otouto.bindings
-  otouto.utilities
-  serpent)
+  otouto.utilities)
 
 {
   :init (fn [self bot]
@@ -21,13 +20,12 @@
            (https.request (.. "https://dilbert.com/strip/" (url.escape (or
               (and input (: input :match "^%d%d%d%d%-%d%d%-%d%d$"))
               (os.date "%F"))))))
-    (if (= code 200)
+    (if (~= code 200)
+      (do (utilities.send_reply msg bot.config.errors.connection) nil)
+    ;else
       (bindings.sendPhoto {
         :chat_id msg.chat.id
         :photo (: res :match "<meta property=\"og:image\" content=\"(.-)\"/>")
         :caption (: res :match "<meta property=\"article:publish_date\" content=\"(.-)\"/>")})
-    ;else
-      (bindings.sendMessage {
-        :chat_id msg.chat.id
-        :text bot.config.errors.connection}))))
+      nil)))
 }
