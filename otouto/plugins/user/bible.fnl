@@ -13,7 +13,7 @@
   :init (fn [self bot]
     (when (not bot.config.biblia_api_key)
       (io.write "Missing config value: biblia_api_key.\n\z \tuser.bible will \z
-        not work without a key from http://bibliaapi.com/."))
+        not work without a key from http://bibliaapi.com/.\n"))
     (set self.url "http://api.biblia.com/v1")
 
     (set self.command "bible <reference>")
@@ -34,14 +34,14 @@
     (if (not input)
       (do (utilities.send_plugin_help msg.chat.id msg.message_id bot.config.cmd_pat self) nil)
       (let [key bot.config.biblia_api_key]
-        (var (output res) (: self biblia_content key "ASV" input))
-        (when (or (not output) (~= res 200) (= (: output len) 0))
-          (set (output res (: self biblia_content key "KJVAPOC" input))))
-        (when (or (not output) (~= res 200) (= (: output len) 0))
-          (set output self.config.errors.results))
-        (when (> (: output len) 4000)
+        (var (output res) (: self :biblia_content key "ASV" input))
+        (when (or (not output) (~= res 200) (= (: output :len) 0))
+          (set (output res) (: self :biblia_content key "KJVAPOC" input)))
+        (when (or (not output) (~= res 200) (= (: output :len) 0))
+          (set output bot.config.errors.results))
+        (when (> (: output :len) 4000)
           (set output "The text is too long to post here. Try being more specific."))
-        (utilities.send_reply msg ouput)
+        (utilities.send_reply msg output)
         nil)))
 }
 
