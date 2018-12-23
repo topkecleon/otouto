@@ -146,6 +146,7 @@ Send /help to get started."
         user [
           :user.cats
           :user.dice
+          :user.dilbert
           :user.echo
           :user.maybe
           :user.regex
