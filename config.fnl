@@ -144,10 +144,15 @@ Send /help to get started."
           :admin.unrestrict
         ]
         user [
+          :user.apod
+          :user.bible
+          :user.calc
+          :user.catfact
           :user.cats
           :user.dice
           :user.dilbert
           :user.echo
+          :user.eightball
           :user.maybe
           :user.regex
           :user.reminders
