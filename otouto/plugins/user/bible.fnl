@@ -11,17 +11,16 @@
 
 {
   :init (fn [self bot]
-    (when (not bot.config.biblia_api_key)
-      (io.write "Missing config value: biblia_api_key.\n\z \tuser.bible will \z
-        not work without a key from http://bibliaapi.com/.\n"))
-    (set self.url "http://api.biblia.com/v1")
-
-    (set self.command "bible <reference>")
-    (set self.doc
-      "Returns a verse from the American Standard Version of the Bible, \z
-       or an apocryphal verse from the King James Version. \z
-       Results from Biblia.com.")
-    (set self.triggers (utilities.make_triggers bot [] [:bible true] [:b true]))
+    (if (not bot.config.biblia_api_key)
+      (io.write "Missing config value: biblia_api_key.\n\z
+      \tuser.bible will not work without a key from http://bibliaapi.com.\n")
+    ;else
+      (do (set self.url "http://api.biblia.com/v1")
+          (set self.command "bible <reference>")
+          (set self.doc "Returns a verse from the American Standard Version of the Bible,\z
+            or a deuterocanonical/apocryphal verse from the King James Version.\z
+            Results from <a href=\"http://biblia.com\">Biblia</a>.")
+          (set self.triggers (utilities.make_triggers bot [] [:bible true] [:b true]))))
     (values))
 
   :biblia_content (fn [self key bible passage]
