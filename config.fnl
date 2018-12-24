@@ -24,6 +24,14 @@
 \
 Send /help to get started."
 
+  ;; Third-party API keys
+  ; The Cat API (thecatapi.com) (optional)
+  :thecatapi_key nil
+  ; Biblia (bibliaapi.com) (mandatory)
+  :biblia_api_key nil
+  ; NASA APOD (api.nasa.gov) (optional)
+  :nasa_api_key "DEMO_KEY"
+
   :paged_lists {
     :page_length 8
     :list_duration 900
@@ -159,6 +167,7 @@ Send /help to get started."
           :user.slap
           :user.user_lookup
           :user.whoami
+          :user.wikipedia
           :user.xkcd
           :user.reactions
         ]
