@@ -26,7 +26,7 @@ Send /help to get started."
 
   ;; Third-party API keys
   ; The Cat API (thecatapi.com) (optional)
-  :thecatapi_key nil
+  :cat_api_key nil
   ; Biblia (bibliaapi.com) (mandatory)
   :biblia_api_key nil
   ; NASA APOD (api.nasa.gov) (optional)
