@@ -26,7 +26,7 @@ function calc:action(msg)
         return
     end
 
-    local url = 'https://api.mathjs.org/v1/?expr=' .. URL.escape(input)
+    local url = 'https://api.mathjs.org/v4/?expr=' .. URL.escape(input)
     local output = HTTPS.request(url)
     output = output and '`'..output..'`' or self.config.errors.connection
     utilities.send_reply(msg, output, true)
