@@ -21,7 +21,7 @@
 
   :action (fn [self bot msg]
     (local (jstr code) (https.request self.url))
-    (if (code ~= 200)
+    (if (~= code 200)
       (do (utilities.send_reply msg bot.config.errors.connection) nil)
       (let [data (json.decode jstr)
             output (f-str "<b>Cat Fact</b>\n<i>{}</i>" (utilities.html_escape data.fact))]
