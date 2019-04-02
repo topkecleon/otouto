@@ -6,16 +6,16 @@
 
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
+local bindings = require('otouto.bindings')
 
 local P = {}
 
 function P:init(bot)
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, self.name .. ' requires flags')
-    local flag = 'antisquigpp'
-    self.flag = flag
-    flags_plugin.flags[flag] =
-        'Arabic script is not allowed in names.'
+    self.flag_desc = 'Arabic script is not allowed in names.'
+    self.flag = 'antisquigpp'
+    flags_plugin.flags[self.flag] = self.flag_desc
     self.triggers = {''}
     self.administration = true
 end
@@ -28,7 +28,23 @@ function P:action(bot, msg, group, user)
         name:match(utilities.char.rtl_override) or
         name:match(utilities.char.rtl_mark)
     then
-        autils.strike(bot, msg, self.flag)
+        bindings.deleteMessage{
+            chat_id = msg.chat.id,
+            message_id = msg.message_id
+        }
+
+        local success, result = bindings.kickChatMember{
+            chat_id = msg.chat.id,
+            user_id = msg.from.id
+        }
+
+        autils.log(bot, {
+            source = self.flag,
+            reason = self.flag_desc,
+            target = msg.from.id,
+            chat_id = msg.chat.id,
+            action = success and 'Kicked' or result.description
+        })
     else
         return 'continue'
     end
