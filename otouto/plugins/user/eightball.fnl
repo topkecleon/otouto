@@ -16,7 +16,7 @@
    (values))
 
   :action
-  (fn [self msg]
+  (fn [self _ msg]
     (utilities.send_reply
       msg
       (and-or (: msg.text_lower :match "y/n%p?$")
