@@ -11,7 +11,7 @@
 
 {
   :init (fn [self bot]
-    (set self.url "https://api.mathjs.org/v1/?expr=")
+    (set self.url "https://api.mathjs.org/v4/?expr=")
 
     (set self.command "calc <expression>")
     (set self.doc "Returns solutions to mathematical expressions and \z
@@ -23,7 +23,7 @@
     (local input (utilities.input_from_msg msg))
     (if (not input)
       (do (utilities.send_plugin_help msg.chat.id msg.message_id bot.config.cmd_pat self) nil)
-      (let [(data res) (.. (https.request (.. url (url.escape input))))
+      (let [(data res) (.. (https.request (.. self.url (url.escape input))))
             output (and-or data
                            (f-str "<code>{}</code>" (utilities.html_escape data))
                            bot.config.errors.connection)]
