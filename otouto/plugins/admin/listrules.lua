@@ -28,7 +28,7 @@ function P:action(_bot, msg, group)
         output = '<b>Rules for ' ..utilities.html_escape(msg.chat.title).. ':</b>\n'
             .. table.concat(self.rule_list(admin.rules), '\n')
     end
-    utilities.send_reply(msg, output, 'html')
+    utilities.send_reply(msg.reply_to_message or msg, output, 'html')
 end
 
 function P.rule_list(rules)
