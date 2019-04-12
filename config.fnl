@@ -25,12 +25,14 @@
 Send /help to get started."
 
   ;; Third-party API keys
-  ; The Cat API (thecatapi.com) (optional)
+  ; The Cat API (thecatapi.com) (optional for cats)
   :cat_api_key nil
-  ; Biblia (bibliaapi.com) (mandatory)
+  ; Biblia (bibliaapi.com) (mandatory for bible)
   :biblia_api_key nil
-  ; NASA APOD (api.nasa.gov) (optional)
+  ; NASA APOD (api.nasa.gov) (optional for apod)
   :nasa_api_key "DEMO_KEY"
+  :google (mandatory for google_translate)
+  :google_api_key nil
 
   :paged_lists {
     :page_length 8
