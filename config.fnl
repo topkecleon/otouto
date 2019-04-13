@@ -164,6 +164,7 @@ Send /help to get started."
           :user.dilbert
           :user.echo
           :user.eightball
+          :user.fullwidth
           :user.google_translate
           :user.hexcolor
           :user.maybe
