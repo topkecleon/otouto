@@ -22,10 +22,8 @@ function tl:init(bot)
 
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('g?translate', true):t('g?tl', true).table
-    self.command = 'gtranslate <text>'
-    self.doc = bot.config.cmd_pat .. [[translate [lang]
-    <text>
-]] .. bot.config.cmd_pat .. [[translate [lang] (in reply)
+    self.command = 'translate <text>'
+    self.doc = bot.config.cmd_pat .. [[translate [lang] (in reply)
 Translates input or the replied-to message into the bot's default language.
 In non-reply commands, $text follows a line break after the command and language code.
 Translation service provided by Google.
