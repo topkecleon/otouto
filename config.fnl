@@ -171,6 +171,7 @@ Send /help to get started."
           :user.regex
           :user.reminders
           :user.slap
+          :user.shout
           :user.user_lookup
           :user.whoami
           :user.wikipedia
