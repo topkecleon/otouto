@@ -159,10 +159,13 @@ Send /help to get started."
           :user.calc
           :user.catfact
           :user.cats
+          :user.currency
           :user.dice
           :user.dilbert
           :user.echo
           :user.eightball
+          :user.google_translate
+          :user.hexcolor
           :user.maybe
           :user.regex
           :user.reminders
