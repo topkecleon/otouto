@@ -37,6 +37,8 @@ function p:action(bot, msg)
                 data.rates[to_cur:upper()],
                 data.date
             )
+        elseif response then
+            output = json.decode(response).error
         else
             output = bot.config.errors.connection
         end
