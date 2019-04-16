@@ -39,7 +39,7 @@ function P:init(bot)
     self.default = bot.config.paged_lists
 
     -- somewhat consistent message width, kinda gross, really sorry
-    self.blank = string.rep('⠀', 39)
+    self.blank = string.rep(utilities.char.braille_space, 39)
 
     -- P.action will let local admins with can_change_info configure the length
     -- of pages, duration of lists, and whether or not lists will be sent
