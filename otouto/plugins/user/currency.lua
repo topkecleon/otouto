@@ -45,7 +45,7 @@ function p:action(bot, msg)
     else
         output = self.doc
     end
-    print(require('serpent').block({utilities.send_reply(msg, output, 'html')}))
+    utilities.send_reply(msg, output, 'html')
 end
 
 return p
