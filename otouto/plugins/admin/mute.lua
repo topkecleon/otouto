@@ -4,6 +4,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
+local anise = require('anise')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
@@ -30,7 +31,7 @@ end
 function P:action(bot, msg, _group, _user)
     local targets, output, reason, duration =
         autils.targets(bot, msg, {get_duration = true})
-    local muted_users = utilities.new_set()
+    local muted_users = anise.set()
 
     -- Durations shorter than 30 seconds and longer than a leap year are
     -- interpreted as "forever" by the bot API.
@@ -50,7 +51,7 @@ function P:action(bot, msg, _group, _user)
         log_str = 'Muted'
     end
 
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
 
         if autils.rank(bot, target, msg.chat.id) >= 2 then
@@ -64,7 +65,7 @@ function P:action(bot, msg, _group, _user)
             }
             if success then
                 table.insert(output, name .. out_str)
-                muted_users:add(target)
+                muted_users:add(target, reason or true)
             else
                 table.insert(output, result.description .. ' (' ..target.. ')')
             end

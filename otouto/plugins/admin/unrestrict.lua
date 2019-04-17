@@ -26,7 +26,7 @@ end
 
 function P:action(bot, msg, group)
     local targets, output = autils.targets(bot, msg)
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
         bindings.restrictChatMember{
             chat_id = msg.chat.id,

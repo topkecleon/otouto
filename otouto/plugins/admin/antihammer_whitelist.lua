@@ -25,7 +25,7 @@ function P:action(bot, msg, group)
     local admin = group.data.admin
 
     if #targets > 0 or #output > 0 then
-        for target in pairs(targets) do
+        for target, _ in pairs(targets) do
             local name = utilities.lookup_name(bot, target)
             if admin.antihammer[target] then
                 admin.antihammer[target] = nil

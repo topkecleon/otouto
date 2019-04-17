@@ -21,7 +21,7 @@ end
 
 function P:action(bot, msg)
     local targets, output = autils.targets(bot, msg, {self_targeting = true})
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local rank = autils.rank(bot, target, msg.chat.id)
         local name = utilities.lookup_name(bot, target)
         local suc, res

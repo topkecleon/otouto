@@ -27,7 +27,7 @@ removes a group's link from the public list and makes it only available to \z
 moderators and greater."
     if anise.dict_len(bot.config.administration.flags) > 0 then
         self.doc = self.doc .. "\nThe following flags are enabled by default:"
-        for flag in pairs(bot.config.administration.flags) do
+        for flag, _ in pairs(bot.config.administration.flags) do
             self.doc = self.doc .. '\n• ' .. flag
         end
     end

@@ -4,6 +4,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
+local anise = require('anise')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
@@ -26,9 +27,9 @@ end
 
 function P:action(bot, msg, _group, _user)
     local targets, output, reason = autils.targets(bot, msg)
-    local kicked_users = utilities.new_set()
+    local kicked_users = anise.set()
 
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
         if autils.rank(bot, target, msg.chat.id) >= 2 then
             table.insert(output, name .. ' is too privileged to be kicked.')
@@ -41,7 +42,7 @@ function P:action(bot, msg, _group, _user)
             }
             if success then
                 table.insert(output, name .. ' has been kicked.')
-                kicked_users:add(target)
+                kicked_users:add(target, reason or true)
             else
                 table.insert(output, 'Error kicking ' .. name .. ': ' ..
                     result.description)
