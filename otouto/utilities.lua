@@ -6,6 +6,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
+local anise = require('anise')
 local http = require('socket.http')
 local https = require('ssl.https')
 -- Global http/s timeout.
@@ -110,90 +111,6 @@ function utilities.get_coords(input)
     end
 end
 
-utilities.data_table_meta = {
-    __index = function (self, key)
-        local data = rawget(self, "_data")
-        if data._parent then
-            local val = data[key]
-            return val and
-                setmetatable({_data = val, _key = rawget(self, "_key")}, getmetatable(self))
-        else
-            local val = data[key]
-            return val and val[rawget(self, "_key")]
-        end
-    end,
-    __newindex = function (self, key, value)
-        local data = rawget(self, "_data")
-        if data._parent then
-            error("Can't set non-terminal key " .. tostring(key) .. " in a data_table")
-            return
-        else
-            local t = data[key]
-            if t == nil then
-                t = {}
-                data[key] = t
-            end
-            t[rawget(self, "_key")] = value
-            return
-        end
-    end,
-    __pairs = function (self)
-        local data = rawget(self, "_data")
-        if data._parent then
-            local selfmeta = getmetatable(self)
-            local function iter(table, index)
-                local new_index, val = next(table, index)
-                if new_index then
-                    return new_index, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
-                else
-                    return nil
-                end
-            end
-            return iter, data, nil
-        else
-            local function iter(table, index)
-                local new_index, val = next(table, index)
-                if new_index then
-                    return new_index, val[rawget(self, "_key")]
-                else
-                    return nil
-                end
-            end
-            return iter, data, nil
-        end
-    end,
-    __ipairs = function (self)
-        local data = rawget(self, "_data")
-        if data._parent then
-            local selfmeta = getmetatable(self)
-            local function iter(table, i)
-                i = i + 1
-                local val = table[i]
-                if val then
-                    return i, setmetatable({_data = val, _key = rawget(self, "_key")}, selfmeta)
-                else
-                    return nil
-                end
-            end
-            return iter, data, 0
-        else
-            local function iter(table, i)
-                i = i + 1
-                local val = table[i]
-                if val then
-                    return i, val[rawget(self, "_key")]
-                else
-                    return nil
-                end
-            end
-            return iter, data, nil
-        end
-    end,
-}
-function utilities.data_table(data, key)
-    return setmetatable({_data = data, _key = key}, utilities.data_table_meta)
-end
-
 utilities.user_meta = {
     rank = function(self, bot, chat_id)
         if self.data.info then
@@ -213,13 +130,13 @@ utilities.user_meta.__index = utilities.user_meta
 
 function utilities.user(bot, user_id)
     return setmetatable(
-        {data = utilities.data_table(bot.database.userdata, tostring(user_id))},
+        {data = anise.data_table(bot.database.userdata, tostring(user_id))},
         utilities.user_meta
     )
 end
 
 function utilities.group(bot, chat_id)
-    return {data = utilities.data_table(bot.database.groupdata, tostring(chat_id))}
+    return {data = anise.data_table(bot.database.groupdata, tostring(chat_id))}
 end
 
 -- Just an easy way to get a user's full name.
@@ -380,49 +297,6 @@ utilities.char = {
     invisible_separator = utf8.char(0x2063)
 }
 
-utilities.set_meta = {
-    add = function (self, x)
-        if x == "__count" then
-            return false
-        else
-            if not self[x] then
-                self[x] = true
-                self.__count = self.__count + 1
-            end
-            return true
-        end
-    end,
-    remove = function (self, x)
-        if x == "__count" then
-            return false
-        else
-            if self[x] then
-                self[x] = nil
-                self.__count = self.__count - 1
-            end
-            return true
-        end
-    end,
-    next = function(self, key)
-        local val
-        repeat key, val = next(self, key)
-            until val == nil or val == true
-        return key, val
-    end,
-    __len = function (self)
-        return self.__count
-    end,
-    __pairs = function(self)
-        return function(tab, key)
-            return tab:next(key)
-        end, self
-    end
-}
-utilities.set_meta.__index = utilities.set_meta
-function utilities.new_set()
-    return setmetatable({__count = 0}, utilities.set_meta)
-end
-
 -- Converts a gross string back into proper UTF-8.
 -- Useful for fixing improper encoding caused by bad json escaping.
 function utilities.fix_utf8(str)
@@ -484,7 +358,7 @@ end
 -- and return an array of their formatted names.
 function utilities.list_names(bot, ids)
     local t = {}
-    for id in pairs(ids) do
+    for id, _ in pairs(ids) do
         table.insert(t, utilities.lookup_name(bot, id))
     end
     return t

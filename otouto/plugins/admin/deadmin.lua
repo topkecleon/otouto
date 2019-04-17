@@ -20,11 +20,11 @@ end
 
 function P:action(bot, msg, _group, _user)
     local targets, output = autils.targets(bot, msg)
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local user = utilities.user(bot, target)
         if user.data.administrator then
             user.data.administrator = nil
-            for chat_id in pairs(bot.database.groupdata.admin) do
+            for chat_id, _ in pairs(bot.database.groupdata.admin) do
                 if user:rank(bot, chat_id) < 2 then
                     autils.demote_admin(chat_id, target)
                 end

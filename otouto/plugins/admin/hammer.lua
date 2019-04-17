@@ -4,6 +4,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
+local anise = require('anise')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
@@ -24,9 +25,9 @@ end
 
 function P:action(bot, msg, group)
     local targets, output, reason = autils.targets(bot, msg)
-    local hammered_users = utilities.new_set()
+    local hammered_users = anise.set()
 
-    for target in pairs(targets) do
+    for target, _ in pairs(targets) do
         local name = utilities.lookup_name(bot, target)
 
         if autils.rank(bot, target, msg.chat.id) >= 4 then
@@ -38,9 +39,9 @@ function P:action(bot, msg, group)
                 chat_id = msg.chat.id,
                 user_id = target
             } end
-            bot.database.userdata.hammered[target] = true
+            bot.database.userdata.hammered[target] = reason or true
             table.insert(output, name .. ' has been globally banned.')
-            hammered_users:add(target)
+            hammered_users:add(target, reason or true)
         end
     end
 

@@ -99,7 +99,7 @@ function P:action(bot, msg, group, user)
                 source = self.flag,
                 reason = self.flag_desc
             })
-            for chat_id_str in pairs(store.groups) do
+            for chat_id_str, _ in pairs(store.groups) do
                 bindings.kickChatMember{
                     chat_id = chat_id_str,
                     user_id = msg.from.id
