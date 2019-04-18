@@ -67,7 +67,7 @@ end
 function autils.targets(bot, msg, options)
     local input = utilities.input(msg.text)
     options = options or {}
-    local user_ids = utilities.new_set()
+    local user_ids = anise.set()
     local errors = {}
 
     -- Reply messages target the replied-to message's sender, or the added/
