@@ -13,7 +13,7 @@ local P = {}
 function P:init(bot)
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, self.name .. ' requires flags')
-    self.flag = 'files-only'
+    self.flag = 'files_only'
     self.flag_desc = 'Deletes photos and videos and reuploads them as files.'
     flags_plugin.flags[self.flag] = self.flag_desc
     self.triggers = {''}
