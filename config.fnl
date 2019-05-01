@@ -109,8 +109,8 @@ Send /help to get started."
           :admin.delete_left_messages
           :admin.delete_join_messages
           :admin.filterer
-          :admin.filesonly
-          :admin.nostickers
+          :admin.files_only
+          :admin.no_stickers
         ]
         core [
           :core.end_forwards
