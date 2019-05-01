@@ -39,6 +39,7 @@
                   (for [_ 1 count]
                     (set output (f-str "{output}{}\t" (math.random range))))
                   (set output (f-str "{output}</code>"))
-                  (utilities.send_message msg.chat.id output true msg.message_id true)
+                  (utilities.send_message msg.chat.id output true msg.message_id :html)
                   nil)))))))
 }
+
