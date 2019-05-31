@@ -373,10 +373,10 @@ end
 utilities.tiem = {
     order = { 'y', 'w', 'd', 'h', 'm', 's' },
     dict = {
-        y = 365.25 * 86400,
-        w = 7 * 86400,
-        d = 86400,
-        h = 3600,
+        y = 60 * 60 * 24 * 365.25,
+        w = 60 * 60 * 24 * 7,
+        d = 60 * 60 * 24,
+        h = 60 * 60,
         m = 60,
         s = 1
     },
@@ -394,8 +394,12 @@ utilities.tiem = {
             local v = utilities.tiem.dict[l]
             if seconds >= v then
                 local q, r = utilities.divmod(seconds, v)
-                table.insert(output, string.format('%s %s%s',
-                    q, utilities.tiem.pretty[l], q == 1 and '' or 's'))
+                table.insert(output, string.format(
+                    '%s %s%s',
+                    q,
+                    utilities.tiem.pretty[l],
+                    q == 1 and '' or 's'
+                ))
                 seconds = r
             end
         end
