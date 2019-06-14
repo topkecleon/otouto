@@ -59,6 +59,7 @@ capture <- ('\\' {[0-9]+}) -> '%%%1'\
 {
   :init (fn [self bot]
     (set self.command "s/<pattern>/<substitution>")
+    (set self.help_word :regex)
     (set self.doc "Replace all matches for the given pattern.\n\z
 Uses PCRE regexes.\n\z
 \n\z
