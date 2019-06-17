@@ -172,6 +172,7 @@ Send /help to get started."
           :user.reminders
           :user.slap
           :user.shout
+          :user.urban_dictionary
           :user.user_lookup
           :user.whoami
           :user.wikipedia
