@@ -19,9 +19,9 @@ local P = {}
 local three_hours = 60 * 60 * 3
 
 function P:init(bot)
-    self.command = 'ud [query]'
+    self.command = 'urbandictionary [query]'
     self.doc = string.format(
-        'Search the Urban Dictionary.\nAliases: %surbandictionary, %surban',
+        'Search the Urban Dictionary.\nAliases: %sud, %surban',
         bot.config.cmd_pat,
         bot.config.cmd_pat
     )
