@@ -125,11 +125,16 @@ function P:create_message(list, i)
     local linked_terms = anise.set()
     -- Iterate over bracketed terms in the definition.
     for term in entry.definition:gmatch('%[(.-)%]') do
-        linked_terms:add(term:lower())
+        -- Don't add a term if it's the same as the initial term.
+        if term:lower() ~= entry.word:lower() then
+            linked_terms:add(term:lower())
+        end
     end
     -- Iterate over bracketed terms in the example.
     for term in entry.example:gmatch('%[(.-)%]') do
-        linked_terms:add(term:lower())
+        if term:lower() ~= entry.word:lower() then
+            linked_terms:add(term:lower())
+        end
     end
 
     -- Initialize the keyboard.
