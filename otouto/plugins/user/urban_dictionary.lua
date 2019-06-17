@@ -19,8 +19,12 @@ local P = {}
 local three_hours = 60 * 60 * 3
 
 function P:init(bot)
---    self.command = 'ud [query]'
-    self.doc = 'Search the Urban Dictionary.'
+    self.command = 'ud [query]'
+    self.doc = string.format(
+        'Search the Urban Dictionary.\nAliases: %surbandictionary, %surban',
+        bot.config.cmd_pat,
+        bot.config.cmd_pat
+    )
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
         :t('ud', true)
         :t('urbandictionary', true)
