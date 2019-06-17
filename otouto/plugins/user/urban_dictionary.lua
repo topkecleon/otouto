@@ -16,8 +16,7 @@ local anise = require('extern.anise')
 
 local P = {}
 
-local six_hours = 60 * 60 * 6
-local day_in_seconds = six_hours * 4
+local three_hours = 60 * 60 * 3
 
 function P:init(bot)
 --    self.command = 'ud [query]'
@@ -32,9 +31,7 @@ function P:init(bot)
     self.cache = {}
 
     -- Schedule a job to clear expired cached lists.
-    -- Initial job will run 24 hours after initialization, but subsequent jobs
-    -- will run every 6 hours.
-    bot:do_later(self.name, os.time() + day_in_seconds)
+    bot:do_later(self.name, os.time() + three_hours)
 
     self.url = 'http://api.urbandictionary.com/v0/define?term='
 end
@@ -81,8 +78,8 @@ function P:later(bot)
             self.cache[term] = nil
         end
     end
-    -- Schedule another check in six hours.
-    bot:do_later(self.name, os.time() + six_hours)
+    -- Schedule another check in three hours.
+    bot:do_later(self.name, os.time() + three_hours)
 end
 
  -- Fetch a list of definitions from the Urban Dictionary API or the cache.
@@ -91,7 +88,7 @@ function P:fetch(escaped_term)
     -- If the term is cached, use that.
     if self.cache[escaped_term] then
         -- Reset the expiration date.
-        self.cache[escaped_term].expires = os.time() + day_in_seconds
+        self.cache[escaped_term].expires = os.time() + three_hours
         return self.cache[escaped_term].list
     else
         -- Otherwise, check the API.
@@ -101,7 +98,7 @@ function P:fetch(escaped_term)
 
             -- Cache the results.
             self.cache[escaped_term] = {
-                expires = os.time() + day_in_seconds,
+                expires = os.time() + three_hours,
                 list = data.list
             }
 
