@@ -98,7 +98,7 @@ Send /help to get started."
         ]
         admin-critical [
           :admin.flags
-          :admin.banremover
+          :admin.ban_remover
           :admin.autopromoter
         ]
         admin-filters [
@@ -124,33 +124,33 @@ Send /help to get started."
           :core.user_lists
         ]
         admin [
-          :admin.addadmin
-          :admin.addgroup
-          :admin.addmod
+          :admin.add_admin
+          :admin.add_group
+          :admin.add_mod
           :admin.antihammer_whitelist
           :admin.ban
           :admin.deadmin
           :admin.demod
           :admin.filter
-          :admin.fixperms
-          :admin.getdescription
-          :admin.getlink
+          :admin.fix_perms
+          :admin.get_description
+          :admin.get_link
           :admin.hammer
           :admin.interactive_flags
           :admin.kick
           :admin.kickme
-          :admin.listadmins
-          :admin.listflags
-          :admin.listgroups
-          :admin.listmods
-          :admin.listrules
+          :admin.list_admins
+          :admin.list_flags
+          :admin.list_groups
+          :admin.list_mods
+          :admin.list_rules
           :admin.mute
-          :admin.regenlink
-          :admin.removegroup
-          :admin.setdescription
-          :admin.setgovernor
-          :admin.setrules
-          :admin.tempban
+          :admin.regen_link
+          :admin.remove_group
+          :admin.set_description
+          :admin.set_governor
+          :admin.set_rules
+          :admin.temp_ban
           :admin.unhammer
           :admin.unrestrict
         ]
@@ -158,16 +158,16 @@ Send /help to get started."
           :user.apod
           :user.bible
           :user.calc
-          :user.catfact
+          :user.cat_fact
           :user.cats
           :user.currency
           :user.dice
           :user.dilbert
           :user.echo
-          :user.eightball
-          :user.fullwidth
+          :user.eight_ball
+          :user.full_width
           :user.google_translate
-          :user.hexcolor
+          :user.hex_color
           :user.maybe
           :user.regex
           :user.reminders

@@ -1,5 +1,5 @@
 --[[
-    regenlink.lua
+    regen_link.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -11,7 +11,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('regenlink').table
+        :t('regen_?link').table
     self.command = 'regenlink'
     self.doc = 'Regenerates the group link.'
     self.administration = true

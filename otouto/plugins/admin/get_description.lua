@@ -1,5 +1,5 @@
 --[[
-    getdescription.lua
+    get_description.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -62,7 +62,7 @@ function P.desc(bot, chat_id)
     -- Rules
     if #admin.rules > 0 then
         table.insert(output, '<b>Rules:</b>\n' .. table.concat(
-            bot.named_plugins['admin.listrules'].rule_list(admin.rules), '\n'))
+            bot.named_plugins['admin.list_rules'].rule_list(admin.rules), '\n'))
     end
 
     -- Flags

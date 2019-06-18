@@ -1,5 +1,5 @@
 --[[
-    addadmin.lua
+    add_admin.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -11,7 +11,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('admin', true):t('addadmin', true).table
+        :t('admin', true):t('add_?admin', true).table
     self.privilege = 5
     self.command = 'admin'
     self.doc = 'Promotes a user or users to administrator(s).'

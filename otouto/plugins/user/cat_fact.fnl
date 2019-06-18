@@ -1,4 +1,4 @@
-;; catfact.fnl
+;; cat_fact.fnl
 ;; Returns cat facts.
 
 ;; Based on a plugin by matthewhesketh.
@@ -16,7 +16,7 @@
 
     (set self.command "catfact")
     (set self.doc "Returns a cat fact from catfact.ninja.")
-    (set self.triggers (utilities.make_triggers bot [] [:catfact true]))
+    (set self.triggers (utilities.make_triggers bot [] ["cat_?fact"]))
     (values))
 
   :action (fn [self bot msg]

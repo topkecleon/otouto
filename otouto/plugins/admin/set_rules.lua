@@ -1,5 +1,5 @@
 --[[
-    setrules.lua
+    set_rules.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -10,8 +10,8 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('setrules?', true):t('changerules?', true)
-        :t('addrules?', true):t('delrules?', true).table
+        :t('set_?rules?', true):t('change_?rules?', true)
+        :t('add_?rules?', true):t('del_?rules?', true).table
     self.command = 'setrules <subcommand>'
     -- luacheck: push no max string line length
     self.doc = [[
@@ -55,19 +55,19 @@ function P:action(bot, msg, group)
 
     -- "/changerule ..." -> "/setrules change ..."
     local c = '^' .. bot.config.cmd_pat
-    if msg.text_lower:match(c..'changerule') then
+    if msg.text_lower:match(c..'change_?rule') then
         subc = 'change'
-        idx = msg.text_lower:match(c..'changerules?%s+(%d+)')
+        idx = msg.text_lower:match(c..'change_?rules?%s+(%d+)')
 
-    elseif msg.text_lower:match(c..'addrule') then
+    elseif msg.text_lower:match(c..'add_?rule') then
         subc = 'add'
-        idx = msg.text_lower:match(c..'addrules?%s+(%d+)')
+        idx = msg.text_lower:match(c..'add_?rules?%s+(%d+)')
 
-    elseif msg.text_lower:match(c..'delrule') then
+    elseif msg.text_lower:match(c..'del_?rule') then
         subc = 'del'
-        idx = msg.text_lower:match(c..'delrules?%s+(%d+)')
+        idx = msg.text_lower:match(c..'del_?rules?%s+(%d+)')
     else
-        subc, idx = msg.text_lower:match(c..'setrules?%s+(%a+)%s*(%d*)')
+        subc, idx = msg.text_lower:match(c..'set_?rules?%s+(%a+)%s*(%d*)')
     end
 
     local nrules = msg.text:match('^.-\n+(.+)$') or msg.reply_to_message and

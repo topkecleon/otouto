@@ -1,4 +1,4 @@
-; listflags.fnl
+; list_flags.fnl
 ; Copyright 2018 topkecleon <drew@otou.to>
 ; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
@@ -10,7 +10,7 @@
     (set self.command "listflags")
     (set self.doc "Returns a list of enabled and disabled flags. Governors and\z
  administrators can use /flags to configure them.")
-    (set self.triggers (utilities.make_triggers bot [] :listflags :flags))
+    (set self.triggers (utilities.make_triggers bot [] "list_?flags"))
     (set self.administration true)
     (values))
 

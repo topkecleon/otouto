@@ -1,5 +1,5 @@
 --[[
-    addmod.lua
+    add_mod.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -11,8 +11,8 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('mod', true):t('addmod', true):t('op', true).table
-    self.command = 'addmod'
+        :t('mod', true):t('add_?mod', true):t('op', true).table
+    self.command = 'mod'
     self.doc = 'Promotes a user to a moderator.'
     self.privilege = 3
     self.administration = true

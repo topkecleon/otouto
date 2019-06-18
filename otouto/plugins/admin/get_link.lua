@@ -1,5 +1,5 @@
 --[[
-    getlink.lua
+    get_link.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -10,7 +10,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('link').table
+        :t('link'):t('get_?link').table
     self.command = 'link'
     self.doc = "Returns the group link. If the group is private, \z
         only moderators may use this command and responses will be sent in private."

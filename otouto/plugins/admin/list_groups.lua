@@ -1,5 +1,5 @@
 --[[
-    listgroups.lua
+    list_groups.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -14,8 +14,8 @@ function P:init(bot)
     plists = bot.named_plugins['core.paged_lists']
     assert(plists, self.name .. ' requires core.paged_lists.')
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('groups?', true):t('listgroups', true).table
-    self.command = 'listgroups [query]'
+        :t('groups?', true):t('list_?groups', true).table
+    self.command = 'groups [query]'
     self.doc = "/groups [query]\
 Returns a list of all public, administrated groups, or the results of a query."
 end

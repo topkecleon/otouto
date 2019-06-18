@@ -1,5 +1,5 @@
 --[[
-    removegroup.lua
+    remove_group.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -10,7 +10,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('removegroup', true):t('remgroup').table
+        :t('remove_?group', true):t('rem_?group').table
     self.command = 'removegroup [chat ID]'
     self.doc = "/removegroup [chat ID]\
 Removes the current or specified group from the administrative system."

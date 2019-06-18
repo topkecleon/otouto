@@ -1,5 +1,5 @@
 --[[
-    listrules.lua
+    list_rules.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -10,7 +10,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('rules?', true):t('listrules').table
+        :t('rules?', true):t('list_?rules').table
     self.command = 'rules [i]'
     self.doc = 'Returns the list of rules, or the specified rule.'
     self.administration = true

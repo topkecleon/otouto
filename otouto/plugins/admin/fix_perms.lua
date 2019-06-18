@@ -1,5 +1,5 @@
 --[[
-    fixperms.lua
+    fix_perms.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -11,7 +11,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('fixperms', true).table
+        :t('fix_?perms', true).table
     self.command = 'fixperms'
     self.doc = 'Fixes local permissions for the user or specified target.'
     self.privilege = 2

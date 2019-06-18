@@ -1,4 +1,4 @@
-;; eightball.fnl
+;; eight_ball.fnl
 ;; Returns magic 8-ball like answers.
 
 ;; Copyright 2018 topkecleon <drew@otou.to>
@@ -6,7 +6,7 @@
 
 (require-macros :anise.macros)
 (require* otouto.utilities
-          (rename otouto.plugins.user.data.eightball data))
+          (rename otouto.plugins.user.data.eight_ball data))
 
 { :init
   (fn [self bot]

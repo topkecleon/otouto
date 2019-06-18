@@ -1,5 +1,5 @@
 --[[
-    hexcolor.lua
+    hex_color.lua
     Returns an image of the given color code in hexadecimal format.
 
     If colorhexa.com ever stops working for any reason, it would be simple to
@@ -29,7 +29,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('colou?r', true).table
+        :t('colou?r', true):t('hex', true).table
     self.command = 'color [ffffff]'
     self.doc = [[Returns an image of the given color code. Color codes must be in hexadecimal.
 Acceptable code formats:

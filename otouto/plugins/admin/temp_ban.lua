@@ -1,5 +1,5 @@
 --[[
-    tempban.lua
+    temp_ban.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -13,7 +13,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('tempban', true).table
+        :t('temp_?ban', true).table
     self.command = 'tempban'
     self.doc = "Bans a user or users. A duration must be given on a new line \z
 (or after the command in a reply). A reason can be given after that. The \z

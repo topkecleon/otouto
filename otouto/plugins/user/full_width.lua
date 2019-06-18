@@ -1,5 +1,5 @@
 --[[
-    fullwidth.lua
+    full_width.lua
     otouto plugin to convert Latin text to Latin full-width text.
 
     Copyright 2017 topkecleon <drew@otou.to>
@@ -12,7 +12,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('fullwidth', true).table
+        :t('full_?width', true).table
     self.command = 'fullwidth <text>'
     self.doc = 'Returns ａｅｓｔｈｅｔｉｃ text.'
 end

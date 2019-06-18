@@ -1,5 +1,5 @@
 --[[
-    setdescription.lua
+    set_description.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -10,7 +10,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('setdescription', true):t('setdesc', true).table
+        :t('set_?description', true):t('set_?desc', true).table
     self.command = 'setdesc <text>'
     self.doc = 'Set a group description. Passing "--" will delete the current one.'
     self.privilege = 3

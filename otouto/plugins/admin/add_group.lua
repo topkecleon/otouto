@@ -1,5 +1,5 @@
 --[[
-    addgroup.lua
+    add_group.lua
     Copyright 2018 topkecleon <drew@otou.to>
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
@@ -13,7 +13,7 @@ local P = {}
 
 function P:init(bot)
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('addgroup').table
+        :t('add_?group').table
     self.command = 'addgroup'
     self.doc = 'Adds the current supergroup to the administrative system.'
 
