@@ -7,7 +7,7 @@
 
 (require-macros :anise.macros)
 (require* anise
-          otouto.bindings
+          extern.bindings
           otouto.utilities)
 
 {

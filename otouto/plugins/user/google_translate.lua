@@ -16,21 +16,23 @@ local utilities = require('otouto.utilities')
 
 local tl = {}
 
-function tl:init(bot)
-    assert(bot.config.google_api_key,
-        'google_translate.lua requires a Google API key.')
-
-    self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('g?translate', true):t('g?tl', true).table
-    self.command = 'translate <text>'
-    self.doc = bot.config.cmd_pat .. [[translate [lang] (in reply)
-Translates input or the replied-to message into the bot's default language.
-In non-reply commands, $text follows a line break after the command and language code.
-Translation service provided by Google.
-Aliases: /gtranslate, /tl, /gtl.]]
- -- "gtl" = "good translate"
-    self.url = 'https://translation.googleapis.com/language/translate/v2?key=' ..
-        bot.config.google_api_key .. '&format=text&target=%s&q=%s'
+function tl:init(bot)    
+    if not bot.config.google_api_key then
+        io.write("Missing config value: google_api_key.\n\z
+            \tuser.google_translate will not work without a Google API key.\n")
+    else
+        self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
+            :t('g?translate', true):t('g?tl', true).table
+        self.command = 'translate <text>'
+        self.doc = bot.config.cmd_pat .. [[translate [lang] (in reply)
+    Translates input or the replied-to message into the bot's default language.
+    In non-reply commands, $text follows a line break after the command and language code.
+    Translation service provided by Google.
+    Aliases: /gtranslate, /tl, /gtl.]]
+    -- "gtl" = "good translate"
+        self.url = 'https://translation.googleapis.com/language/translate/v2?key=' ..
+            bot.config.google_api_key .. '&format=text&target=%s&q=%s'
+    end
 end
 
 function tl:action(bot, msg)

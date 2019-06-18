@@ -6,7 +6,7 @@
 
 (require-macros :anise.macros)
 (require* socket.http
-          otouto.bindings
+          extern.bindings
           otouto.utilities)
 
 { :init

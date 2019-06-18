@@ -5,7 +5,7 @@
 (require-macros :anise.macros)
 (require* (rename dkjson json)
   ssl.https
-  otouto.bindings
+  extern.bindings
   otouto.utilities)
 
 {

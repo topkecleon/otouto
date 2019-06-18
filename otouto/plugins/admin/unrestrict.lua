@@ -4,7 +4,7 @@
     This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
 
-local bindings = require('otouto.bindings')
+local bindings = require('extern.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
 

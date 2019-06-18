@@ -5,7 +5,7 @@
 (require-macros :anise.macros)
 (require* ssl.https
   socket.url
-  otouto.bindings
+  extern.bindings
   otouto.utilities)
 
 {

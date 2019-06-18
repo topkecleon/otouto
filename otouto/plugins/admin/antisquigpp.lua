@@ -6,7 +6,7 @@
 
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
-local bindings = require('otouto.bindings')
+local bindings = require('extern.bindings')
 
 local P = {}
 

@@ -7,7 +7,7 @@
 ; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
 (require-macros :anise.macros)
-(require* otouto.bindings)
+(require* extern.bindings)
 
 {
   :init (fn [_ bot] (set? bot.database.groupdata.whitelisted {}))

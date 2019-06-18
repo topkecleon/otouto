@@ -10,7 +10,7 @@ local json = require('dkjson')
 local url = require('socket.url')
 local https = require('ssl.https')
 
-local bindings = require('otouto.bindings')
+local bindings = require('extern.bindings')
 local utilities = require('otouto.utilities')
 local anise = require('extern.anise')
 

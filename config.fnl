@@ -156,7 +156,7 @@ Send /help to get started."
         ]
         user [
           :user.apod
-          :user.bible
+          ;:user.bible
           :user.calc
           :user.cat_fact
           :user.cats
@@ -166,7 +166,7 @@ Send /help to get started."
           :user.echo
           :user.eight_ball
           :user.full_width
-          :user.google_translate
+          ;:user.google_translate
           :user.hex_color
           :user.maybe
           :user.regex
@@ -184,10 +184,10 @@ Send /help to get started."
 
     (anise.concat
       core-critical
-      admin-critical
-      admin-filters
+      ;admin-critical
+      ;admin-filters
       core
-      admin
+      ;admin
       user
     ))
 

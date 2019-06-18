@@ -5,7 +5,7 @@
 ]]--
 
 local anise = require('anise')
-local bindings = require('otouto.bindings')
+local bindings = require('extern.bindings')
 local utilities = require('otouto.utilities')
 local autils = require('otouto.autils')
 

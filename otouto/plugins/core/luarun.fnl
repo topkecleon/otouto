@@ -22,7 +22,7 @@
 (require-macros :anise.macros)\
 (require* anise\
           otouto.autils\
-          otouto.bindings\
+          extern.bindings\
           otouto.utilities\
           fennel\
           fennelview\
@@ -35,7 +35,7 @@
   :lua_preamble "\z
 local anise = require('anise')\
 local autils = require('otouto.autils')\
-local bindings = require('otouto.bindings')\
+local bindings = require('extern.bindings')\
 local utilities = require('otouto.utilities')\
 local fennel = require('fennel')\
 local fennelview = require('fennelview')\

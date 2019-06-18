@@ -72,7 +72,7 @@ function control:action(bot, msg)
                 package.loaded[pac] = nil
             end
         end
-        package.loaded['otouto.bindings'] = nil
+        package.loaded['extern.bindings'] = nil
         package.loaded['otouto.utilities'] = nil
         package.loaded['anise'] = nil
         package.loaded['otouto.autils'] = nil

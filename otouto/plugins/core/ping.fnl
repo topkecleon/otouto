@@ -6,7 +6,7 @@
 
 (require-macros :anise.macros)
 (require* socket
-          otouto.bindings
+          extern.bindings
           otouto.utilities)
 
 {

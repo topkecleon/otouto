@@ -1,7 +1,7 @@
 ;; delete_messages.fnl
 ;; Provides a "later" job to delete messages.
 
-(local bindings (require "otouto.bindings"))
+(local bindings (require "extern.bindings"))
 
 {
   :later (fn [_self _bot param]

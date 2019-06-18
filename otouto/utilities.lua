@@ -18,7 +18,7 @@ local url = require('socket.url')
 -- If no built-in utf8 is available, load the library.
 local utf8 = utf8 or require('lua-utf8')
 
-local bindings = require('otouto.bindings')
+local bindings = require('extern.bindings')
 
 local utilities = {}
 
