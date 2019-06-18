@@ -14,7 +14,7 @@ function P:init(bot)
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, self.name .. ' requires flags')
     self.flag = 'no_stickers'
-    self.flag_desc = 'Stickers are filtered. These deletions are not logged.'
+    self.flag_desc = 'Stickers are filtered.'
     flags_plugin.flags[self.flag] = self.flag_desc
     self.triggers = {'^$'}
     self.administration = true
