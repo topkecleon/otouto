@@ -136,6 +136,7 @@ Send /help to get started."
           :admin.getdescription
           :admin.getlink
           :admin.hammer
+          :admin.interactive_flags
           :admin.kick
           :admin.kickme
           :admin.listadmins
