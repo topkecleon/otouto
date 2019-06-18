@@ -13,7 +13,7 @@ local P = {}
 function P:init(bot)
     local flags_plugin = bot.named_plugins['admin.flags']
     assert(flags_plugin, self.name .. ' requires flags')
-    self.flag = 'no_stickers'
+    self.flag = 'antisticker'
     self.flag_desc = 'Stickers are filtered.'
     flags_plugin.flags[self.flag] = self.flag_desc
     self.triggers = {'^$'}
@@ -28,7 +28,7 @@ function P:action(bot, msg, group)
             chat_id = msg.chat.id
         }
 
-        if msg.date >= (admin.last_nosticker_msg or -3600) + 3600 then -- 1h
+        if msg.date >= (admin.last_antisticker_msg or -3600) + 3600 then -- 1h
             local success, result =
                 utilities.send_message(msg.chat.id, 'Stickers are filtered.')
             if success then
@@ -36,7 +36,7 @@ function P:action(bot, msg, group)
                     chat_id = msg.chat.id,
                     message_id = result.result.message_id
                 })
-                admin.last_nosticker_msg = result.result.date
+                admin.last_antisticker_msg = result.result.date
             end
         end
 

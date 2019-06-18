@@ -106,11 +106,11 @@ Send /help to get started."
           :admin.antilink
           :admin.antisquigpp
           :admin.antisquig
+          :admin.antisticker
           :admin.delete_left_messages
           :admin.delete_join_messages
           :admin.filterer
           :admin.files_only
-          :admin.no_stickers
         ]
         core [
           :core.end_forwards
