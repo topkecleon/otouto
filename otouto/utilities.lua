@@ -314,15 +314,27 @@ function utilities.normalize_id(id)
 end
 
 -- returns "<b>$fullname</b> <code>[$id]</code> ($username)"
+-- Username will not mention or be linkified.
 function utilities.format_name(user) -- or chat
-    return (string.format(
-        '%s <code>[%s]</code>%s',
+    local s = string.format(
+        '%s <code>[%s]</code>',
         utilities.html_escape(
             user.title or utilities.build_name(user.first_name, user.last_name)
         ),
-        utilities.normalize_id(user.id),
-        user.username and ' <i>@' .. user.username .. '</i>' or ''
-    ):gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, ''))
+        utilities.normalize_id(user.id)
+    )
+
+    if user.username then
+        s = s .. string.format(
+            ' <i>@%s%s</i>',
+            utilities.char.zwnj,
+            user.username
+        )
+    end
+
+    s = s:gsub(utilities.char.rtl_override, ''):gsub(utilities.char.rtl_mark, '')
+
+    return s
 end
 
  -- For names without formatting, in captions and the console etc.
