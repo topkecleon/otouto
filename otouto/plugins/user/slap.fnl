@@ -16,14 +16,15 @@
     (values))
 
   :get_name (fn [bot user]
-    (local id_str (tostring user.id))
-    (local nick bot.database.userdata.nick)
-    (if nick[id_str]
-        nick[id_str]
-        user.last_name
-        (f-str "{user.first_name} {user.last_name}")
-        ; else
-        user.first_name))
+    (local uis (tostring user.id))
+    (local nicks bot.database.userdata.nick)
+    (if (. nicks uis)
+      (. nicks uis)
+      ; elseif user.last_name
+      user.last_name
+      (f-str "{user.first_name} {user.last_name}")
+      ; else
+      user.first_name))
 
   :action (fn [self bot msg]
     (local victor (self.get_name bot msg.from))
