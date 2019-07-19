@@ -337,7 +337,7 @@ function utilities.format_name(user) -- or chat
     return s
 end
 
- -- For names without formatting, in captions and the console etc.
+-- For names without formatting, in captions and the console etc.
 function utilities.print_name(user)
     return (string.format(
         '%s [%s]%s',

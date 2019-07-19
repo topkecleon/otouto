@@ -21,14 +21,20 @@ local three_hours = 60 * 60 * 3
 function P:init(bot)
     self.command = 'urbandictionary [query]'
     self.doc = string.format(
-        'Search the Urban Dictionary.\nAliases: %sud, %surban',
+        'Search the Urban Dictionary.\nAliases: %sud, %surban\n\zBy default, \z
+        results include an inline keyboard for paging and related terms. Use \z
+        %sud1 for only paging buttons. Use %sud0 for no keyboard.',
+        bot.config.cmd_pat,
+        bot.config.cmd_pat,
         bot.config.cmd_pat,
         bot.config.cmd_pat
     )
     self.triggers = utilities.triggers(bot.info.username, bot.config.cmd_pat)
-        :t('ud', true)
+        :t('ud%d?', true)
         :t('urbandictionary', true)
         :t('urban', true).table
+
+    self.kb_level_pattern = '^' .. bot.config.cmd_pat .. 'ud(%d)'
 
     -- Cache to store definition lists.
     -- Should provide a noticeable speed benefit for paging.
@@ -46,7 +52,8 @@ function P:action(bot, msg)
         local list = self:fetch(url.escape(query))
         if list ~= false then
             if #list > 0 then
-                local message = self:create_message(list, 1)
+                local kb_level = tonumber(msg.text:lower():match(self.kb_level_pattern) or 2)
+                local message = self:create_message(list, 1, kb_level)
                 message.chat_id = msg.chat.id
                 message.reply_to_message_id = msg.message_id
                 bindings.sendMessage(message)
@@ -63,10 +70,11 @@ end
 
 function P:callback_action(_, query)
     local escaped_term = utilities.get_word(query.data, 2)
-    local def_num = tonumber(utilities.get_word(query.data, 3) or 1)
+    local def_num = tonumber(utilities.get_word(query.data, 3))
+    local kb_level = tonumber(utilities.get_word(query.data, 4))
 
     local new_list = P:fetch(escaped_term)
-    local new_message = self:create_message(new_list, def_num)
+    local new_message = self:create_message(new_list, def_num, kb_level)
     new_message.chat_id = query.message.chat.id
     new_message.message_id = query.message.message_id
     new_message.parse_mode = 'html'
@@ -114,58 +122,83 @@ function P:fetch(escaped_term)
 end
 
  -- i is the index of the entry which should be display.
-function P:create_message(list, i)
+ -- kb_level: 0 is no keyboard. 1 is paging keyboard. 2 is full keyboard.
+ -- Paging keyboard provides arrows to navigate through several entries for
+ -- one term. Full keyboard provides arrows as well as keys for related terms
+ -- which are linked in the definition.
+function P:create_message(list, i, kb_level)
     local entry = list[i]
     local message = {
         parse_mode = 'html',
         disable_web_page_preview = true,
+        text = self.format_entry(list, i)
     }
 
-    -- Set for all terms appearing in the definition or example, which will be on buttons on the keyboard.
-    local linked_terms = anise.set()
-    -- Iterate over bracketed terms in the definition.
-    for term in entry.definition:gmatch('%[(.-)%]') do
-        -- Don't add a term if it's the same as the initial term.
-        if term:lower() ~= entry.word:lower() then
-            linked_terms:add(term:lower())
-        end
-    end
-    -- Iterate over bracketed terms in the example.
-    for term in entry.example:gmatch('%[(.-)%]') do
-        if term:lower() ~= entry.word:lower() then
-            linked_terms:add(term:lower())
-        end
-    end
+    if kb_level > 0 then
+        -- Initialize the keyboard.
+        local keyboard = utilities.keyboard('inline_keyboard')
 
-    -- Initialize the keyboard.
-    local keyboard = utilities.keyboard('inline_keyboard'):row()
+        -- Paging arrows if there is more than one entry for the term.
+        if #list > 1 then
+            local prev_entry_num = list[i - 1] and i - 1 or #list
+            local next_entry_num = list[i + 1] and i + 1 or 1
+            local escaped_term = url.escape(entry.word)
 
-    -- Paging arrows if there is more than one entry for the term.
-    if #list > 1 then
-        local prev_entry_num = list[i - 1] and i - 1 or #list
-        local next_entry_num = list[i + 1] and i + 1 or 1
-        local escaped_term = url.escape(entry.word)
-
-        keyboard:button('◀️', 'callback_data', self.name .. ' ' .. escaped_term .. ' ' .. prev_entry_num)
-            :button('▶️', 'callback_data', self.name .. ' ' .. escaped_term .. ' ' .. next_entry_num)
-            :row()
-    end
-
-    -- Populate with linked terms.
-    local j = 0
-    for term in pairs(linked_terms) do
-        keyboard:button(term, 'callback_data', self.name .. ' ' .. url.escape(term))
-        -- When there are three buttons in a row, a new row is started.
-        j = j + 1
-        if j % 3 == 0 then
             keyboard:row()
+            keyboard:button('◀️', 'callback_data', string.format(
+                '%s %s %s %s',
+                self.name,
+                escaped_term,
+                prev_entry_num,
+                kb_level
+            ))
+            keyboard:button('▶️', 'callback_data', string.format(
+                '%s %s %s %s',
+                self.name,
+                escaped_term,
+                next_entry_num,
+                kb_level
+            ))
         end
+
+        if kb_level > 1 then
+            -- Set for all terms appearing in the definition or example, which will be on buttons on the keyboard.
+            local linked_terms = anise.set()
+            -- Iterate over bracketed terms in the definition.
+            for term in entry.definition:gmatch('%[(.-)%]') do
+                -- Don't add a term if it's the same as the initial term.
+                if term:lower() ~= entry.word:lower() then
+                    linked_terms:add(term:lower())
+                end
+            end
+            -- Iterate over bracketed terms in the example.
+            for term in entry.example:gmatch('%[(.-)%]') do
+                if term:lower() ~= entry.word:lower() then
+                    linked_terms:add(term:lower())
+                end
+            end
+
+            -- Populate with linked terms.
+            local j = 0
+            for term in pairs(linked_terms) do
+                -- When there are three buttons in a row, a new row is started.
+                if j % 3 == 0 then
+                    keyboard:row()
+                end
+                keyboard:button(term, 'callback_data', string.format(
+                    '%s %s %s %s',
+                    self.name,
+                    url.escape(term),
+                    1,
+                    kb_level
+                ))
+                j = j + 1
+            end
+        end
+
+        -- Prep the functions
+        message.reply_markup = keyboard:serialize()
     end
-
-    -- Prep the functions
-    message.reply_markup = keyboard:serialize()
-
-    message.text = self.format_entry(list, i)
 
     return message
 end
