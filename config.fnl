@@ -197,6 +197,7 @@ Send /help to get started."
           :user.greetings
           :user.hex_color
           :user.maybe
+          :user.nickname
           :user.regex
           :user.reminders
           :user.slap
