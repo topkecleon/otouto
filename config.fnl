@@ -86,6 +86,33 @@ Send /help to get started."
     :facepalm "(－‸ლ)"
   }
 
+  :greetings {
+    "Hello, #NAME." {
+      "hello"
+      "hey"
+      "hi"
+      "good morning"
+      "good day"
+      "good afternoon"
+      "good evening"
+    }
+    "Goodbye, #NAME." {
+      "good%-?bye"
+      "bye"
+      "later"
+      "see ya"
+      "good night"
+    }
+    "Welcome back, #NAME." {
+      "i'm home"
+      "i'm back"
+    }
+    "You're welcome, #NAME." {
+      "thanks"
+      "thank you"
+    }
+  }
+
   ; To enable a plugin, add its name to the list.
   :plugins (let
       [
@@ -167,6 +194,7 @@ Send /help to get started."
           :user.eight_ball
           :user.full_width
           ;:user.google_translate
+          :user.greetings
           :user.hex_color
           :user.maybe
           :user.regex
