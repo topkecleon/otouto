@@ -149,6 +149,12 @@ function utilities.build_name(first, last)
     end
 end
 
+function utilities.get_nick(bot, user)
+    local nicks = bot.database.userdata.nickname
+    local uis = tostring(user.id)
+    return nicks[uis] or utilities.build_name(user.first_name, user.last_name)
+end
+
 function utilities.resolve_username(bot, input)
     input = input:gsub('^@', '')
     if not bot.database.userdata.info then return end

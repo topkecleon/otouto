@@ -1,7 +1,7 @@
 ;; slap.fnl
 ;; Allows users to slap someone.
 
-;; Copyright 2016 topkecleon <drew@otou.to>
+;; Copyright 2019 topkecleon <drew@otou.to>
 ;; This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 
 (require-macros :anise.macros)
@@ -15,35 +15,24 @@
     (set self.triggers (utilities.make_triggers bot [] [:slap true]))
     (values))
 
-  :get_name (fn [bot user]
-    (local uis (tostring user.id))
-    (local nicks bot.database.userdata.nick)
-    (if (. nicks uis)
-      (. nicks uis)
-      ; elseif user.last_name
-      user.last_name
-      (f-str "{user.first_name} {user.last_name}")
-      ; else
-      user.first_name))
-
   :action (fn [self bot msg]
-    (local victor (self.get_name bot msg.from))
+    (local victor (utilities.get_nick bot msg.from))
     (local input (utilities.input msg.text))
     (local users bot.database.userdata.info)
     (local victim (if msg.reply_to_message
-                      (self.get_name bot msg.reply_to_message.from)
+                      (utilities.get_nick bot msg.reply_to_message.from)
                       input
                       (if (= (: input :match "^@(.+)$") bot.info.username)
                           bot.info.first_name
                           (: input :match "^@.")
                           (let [user (utilities.resolve_username bot input)]
-                            (if user (self.get_name bot user) input))
+                            (if user (utilities.get_nick bot user) input))
                           (and (tonumber input) users users[input])
-                          (self.get_name bot users[input])
+                          (utilities.get_nick bot users[input])
                           ; else
                           input)
                       ; else
-                      (self.get_name bot msg.from)))
+                      (utilities.get_nick bot msg.from)))
     (local victor (if (= victor victim) bot.info.first_name victor))
 
     (let [victor (: victor :gsub "%%" "%%%%")
