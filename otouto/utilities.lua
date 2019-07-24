@@ -124,6 +124,12 @@ utilities.user_meta = {
             id = tonumber(self.data._key),
             first_name = 'Unknown'
         })
+    end,
+    display_name = function(self)
+        return utilities.build_name(
+            self.data.info.first_name,
+            self.data.info.last_name
+        )
     end
 }
 utilities.user_meta.__index = utilities.user_meta

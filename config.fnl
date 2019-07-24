@@ -31,8 +31,10 @@ Send /help to get started."
   :biblia_api_key nil
   ; NASA APOD (api.nasa.gov) (optional for apod)
   :nasa_api_key "DEMO_KEY"
-  ; google (mandatory for google_translate)
+  ; Google (mandatory for google_translate)
   :google_api_key nil
+  ; last.fm (mandatory for lastfm)
+  :lastfm_api_key nil
 
   :paged_lists {
     :page_length 8
@@ -196,6 +198,7 @@ Send /help to get started."
           ;:user.google_translate
           :user.greetings
           :user.hex_color
+          ;:user.lastfm
           :user.maybe
           :user.nickname
           :user.regex
