@@ -12,7 +12,7 @@ local utilities -- Miscellaneous and shared functions.
 local anise -- More utility functions.
 local autils -- Administration-related functions.
 
-bot.version = '3.16 admin'
+bot.version = '4.0'
 
  -- Function to be run on start and reload.
 function bot:init()
