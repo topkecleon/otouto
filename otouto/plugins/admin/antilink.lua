@@ -34,7 +34,8 @@ antilink can be enabled with /flag antilink (see /help flags)."
         'telegram.me',
         'telegram.dog',
         'tlgrm.me',
-        't.me'
+        't.me',
+        'telega.one'
     } do
         local s = ''
         -- We build the pattern character by character from the domains.
