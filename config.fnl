@@ -189,6 +189,7 @@ Send /help to get started."
           :user.calc
           :user.cat_fact
           :user.cats
+          :user.commit
           :user.currency
           :user.dice
           :user.dilbert
