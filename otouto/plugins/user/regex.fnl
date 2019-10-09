@@ -49,12 +49,13 @@ capture <- ('\\' {[0-9]+}) -> '%%%1'\
     (fn [] (< (* (math.random) 100) probability))
     ; else
     (do
-      (var matches_left n_matches)
+      (local matches_left n_matches)
       (fn []
+        (local tmp (and-or (< matches_left 0) 0 nil))
         (set matches_left (- matches_left 1))
         (values
           (< (* (math.random) 100) probability)
-          (and-or (< 0 matches_left) 0 nil))))))
+          tmp)))))
 
 {
   :init (fn [self bot]
@@ -69,10 +70,15 @@ Modifiers are [&lt;flags&gt;][#&lt;matches&gt;][%probability]:\n\z
   (all matches are replaced by default)\n\z
 * Probability is the percentage that a match will\n\z
   be replaced (100 by default)")
-  (set self.triggers [(.. bot.config.cmd_pat "?s/.-/.-$")])
-  (values))
+    (set self.triggers [(.. bot.config.cmd_pat "?s/.-/.-$")])
+    (local flags_plugin (. bot.named_plugins :admin.flags))
+    (set self.flag :regex_unwrapped)
+    (set self.flag_desc "Regex substitutions aren't prefixed.")
+    (when flags_plugin
+      (tset flags_plugin.flags self.flag self.flag_desc))
+    (values))
 
-  :action (fn [self bot msg]
+  :action (fn [self bot msg group]
     (if (not msg.reply_to_message)
       true
       (let [(patt repl flags n_matches probability) (process_text msg.text bot.config.cmd_pat)
@@ -93,7 +99,9 @@ Modifiers are [&lt;flags&gt;][#&lt;matches&gt;][%probability]:\n\z
                 nil
                 ; else
                 (let [output (anise.trim (: result :sub 1 4000))
-                      output (f-str "<b>Did you mean:</b>\n\"{}\"" (utilities.html_escape output))]
+                      output (utilities.html_escape output)]
+                  (when (not (and flags_plugin group.data.admin.flags[self.flag]))
+                    (set output (f-str "<b>Did you mean:</b>\n\"{}\"" output)))
                   (utilities.send_reply msg.reply_to_message output :html)
                   nil)))))))
 }
