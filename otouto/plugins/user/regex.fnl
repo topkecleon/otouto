@@ -49,7 +49,7 @@ capture <- ('\\' {[0-9]+}) -> '%%%1'\
     (fn [] (< (* (math.random) 100) probability))
     ; else
     (do
-      (local matches_left n_matches)
+      (var matches_left n_matches)
       (fn []
         (local tmp (and-or (< matches_left 0) 0 nil))
         (set matches_left (- matches_left 1))
@@ -98,8 +98,8 @@ Modifiers are [&lt;flags&gt;][#&lt;matches&gt;][%probability]:\n\z
                 (= n_matched 0)
                 nil
                 ; else
-                (let [output (anise.trim (: result :sub 1 4000))
-                      output (utilities.html_escape output)]
+                (do (var output (anise.trim (: result :sub 1 4000)))
+                  (set output (utilities.html_escape output))
                   (when (not (and flags_plugin group.data.admin.flags[self.flag]))
                     (set output (f-str "<b>Did you mean:</b>\n\"{}\"" output)))
                   (utilities.send_reply msg.reply_to_message output :html)
