@@ -50,6 +50,24 @@ function autils.rank(bot, user_id, chat_id)
     return 1
 end
 
+ -- If the reason matches "rule 3" or "r3" then it will be expanded to the
+ -- appropriate group rule.
+function autils.rule_from_reason(bot, text, chat_id)
+    if text:match('^rule%s*%d+$') or text:match('^r%s*%d+$') then
+        local rule_no = tonumber(text:match('%d+'))
+        local group = bot.database.groupdata.admin[tostring(chat_id)]
+        if group.rules[rule_no] then
+            return group.rules[rule_no]
+        else
+            return text
+        end
+    else
+        return text
+    end
+end
+
+ -- If the first "word" of a reason is a number or a valid tiem string, it
+ -- becomes the duration.
 function autils.duration_from_reason(text)
     local reason = text
     local duration
@@ -69,6 +87,7 @@ function autils.targets(bot, msg, options)
     options = options or {}
     local user_ids = anise.set()
     local errors = {}
+    local reason, duration
 
     -- Reply messages target the replied-to message's sender, or the added/
     -- removed user. The reason is always the text given after the command.
@@ -78,25 +97,15 @@ function autils.targets(bot, msg, options)
         or msg.reply_to_message.left_chat_member
         or msg.reply_to_message.from).id))
 
-        -- return user_ids, nil, autils.duration_from_reason(input) or input
-        -- would only return the first value from duration_from_reason.
-        if options.get_duration then
-            return user_ids, errors, autils.duration_from_reason(input)
-        else
-            return user_ids, errors, input
-        end
+        reason = input
 
     elseif input then
-        local reason, duration
         local text = msg.text
 
          -- The text following a newline is the reason. If the first word is a
          -- number or time string (eg 6h45m30s), it will be the duration.
         if text:match('\n') then
             text, reason = text:match('^(.-)\n+(.+)$')
-            if reason and options.get_duration then
-                reason, duration = autils.duration_from_reason(reason)
-            end
         end
 
         -- Iterate over entities for text mentions, add mentioned users to
@@ -144,15 +153,24 @@ function autils.targets(bot, msg, options)
             end
         end
 
-        return user_ids, errors, reason, duration
-
     elseif options.self_targeting then
         user_ids:add(tostring(msg.from.id))
-        return user_ids, errors
 
     else
-        return user_ids, { bot.config.errors.specify_targets }
+        errors = { bot.config.errors.specify_targets }
     end
+
+    if reason then
+        -- Get the duration from the reason, if applicable.
+        if options.get_duration then
+            reason, duration = autils.duration_from_reason(reason)
+        end
+
+        -- If the reason matches "rule n" or "rn" then expand it to that rule.
+        reason = autils.rule_from_reason(bot, reason, msg.chat.id)
+    end
+
+    return user_ids, errors, reason, duration
 end
 
  -- Returns true if action was taken.
