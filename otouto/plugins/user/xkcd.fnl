@@ -35,11 +35,14 @@
       ; Simple way to correct an out-of-date latest strip.
       (when (> strip.num bot.database.xkcd.num) (set bot.database.xkcd strip))
 
-      (bindings.sendMessage {
+      (bindings.sendPhoto {
         :chat_id msg.chat.id
         :parse_mode :html
-        :text (f-str
-          "<b>{}</b>\n<i>{}</i>\n<a href=\"{}\">[i]</a> https://xkcd.com/{}"
+        :photo strip.img
+        :caption (f-str "<b>{}</b>\n<i>{}</i>\nhttps://xkcd.com/{}"
           (utilities.html_escape (utilities.fix_utf8 strip.safe_title))
-          (utilities.html_escape strip.alt) strip.img strip.num)})))))
+          (utilities.html_escape strip.alt)
+          strip.num
+        )
+      })))))
 }
